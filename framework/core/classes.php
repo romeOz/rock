@@ -1,0 +1,506 @@
+<?php
+
+/**
+ * Container "Models"
+ */
+use apps\common\rbac\UserRole;
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Cache\Adapter;
+use rock\db\BatchQueryResult;
+use rock\file\FileManager;
+use rock\helpers\ArrayHelper;
+use rock\i18n\i18n;
+use rock\rbac\Permission;
+use rock\rbac\Role;
+use rock\Rock;
+use rock\security\Security;
+use rock\template\Template;
+use rock\validation\Validation;
+
+
+return array_merge(
+    [
+        'access' => [
+            'class' => \rock\access\Access::className(),
+            'singleton' => true
+        ],
+
+        // Database
+        'db' => [
+            'class' => \rock\db\Connection::className(),
+            'username' => 'root',
+            'password' => '123',
+            'charset' => 'utf8',
+            'dsn' => 'mysql:host=localhost;dbname=rockdemo;charset=utf8',
+            'tablePrefix' => 'spt_',
+            'aliasSeparator' => '__',
+        ],
+        'BatchQueryResult' => [
+            'class' => BatchQueryResult::className(),
+            //'singleton' => true,
+        ],
+        'cache' => [
+            'class' => \rock\cache\CacheFile::className(),
+            'singleton' => true,
+            'adapter' => function () {
+                    return Rock::factory(
+                        [
+                            'class' => FileManager::className(),
+                            'adapter' =>
+                                function () {
+                                    return new Local(Rock::getAlias('@common/runtime/cache'));
+                                },
+                            'config' => ['visibility' => FileManager::VISIBILITY_PRIVATE],
+                            'cache' => function () {
+                                    $local = new Local(Rock::getAlias('@common/runtime/filesystem'));
+                                    $cache = new Adapter($local, 'cache.tmp');
+
+                                    return $cache;
+                                }
+                        ]
+                    );
+                },
+            'enabled' => false,
+        ],
+        'template' => [
+            'class' => Template::className(),
+            'autoEscape' => Template::ESCAPE | Template::TO_TYPE,
+            'handlerLink' => function($link, Template $template)
+                {
+                    $class = $link[0];
+                    if (!class_exists($class)) {
+                        /** @var \rock\base\Controller $class */
+                        if (!$class = ArrayHelper::getValue((array)\rock\di\Container::get($class), ['class'])) {
+                            throw new \rock\template\Exception(\rock\template\Exception::CRITICAL, \rock\template\Exception::UNKNOWN_CLASS, ['class' => $link[0]]);
+                        }
+                    }
+
+                    //  Get url by context
+                    if (count($link) === 1) {
+                        /** @var \rock\url\Url $urlBuilder */
+                        $urlBuilder = Rock::factory($class::context(['url']), \rock\url\Url::className());
+                        return $template->autoEscape($urlBuilder->get());
+                    }
+                    // Get url by resource
+                    if (count($link) > 1) {
+                        /** @var \rock\url\Url $urlBuilder */
+                        $urlBuilder = Rock::factory($class::findUrlById($link[1]), \rock\url\Url::className());
+                        return $template->autoEscape($urlBuilder->get());
+                    }
+                    return '#';
+                },
+            'filters' => [
+                'size' => [
+                    'class' => \rock\template\filters\StringFilter::className(),
+                ],
+                'trimPattern' => [
+                    'class' => \rock\template\filters\StringFilter::className(),
+                ],
+                'contains' => [
+                    'class' => \rock\template\filters\StringFilter::className(),
+                ],
+                'truncate' => [
+                    'class' => \rock\template\filters\StringFilter::className(),
+                ],
+                'truncateWords' => [
+                    'class' => \rock\template\filters\StringFilter::className(),
+                ],
+                'upper' => [
+                    'class' => \rock\template\filters\StringFilter::className(),
+                ],
+                'lower' => [
+                    'class' => \rock\template\filters\StringFilter::className(),
+                ],
+                'upperFirst' => [
+                    'class' => \rock\template\filters\StringFilter::className(),
+                ],
+                'encode' => [
+                    'class' => \rock\template\filters\StringFilter::className(),
+                ],
+                'decode' => [
+                    'class' => \rock\template\filters\StringFilter::className(),
+                ],
+                'markdown' => [
+                    'class' => \rock\template\filters\StringFilter::className(),
+                ],
+                'paragraph' => [
+                    'class' => \rock\template\filters\StringFilter::className(),
+                ],
+                'isParity' => [
+                    'class' => \rock\template\filters\NumericFilter::className(),
+                ],
+                'positive' => [
+                    'class' => \rock\template\filters\NumericFilter::className(),
+                ],
+                'formula' => [
+                    'class' => \rock\template\filters\NumericFilter::className(),
+                ],
+                'unserialize' => [
+                    'class' => \rock\template\filters\BaseFilter::className(),
+                ],
+                'replaceTpl' => [
+                    'class' => \rock\template\filters\BaseFilter::className(),
+                ],
+                'modifyDate' => [
+                    'class' => \rock\template\filters\BaseFilter::className(),
+                ],
+                'date' => [
+                    'class' => \rock\template\filters\BaseFilter::className(),
+                ],
+                'modifyUrl' => [
+                    'class' => \rock\template\filters\BaseFilter::className(),
+                ],
+                'url' => [
+                    'method' => 'modifyUrl',
+                    'class' => \rock\template\filters\BaseFilter::className(),
+                ],
+                'arrayToJson' => [
+                    'class' => \rock\template\filters\BaseFilter::className(),
+                ],
+                'toJson' => [
+                    'method' => 'arrayToJson',
+                    'class' => \rock\template\filters\BaseFilter::className(),
+                ],
+                'jsonToArray' => [
+                    'method' => 'unserialize',
+                    'class' => \rock\template\filters\BaseFilter::className(),
+                ],
+                'toArray' => [
+                    'method' => 'unserialize',
+                    'class' => \rock\template\filters\BaseFilter::className(),
+                ],
+                'notEmpty' => [
+                    'class' => \rock\template\filters\ConditionFilter::className(),
+                ],
+                'empty' => [
+                    'method' => '_empty',
+                    'class' => \rock\template\filters\ConditionFilter::className(),
+
+                ],
+                'if' => [
+                    'method' => '_if',
+                    'class' => \rock\template\filters\ConditionFilter::className(),
+                ],
+                'thumb' => [
+                    'class' => \rock\template\filters\BaseFilter::className(),
+                ],
+            ],
+            'extensions' => [
+                'user' => function (array $keys) {
+                        if (current($keys) === 'isGuest') {
+                            return Rock::$app->user->isGuest();
+                        } elseif (in_array(current($keys), ['isLogin', 'isAuthenticated'], true)) {
+                            return !Rock::$app->user->isGuest();
+                        }
+                        return \rock\helpers\ArrayHelper::getValue(Rock::$app->user->getAll(), $keys);
+                    },
+                'call' => function (array $call, array $params = [], Template $template) {
+                        if (!isset($call[1])) {
+                            $call[1] = null;
+                        }
+                        list($class, $method) = $call;
+                        if ($class === 'context') {
+                            $object = $template->context;
+                            $function = [$object, $method];
+                        } elseif (function_exists($class) && !$class instanceof \Closure){
+                            return call_user_func_array($class, $params);
+                        } else {
+                            $object = Rock::factory(Rock::getAlias($class));
+                            if (!method_exists($object, $method)) {
+                                throw new \rock\exception\Exception(
+                                    \rock\exception\Exception::CRITICAL, \rock\exception\Exception::UNKNOWN_METHOD, ['method' => "{$class}::{$method}"]
+                                );
+                            }
+                            $function = [$object, $method];
+                        }
+
+                        return call_user_func_array($function, $params);
+                    },
+            ],
+            'title' => 'Demo',
+            'metaTags' => function(){
+                    return [
+                        '<meta charset="'.Rock::$app->charset.'" />',
+                    ];
+                },
+            'linkTags' => [
+                '<link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico?10">',
+            ],
+        ],
+
+        'eval' => [
+            'class' => \rock\execute\CacheExecute::className(),
+            'singleton' => true,
+        ],
+
+
+        'i18n' => [
+            'class' => \rock\i18n\i18n::className(),
+            'singleton' => true,
+            'pathsDicts' => [
+                i18n::RU => [
+                    '@common/lang/ru/lang.inc',
+                ],
+                i18n::EN => [
+                    '@common/lang/en/lang.inc',
+                ]
+            ]
+        ],
+        'date' => [
+            'class' => \rock\date\DateTime::className(),
+            'formats' => [
+                'mysql' => \rock\date\DateTime::ISO_DATETIME_FORMAT,
+                'dmy'   => function(\rock\date\DateTime $dateTime){
+                        $nowYear  = date('Y');
+                        $lastYear = $dateTime->format('Y');
+
+                        return $nowYear > $lastYear
+                            ? $dateTime->format('j F Y')
+                            : $dateTime->format('d F');
+                    },
+                'dmyhm' => function(\rock\date\DateTime $dateTime){
+                        $nowYear  = date('Y');
+                        $lastYear = $dateTime->format('Y');
+                        return $nowYear > $lastYear
+                            ? $dateTime->format('j F Y H:i')
+                            : $dateTime->format('j F H:i');
+                    },
+            ]
+        ],
+
+        'mail' => [
+            'class' => \rock\mail\Mail::className(),
+            'singleton' => true,
+            'From' => 'support@' . (new \rock\request\Request())->getHost(),
+            'FromName' => 'Rock Framework',
+        ],
+        'request' => [
+            'class' => \rock\request\Request::className(),
+            'singleton' => true,
+        ],
+        'requestCollection' => [
+            'class' => \rock\request\RequestCollection::className(),
+            'singleton' => true,
+        ],
+        'response' => [
+            'class' => \rock\response\Response::className(),
+            'singleton' => true,
+        ],
+        'htmlResponseFormatter' => [
+            'class' => \rock\response\HtmlResponseFormatter::className(),
+            'singleton' => true,
+        ],
+        'jsonResponseFormatter' => [
+            'class' => \rock\response\JsonResponseFormatter::className(),
+            'singleton' => true,
+        ],
+        'xmlResponseFormatter' => [
+            'class' => \rock\response\XmlResponseFormatter::className(),
+            'singleton' => true,
+        ],
+        'rssResponseFormatter' => [
+            'class' => \rock\response\RssResponseFormatter::className(),
+            'singleton' => true,
+        ],
+
+        'route' => [
+            'class' => \rock\route\Route::className(),
+            'singleton' => true,
+        ],
+
+        'sphinx' => [
+            'class' => \rock\sphinx\Connection::className(),
+            'singleton' => true,
+            'dsn' => 'mysql:host=127.0.0.1;port=9306;charset=utf8;',
+            'username' => '',
+            'password' => '',
+        ],
+        'session' => [
+            'class' => \rock\session\Session::className(),
+            'singleton' => true,
+            'cookieParams' => [
+                'httponly' => true,
+                'lifetime' => 60 * 60 * 24 * 60,
+                'setUseCookies' => \rock\session\Session::USE_ONLY_COOKIES
+            ],
+        ],
+        'cookie' => [
+            'class' => \rock\cookie\Cookie::className(),
+            'singleton' => true
+        ],
+
+        'dataImage' => [
+            'class' => \rock\image\DataProvider::className(),
+            'singleton' => true,
+            'adapterImage' => function () {
+                    return Rock::factory(
+                        [
+                            'class' => FileManager::className(),
+                            'adapter' =>
+                                function () {
+                                    return new Local(Rock::getAlias('@assets/images'));
+                                },
+                            'cache' => function () {
+                                    $local = new Local(Rock::getAlias('@common.runtime/filesystem'));
+                                    $cache = new Adapter($local, 'images.tmp');
+
+                                    return $cache;
+                                }
+                        ]
+                    );
+                },
+            'adapterCache' => function () {
+                    return Rock::factory(
+                        [
+                            'class' => FileManager::className(),
+                            'adapter' =>
+                                function () {
+                                    return new Local(Rock::getAlias('@assets/cache'));
+                                },
+                            'cache' => function () {
+                                    $local = new Local(Rock::getAlias('@common.runtime/filesystem'));
+                                    $cache = new Adapter($local, 'image_cache.tmp');
+
+                                    return $cache;
+                                }
+                        ]
+                    );
+                },
+        ],
+        'token' => [
+            'class' => \rock\token\Token::className(),
+            'singleton' => true,
+        ],
+        'url' => [
+            'class' => \rock\url\Url::className(),
+        ],
+        'validation' => [
+            'class' => \rock\validation\Validation::className(),
+            'singleton' => true,
+            'locale' => function (Validation $validation){ $validation::$locale = Rock::$app->language;}
+        ],
+        'captcha' => [
+            'class' => \rock\captcha\Captcha::className(),
+            'singleton' => true,
+            /**
+             * Captcha string length
+             */
+            'length' => 0,
+            /**
+             * Noise white
+             */
+            'whiteNoiseDensity' => 1 / 6,
+            /**
+             * Noise black
+             */
+            'blackNoiseDensity' => 1 / 30,
+        ],
+        'file' => [
+            'class' => \rock\file\FileManager::className(),
+        ],
+        'user' => [
+            'class' => \rock\user\User::className(),
+            'singleton' => true,
+            'container' => 'user',
+        ],
+
+        'activeData' => [
+            'class' => \rock\db\ActiveDataProvider::className(),
+            'singleton' => true,
+        ],
+        'di' => [
+            'class' => \rock\di\Container::className(),
+            'singleton' => true,
+        ],
+        'log' => [
+            'class' => \rock\log\Log::className(),
+            'singleton' => true,
+        ],
+
+        'behavior' => [
+            'class' => \rock\base\Behavior::className(),
+            'singleton' => true
+        ],
+        \rock\filters\AccessFilter::className() => [
+            'class' => \rock\filters\AccessFilter::className(),
+        ],
+        \rock\filters\EventFilter::className() => [
+            'class' => \rock\filters\EventFilter::className(),
+        ],
+        \rock\filters\SanitizeFilter::className() => [
+            'class' => \rock\filters\SanitizeFilter::className(),
+        ],
+        \rock\filters\ValidationFilters::className() => [
+            'class' => \rock\filters\ValidationFilters::className(),
+        ],
+        'rbac' =>[
+            'class' => \rock\rbac\DBManager::className(),
+            'singleton' => true,
+        ],
+        'markdown' =>[
+            'class' => \rock\markdown\Markdown::className(),
+            'handlerLinkByUsername' => function($username){
+                    return \apps\common\models\users\Users::findUrlByUsername($username);
+                }
+        ],
+        'uploadedFile' =>[
+            'class' => \rock\file\UploadedFile::className(),
+            'adapter' => function () {
+                    return Rock::factory(
+                        [
+                            'class' => FileManager::className(),
+                            'adapter' =>
+                                function () {
+                                    return new Local(Rock::getAlias('@assets/images'));
+                                },
+                            'cache' => function () {
+                                    $local = new Local(Rock::getAlias('@common.runtime/filesystem'));
+                                    $cache = new Adapter($local, 'images.tmp');
+
+                                    return $cache;
+                                }
+                        ]
+                    );
+                },
+            'calculatePathname' => function(\rock\file\UploadedFile $file, FileManager $fileManager) {
+                    $pathname = [];
+                    $num = floor(
+                        count(
+                            $fileManager
+                                ->listContents(
+                                    "~/^\\d+\//",
+                                    true,
+                                    FileManager::TYPE_FILE
+                                )
+                        ) / 500);
+
+                    if (isset($num)) {
+                        $pathname[] =$num;
+                    }
+
+                    $pathname[] = str_shuffle(md5_file($file->tempName));
+                    return implode(DS, $pathname) . '.' . $file->extension;
+                }
+        ],
+        'security' => [
+            'class' => Security::className(),
+            'singleton' => true,
+            'deriveKeyStrategy' => 'hmac', // for PHP version < 5.5.0
+            //'deriveKeyStrategy' => 'pbkdf2', // for PHP version >= 5.5.0
+        ],
+        Role::className() =>[
+            'class' => Role::className(),
+            'singleton' => true,
+        ],
+        Permission::className() =>[
+            'class' => Permission::className(),
+            'singleton' => true,
+        ],
+        UserRole::className() =>[
+            'class' => UserRole::className(),
+            'singleton' => true,
+        ],
+    ],
+    require(__DIR__ . '/widgets.php'),
+    require(__DIR__ . '/snippets.php')
+);

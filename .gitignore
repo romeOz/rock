@@ -1,0 +1,48 @@
+############
+## Project
+############
+
+tmp
+vendor
+backup
+composer.lock
+#./index.php
+*~
+www/assets/*
+!assets/.gitignore
+apps/*
+tests/runtime/*
+robots.txt
+composer.lock
+
+
+############
+## Phing
+############
+build.properties
+build.xml
+phing-latest.phar
+
+
+############
+## Windows
+############
+
+# Windows image file caches
+Thumbs.db
+
+# Folder config file
+Desktop.ini
+
+
+############
+## Vagrant
+############
+.vagrant/*
+
+
+############
+## PHPStorm
+############
+.idea/*
+

@@ -1,0 +1,17 @@
+<?php
+
+namespace rock\validation\exceptions;
+
+class ExistsException extends ValidationException
+{
+
+    public static $defaultTemplates = array(
+        self::MODE_DEFAULT => array(
+            self::STANDARD => '{{name}} must exists',
+        ),
+        self::MODE_NEGATIVE => array(
+            self::STANDARD => '{{name}} must not exists',
+        )
+    );
+
+}

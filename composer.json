@@ -1,0 +1,50 @@
+{
+    "name": "romeo7/rock",
+    "description": "The Rock PHP framework",
+    "keywords": ["rock", "framework"],
+    "type": "library",
+    "license": "MIT",
+    "support": {
+        "email": "serggalka@gmail.com",
+        "issues": "https://github.com/romao7/rock/issues",
+        "source": "https://github.com/romao7/rock"
+    },
+    "authors": [
+        {
+            "name": "Ruslan",
+            "email": "serggalka@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "filp/whoops": "*",
+        "phpmailer/phpmailer"   : "*",
+        "jeremeamia/SuperClosure": "*",
+        "imagine/imagine": "*",
+        "monolog/monolog": "*",
+        "league/flysystem": "*",
+        "cebe/markdown": "*@dev",
+        "mibe/feedwriter": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~3.7"
+    },
+    "suggest": {
+        "tackk/cartographer": "required by SitemapResponseFormatter",
+        "mibe/feedwriter": "required by RssResponseFormatter"
+    },
+    "autoload": {
+        "psr-4": {
+            "rock\\": "framework/core/",
+            "rock\\snippets\\": "framework/snippets/",
+            "rock\\sphinx\\": "framework/extensions/sphinx/",
+            "apps\\": "apps/"
+        },
+        "files": ["framework/extensions/phpmorphy/src/common.php"]
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}

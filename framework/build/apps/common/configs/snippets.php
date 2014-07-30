@@ -1,0 +1,5 @@
+<?php
+/**
+ * Container "Snippets"
+ */
+return [];
