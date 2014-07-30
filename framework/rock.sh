@@ -18,6 +18,7 @@ done
 
 cp -r ${CWD}/build/apps ${CWD}/../
 cp -r ${CWD}/build/assets ${CWD}/../www/
+cp -r ${CWD}/build/500.html ${CWD}/../www/
 
 if [[ ${user} != "" ]]; then
   mysql -u${user} -p -e 'CREATE DATABASE rockdemo CHARACTER SET utf8 COLLATE utf8_general_ci;';
