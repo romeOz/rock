@@ -200,7 +200,7 @@ class QueryTest extends DatabaseTestCase
 
     public function testUnion()
     {
-        $connection = $this->getConnection(false);
+        $connection = $this->getConnection();
         $query = new Query;
         $query->select(['id', 'name', new Expression('\'item\' `tbl`')])
             ->from('item')
@@ -263,14 +263,14 @@ class QueryTest extends DatabaseTestCase
 
     public function testIndexBy()
     {
-        $connection = $this->getConnection(false);
+        $connection = $this->getConnection();
         $result = (new Query)->from('customer')->indexBy('name')->all($connection);
         $this->assertSame(key($result), 'user1');
     }
 
     public function testOne()
     {
-        $connection = $this->getConnection(false);
+        $connection = $this->getConnection();
 
         $result = (new Query)->from('customer')->where(['status' => 2])->one($connection);
         $this->assertEquals('user3', $result['name']);
@@ -281,6 +281,7 @@ class QueryTest extends DatabaseTestCase
 
     public function testSelectBuilder()
     {
+        $connection = $this->getConnection();
         $query = new Query();
         $query->select(
                 [
@@ -294,7 +295,7 @@ class QueryTest extends DatabaseTestCase
             ->innerJoin('order', 'customer.id=order.customer_id');
 
         $sql = "SELECT `customer`.`id` AS `customer__id`, `customer`.`name` AS `customer__name`, `order`.`id` AS `orders+id`, `order`.`total` AS `orders+total` FROM `customer` INNER JOIN `order` ON customer.id=order.customer_id";
-        $this->assertSame($query->getRawSql(), $sql);
+        $this->assertSame($query->getRawSql($connection), $sql);
     }
 
     public function testCache()
@@ -314,7 +315,7 @@ class QueryTest extends DatabaseTestCase
                                            ]);
                 }
         ];
-        $connection = $this->getConnection(false);
+        $connection = $this->getConnection();
         Trace::removeAll();
         $connection->enableQueryCache = true;
         $connection->queryCache = $cache;
@@ -372,7 +373,7 @@ class QueryTest extends DatabaseTestCase
 
     public function testSmartAccessAndEvent()
     {
-        $connection = $this->getConnection(false);
+        $connection = $this->getConnection();
 
         // fail
         $query = new Query();
@@ -457,7 +458,7 @@ class QueryTest extends DatabaseTestCase
 
     public function testSmartFilter()
     {
-        $connection = $this->getConnection(false);
+        $connection = $this->getConnection();
         $query = new Query();
         $query->from('customer');
         $query->filters(

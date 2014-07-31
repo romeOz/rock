@@ -40,6 +40,8 @@ Rock::setAlias('runtime', '@tests/runtime');
 Rock::$app = new Rock();
 Rock::$app->language = \rock\i18n\i18nInterface::EN;
 
+require(dirname(__DIR__) . '/framework/mixins.php');
+
 \rock\base\Config::set($configs);
 
 \rock\di\Container::addMulti($configs['_components']);
@@ -85,27 +87,5 @@ Rock::$app->di['rbac'] = [
     'path' => '@tests/core/rbac/src/rbac.php'
 ];
 
-Rock::$app->di['sphinx'] = [
-    'class' => \rock\sphinx\Connection::className(),
-    'singleton' => true,
-    'dsn' => 'mysql:host=127.0.0.1;port=9306;charset=utf8;',
-    'username' => '',
-    'password' => '',
-    'aliasSeparator' => '__',
-    //'enableSchemaCache' => true,
-    //'enableQueryCache'  => true
-];
-
-
 //(new SessionsMigration())->up();
-
-
-// setup sphinx
-//$sphinx = new SphinxTestCase;
-//$sphinx->up();
-//$sphinx->getDbConnection();
-//$pathSphinx = Rock::getAlias('@tests/data/sphinx/sphinx.conf');
-//system('searchd --stop --config '.$pathSphinx);
-//system('indexer --all --config '.$pathSphinx);
-//system('searchd --config '.$pathSphinx);
 
