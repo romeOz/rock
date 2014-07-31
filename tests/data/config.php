@@ -14,8 +14,8 @@ return [
         ],
         'mysql' => [
             'dsn' => 'mysql:host=127.0.0.1;dbname=rocktest',
-            'username' => 'root',
-            'password' => '123',
+            'username' => 'travis',
+            'password' => '',
             'fixture' => __DIR__ . '/mysql.sql',
             'migrations' => [
                 UsersMigration::className(),
@@ -53,13 +53,13 @@ return [
     'sphinx' => [
         'sphinx' => [
             'dsn' => 'mysql:host=127.0.0.1;port=9306;',
-            'username' => '',
+            'username' => 'travis',
             'password' => '',
         ],
         'db' => [
             'dsn' => 'mysql:host=127.0.0.1;dbname=rocktest',
-            'username' => 'root',
-            'password' => '123',
+            'username' => 'travis',
+            'password' => '',
             'fixture' => __DIR__ . '/sphinx/source.sql',
         ],
     ],

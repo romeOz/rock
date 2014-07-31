@@ -1,5 +1,9 @@
 #!/bin/sh
 
+if (php --version | grep -i HHVM > /dev/null); then
+  echo "skipping APC on HHVM"
+else
+
 # this is helpful to compile extension
 sudo apt-get install autoconf
 
@@ -14,3 +18,5 @@ phpize && ./configure && make install && echo "Installed ext/apcu-${APCU}"
 
 echo "extension = apcu.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 echo "apc.enable_cli = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+
+fi

@@ -9,6 +9,7 @@ composer.lock
 #./index.php
 *~
 www/assets/*
+www/500.html
 !assets/.gitignore
 apps/*
 tests/runtime/*
