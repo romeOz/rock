@@ -3,7 +3,7 @@
 namespace rock\cache\versioning;
 
 use rock\cache\CacheInterface;
-use rock\date\Date;
+use rock\date\DateTime;
 
 class Redis extends \rock\cache\Redis implements CacheInterface
 {
@@ -40,7 +40,7 @@ class Redis extends \rock\cache\Redis implements CacheInterface
         }
         foreach ($tagsByValue as $tag => $timestamp) {
             if ((!$tagTimestamp = static::$storage->get($tag)) ||
-                Date::microtime($tagTimestamp) > Date::microtime($timestamp)
+                DateTime::microtime($tagTimestamp) > DateTime::microtime($timestamp)
             ) {
                 static::$storage->delete($key);
 
