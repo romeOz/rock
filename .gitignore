@@ -15,6 +15,7 @@ apps/*
 tests/runtime/*
 robots.txt
 composer.lock
+./.htaccess
 
 
 ############
