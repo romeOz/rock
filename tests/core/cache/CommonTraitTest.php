@@ -5,7 +5,7 @@ namespace rockunit\core\cache;
 
 use rock\cache\CacheInterface;
 
-trait CommonTraitTest
+abstract class CommonTraitTest extends \PHPUnit_Framework_TestCase
 {
     public static function flush(){}
 

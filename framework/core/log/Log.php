@@ -29,6 +29,9 @@ class Log implements LoggerInterface
         static::$logger = new Logger('Rock');
 
         $path = Rock::getAlias(static::$path);
+        if (!is_dir($path)) {
+            mkdir($path);
+        }
         $formatter = new LineFormatter("[%datetime%]\t%level_name%\t%extra.hash%\t%message%\t%extra.user_id%\t%extra.user_ip%\t%extra.user_agent%\n");
         static::$logger->pushProcessor(function ($record) {
                 $record['extra']['hash'] = substr(md5($record['message']), -6);

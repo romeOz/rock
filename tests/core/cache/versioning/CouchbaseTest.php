@@ -1,14 +1,17 @@
 <?php
 namespace rockunit\core\cache\versioning;
 
-/**
- * @group cache
- * @group couchbase
- */
-class CouchbaseTest extends \PHPUnit_Framework_TestCase
-{
-    use  CommonTraitTest;
+use rock\cache\Couchbase;
+use rockunit\core\cache\CommonTraitTest;
+use rock\cache\CacheInterface;
+use rock\cache\Exception;
 
+/**
+ * @group couchbase
+ * @group cache
+ */
+class CouchbaseTest extends CommonTraitTest
+{
     public static function flush()
     {
         (new Couchbase(['enabled' => true]))->flush();
@@ -16,6 +19,12 @@ class CouchbaseTest extends \PHPUnit_Framework_TestCase
 
     public function init($serialize)
     {
+        if (!class_exists('\Couchbase')) {
+            $this->markTestSkipped(
+                'The Couchbase is not available.'
+            );
+        }
+
         return new Couchbase(['enabled' => true, 'serializer' => $serialize]);
     }
 

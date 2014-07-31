@@ -34,7 +34,7 @@ before_script:
 
 script:
   - mkdir -p build/logs
-  - vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml --exclude-group sphinx,couchbase
+  - vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml --exclude-group couchbase,sphinx
 
 after_script:
   - vendor/bin/coveralls -v

@@ -9,10 +9,8 @@ use rock\cache\Memcache;
  * @group cache
  * @group memcache
  */
-class MemcacheTest extends \PHPUnit_Framework_TestCase
+class MemcacheTest extends CommonTraitTest
 {
-    use  CommonTraitTest;
-
     public static function flush()
     {
         (new Memcache(['enabled' => true]))->flush();
