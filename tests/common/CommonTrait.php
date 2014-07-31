@@ -36,9 +36,15 @@ trait CommonTrait
         @unlink("{$runtime}/filesystem.tmp");
     }
 
-    protected static function sort($value)
+    protected static function sortByKey($value)
     {
         ksort($value);
+        return $value;
+    }
+
+    protected static function sort($value)
+    {
+        sort($value);
         return $value;
     }
 } 

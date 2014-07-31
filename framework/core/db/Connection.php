@@ -8,14 +8,14 @@ use rock\base\ObjectTrait;
 use rock\Rock;
 
 /**
- * Connection represents a connection to a database via [PDO](http://www.php.net/manual/en/ref.pdo.php).
+ * Connection represents a connection to a database via `PDO`(http://www.php.net/manual/en/ref.pdo.php).
  *
- * Connection works together with [[Command]], [[DataReader]] and [[Transaction]]
+ * Connection works together with `Command`, `DataReader` and `Transaction`
  * to provide data access to various DBMS in a common set of APIs. They are a thin wrapper
  * of the [[PDO PHP extension]](http://www.php.net/manual/en/ref.pdo.php).
  *
- * To establish a DB connection, set [[dsn]], [[username]] and [[password]], and then
- * call [[open()]] to be true.
+ * To establish a DB connection, set `dsn`, `username` and `password`, and then
+ * call `open()` to be true.
  *
  * The following example shows how to create a Connection instance and establish
  * the DB connection:
@@ -48,7 +48,7 @@ use rock\Rock;
  * $post = $command->query();
  * ```
  *
- * For more information about how to perform various DB queries, please refer to [[Command]].
+ * For more information about how to perform various DB queries, please refer to `Command`.
  *
  * If the underlying DBMS supports transactions, you can perform transactional SQL queries
  * like the following:
@@ -108,9 +108,6 @@ use rock\Rock;
  * is read-only.
  * @property Transaction $transaction The currently active transaction. Null if no active transaction. This
  * property is read-only.
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 class Connection implements ObjectInterface
 {
@@ -149,7 +146,7 @@ class Connection implements ObjectInterface
      */
     public $password;
     /**
-     * @var array PDO attributes (name => value) that should be set when calling [[open()]]
+     * @var array PDO attributes (name => value) that should be set when calling `open()`
      * to establish a DB connection. Please refer to the
      * [PHP manual](http://www.php.net/manual/en/function.PDO-setAttribute.php) for
      * details about available attributes.
@@ -157,7 +154,7 @@ class Connection implements ObjectInterface
     public $attributes;
     /**
      * @var PDO the PHP PDO instance associated with this DB connection.
-     * This property is mainly managed by [[open()]] and [[close()]] methods.
+     * This property is mainly managed by `open()` and [[close()]] methods.
      * When a DB connection is active, this property will represent a PDO instance;
      * otherwise, it will be null.
      */
@@ -583,7 +580,7 @@ class Connection implements ObjectInterface
     }
 
     /**
-     * Returns the name of the DB driver. Based on the the current [[dsn]], in case it was not set explicitly
+     * Returns the name of the DB driver. Based on the the current `dsn`, in case it was not set explicitly
      * by an end user.
      * @return string name of the DB driver
      */

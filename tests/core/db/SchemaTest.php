@@ -15,6 +15,13 @@ class SchemaTest extends DatabaseTestCase
 {
     use CommonTrait;
 
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->getConnection()->schema->refresh();
+    }
+
+
     public function testGetTableNames()
     {
         /* @var $schema Schema */

@@ -213,7 +213,7 @@ class QueryTest extends DatabaseTestCase
             );
 
         $sql = "(SELECT `id`, `name`, 'item' `tbl` FROM `item` LIMIT 2) UNION ( SELECT `id`, `name`, 'category' `tbl` FROM `category` LIMIT 2 )";
-        $this->assertSame($query->getRawSql(), $sql);
+        $this->assertSame($query->getRawSql($connection), $sql);
         $this->assertEquals(
             $query->all($connection),
             array (
@@ -258,7 +258,7 @@ class QueryTest extends DatabaseTestCase
             ->unionLimit(3);
 
         $sql = "(SELECT `id`, `name`, 'item' `tbl` FROM `item` LIMIT 2) UNION ( SELECT `id`, `name`, 'category' `tbl` FROM `category` LIMIT 2 ) ORDER BY `item` DESC LIMIT 3";
-        $this->assertSame($query->getRawSql(), $sql);
+        $this->assertSame($query->getRawSql($connection), $sql);
     }
 
     public function testIndexBy()

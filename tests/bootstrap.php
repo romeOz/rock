@@ -6,8 +6,6 @@ use rock\file\FileManager;
 use rock\log\Log;
 use rock\rbac\PhpManager;
 use rock\Rock;
-use rockunit\extensions\sphinx\SphinxTestCase;
-use rockunit\migrations\SessionsMigration;
 use rockunit\mocks\CookieMock;
 use rockunit\mocks\SessionMock;
 
