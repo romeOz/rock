@@ -18,7 +18,7 @@ sudo mkdir /var/run/sphinx
 sudo chmod 777 /var/run/sphinx # ugly (for travis)
 
 # Setup source database
-mysql -D yiitest -u travis < $CWD/../sphinx/source.sql
+mysql -D rocktest -u travis < $CWD/../sphinx/source.sql
 
 # setup test Sphinx indexes:
 indexer --config $CWD/../sphinx/sphinx.conf --all

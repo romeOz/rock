@@ -30,11 +30,11 @@ install:
 
 before_script:
   - mysql -e 'CREATE DATABASE rocktest;';
-#  - tests/data/travis/sphinx-setup.sh
+  - tests/data/travis/sphinx-setup.sh
 
 script:
   - mkdir -p build/logs
-  - vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml --exclude-group couchbase,sphinx
+  - vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml --exclude-group couchbase
 
 after_script:
   - vendor/bin/coveralls -v
