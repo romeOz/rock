@@ -23,7 +23,7 @@ install:
   - composer install --prefer-dist
   - composer require satooshi/php-coveralls:*@dev
   - chmod -R +x tests/data/travis/
-  - bash -c 'if (!(php --version | grep -i HHVM > /dev/null)); then tests/data/travis/apc-setup.sh; fi;'
+  - bash -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ] && [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then tests/data/travis/apc-setup.sh; fi;'
   - tests/data/travis/memcache-setup.sh
   - tests/data/travis/redis-setup.sh
   - framework/rock.sh
@@ -34,7 +34,7 @@ before_script:
 
 script:
   - mkdir -p build/logs
-  - bash -c 'if (!(php --version | grep -i HHVM > /dev/null)); then vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml --exclude-group hhvm,couchbase; fi;'
+  - bash -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ] && [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml --exclude-group hhvm,couchbase; fi;'
   - bash -c 'if (php --version | grep -i HHVM > /dev/null); then vendor/bin/phpunit --verbose --exclude-group php,couchbase,memcache,memcached,redis,apc; fi;'
 
 after_script:
