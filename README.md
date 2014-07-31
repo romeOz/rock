@@ -1,7 +1,7 @@
 Rock PHP Framework
 =================
 
-Framework is not ready for production use yet.
+**Framework is not ready for production use yet.**
 
 [![Latest Stable Version](https://poser.pugx.org/romeo7/rock/v/stable.svg)](https://packagist.org/packages/romeo7/rock)
 [![Total Downloads](https://poser.pugx.org/romeo7/rock/downloads.svg)](https://packagist.org/packages/romeo7/rock)
@@ -123,4 +123,4 @@ Requirements
 License
 -------------------
 
-The Rock PHP Framework is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
+The Rock PHP Framework is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).

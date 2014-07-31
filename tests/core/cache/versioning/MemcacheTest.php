@@ -19,6 +19,11 @@ class MemcacheTest extends CommonTraitTest
 
     public function init($serialize)
     {
+        if (!class_exists('\Memcache')) {
+            $this->markTestSkipped(
+                'The \Memcache is not available.'
+            );
+        }
         return new Memcache(['enabled' => true, 'serializer' => $serialize]);
     }
 

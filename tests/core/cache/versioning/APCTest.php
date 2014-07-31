@@ -20,6 +20,11 @@ class APCTest extends CommonTraitTest
 
     public function init($serialize)
     {
+        if (!extension_loaded('apc')) {
+            $this->markTestSkipped(
+                'The APC is not available.'
+            );
+        }
         return new APC(['enabled' => true, 'serializer' => $serialize]);
     }
 
