@@ -1,8 +1,13 @@
 Rock PHP Framework
 =================
 
+Framework is not ready for production use yet.
+
+[![Latest Stable Version](https://poser.pugx.org/romeo7/rock/v/stable.svg)](https://packagist.org/packages/romeo7/rock)
+[![Total Downloads](https://poser.pugx.org/romeo7/rock/downloads.svg)](https://packagist.org/packages/romeo7/rock)
 [![Build Status](https://travis-ci.org/romeo7/rock.svg?branch=master)](https://travis-ci.org/romeo7/rock)
-[![Coverage Status](https://coveralls.io/repos/romeo7/rock/badge.png)](https://coveralls.io/r/romeo7/rock)
+[![Coverage Status](https://coveralls.io/repos/romeo7/rock/badge.png?branch=master)](https://coveralls.io/r/romeo7/rock?branch=master)
+[![License](https://poser.pugx.org/romeo7/rock/license.svg)](https://packagist.org/packages/romeo7/rock)
 
 [Rock Framework on Packagist](https://packagist.org/packages/romeo7/rock)
 
@@ -113,7 +118,7 @@ cd /var/www/
 Requirements
 -------------------
  * **PHP 5.4+**
- * MySQL 5.6+
+ * **MySQL 5.6+**
 
 License
 -------------------
