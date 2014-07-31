@@ -104,7 +104,6 @@ class Validation extends AllOf
 {
     use ComponentsTrait {
         ComponentsTrait::__construct as parentConstruct;
-        //ObjectTrait::__call as parentCall;
     }
     /**
      * @var \Closure[]
@@ -115,7 +114,6 @@ class Validation extends AllOf
     {
         $this->parentConstruct($configs);
         call_user_func_array(['parent', '__construct'], array_slice(func_get_args(), 1));
-        //parent::__construct();
     }
 
     public function init()

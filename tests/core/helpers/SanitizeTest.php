@@ -73,8 +73,8 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase {
 
     public function testNumeric()
     {
-        $input['foo'] = '-5.5</b>     ';
-        $input['bar'] = '5.5';
+        $input['foo'] = '-5.6</b>     ';
+        $input['bar'] = '5.6';
         $input['baz'] = '{"baz" : "5.6"}';
         $result = Sanitize::sanitize($input, [
                                                 'foo' => ['abs', 'ceil'],

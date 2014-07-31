@@ -5,8 +5,7 @@ if (php --version | grep -i HHVM > /dev/null); then
 else
     # this is helpful to compile extension
     sudo apt-get install autoconf
-    sudo apt-get install phpize
-    
+
     # install this version
     APCU=4.0.6
 

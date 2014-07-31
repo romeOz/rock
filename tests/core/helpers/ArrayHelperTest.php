@@ -29,6 +29,7 @@ class Post_2 extends Model
 class ArrayHelperTest extends DatabaseTestCase
 {
     /**
+     * @group php
      * @dataProvider providerToArray
      */
     public function testToArray($expected, $actual, $only = [], $exclude = [])
@@ -39,6 +40,16 @@ class ArrayHelperTest extends DatabaseTestCase
     public function providerToArray()
     {
         return [
+            [
+                [
+                    (object)['id', 'title', 'title1'],
+                    (object)['id', 'title', 'title2'],
+                ],
+                [
+                    [],
+                    [],
+                ],
+            ],
             [
                 [
                     'name' => 'Tom',
@@ -247,16 +258,7 @@ class ArrayHelperTest extends DatabaseTestCase
                     ['id' => 2, 'title' => 'title2'],
                 ],
             ],
-            [
-                [
-                    (object)['id', 'title', 'title1'],
-                    (object)['id', 'title', 'title2'],
-                ],
-                [
-                    [],
-                    [],
-                ],
-            ],
+
             [
                 new Post_1(),
                 ['name' => 'Tom', 'email' => 'tom@site.com']
@@ -274,6 +276,30 @@ class ArrayHelperTest extends DatabaseTestCase
         ];
     }
 
+    /**
+     * @group hhvm
+     * @dataProvider providerToArrayHHVM
+     */
+    public function testToArrayHHVM($expected, $actual, $only = [], $exclude = [])
+    {
+        $this->assertSame(ArrayHelper::toArray($expected, $only, $exclude, true), $actual);
+    }
+
+    public function providerToArrayHHVM()
+    {
+        $result = $this->providerToArray();
+        $result[0] =             [
+            [
+                (object)['id', 'title', 'title1'],
+                (object)['id', 'title', 'title2'],
+            ],
+            [
+                ['id', 'title', 'title1'],
+                ['id', 'title', 'title2'],
+            ],
+        ];
+        return $result;
+    }
 
     /**
      * @group db
