@@ -34,7 +34,8 @@ before_script:
 
 script:
   - mkdir -p build/logs
-  - bash -c 'if (php --version | grep -i HHVM > /dev/null); then vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml --exclude-group couchbase,memcache,memcached,redis,apc else vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml --exclude-group couchbase fi;'
+  - bash -c 'if (!(php --version | grep -i HHVM > /dev/null)); then vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml --exclude-group couchbase; fi;'
+  - bash -c 'if (php --version | grep -i HHVM > /dev/null); then vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml --exclude-group couchbase,memcache,memcached,redis,apc; fi;'
 
 after_script:
   - vendor/bin/coveralls -v
