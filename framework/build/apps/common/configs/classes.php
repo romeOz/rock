@@ -9,17 +9,6 @@ use rock\route\Route;
 use rock\template\Template;
 
 return [
-    // Database
-    'db' => [
-        'class' => \rock\db\Connection::className(),
-        'username' => 'root',
-        'password' => '123',
-        'charset' => 'utf8',
-        'dsn' => 'mysql:host=localhost;dbname=rockdemo;charset=utf8',
-        'tablePrefix' => 'spt_',
-        'aliasSeparator' => '__',
-    ],
-
     'route' => [
         'class' => \rock\route\Route::className(),
         'singleton' => true,

@@ -55,7 +55,7 @@ From the Command Line:
 `composer create-project romeo7/rock --prefer-dist`
 
 Then, to create the structure of the application you must to run `/path/to/framework/rock.sh`.
-if you want to create tables `Users` and `Access`, then run with parameter `/path/to/framework/rock.sh -u username`, where `username` - user for login to mysql.
+if you want to create tables `Users` and `Access`, then run with parameter `/path/to/framework/rock.sh -u <username> -p <password>`.
 
 ###Configure server
 
