@@ -29,7 +29,7 @@ return array_merge(
         'db' => [
             'class' => \rock\db\Connection::className(),
             'username' => 'root',
-            'password' => '123',
+            'password' => 'root',
             'charset' => 'utf8',
             'dsn' => 'mysql:host=localhost;dbname=rockdemo;charset=utf8',
             'tablePrefix' => 'spt_',
