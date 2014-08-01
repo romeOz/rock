@@ -17,7 +17,7 @@ use rock\template\Template;
 \rock\Rock::setAlias('root', dirname(dirname(dirname(__DIR__))));
 \rock\Rock::setAlias('vendor', '@root/vendor');
 \rock\Rock::setAlias('extensions', '@root/framework/extensions');
-\rock\Rock::setAlias('assets', '@root/www/assets');
+\rock\Rock::setAlias('assets', '@root/public/assets');
 \rock\Rock::setAlias('web', '/assets');
 \rock\Rock::setAlias('webImg', '/assets/images');
 \rock\Rock::setAlias('app', '@root/apps');
