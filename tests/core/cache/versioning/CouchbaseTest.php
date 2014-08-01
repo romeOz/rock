@@ -1,7 +1,7 @@
 <?php
 namespace rockunit\core\cache\versioning;
 
-use rock\cache\Couchbase;
+use rock\cache\versioning\Couchbase;
 use rockunit\core\cache\CommonTraitTest;
 use rock\cache\CacheInterface;
 use rock\cache\Exception;
@@ -72,9 +72,9 @@ class CouchbaseTest extends CommonTraitTest
      */
     public function testGetTag(CacheInterface $cache)
     {
-        $this->assertTrue($cache->set('key1', ['one', 'two'], 0, ['foo', 'bar']));
-        $this->assertTrue($cache->set('key2', 'three', 0, ['foo']));
-        $this->assertInternalType('string', $cache->getTag('foo'), 'var should be type string');
+        $this->assertTrue($cache->set('key25', ['one', 'two'], 0, ['tag_18', 'tag_17']));
+        $this->assertTrue($cache->set('key26', 'three', 0, ['tag_18']));
+        $this->assertInternalType('string', $cache->getTag('tag_18'), 'var should be type string');
     }
 
     /**

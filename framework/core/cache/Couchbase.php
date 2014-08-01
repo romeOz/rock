@@ -145,7 +145,7 @@ class Couchbase implements CacheInterface
      */
     public function getTag($tag)
     {
-        return $this->unserialize(static::$storage->get(self::TAG_PREFIX . $tag));
+        return $this->unserialize(static::$storage->get($this->prepareTag($tag)));
     }
 
     /**
