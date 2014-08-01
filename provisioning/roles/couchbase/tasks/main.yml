@@ -1,0 +1,32 @@
+- name: Download and uncompress Couchbase Server
+  shell: chdir="/tmp" wget http://packages.couchbase.com/releases/2.2.0/couchbase-server-community_2.2.0_x86.deb; sudo dpkg -i couchbase-server-community_2.2.0_x86.deb
+  tags: couchbase
+
+- name: Add couchbase.list to sources.list  
+  shell: sudo wget -O/etc/apt/sources.list.d/couchbase.list http://packages.couchbase.com/ubuntu/couchbase-ubuntu1204.list; sudo wget -O- http://packages.couchbase.com/ubuntu/couchbase.key | sudo apt-key add -  
+  tags: couchbase
+
+- name: update apt cache
+  apt: update_cache=yes
+  tags: couchbase
+
+- name: install C Client Library
+  apt: pkg={{ item }} state=latest
+  with_items:
+    - libcouchbase2-libevent
+    - libcouchbase-dev
+  tags: couchbase
+
+- name: install PECL
+  sudo: yes
+  script: install_pecl.sh
+  tags: couchbase  
+#  shell: sudo pecl install couchbase
+
+- name: Restart nginx
+  service: name=nginx state=restarted
+  tags: couchbase
+
+- name: Restart php
+  service: name=php5-fpm state=restarted
+  tags: couchbase

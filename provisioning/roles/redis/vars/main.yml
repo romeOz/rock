@@ -1,0 +1,27 @@
+redis:
+  #version: 2:2.6.16-1chl1~precise1
+  config_path: /etc/redis/redis.conf
+
+  user: redis
+  group: redis
+
+  config:
+    bind: 127.0.0.1
+    port: 6379
+
+    loglevel: notice
+    logfile: /var/log/redis/redis-server.log
+
+    databases: 16
+
+    maxmemory: 32mb
+    maxmemory_policy: volatile-lru
+
+    appendonly: "no"
+    appendfsync: everysec
+
+    dir: /var/lib/redis
+    save:
+      - 900 1
+      - 300 10
+      - 60 10000

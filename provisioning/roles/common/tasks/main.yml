@@ -1,0 +1,24 @@
+- name: ensure system packages are installed
+  apt: pkg={{ item }} state=latest
+  with_items:
+    - git-core
+    - curl
+    - wget
+    - htop
+    - mc
+    - libpq-dev
+    - build-essential
+    - python-software-properties
+    - python-mysqldb
+    - unzip
+
+- name: Add chris-lea PPA
+  apt_repository: repo='ppa:chris-lea/redis-server'
+
+- name: Add Ondřej Surý PPA php5
+  apt_repository: repo='ppa:ondrej/php5'
+
+- name: update apt cache
+  apt: update_cache=yes
+
+- include: ntp.yml
