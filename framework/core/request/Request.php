@@ -527,12 +527,14 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
             $http = $secure ? 'https' : 'http';
             if (isset($_SERVER['HTTP_HOST'])) {
                 $this->_hostInfo = $http . '://' . $_SERVER['HTTP_HOST'];
-            } else {
+            } elseif (isset($_SERVER['SERVER_NAME'])) {
                 $this->_hostInfo = $http . '://' . $_SERVER['SERVER_NAME'];
                 $port = $secure ? $this->getSecurePort() : $this->getPort();
                 if (($port !== 80 && !$secure) || ($port !== 443 && $secure)) {
                     $this->_hostInfo .= ':' . $port;
                 }
+            } else {
+                $this->_hostInfo = null;
             }
         }
 
@@ -560,7 +562,7 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
 
     public function getHost()
     {
-        if ($this->_host === null) {
+        if ($this->_host === null && isset($_SERVER['SERVER_NAME'])) {
             $this->_host = Helper::getValue($_SERVER['HTTP_HOST'], $_SERVER['SERVER_NAME']);
         }
 
