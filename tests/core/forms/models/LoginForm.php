@@ -10,18 +10,19 @@ use rockunit\core\db\models\BaseUsers;
 class LoginForm extends BaseLoginForm
 {
     /**
-     * Finds user by [[email]]
+     * Finds user by `email`
      *
      * @return BaseUsers
      */
     public function getUsers()
     {
         if (!isset($this->_users)) {
-            if (!$this->_users = BaseUsers::find()->byEmail($this->email)->one()) {
+            if (!$this->_users = BaseUsers::findOneByEmail($this->email, BaseUsers::STATUS_ACTIVE, false)) {
                 $this->Rock->template->addPlaceholder('e_login', Rock::t('notExistsUser'), true);
             }
         }
 
         return $this->_users;
     }
+
 }

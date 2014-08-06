@@ -2,9 +2,11 @@
 namespace rock;
 
 
+use apps\common\models\users\Users;
 use League\Flysystem\Util;
 use rock\base\ClassName;
 use rock\base\Config;
+use rock\date\DateTime;
 use rock\di\Container;
 use rock\event\Event;
 use rock\exception\Exception;
@@ -38,6 +40,11 @@ class Rock
     public $allowLanguages = [i18nInterface::EN, i18nInterface::RU];
     public $currentController;
 
+    /**
+     * @var string the application name.
+     */
+    public $name = 'My Application';
+
 
     /**
      * Bootstrap
@@ -46,17 +53,9 @@ class Rock
      */
     public static function bootstrap(array $configs)
     {
-
-        //$i=1;
-        //while($i<=5){
-        ini_set('xdebug.var_display_max_data', '50000');
-        ini_set('xdebug.var_display_max_depth', '10');
-
         try {
             Config::set($configs);
             Container::addMulti($configs['_components']);
-
-            //require __DIR__ . '/../../../apps/common/migrations/bootstrap.php';
 
             Event::on(
                 Template::className(),
@@ -78,29 +77,18 @@ class Rock
 
             /** Routing */
             Rock::$app->route->run();
-            //session_destroy();
 
 
         } catch (\Exception $e) {
             new Exception(Exception::ERROR, null, [], $e);
         }
-
+        var_dump($_SESSION);
         //var_dump(Trace::getTime(Trace::APP_TIME));
         \rock\helpers\Trace::endProfile(\rock\helpers\Trace::APP, \rock\helpers\Trace::TOKEN_APP_RUNTIME);
         //var_dump(Trace::get('db.query'), Trace::get(\rock\helpers\Trace::APP));
 
         /** Event "endApp" */
         Event::trigger(static::className(), self::EVENT_END_APP);
-//
-//        /**
-//         * Clear app
-//         */
-//        Rock::destroy();
-//
-//
-//        //    echo "\t".memory_get_usage()."<br/>";
-//        //    $i++;
-//        //}
     }
 
 
@@ -327,6 +315,14 @@ class Rock
         }
     }
 
+    /**
+     * Translate
+     * @param string|array  $keys
+     * @param array $dataReplace
+     * @param string|null  $category
+     * @param null  $language
+     * @return null|string.
+     */
     public static function t($keys, array $dataReplace = [], $category = null, $language = null)
     {
         return static::$app->i18n->get($keys, $dataReplace, $category, $language ? : static::$app->language);
@@ -360,30 +356,43 @@ class Rock
         Trace::endProfile($category, $token);
     }
 
+    /**
+     * Logging as INFO
+     * @param string $message
+     * @param array  $dataReplace
+     */
     public static function info($message, $dataReplace = [])
     {
         static::$app->log->info($message, $dataReplace);
     }
 
+    /**
+     * Logging as DEBUG
+     * @param string $message
+     * @param array  $dataReplace
+     */
     public static function debug($message, $dataReplace = [])
     {
         static::$app->log->debug($message, $dataReplace);
     }
 
+    /**
+     * Logging as WARNING
+     * @param string $message
+     * @param array  $dataReplace
+     */
     public static function warning($message, $dataReplace = [])
     {
         static::$app->log->warning($message, $dataReplace);
     }
 
+    /**
+     * Logging as ERROR
+     * @param string $message
+     * @param array  $dataReplace
+     */
     public static function error($message, $dataReplace = [])
     {
         static::$app->log->error($message, $dataReplace);
     }
-//    /**
-//     * Reset Application
-//     */
-//    public static function destroy()
-//    {
-//
-//    }
 }

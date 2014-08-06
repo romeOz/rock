@@ -4,7 +4,6 @@ namespace apps\common\models\forms;
 
 
 use apps\common\models\users\BaseUsers;
-use rock\base\Config;
 use rock\base\Model;
 use rock\event\Event;
 use rock\helpers\ArrayHelper;
@@ -121,14 +120,14 @@ class BaseRecoveryForm extends Model
     protected $_users;
 
     /**
-     * Finds user by [[email]]
+     * Finds user by `email`
      *
      * @return BaseUsers
      */
     public function getUsers()
     {
         if (!isset($this->_users)) {
-            if (!$this->_users = BaseUsers::find()->byStatus(BaseUsers::STATUS_ACTIVE)->byEmail($this->email)->one()) {
+            if (!$this->_users = BaseUsers::findOneByEmail($this->email, BaseUsers::STATUS_ACTIVE, false)) {
                 $this->Rock->template->addPlaceholder('e_recovery', Rock::t('invalidEmail'), true);
             }
         }

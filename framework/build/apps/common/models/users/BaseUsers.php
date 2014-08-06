@@ -1,9 +1,9 @@
 <?php
 
 namespace apps\common\models\users;
+
 use rock\db\ActiveRecord;
 use rock\helpers\Numeric;
-use rock\helpers\Security;
 
 /**
  * @property int id
@@ -24,28 +24,15 @@ class BaseUsers extends ActiveRecord
     const STATUS_NOT_ACTIVE = 2;
     const STATUS_ACTIVE = 3;
 
-
-//    public function rules()
-//    {
-//        $timestamp = $this->Rock->date->isoDatetime();
-//        return [
-//            [
-//                self::RULE_DEFAULT,
-//                [
-//                    'login_last' => $timestamp,
-//                    //'createdon' => $timestamp,
-//                ],
-//                [self::S_REGISTRATION]
-//            ]
-//        ];
-//    }
-
-
+    /**
+     * Declares the name of the database table associated with this AR class.
+     *
+     * @return string
+     */
     public static function tableName()
     {
         return 'users';
     }
-
 
     /**
      * @inheritdoc
@@ -56,15 +43,173 @@ class BaseUsers extends ActiveRecord
         return new BaseUsersQuery(get_called_class());
     }
 
+    /**
+     * Finds url by `username`
+     * @param string    $username - `username` of user
+     * @param int|null  $status - `status` of user
+     * @return bool|string
+     */
+    public static function findUrlByUsername($username, $status = self::STATUS_ACTIVE)
+    {
+        $query = static::find()->select(['url'])->byUsername($username);
+        if (isset($status)) {
+            $query->byStatus($status);
+        }
+        return $query->asArray()->scalar();
+    }
 
+    /**
+     * Finds user by `id`
+     *
+     * @param int  $id      - `id` of user
+     * @param int|null  $status - `status` of user
+     * @param bool $asArray - result as `Array`
+     * @return UsersQuery|Users|array|null
+     */
+    public static function findOneById($id, $status = self::STATUS_ACTIVE, $asArray = true)
+    {
+        $query = static::find()->byId($id);
+        if (isset($status)) {
+            $query->byStatus($status);
+        }
+        return $query->asArray($asArray)->one();
+    }
+
+    /**
+     * Finds user by username
+     *
+     * @param  string $username - `username` of user
+     * @param int|null  $status - `status` of user
+     * @param bool    $asArray  - result as `Array`
+     * @return UsersQuery|Users|array|null
+     */
+    public static function findOneByUsername($username, $status = self::STATUS_ACTIVE, $asArray = true)
+    {
+        $query = static::find()->byUsername($username);
+        if (isset($status)) {
+            $query->byStatus($status);
+        }
+        return $query->asArray($asArray)->one();
+    }
+
+    /**
+     * Finds user by `email`
+     *
+     * @param  string $email   - `email` of user
+     * @param int|null  $status - `status` of user
+     * @param bool    $asArray - result as `Array`
+     * @return UsersQuery|Users|array|null
+     */
+    public static function findOneByEmail($email, $status = self::STATUS_ACTIVE, $asArray = true)
+    {
+        $query = static::find()->byEmail($email);
+        if (isset($status)) {
+            $query->byStatus($status);
+        }
+        return $query->asArray($asArray)->one();
+    }
+
+    /**
+     * Finds user by `token`
+     *
+     * @param  string      $token - `token` of user
+     * @param int|null  $status - `status` of user
+     * @param bool    $asArray - result as `Array`
+     * @return UsersQuery|Users|array|null
+     */
+    public static function findByToken($token, $status = self::STATUS_ACTIVE, $asArray = true)
+    {
+        $query = static::find()->byToken($token);
+        if (isset($status)) {
+            $query->byStatus($status);
+        }
+        return $query->asArray($asArray)->one();
+    }
+
+    /**
+     * Exists user by `id`
+     *
+     * @param  int $id - `id` of user
+     * @param int|null  $status - `status` of user
+     * @return bool
+     */
+    public static function existsById($id, $status = self::STATUS_ACTIVE)
+    {
+        $query = static::find()->byId($id);
+        if (isset($status)) {
+            $query->byStatus($status);
+        }
+        return $query->exists();
+    }
+
+    /**
+     * Exists user by `username`
+     *
+     * @param  string $username - `username` of user
+     * @param int|null  $status - `status` of user
+     * @return bool
+     */
+    public static function existsByUsername($username, $status = self::STATUS_ACTIVE)
+    {
+        $query = static::find()->byUsername($username);
+        if (isset($status)) {
+            $query->byStatus($status);
+        }
+        return $query->exists();
+    }
+
+    /**
+     * Exists user by `email`
+     *
+     * @param  string $email - `email` of user
+     * @param int|null  $status - `status` of user
+     * @return bool
+     */
+    public static function existsByEmail($email, $status = self::STATUS_ACTIVE)
+    {
+        $query = static::find()->byEmail($email);
+        if (isset($status)) {
+            $query->byStatus($status);
+        }
+        return $query->exists();
+    }
+
+    /**
+     * Exists user by `email` or `username`
+     *
+     * @param     $email    - `email` of user
+     * @param     $username - `username` of user
+     * @param int|null  $status - `status` of user
+     * @return bool
+     */
+    public static function existsByUsernameOrEmail($email, $username, $status = self::STATUS_ACTIVE)
+    {
+        $query = static::find()
+            ->orWhere(
+                static::tableName() . '.email_hash=UNHEX(MD5(CONCAT(:email, \'' . static::tableName() . '\')))',
+                [':email' => $email]
+            )
+            ->orWhere(
+                static::tableName() . '.username_hash=UNHEX(MD5(CONCAT(:username, \'' . static::tableName() . '\')))',
+                [':username' => $username]
+            );
+
+        if (isset($status)) {
+            $query->byStatus($status);
+        }
+
+        return $query->exists();
+    }
 
     /**
      * Creates a new user
      *
-     * @param  array       $attributes the attributes given by field => value
+     * @param  array $attributes the attributes given by field => value
+     * @param int    $defaultStatus
+     * @param bool   $generateToken
      * @return BaseUsers|null the newly created model, or null on failure
      */
-    public static function create($attributes)
+    public static function create($attributes, $defaultStatus = self::STATUS_NOT_ACTIVE, $generateToken = true)
     {
         /** @var Users $user */
         $user = new static();
@@ -72,8 +217,10 @@ class BaseUsers extends ActiveRecord
         $user->setAttributes($attributes);
         $user->setPassword($attributes['password']);
         $user->setHash(['username', 'email']);
-        $user->generateToken();
-        $user->setStatus(self::STATUS_NOT_ACTIVE);
+        if ($generateToken === true) {
+            $user->generateToken();
+        }
+        $user->setStatus($defaultStatus);
         if ($user->save()) {
             return $user;
 
@@ -82,140 +229,9 @@ class BaseUsers extends ActiveRecord
         }
     }
 
-
-
-
-    public static function existsByUsernameOrEmail($email, $username)
-    {
-        return static::find()
-            ->orWhere(
-                static::tableName() . '.email_hash=UNHEX(MD5(CONCAT(:email, \'' . static::tableName() . '\')))',
-                [':email' => $email]
-            )
-            ->orWhere(
-                static::tableName() . '.username_hash=UNHEX(MD5(CONCAT(:username, \'' . static::tableName() . '\')))',
-                [':username' => $username]
-            )->exists();
-    }
-
-
-    public static function findUrlByUsername($username)
-    {
-        return static::find()
-            ->select(['url'])
-            ->byUsername($username)
-            ->isEnabled()
-            ->asArray()
-            ->scalar();
-    }
-
-
     /**
-     * Finds user by id
-     *
-     * @param int $id
-     * @return array|null
-     */
-    public static function findOneById($id)
-    {
-        return static::find()
-            ->byStatus(self::STATUS_ACTIVE)
-            ->byId($id)
-            ->asArray()
-            ->one();
-    }
-
-    /**
-     * Finds user by username
-     *
-     * @param  string      $username
-     * @return array|null
-     */
-    public static function findOneByUsername($username)
-    {
-        return static::find()
-            ->byStatus(self::STATUS_ACTIVE)
-            ->byUsername($username)
-            ->asArray()
-            ->one();
-    }
-
-
-    /**
-     * Finds user by email
-     *
-     * @param  string      $email
-     * @return array|null
-     */
-    public static function findOneByEmail($email)
-    {
-        return static::find()
-            ->byStatus(self::STATUS_ACTIVE)
-            ->byEmail($email)
-            ->asArray()
-            ->one();
-    }
-
-    /**
-     * Finds user by token
-     *
-     * @param  string      $token
-     * @return UsersQuery|Users|null
-     */
-    public static function findByToken($token)
-    {
-        return static::find()
-            ->byStatus(self::STATUS_NOT_ACTIVE)
-            ->byToken($token)
-            //->asArray()
-            ->one();
-    }
-
-    /**
-     * Exists user by id
-     *
-     * @param  int      $id
-     * @return bool
-     */
-    public static function existsById($id)
-    {
-        return static::find()
-            ->byStatus(self::STATUS_ACTIVE)
-            ->byId($id)
-            ->exists();
-    }
-
-
-    /**
-     * Exists user by username
-     *
-     * @param  string      $username
-     * @return bool
-     */
-    public static function existsByUsername($username)
-    {
-        return static::find()
-            ->byStatus(self::STATUS_ACTIVE)
-            ->byUsername($username)
-            ->exists();
-    }
-
-    /**
-     * Exists user by email
-     *
-     * @param  string      $email
-     * @return bool
-     */
-    public static function existsByEmail($email)
-    {
-        return static::find()
-            ->byStatus(self::STATUS_ACTIVE)
-            ->byEmail($email)
-            ->exists();
-    }
-
-    /**
-     * @param string $username
+     * Deletes user by `username`
+     * @param string $username - `username` of user
      * @return int
      */
     public static function deleteByUsername($username)
@@ -236,14 +252,14 @@ class BaseUsers extends ActiveRecord
     }
 
     /**
+     * Set status
      *
-     * @param int $status
+     * @param int $status - `status` of user
      */
     public function setStatus($status)
     {
         $this->status = $status;
     }
-
 
     /**
      * Generates password hash from password and sets it to the model
@@ -255,16 +271,17 @@ class BaseUsers extends ActiveRecord
         $this->password = $this->Rock->security->generatePasswordHash($password);
     }
 
-
+    /**
+     * Set hash for attributes
+     *
+     * @param array $attributes
+     */
     public function setHash(array $attributes)
     {
         foreach ($attributes as $attribute) {
             $this->{$attribute .'_hash'} = Numeric::hexToBin(md5($this->$attribute . static::tableName()));
         }
     }
-
-
-
 
     /**
      * Generates new password reset token

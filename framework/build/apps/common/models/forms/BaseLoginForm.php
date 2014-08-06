@@ -25,7 +25,7 @@ class BaseLoginForm extends Model
     public $csrf;
 
     public $redirectUrl;
-
+    public $enableCsrfToken = true;
     public $isLogin = false;
 
 
@@ -36,17 +36,19 @@ class BaseLoginForm extends Model
             [
                 self::RULE_VALIDATION,
                 function(array $attributes){
-
-                    if ($this->Rock->validation
-                            ->notEmpty()
-                            ->token($this->formName())
-                            ->setName(Rock::t('token'))
-                            ->setPlaceholders('e_login')
-                            ->setModel($this)
-                            ->validate($attributes[$this->Rock->token->csrfPrefix]) === false
-                    ) {
-                        return false;
+                    if ($this->enableCsrfToken) {
+                        if ($this->Rock->validation
+                                ->notEmpty()
+                                ->token($this->formName())
+                                ->setName(Rock::t('token'))
+                                ->setPlaceholders('e_login')
+                                ->setModel($this)
+                                ->validate($attributes[$this->Rock->token->csrfPrefix]) === false
+                        ) {
+                            return false;
+                        }
                     }
+
                     if ($this->Rock->validation
                             ->key(
                                 'email',
@@ -139,14 +141,14 @@ class BaseLoginForm extends Model
     protected $_users;
 
     /**
-     * Finds user by [[email]]
+     * Finds user by `email`
      *
      * @return BaseUsers
      */
     public function getUsers()
     {
         if (!isset($this->_users)) {
-            if (!$this->_users = BaseUsers::find()->byEmail($this->email)->one()) {
+            if (!$this->_users = BaseUsers::findOneByEmail($this->email, BaseUsers::STATUS_ACTIVE, false)) {
                 $this->Rock->template->addPlaceholder('e_login', Rock::t('notExistsUser'), true);
             }
         }

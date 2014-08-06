@@ -4,16 +4,16 @@ namespace apps\common\models\forms;
 
 
 use apps\common\models\users\BaseUsers;
-use rock\base\Config;
 use rock\base\Model;
 use rock\db\Connection;
 use rock\event\Event;
+use rock\exception\ErrorHandler;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\Sanitize;
 use rock\helpers\String;
-use rock\mail\Exception;
 use rock\Rock;
+use rock\url\Url;
 use rock\validation\Validation;
 
 class BaseSignupForm extends Model
@@ -31,8 +31,11 @@ class BaseSignupForm extends Model
 
     public $emailBodyTpl = '@common.views/email/{lang}/activate';
     public $redirectUrl;
-
     public $activateUrl = '/activation.html';
+    public $defaultStatus = BaseUsers::STATUS_NOT_ACTIVE;
+    public $generateToken = true;
+    public $enableCaptcha = true;
+    public $enableCsrfToken = true;
 
     public $isSignup = false;
 
@@ -47,50 +50,54 @@ class BaseSignupForm extends Model
                 self::RULE_VALIDATION,
                 function(array $attributes){
 
-                    if ($this->Rock->validation
-                            ->notEmpty()
-                            ->token($this->formName())
-                            ->setName(Rock::t('token'))
-                            ->setModel($this)
-                            ->setPlaceholders('e_signup')
-                            ->validate($attributes[$this->Rock->token->csrfPrefix]) === false
-                    ) {
-                        return false;
+                    if ($this->enableCsrfToken) {
+                        if ($this->Rock->validation
+                                ->notEmpty()
+                                ->token($this->formName())
+                                ->setName(Rock::t('token'))
+                                ->setModel($this)
+                                ->setPlaceholders('e_signup')
+                                ->validate($attributes[$this->Rock->token->csrfPrefix]) === false
+                        ) {
+                            return false;
+                        }
                     }
-                    if ($this->Rock->validation
-                            ->key(
-                                'email',
-                                Validation::notEmpty()
-                                    ->length(4, 80, true)
-                                    ->email()
-                                    //->setName($this->Rock->i18n->get('email'))
-                            )
-                            ->key(
-                                'username',
-                                Validation::notEmpty()
-                                    ->length(3, 80, true)
-                                    ->regex('/^[\w\s\-\*\@\%\#\!\?\.\)\(\+\=\~\:]+$/iu')
-                                    //->setName($this->Rock->i18n->get('username'))
-                            )
-                            ->key(
-                                'password',
-                                Validation::notEmpty()
-                                    ->length(6, 20, true)
-                                    ->regex('/^[\\w\\d\-\.]+$/i')
-                                    ->setName(Rock::t('password'))
-                            )
-                            ->key(
-                                'password_confirm',
-                                Validation::notEmpty()
-                                    ->confirm(Helper::getValue($attributes['password']), true)
-                                    //->setName(Rock::t('passwords'))
-                            )
-                            ->key(
-                                'captcha',
-                                Validation::notEmpty()
-                                    ->captcha($this->Rock->captcha->getSession(), true)
-                                    //->setName($this->Rock->i18n->get('captcha'))
-                            )
+
+                    $validation = $this->Rock->validation
+                        ->key(
+                            'email',
+                            Validation::notEmpty()
+                                ->length(4, 80, true)
+                                ->email()
+                        )
+                        ->key(
+                            'username',
+                            Validation::notEmpty()
+                                ->length(3, 80, true)
+                                ->regex('/^[\w\s\-\*\@\%\#\!\?\.\)\(\+\=\~\:]+$/iu')
+                        )
+                        ->key(
+                            'password',
+                            Validation::notEmpty()
+                                ->length(6, 20, true)
+                                ->regex('/^[\\w\\d\-\.]+$/i')
+                                ->setName(Rock::t('password'))
+                        )
+                        ->key(
+                            'password_confirm',
+                            Validation::notEmpty()
+                                ->confirm(Helper::getValue($attributes['password']), true)
+                        );
+
+                    if ($this->enableCaptcha) {
+                        $validation->key(
+                            'captcha',
+                            Validation::notEmpty()
+                                ->captcha($this->Rock->captcha->getSession(), true)
+                        );
+                    }
+
+                    if ($validation
                             ->setModel($this)
                             ->setPlaceholders(
                                 [
@@ -105,7 +112,7 @@ class BaseSignupForm extends Model
                         return false;
                     }
 
-                    if (BaseUsers::existsByUsernameOrEmail($attributes['email'], $attributes['username']) === true) {
+                    if (BaseUsers::existsByUsernameOrEmail($attributes['email'], $attributes['username'], null) === true) {
                         $this->Rock->template->addPlaceholder('e_signup', Rock::t('existsUsernameOrEmail'), true);
                         return false;
                     }
@@ -194,14 +201,16 @@ class BaseSignupForm extends Model
         if (isset($data['firstname']) || isset($data['lastname'])) {
             $name = implode(' ', ArrayHelper::intersectByKeys($data, ['firstname', 'lastname']));
         }
-
-
         $data['fullname'] = $name;
         $data['password'] = $this->password;
-        $data['url'] = $this->Rock->url
-            ->set($this->activateUrl)
-            ->addArgs(['token' => $data['token']])
-            ->getAbsoluteUrl(true);
+
+        if ($this->generateToken) {
+            /** @var Url $urlBuilder */
+            $urlBuilder = Rock::factory($this->activateUrl, Url::className());
+            $data['url'] = $urlBuilder
+                ->addArgs(['token' => $data['token']])
+                ->getAbsoluteUrl(true);
+        }
 
         return $this->Rock->template->getChunk($chunk, $data);
     }
@@ -226,8 +235,23 @@ class BaseSignupForm extends Model
                 ->send();
         } catch (\Exception $e) {
             $this->Rock->template->addPlaceholder('e_signup', Rock::t('failSendEmail'), true);
-            new Exception(Exception::WARNING, $e->getMessage(), [], $e);
+            Rock::warning(ErrorHandler::convertExceptionToString($e));
         }
+    }
+
+    public function login()
+    {
+        $users = $this->getUsers();
+        $users->login_last = $this->Rock->date->isoDatetime();
+        if (!$users->save()) {
+            $this->Rock->template->addPlaceholder('e_signup', Rock::t('failAuth'), true);
+            return;
+        }
+
+        $data = $users->toArray();
+        $user = $this->Rock->user;
+        $user->addMulti(ArrayHelper::intersectByKeys($data, ['id', 'username', 'url']));
+        $user->login();
     }
 
     public function beforeSignup()
@@ -242,11 +266,12 @@ class BaseSignupForm extends Model
 
     public function afterSignup()
     {
-        if (!$users = BaseUsers::create($this->getAttributes())) {
+        if (!$users = BaseUsers::create($this->getAttributes(), $this->defaultStatus, $this->generateToken)) {
             $this->Rock->template->addPlaceholder('e_signup', Rock::t('failSignup'), true);
             return false;
         }
         $this->users = $users;
+        $this->users->id = $this->users->primaryKey;
         $this->isSignup = true;
         $result = $users->toArray();
         if ($this->trigger(self::EVENT_AFTER_SIGNUP, Event::AFTER)->after(null, $result) === false) {
