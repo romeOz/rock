@@ -2,8 +2,7 @@
 
 namespace rock\validation\exceptions\ru;
 
-
-class LengthException extends \Respect\Validation\Exceptions\LengthException
+class LengthException extends \rock\validation\exceptions\LengthException
 {
     public static $defaultTemplates = array(
         self::MODE_DEFAULT => array(

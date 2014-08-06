@@ -2,8 +2,7 @@
 
 namespace rock\validation\exceptions\ru;
 
-
-class DateException extends \Respect\Validation\Exceptions\DateException
+class DateException extends \rock\validation\exceptions\DateException
 {
     public static $defaultTemplates = array(
         self::MODE_DEFAULT => array(
