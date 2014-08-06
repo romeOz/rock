@@ -18,6 +18,11 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
     protected static $storage;
     public $container = 'user';
 
+    /**
+     * @var string the session variable name used to store the value of [[returnUrl]].
+     */
+    public $returnUrlParam = '__returnUrl';
+
 
     public function init()
     {
@@ -269,7 +274,7 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
 
     public function activate($token, $autoLogin = false)
     {
-        if (empty($token) || (!$users = Users::findByToken($token))) {
+        if (empty($token) || (!$users = Users::findByToken($token, Users::STATUS_NOT_ACTIVE, false, []))) {
             return false;
         }
 
@@ -278,7 +283,7 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
         $users->save();
 
         if ($autoLogin === true) {
-            $this->addMulti($users->toArray());
+            $this->addMulti($users->toArray(['id', 'username', 'firstname', 'lastname', 'fullname', 'url']));
             $this->login();
         }
 
@@ -354,6 +359,25 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
     public function removeAllowance($action)
     {
         $this->remove("_allowance.{$action}");
+    }
+
+    /**
+     * Returns the URL that the browser should be redirected to after successful login.
+     *
+     * This method reads the return URL from the session. It is usually used by the login action which
+     * may call this method to redirect the browser to where it goes after successful authentication.
+     *
+     * @param string|array $defaultUrl the default return URL in case it was not set previously.
+     * If this is null and the return URL was not set previously, [[Application::homeUrl]] will be redirected to.
+     * Please refer to [[setReturnUrl()]] on accepted format of the URL.
+     * @return string the URL that the user should be redirected to after login.
+     * @see loginRequired()
+     */
+    public function getReturnUrl($defaultUrl = null)
+    {
+        $url = $this->Rock->session->get($this->returnUrlParam, $defaultUrl);
+
+        return $url === null ? $this->Rock->request->getHomeUrl() : $url;
     }
 
     protected function prepareKeys($keys)
