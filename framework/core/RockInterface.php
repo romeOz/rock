@@ -10,6 +10,7 @@ namespace rock;
  * @property-read string[] $allowLanguages
  * @property-read string $charset
  * @property-read \rock\base\Controller $currentController
+ * @property-read string $name
  * @property-read \rock\cache\CacheInterface                                            $cache
  * @property-read \rock\db\Connection                                           $db
  * @property-read \rock\event\Event                                             $event
@@ -37,6 +38,7 @@ namespace rock;
  * @property-read \rock\rbac\RBAC                                            $rbac
  * @property-read \rock\markdown\Markdown                                            $markdown
  * @property-read \rock\security\Security                                            $security
+ * @property-read \rock\authclient\Collection   $authClientCollection
  *
  */
 interface RockInterface 
