@@ -22,9 +22,7 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
      *
      * @var int
      */
-    protected static $level = 3;
-
-    protected static $traceFull = false;
+    protected static $level = self::INFO;
     /**
      * Array of exceptions
      *
@@ -186,7 +184,7 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
         $data['method'] = Helper::getValue($dataTrace[2]['function']);
         $data['file']   = $dataTrace[1]['file'];
         $data['line']   = $dataTrace[1]['line'];
-        if (static::$traceFull === true) {
+        if (DEBUG === true) {
             ob_start();
             debug_print_backtrace(-2);
             $data['trace'] = str_replace("\n", ' ; ', ob_get_clean());
@@ -218,7 +216,7 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
             $line            = $handler->getLine();
         }
         $array = current($trace);
-        if (static::$traceFull === true) {
+        if (DEBUG === true) {
             return str_replace("\n", ' ; ', $traceAsString);
         }
         return implode(' ', [$array['class'].'::'.$array['function'], $file . ' on line', $line]);
@@ -255,12 +253,12 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
      */
     protected function display($level = self::ERROR, $msg, \Exception $handler = null)
     {
-        if (DEBUG === true && $level > self::INFO) {
+        if (DEBUG === true && $level > static::$level) {
             static::debuger()->handleException(isset($handler) ? $handler : $this);
             return;
         }
-        if ($level > self::ERROR) {
-            Exception::displayFatal();
+        if ($level > static::$level) {
+            static::displayFatal();
         }
         $className = explode('\\', get_class($this));
         $className = end($className);
