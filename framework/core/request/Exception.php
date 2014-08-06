@@ -7,8 +7,6 @@ use rock\exception\BaseException;
 
 class Exception extends BaseException
 {
-    const INVALID_DOMAIN = 'invalid domain';
-
     /**
      * Constructor
      *

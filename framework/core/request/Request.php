@@ -44,18 +44,10 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
     public function __construct($config = [])
     {
         $this->parentConstruct($config);
-        if (!$this->isSelfDomain()) {
-            $this->Rock->response->status500();
-        }
+        $this->isSelfDomain(true);
+
         $this->parseRequest();
     }
-
-//
-//    public function init()
-//    {
-//
-//    }
-
 
     public function getAll($filters = null)
     {
@@ -421,7 +413,7 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
      */
     public function isSelfDomain($throw = false)
     {
-        if (!$domains = (array)$this->allowDomains) {
+        if (!$domains = $this->allowDomains) {
             return true;
         }
 
@@ -429,7 +421,9 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
             !in_array(strtolower($_SERVER['HTTP_HOST']), $domains, true)
         ) {
             if ($throw === true) {
-                throw new Exception(Exception::CRITICAL, Exception::INVALID_DOMAIN);
+                throw new Exception(Exception::CRITICAL, "Invalid domain: {$_SERVER['HTTP_HOST']}");
+            } else {
+                Rock::error("Invalid domain: {$_SERVER['HTTP_HOST']}");
             }
 
             return false;
