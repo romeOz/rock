@@ -103,7 +103,6 @@ class SelectBuilder
             $aliasSeparator = Helper::getValue($aliasSeparator, $db->aliasSeparator);
 
             foreach ($columns as $i => $column) {
-
                 if ($column instanceof Expression) {
                     $columns[$i] = $column->expression;
                     $params = array_merge($params, $column->params);

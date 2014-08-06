@@ -145,7 +145,6 @@ class ListView extends Snippet
      */
     public $prepare;
 
-
     /**
      * name of template
      *

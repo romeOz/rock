@@ -122,7 +122,6 @@ class ActiveForm extends Snippet
 
     protected function prepareFields(\rock\widgets\ActiveForm $form, array $fields, array &$result)
     {
-
         foreach ($fields as $attributeName => $params) {
             if (is_int($attributeName)) {
                 $attributeName = $params;

@@ -98,7 +98,6 @@ class BaseJson
             }
         }
 
-
         return $decode;
     }
 
