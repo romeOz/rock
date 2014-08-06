@@ -249,7 +249,6 @@ return array_merge(
         'date' => [
             'class' => \rock\date\DateTime::className(),
             'formats' => [
-                'mysql' => \rock\date\DateTime::ISO_DATETIME_FORMAT,
                 'dmy'   => function(\rock\date\DateTime $dateTime){
                         $nowYear  = date('Y');
                         $lastYear = $dateTime->format('Y');
