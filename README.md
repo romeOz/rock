@@ -45,6 +45,7 @@ Features
  * Extensions
     * Sphinx (search engine)
     * phpMorphy (morphological analyzer library for search and other)
+    * OAuth/OAuth2 clients (abstraction over the [Lusitanian/PHPoAuthLib](https://github.com/Lusitanian/PHPoAuthLib))
 
 
 Installation
