@@ -82,7 +82,6 @@ class Rock
         } catch (\Exception $e) {
             new Exception(Exception::ERROR, null, [], $e);
         }
-        var_dump($_SESSION);
         //var_dump(Trace::getTime(Trace::APP_TIME));
         \rock\helpers\Trace::endProfile(\rock\helpers\Trace::APP, \rock\helpers\Trace::TOKEN_APP_RUNTIME);
         //var_dump(Trace::get('db.query'), Trace::get(\rock\helpers\Trace::APP));
