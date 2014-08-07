@@ -53,7 +53,7 @@ Installation
 
 From the Command Line:
 
-`composer create-project --prefer-dist romeo7/rock:1.0.0-beta.1`
+`composer create-project --prefer-dist romeo7/rock:1.0.0-beta.2`
 
 Then, to create the structure of the application you must to run `/path/to/framework/rock.sh`.
 if you want to create tables `Users` and `Access`, then run with parameter `/path/to/framework/rock.sh -u <username> -p <password>`.
@@ -103,7 +103,7 @@ Use a specially prepared environment (Vagrant + Ansible) with preinstalled and c
 ###Installation:
 
 1. [Install Composer](https://getcomposer.org/doc/00-intro.md#globally)
-2. `composer create-project --prefer-dist romeo7/rock:1.0.0-beta.1`
+2. `composer create-project --prefer-dist romeo7/rock:1.0.0-beta.2`
 3. [Install Vagrant](https://www.vagrantup.com/downloads), and additional Vagrant plugins `vagrant plugin install vagrant-hostsupdater vagrant-vbguest vagrant-cachier`
 4. `vagrant up`
 5. Open demo [http://rock/](http://rock/) or [http://192.168.33.37/](http://192.168.33.37/)
