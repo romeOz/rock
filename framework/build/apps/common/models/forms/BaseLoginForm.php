@@ -148,7 +148,7 @@ class BaseLoginForm extends Model
     public function getUsers()
     {
         if (!isset($this->_users)) {
-            if (!$this->_users = BaseUsers::findOneByEmail($this->email, BaseUsers::STATUS_ACTIVE, false)) {
+            if (!$this->_users = BaseUsers::findOneByEmail($this->email, null, false)) {
                 $this->Rock->template->addPlaceholder('e_login', Rock::t('notExistsUser'), true);
             }
         }

@@ -98,76 +98,87 @@ class BaseUsers extends ActiveRecord
     }
 
 
-    public static function findUrlByUsername($username)
+    /**
+     * Finds url by `username`
+     * @param string    $username - `username` of user
+     * @param int|null  $status - `status` of user
+     * @return bool|string
+     */
+    public static function findUrlByUsername($username, $status = self::STATUS_ACTIVE)
     {
-        return static::find()
-            ->select(['url'])
-            ->byUsername($username)
-            ->isEnabled()
-            ->asArray()
-            ->scalar();
+        $query = static::find()->select(['url'])->byUsername($username);
+        if (isset($status)) {
+            $query->byStatus($status);
+        }
+        return $query->asArray()->scalar();
     }
 
-
     /**
-     * Finds user by id
+     * Finds user by `id`
      *
-     * @param int $id
-     * @return array|null
+     * @param int  $id      - `id` of user
+     * @param int|null  $status - `status` of user
+     * @param bool $asArray - result as `Array`
+     * @return UsersQuery|Users|array|null
      */
-    public static function findOneById($id)
+    public static function findOneById($id, $status = self::STATUS_ACTIVE, $asArray = true)
     {
-        return static::find()
-            ->byStatus(self::STATUS_ACTIVE)
-            ->byId($id)
-            ->asArray()
-            ->one();
+        $query = static::find()->byId($id);
+        if (isset($status)) {
+            $query->byStatus($status);
+        }
+        return $query->asArray($asArray)->one();
     }
 
     /**
      * Finds user by username
      *
-     * @param  string      $username
-     * @return array|null
+     * @param  string $username - `username` of user
+     * @param int|null  $status - `status` of user
+     * @param bool    $asArray  - result as `Array`
+     * @return UsersQuery|Users|array|null
      */
-    public static function findOneByUsername($username)
+    public static function findOneByUsername($username, $status = self::STATUS_ACTIVE, $asArray = true)
     {
-        return static::find()
-            ->byStatus(self::STATUS_ACTIVE)
-            ->byUsername($username)
-            ->asArray()
-            ->one();
-    }
-
-
-    /**
-     * Finds user by email
-     *
-     * @param  string      $email
-     * @return array|null
-     */
-    public static function findOneByEmail($email)
-    {
-        return static::find()
-            ->byStatus(self::STATUS_ACTIVE)
-            ->byEmail($email)
-            ->asArray()
-            ->one();
+        $query = static::find()->byUsername($username);
+        if (isset($status)) {
+            $query->byStatus($status);
+        }
+        return $query->asArray($asArray)->one();
     }
 
     /**
-     * Finds user by token
+     * Finds user by `email`
      *
-     * @param  string      $token
-     * @return UsersQuery|Users|null
+     * @param  string $email   - `email` of user
+     * @param int|null  $status - `status` of user
+     * @param bool    $asArray - result as `Array`
+     * @return UsersQuery|Users|array|null
      */
-    public static function findByToken($token)
+    public static function findOneByEmail($email, $status = self::STATUS_ACTIVE, $asArray = true)
     {
-        return static::find()
-            ->byStatus(self::STATUS_NOT_ACTIVE)
-            ->byToken($token)
-            //->asArray()
-            ->one();
+        $query = static::find()->byEmail($email);
+        if (isset($status)) {
+            $query->byStatus($status);
+        }
+        return $query->asArray($asArray)->one();
+    }
+
+    /**
+     * Finds user by `token`
+     *
+     * @param  string      $token - `token` of user
+     * @param int|null  $status - `status` of user
+     * @param bool    $asArray - result as `Array`
+     * @return UsersQuery|Users|array|null
+     */
+    public static function findByToken($token, $status = self::STATUS_ACTIVE, $asArray = true)
+    {
+        $query = static::find()->byToken($token);
+        if (isset($status)) {
+            $query->byStatus($status);
+        }
+        return $query->asArray($asArray)->one();
     }
 
     /**

@@ -10,7 +10,7 @@ class UserMock extends User
 {
     public function activate($token, $autoLogin = false)
     {
-        if (empty($token) || (!$users = Users::findByToken($token))) {
+        if (empty($token) || (!$users = Users::findByToken($token, Users::STATUS_NOT_ACTIVE, false))) {
             return false;
         }
 
