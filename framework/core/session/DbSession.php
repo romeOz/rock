@@ -4,7 +4,6 @@ namespace rock\session;
 
 use rock\db\Connection;
 use rock\db\Query;
-use rock\di\Container;
 use rock\exception\ErrorHandler;
 use rock\Rock;
 
@@ -32,7 +31,7 @@ class DbSession extends Session
      * After the DbSession object is created, if you want to change this property, you should only assign it
      * with a DB connection object.
      */
-    public static $db = 'db';
+    public $db = 'db';
     /**
      * @var string the name of the DB table that stores the session data.
      * The table should be pre-created as follows:
@@ -65,11 +64,9 @@ class DbSession extends Session
      */
     public function init()
     {
-        if (!static::$db instanceof Connection) {
-            static::$db = Rock::factory(static::$db);
+        if (!$this->db instanceof Connection) {
+            $this->db = Rock::factory($this->db);
         }
-
-        //parent::init();
     }
 
     /**
@@ -102,22 +99,22 @@ class DbSession extends Session
 
         $row = (new Query)->from($this->sessionTable)
             ->where(['id' => $oldID])
-            ->createCommand(static::$db)
+            ->createCommand($this->db)
             ->queryOne();
         if ($row !== false) {
             if ($deleteOldSession) {
-                static::$db->createCommand()
+                $this->db->createCommand()
                     ->update($this->sessionTable, ['id' => $newID], ['id' => $oldID])
                     ->execute();
             } else {
                 $row['id'] = $newID;
-                static::$db->createCommand()
+                $this->db->createCommand()
                     ->insert($this->sessionTable, $row)
                     ->execute();
             }
         } else {
             // shouldn't reach here normally
-            static::$db->createCommand()
+            $this->db->createCommand()
                 ->insert($this->sessionTable, [
                                                 'id' => $newID,
                                                 'expire' => time() + $this->getTimeout(),
@@ -133,12 +130,11 @@ class DbSession extends Session
      */
     public function readSession($id)
     {
-
         $data = (new Query)
             ->select(['data'])
             ->from($this->sessionTable)
             ->where('[[expire]]>:expire AND [[id]]=:id', [':expire' => time(), ':id' => $id])
-            ->createCommand(static::$db)
+            ->createCommand($this->db)
             ->queryScalar();
 
         return $data === false ? '' : $data;
@@ -162,10 +158,10 @@ class DbSession extends Session
                 ->select(['id'])
                 ->from($this->sessionTable)
                 ->where(['id' => $id])
-                ->createCommand(static::$db)
+                ->createCommand($this->db)
                 ->queryScalar();
             if ($exists === false) {
-                static::$db
+                $this->db
                     ->createCommand()
                     ->insert(
                         $this->sessionTable,
@@ -177,7 +173,7 @@ class DbSession extends Session
                     )
                     ->execute();
             } else {
-                static::$db->createCommand()
+                $this->db->createCommand()
                     ->update($this->sessionTable, ['data' => $data, 'expire' => $expire], ['id' => $id])
                     ->execute();
             }
@@ -197,7 +193,7 @@ class DbSession extends Session
      */
     public function destroySession($id)
     {
-        static::$db->createCommand()
+        $this->db->createCommand()
             ->delete($this->sessionTable, ['id' => $id])
             ->execute();
 
@@ -212,7 +208,7 @@ class DbSession extends Session
      */
     public function gcSession($maxLifetime)
     {
-        static::$db->createCommand()
+        $this->db->createCommand()
             ->delete($this->sessionTable, '[[expire]]<:expire', [':expire' => time()])
             ->execute();
 

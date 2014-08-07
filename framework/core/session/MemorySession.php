@@ -4,7 +4,6 @@ namespace rock\session;
 
 
 use rock\cache\CacheInterface;
-use rock\di\Container;
 use rock\Rock;
 
 /**
@@ -27,7 +26,7 @@ use rock\Rock;
  * ]
  * ~~~
  */
-class CacheSession extends Session
+class MemorySession extends Session
 {
     /**
      * @var CacheInterface|string the cache object or the application component ID of the cache object.
@@ -36,7 +35,7 @@ class CacheSession extends Session
      * After the CacheSession object is created, if you want to change this property,
      * you should only assign it with a cache object.
      */
-    public static $cache = 'cache';
+    public $cache = 'cache';
 
 
     /**
@@ -44,12 +43,10 @@ class CacheSession extends Session
      */
     public function init()
     {
-        if (!static::$cache instanceof CacheInterface) {
-            static::$cache = Rock::factory(static::$cache);
-            static::$cache->enabled();
+        if (!$this->cache instanceof CacheInterface) {
+            $this->cache = Rock::factory($this->cache);
+            $this->cache->enabled();
         }
-
-        //parent::init();
     }
 
 
@@ -72,7 +69,7 @@ class CacheSession extends Session
      */
     public function readSession($id)
     {
-        $data = static::$cache->get($this->calculateKey($id));
+        $data = $this->cache->get($this->calculateKey($id));
         return $data === false ? '' : $data;
     }
 
@@ -85,7 +82,7 @@ class CacheSession extends Session
      */
     public function writeSession($id, $data)
     {
-        return static::$cache->set($this->calculateKey($id), $data);
+        return $this->cache->set($this->calculateKey($id), $data);
     }
 
     /**
@@ -96,7 +93,7 @@ class CacheSession extends Session
      */
     public function destroySession($id)
     {
-        return static::$cache->remove($this->calculateKey($id));
+        return $this->cache->remove($this->calculateKey($id));
     }
 
     /**

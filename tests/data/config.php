@@ -2,6 +2,7 @@
 use rockunit\migrations\AccessItemsMigration;
 use rockunit\migrations\AccessRolesItemsMigration;
 use rockunit\migrations\AccessUsersItemsMigration;
+use rockunit\migrations\SessionsMigration;
 use rockunit\migrations\UsersMigration;
 
 return [
@@ -22,6 +23,7 @@ return [
                 AccessItemsMigration::className(),
                 AccessRolesItemsMigration::className(),
                 AccessUsersItemsMigration::className(),
+                SessionsMigration::className(),
             ]
         ],
         'sqlite' => [
