@@ -291,7 +291,7 @@ class Route implements RequestInterface, ErrorsInterface
             }
             return;
         }
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_VAR, ['name' => 'rules']);
+        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_PROPERTY, ['name' => 'rules']);
     }
 
 

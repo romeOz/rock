@@ -440,7 +440,7 @@ class Captcha implements ComponentsInterface, CaptchaInterface
 
         if (empty($return['image'])) {
             new Exception(
-                Exception::ERROR, Exception::UNKNOWN_VAR, ['name' => 'image']
+                Exception::ERROR, Exception::UNKNOWN_VAR, ['name' => '$return[\'image\']']
             );
 
             return false;
