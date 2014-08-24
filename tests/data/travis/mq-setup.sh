@@ -18,6 +18,7 @@ else
     sudo apt-get install gperf
     sudo apt-get install libuuid1
     sudo apt-get install uuid-dev
+    sudo apt-get install libgearman7
     wget https://launchpad.net/gearmand/1.2/1.1.11/+download/gearmand-1.1.11.tar.gz
     tar xf gearmand-1.1.11.tar.gz
     cd gearmand-1.1.11
@@ -27,6 +28,7 @@ else
     cd -
     yes | pecl install gearman
 
+    # Run servers (workers)
     php tests/data/mq/zero/simple_server.php &
     php tests/data/mq/zero/pub_server.php &
 
