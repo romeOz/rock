@@ -17,6 +17,7 @@ else
     #sudo make install
     #cd -
     yes | pecl install zmq-beta
+    echo "extension = zmq.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
     # Install Gearman
     sudo apt-get install gearman-job-server
