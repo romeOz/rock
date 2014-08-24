@@ -43,6 +43,9 @@ else
     php tests/data/mq/zero/pub_server.php &
 
     php tests/data/mq/gearman/simple_server.php &
+
+    php tests/data/mq/rabbit/simple_server.php &
+    php tests/data/mq/rabbit/pub_server.php &
     # Install RabbitMQ
     #sudo apt-get install rabbitmq-server
 fi
