@@ -36,7 +36,7 @@ before_script:
 
 script:
   - mkdir -p build/logs
-  - bash -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ] && [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml --exclude-group hhvm,couchbase,zeromq; fi;'
+  - bash -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ] && [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml --exclude-group hhvm,couchbase; fi;'
   - bash -c 'if [ "$TRAVIS_PHP_VERSION" == "hhvm" ] || [ "$TRAVIS_PHP_VERSION" == "hhvm-nightly" ]; then vendor/bin/phpunit --verbose --exclude-group php,couchbase,memcache,memcached,redis,apc,mq; fi;'
 
 after_script:

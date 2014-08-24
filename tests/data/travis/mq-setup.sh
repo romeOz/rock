@@ -4,11 +4,19 @@ if (php --version | grep -i HHVM > /dev/null); then
     echo "skipping MQ on HHVM"
 else
     sudo add-apt-repository -y ppa:chris-lea/zeromq
-    sudo add-apt-repository -y ppa:ondrej/php5
+    #sudo add-apt-repository -y ppa:ondrej/php5
     sudo apt-get update
 
     # Install ZeroMQ
-    sudo apt-get install libzmq3 libpgm-5.1-0 php5-zmq
+    sudo apt-get install libzmq3 libpgm-5.1-0
+    #wget http://download.zeromq.org/zeromq-4.0.4.tar.gz
+    #tar -xf zeromq-4.0.4.tar.gz
+    #cd zeromq-4.0.4
+    #./configure
+    #make
+    #sudo make install
+    #cd -
+    yes | pecl install zmq-beta
 
     # Install Gearman
     sudo apt-get install gearman-job-server
