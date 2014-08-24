@@ -876,12 +876,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
             $eventBefore = self::EVENT_BEFORE_UPDATE;
             //$eventAfter =  self::EVENT_AFTER_UPDATE;
         }
-        if ($this->trigger($eventBefore)->before() === false) {
-            //Event::offMulti([$eventAfter, $eventBefore]);
-            return false;
-        }
-
-        return true;
+        return $this->trigger($eventBefore)->before();
     }
 
     /**
@@ -907,9 +902,10 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
             //$eventBefore = self::EVENT_BEFORE_UPDATE;
             $eventAfter =  self::EVENT_AFTER_UPDATE;
         }
-        $this->trigger($eventAfter, Event::AFTER, new AfterSaveEvent([
-                                                                         'changedAttributes' => $changedAttributes
-                                                                     ]))->after();
+        $event = new AfterSaveEvent([
+            'changedAttributes' => $changedAttributes
+        ]);
+        $this->trigger($eventAfter, Event::AFTER, $event)->after();
         //Event::offMulti([$eventAfter, $eventBefore]);
     }
 
@@ -918,7 +914,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * The default implementation raises the [[EVENT_BEFORE_DELETE]] event.
      * When overriding this method, make sure you call the parent implementation like the following:
      *
-     * ~~~
+     * ```php
      * public function beforeDelete()
      * {
      *     if (parent::beforeDelete()) {
@@ -928,7 +924,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      *         return false;
      *     }
      * }
-     * ~~~
+     * ```
      *
      * @return boolean whether the record should be deleted. Defaults to true.
      */
