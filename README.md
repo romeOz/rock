@@ -92,7 +92,7 @@ Use a specially prepared environment (Vagrant + Ansible) with preinstalled and c
 
  * Ubuntu 14.04 64 bit
 
-> If you need to use 32 bit of Ubuntu, then uncomment `config.vm.box_url` the appropriate version in the file /path/to/Vagrantfile.
+> If you need to use 32 bit of Ubuntu, then uncomment `config.vm.box_url` the appropriate version in the file `/path/to/Vagrantfile`.
 
  * Nginx 1.6
  * PHP-FPM 5.5
@@ -108,7 +108,7 @@ Use a specially prepared environment (Vagrant + Ansible) with preinstalled and c
     * Gearman 1.0.6 + php5-gearman 1.1.2 (**option**)
  * Local IP loop on Host machine /etc/hosts and Virtual hosts in Nginx already set up!
 
-> To run all services marked "option" you should to uncomment them in the file /path/to/provisioning/main.yml
+> To run all services marked `option` you should to uncomment them in the file `/path/to/provisioning/main.yml`.
 
 ###Installation:
 
