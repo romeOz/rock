@@ -4,7 +4,7 @@ if (php --version | grep -i HHVM > /dev/null); then
     echo "skipping APC on HHVM"
 else
     # Install ZeroMQ
-    sudo add-apt-repository ppa:chris-lea/zeromq
+    sudo add-apt-repository -y ppa:chris-lea/zeromq
     sudo apt-get update
     sudo apt-get install libzmq3 php5-zmq
 
