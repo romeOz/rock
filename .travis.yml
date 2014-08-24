@@ -25,8 +25,8 @@ install:
   - composer require satooshi/php-coveralls:*@dev
   - chmod -R +x tests/data/travis/
   - bash -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ] && [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then tests/data/travis/apc-setup.sh; fi;'
-  - tests/data/travis/memcache-setup.sh
-  - tests/data/travis/redis-setup.sh
+  - bash -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ] && [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then tests/data/travis/memcache-setup.sh; fi;'
+  - bash -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ] && [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then tests/data/travis/radis-setup.sh; fi;'
   - bash -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ] && [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then tests/data/travis/mq-setup.sh; fi;'
   - framework/rock.sh
 
