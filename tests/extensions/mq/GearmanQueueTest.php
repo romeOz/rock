@@ -7,6 +7,7 @@ use rock\mq\GearmanQueue;
 
 /**
  * @group mq
+ * @group gearman
  */
 class GearmanQueueTest extends \PHPUnit_Framework_TestCase
 {

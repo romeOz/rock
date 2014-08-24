@@ -7,6 +7,7 @@ use rock\mq\ZeroQueue;
 
 /**
  * @group mq
+ * @group zeromq
  */
 class ZeroQueueTest extends \PHPUnit_Framework_TestCase
 {
