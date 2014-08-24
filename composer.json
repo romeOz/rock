@@ -23,13 +23,13 @@
         "imagine/imagine": "*",
         "monolog/monolog": "*",
         "league/flysystem": "*",
-        "cebe/markdown": "*@dev",
-        "mibe/feedwriter": "dev-master",
-        "lusitanian/oauth": "*"
+        "cebe/markdown": "*@dev"
     },
     "require-dev": {
         "phpunit/phpunit": "~3.7",
-        "videlalvaro/php-amqplib": "2.2.*"
+        "videlalvaro/php-amqplib": "2.2.*",
+        "lusitanian/oauth": "*",
+        "mibe/feedwriter": "dev-master"
     },
     "suggest": {
         "tackk/cartographer": "required by SitemapResponseFormatter",
