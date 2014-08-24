@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if (php --version | grep -i -e "^HHVM" > /dev/null); then
+if (php --version | grep -i -e "^HHVM.*" > /dev/null); then
     echo "skipping mq on HHVM"
 else
     sudo add-apt-repository -y ppa:chris-lea/zeromq
