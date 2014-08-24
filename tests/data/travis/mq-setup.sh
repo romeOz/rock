@@ -1,7 +1,7 @@
 #!/bin/sh
 
-if (php --version | grep -i -e "^HHVM.*" > /dev/null); then
-    echo "skipping mq on HHVM"
+if (php --version | grep -i HHVM > /dev/null); then
+    echo "skipping MQ on HHVM"
 else
     sudo add-apt-repository -y ppa:chris-lea/zeromq
     sudo add-apt-repository -y ppa:ondrej/php5
@@ -13,6 +13,7 @@ else
     # Install Gearman
     sudo apt-get install gearman-job-server php5-gearman
 
+    php tests/data/mq/gearman/simple_server.php
     # Install RabbitMQ
     #sudo apt-get install rabbitmq-server
 fi
