@@ -46,6 +46,7 @@ Features
     * Sphinx (search engine)
     * phpMorphy (morphological analyzer library for search and other)
     * OAuth/OAuth2 clients (abstraction over the [Lusitanian/PHPoAuthLib](https://github.com/Lusitanian/PHPoAuthLib))
+    * Message queue services (ZeroMQ, RabbitMQ, Gearman)
 
 
 Installation
@@ -53,7 +54,7 @@ Installation
 
 From the Command Line:
 
-`composer create-project --prefer-dist romeo7/rock:1.0.0-beta.2`
+`composer create-project --prefer-dist romeo7/rock:1.0.0-beta.3`
 
 Then, to create the structure of the application you must to run `/path/to/framework/rock.sh`.
 if you want to create tables `Users` and `Access`, then run with parameter `/path/to/framework/rock.sh -u <username> -p <password>`.
@@ -89,21 +90,30 @@ Use a specially prepared environment (Vagrant + Ansible) with preinstalled and c
 
 ###Out of the box:
 
- * Ubuntu 14.04 32 bit
+ * Ubuntu 14.04 64 bit
+
+> If you need to use 32 bit of Ubuntu, then uncomment `config.vm.box_url` the appropriate version in the file /path/to/Vagrantfile.
+
  * Nginx 1.6
  * PHP-FPM 5.5
  * Composer
  * MySQL 5.5
  * For caching
-    * Couhbase 2.2.0 ( + pecl couchbase-1.2.2)
-    * Redis 2.8 ( + php5-redis)
-    * Memcached 1.4.14 ( + php5_memcached, php5_memcache)
+    * Couhbase 2.2.0 + pecl couchbase-1.2.2 (**option**)
+    * Redis 2.8 + php5-redis (**option**)
+    * Memcached 1.4.14 + php5_memcached, php5_memcache
+ * For message queue
+    * ZeroMQ 4.0.4 + php5-zmq 1.1.2 (**option**)
+    * RabbitMQ 3.2.4 (**option**)
+    * Gearman 1.0.6 + php5-gearman 1.1.2 (**option**)
  * Local IP loop on Host machine /etc/hosts and Virtual hosts in Nginx already set up!
+
+> To run all services marked "option" you should to uncomment them in the file /path/to/provisioning/main.yml
 
 ###Installation:
 
 1. [Install Composer](https://getcomposer.org/doc/00-intro.md#globally)
-2. `composer create-project --prefer-dist romeo7/rock:1.0.0-beta.2`
+2. `composer create-project --prefer-dist romeo7/rock:1.0.0-beta.3`
 3. [Install Vagrant](https://www.vagrantup.com/downloads), and additional Vagrant plugins `vagrant plugin install vagrant-hostsupdater vagrant-vbguest vagrant-cachier`
 4. `vagrant up`
 5. Open demo [http://rock/](http://rock/) or [http://192.168.33.37/](http://192.168.33.37/)

@@ -10,15 +10,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # please see the online documentation at vagrantup.com.
 
     # Every Vagrant virtual environment requires a box to build off of.
-    config.vm.box = "Ubuntu14.04"
+    config.vm.box = "Ubuntu14.04x64"
+    config.vm.box_url = "https://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-amd64-vagrant-disk1.box"
 
-    # The url from where the 'config.vm.box' box will be fetched if it
-    # doesn't already exist on the user's system.
-    #config.vm.box_url = "https://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-amd64-vagrant-disk1.box"
-
-    # Uncomment this line and remove config.vm.box_url above
     # if you need to use 32 bit of Ubuntu
-    config.vm.box_url = "https://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-i386-vagrant-disk1.box"
+    #config.vm.box_url = "https://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-i386-vagrant-disk1.box"
 
     # Disable automatic box update checking. If you disable this, then
     # boxes will only be checked for updates when the user runs
@@ -58,7 +54,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         # vb.gui = true
         # Use VBoxManage to customize the VM. For example to change memory:
         vb.customize ["modifyvm", :id, "--memory", "512"]
-        vb.customize ["modifyvm", :id, "--name", "rock-template"]
+        vb.customize ["modifyvm", :id, "--name", "rock"]
         vb.customize ["modifyvm", :id, "--ostype", "Ubuntu"]
         vb.customize ["modifyvm", :id, "--cpuexecutioncap", "90"]
         # By default set to 1, change it to amount of your CPUs
@@ -97,6 +93,6 @@ SCRIPT
     # Run Ansible provisioning inside the VM
     #
     config.vm.provision "shell" do |sh|
-        sh.inline = "chmod -x /vagrant/provisioning/hosts; ansible-playbook /vagrant/provisioning/main.yml --inventory-file=/vagrant/provisioning/hosts --connection=local"
+        sh.inline = "chmod -x /vagrant/provisioning/hosts; ansible-playbook -v /vagrant/provisioning/main.yml --inventory-file=/vagrant/provisioning/hosts --connection=local"
     end
 end

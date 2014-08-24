@@ -1,0 +1,5 @@
+---
+- name: Install RabbitMQ Server
+  action: apt pkg={{ item }} state=latest
+  with_items:
+    - rabbitmq-server

@@ -9,7 +9,10 @@
     - php
     - composer
     - mysql
-    - redis
-    - memcached
-    - couchbase
+#    - redis
+#    - memcached
+#    - couchbase
+#    - zeromq
+#    - rabbitmq
+#    - gearmanmq
     - demo

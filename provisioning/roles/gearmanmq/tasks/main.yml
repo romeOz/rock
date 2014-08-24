@@ -1,0 +1,6 @@
+---
+- name: Install Gearman Server + php5-gearman
+  action: apt pkg={{ item }} state=latest
+  with_items:
+    - gearman-job-server
+    - php5-gearman
