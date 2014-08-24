@@ -28,13 +28,13 @@ else
     #sudo apt-get install libev-libevent-dev
     sudo apt-get install uuid-dev
     sudo apt-get install libgearman-dev
-    wget https://launchpad.net/gearmand/1.2/1.1.11/+download/gearmand-1.1.11.tar.gz
-    tar xf gearmand-1.1.11.tar.gz
-    cd gearmand-1.1.11
-    ./configure
-    make
-    sudo make install
-    cd -
+    #wget https://launchpad.net/gearmand/1.2/1.1.11/+download/gearmand-1.1.11.tar.gz
+    #tar xf gearmand-1.1.11.tar.gz
+    #cd gearmand-1.1.11
+    #./configure
+    #make
+    #sudo make install
+    #cd -
     yes | pecl install gearman
 
     # Run servers (workers)
