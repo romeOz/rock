@@ -13,7 +13,8 @@ else
     # Install Gearman
     sudo apt-get install gearman-job-server php5-gearman
 
-    php tests/data/mq/gearman/simple_server.php
+    php tests/data/mq/zero/simple_server.php &
+    php tests/data/mq/zero/pub_server.php &
     # Install RabbitMQ
     #sudo apt-get install rabbitmq-server
 fi
