@@ -13,7 +13,7 @@ else
     # Install Gearman
     sudo apt-get install gearman-job-server
     sudo apt-get install php5-gearman
-    echo "extension = -gearman.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+    echo "extension = gearman.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
     php tests/data/mq/zero/simple_server.php &
     php tests/data/mq/zero/pub_server.php &
