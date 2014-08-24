@@ -1,8 +1,9 @@
-- name: Install redis-server
+- name: Install Redis Server + php5-redis
   apt: pkg={{ item }} state=latest update-cache=yes
 #  register: redis_install
   with_items:
     - redis-server
+    - php5-redis
   tags: redis
 
 #- name: Disable obsolete init.d service
