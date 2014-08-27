@@ -19,9 +19,9 @@ Features
  * Route
  * Template engine (in a separate project [Rock Template](https://github.com/romeo7/rock-template))
     * Snippets (ListView, Pagination,...)
-    * HTML Builder (fork from [Yii2](https://github.com/yiisoft/yii2))
-    * Widgets (fork from [Yii2](https://github.com/yiisoft/yii2))
- * ORM/DBAL (fork from [Yii2](https://github.com/yiisoft/yii2))
+    * HTML Builder (fork by [Yii2](https://github.com/yiisoft/yii2))
+    * Widgets (fork by [Yii2](https://github.com/yiisoft/yii2))
+ * ORM/DBAL (fork by [Yii2](https://github.com/yiisoft/yii2))
  * DataProviders (DB, Thumb)
  * Events (Pub/Sub)
  * Many different helpers (String, Numeric, ArrayHelper, File, Pagination...)
@@ -34,11 +34,11 @@ Features
  * Session
  * Cookie
  * i18n
- * Validation (fork from [Respect/Validation](https://github.com/Respect/Validation))
+ * Validation (fork by [Respect/Validation](https://github.com/Respect/Validation))
  * Cache (in a separate project [Rock Cache](https://github.com/romeo7/rock-cache))
  * Behaviors + Filters (AccessFilter, ContentNegotiatorFilter, EventFilter, RateLimiter, SanitizeFilter, ValidationFilters, VerbFilter, TimestampBehavior)
  * Mail
- * Security + Token
+ * Security + Tokenization
  * Markdown (abstraction over the [cebe/markdown](https://github.com/cebe/markdown))
  * RBAC (local or DB)
  * Exception + Logger + Tracing
