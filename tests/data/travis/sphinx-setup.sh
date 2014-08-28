@@ -3,6 +3,9 @@
 SCRIPT=$(readlink -f "$0")
 CWD=$(dirname "$SCRIPT")
 
+#Install Sphinx
+sudo apt-get install sphinxsearch
+
 # log files
 sudo mkdir /var/log/sphinx
 sudo touch /var/log/sphinx/searchd.log
