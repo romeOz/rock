@@ -82,6 +82,7 @@ class Template implements ComponentsInterface
 
     /** @var string */
     public $head = '<!DOCTYPE html>';
+    public $body = '<body>';
     /**
      * @var array the registered link tags.
      * @see registerLinkTag()
@@ -994,7 +995,7 @@ class Template implements ComponentsInterface
      */
     protected function renderBodyBeginHtml()
     {
-        $lines = ['<body>'];
+        $lines = [$this->body];
         if (!empty($this->jsFiles[self::POS_BEGIN])) {
             $lines[] = implode("\n", $this->jsFiles[self::POS_BEGIN]);
         }
