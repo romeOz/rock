@@ -49,6 +49,9 @@ trait ActiveRelationTrait
      */
     public $inverseOf;
 
+    /**
+     * @var \Closure
+     */
     public $viaCallback;
 
     /**
@@ -389,8 +392,10 @@ trait ActiveRelationTrait
         return $attributes;
     }
 
-
-
+    /**
+     * @param callable $callback
+     * @return $this
+     */
     public function viaCallback(callable $callback)
     {
         $this->viaCallback = $callback;
