@@ -1,5 +1,9 @@
-#!/bin/bash
 #!/bin/sh
+
+if (php --version | grep -i HipHop > /dev/null); then
+    echo "Skipping Couchbase on HHVM"
+    exit 0
+fi
 
 # Download and uncompress Couchbase Server
 wget http://packages.couchbase.com/releases/2.2.0/couchbase-server-community_2.2.0_x86_64.deb

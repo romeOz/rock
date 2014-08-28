@@ -7,6 +7,7 @@ CWD=$(dirname "$SCRIPT")
 sudo add-apt-repository -y ppa:builds/sphinxsearch-rel21
 sudo apt-get update
 sudo apt-get install sphinxsearch
+sudo service sphinxsearch stop
 
 # log files
 sudo mkdir /var/log/sphinx

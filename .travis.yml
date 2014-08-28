@@ -23,10 +23,10 @@ install:
   - composer install --prefer-dist
   - composer require satooshi/php-coveralls:*@dev
   - chmod -R +x tests/data/travis/
-  - bash -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ] && [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then tests/data/travis/apc-setup.sh; fi;'
-  - bash -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ] && [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then tests/data/travis/memcache-setup.sh; fi;'
-  - bash -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ] && [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then tests/data/travis/redis-setup.sh; fi;'
-  - bash -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ] && [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then tests/data/travis/mq-setup.sh; fi;'
+  - tests/data/travis/apc-setup.sh
+  - tests/data/travis/memcache-setup.sh; fi;'
+  - tests/data/travis/redis-setup.sh
+  - tests/data/travis/mq-setup.sh
   - framework/rock.sh
 
 before_script:
@@ -35,8 +35,12 @@ before_script:
 
 script:
   - mkdir -p build/logs
-  - bash -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ] && [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml --exclude-group hhvm,couchbase; fi;'
-  - bash -c 'if [ "$TRAVIS_PHP_VERSION" == "hhvm" ] || [ "$TRAVIS_PHP_VERSION" == "hhvm-nightly" ]; then vendor/bin/phpunit --verbose --exclude-group php,couchbase,memcache,memcached,redis,apc,mq; fi;'
+  - |
+    if (php --version | grep -i HipHop > /dev/null); then
+      vendor/bin/phpunit --verbose --exclude-group php,couchbase,memcache,memcached,redis,apc,mq
+    else
+      vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml --exclude-group hhvm,couchbase
+    fi
 
 after_script:
   - vendor/bin/coveralls -v
