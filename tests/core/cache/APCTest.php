@@ -42,7 +42,7 @@ class APCTest extends CommonTraitTest
      */
     public function testTtl(CacheInterface $cache)
     {
-
+        $this->markTestSkipped('Skipping: ' . __METHOD__);
     }
 
     /**
@@ -50,7 +50,7 @@ class APCTest extends CommonTraitTest
      */
     public function testHasByTouchFalse(CacheInterface $cache)
     {
-
+        $this->markTestSkipped('Skipping: ' . __METHOD__);
     }
 
     /**
@@ -58,7 +58,7 @@ class APCTest extends CommonTraitTest
      */
     public function testTouch(CacheInterface $cache)
     {
-
+        $this->markTestSkipped('Skipping: ' . __METHOD__);
     }
 
     /**
@@ -66,7 +66,7 @@ class APCTest extends CommonTraitTest
      */
     public function testTouchMultiTrue(CacheInterface $cache)
     {
-
+        $this->markTestSkipped('Skipping: ' . __METHOD__);
     }
 
     /**
@@ -74,7 +74,7 @@ class APCTest extends CommonTraitTest
      */
     public function testTouchMultiFalse(CacheInterface $cache)
     {
-
+        $this->markTestSkipped('Skipping: ' . __METHOD__);
     }
 
     /**
@@ -82,7 +82,7 @@ class APCTest extends CommonTraitTest
      */
     public function testIncrementWithTtl(CacheInterface $cache)
     {
-
+        $this->markTestSkipped('Skipping: ' . __METHOD__);
     }
 }
  
