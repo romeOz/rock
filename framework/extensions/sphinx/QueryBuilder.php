@@ -53,51 +53,23 @@ class QueryBuilder
     public function build($query, $params = [])
     {
         $params = empty($params) ? $query->params : array_merge($params, $query->params);
-
-        if ($query->match !== null) {
-            if ($query->match instanceof Expression) {
-                $query->andWhere('MATCH(' . $query->match->expression . ')');
-                $params = array_merge($params, $query->match->params);
-            } else {
-                $this->buildMatch($query, $params);
-            }
-        }
-
         $from = $query->from;
         if ($from === null && $query instanceof ActiveQuery) {
-            /** @var ActiveRecord $modelClass */
+            /* @var $modelClass ActiveRecord */
             $modelClass = $query->modelClass;
             $from = [$modelClass::indexName()];
         }
-
         $clauses = [
             $this->buildSelect($query->select, $params, $query->distinct, $query->selectOption),
             $this->buildFrom($from, $params),
-            $this->buildWhere($query->from, $query->where, $params),
+            $this->buildWhere($query->from, $query->where, $params, $query->match),
             $this->buildGroupBy($query->groupBy),
             $this->buildWithin($query->within),
             $this->buildOrderBy($query->orderBy),
             $this->buildLimit($query->limit, $query->offset),
             $this->buildOption($query->options, $params),
         ];
-
         return [implode($this->separator, array_filter($clauses)), $params];
-    }
-
-    /**
-     * @param Query $query
-     * @param array $params
-     */
-    protected function buildMatch($query, &$params)
-    {
-        $phName = self::PARAM_PREFIX . count($params);
-        $match = 'MATCH(' . $phName . ')';
-        $params[$phName] = $this->db->escapeMatchValue($query->match);
-        if ((is_string($query->where) && $query->where == $match) || (is_array($query->where) && in_array($match, $query->where, true))) {
-            return;
-        }
-
-        $query->andWhere($match);
     }
 
     /**
@@ -497,10 +469,26 @@ class QueryBuilder
      * @param string[] $indexes list of index names, which affected by query
      * @param string|array $condition
      * @param array $params the binding parameters to be populated
+     * @param string|Expression|null $match
      * @return string the WHERE clause built from [[query]].
      */
-    public function buildWhere($indexes, $condition, &$params)
+    public function buildWhere($indexes, $condition, &$params, $match = null)
     {
+        if ($match !== null) {
+            if ($match instanceof Expression) {
+                $matchWhere = 'MATCH(' . $match->expression . ')';
+                $params = array_merge($params, $match->params);
+            } else {
+                $phName = self::PARAM_PREFIX . count($params);
+                $params[$phName] = $this->db->escapeMatchValue($match);
+                $matchWhere = 'MATCH(' . $phName . ')';
+            }
+            if ($condition === null) {
+                $condition = $matchWhere;
+            } else {
+                $condition = ['and', $matchWhere, $condition];
+            }
+        }
         if (empty($condition)) {
             return '';
         }
@@ -514,7 +502,6 @@ class QueryBuilder
             }
         }
         $where = $this->buildCondition($indexSchemas, $condition, $params);
-
         return $where === '' ? '' : 'WHERE ' . $where;
     }
 

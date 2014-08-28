@@ -6,6 +6,7 @@ namespace rockunit\extensions\sphinx;
 use League\Flysystem\Adapter\Local;
 use rock\access\Access;
 use rock\cache\CacheFile;
+use rock\db\Expression;
 use rock\event\Event;
 use rock\file\FileManager;
 use rock\helpers\Trace;
@@ -746,6 +747,21 @@ class ActiveRecordTest extends SphinxTestCase
             ->validation(Validation::create()->key('tag', Validation::string()))
             ->asArray();
         $this->assertNotEmpty($query->one());
+    }
+
+    /**
+     * @see https://github.com/yiisoft/yii2/issues/4830
+     *
+     * @depends testFind
+     */
+    public function testFindQueryReuse()
+    {
+        $result = ArticleIndex::find()->andWhere(['author_id' => 1]);
+        $this->assertTrue($result->one() instanceof ArticleIndex);
+        $this->assertTrue($result->one() instanceof ArticleIndex);
+        $result = ArticleIndex::find()->match('dogs');
+        $this->assertTrue($result->one() instanceof ArticleIndex);
+        $this->assertTrue($result->one() instanceof ArticleIndex);
     }
 }
  
