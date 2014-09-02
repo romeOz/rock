@@ -2,7 +2,6 @@
 namespace rock\validation\exceptions;
 
 use DateTime;
-use Exception;
 use InvalidArgumentException;
 
 class ValidationException extends InvalidArgumentException
@@ -10,6 +9,8 @@ class ValidationException extends InvalidArgumentException
     const MODE_DEFAULT = 1;
     const MODE_NEGATIVE = 2;
     const STANDARD = 0;
+    
+    public static $replacePattern = '/\{{1,2}(\w+)\}{1,2}/';
     public static $defaultTemplates = array(
         self::MODE_DEFAULT => array(
             self::STANDARD => 'Data validation failed for %s'
@@ -27,7 +28,7 @@ class ValidationException extends InvalidArgumentException
     public static function format($template, array $vars=array())
     {
         return preg_replace_callback(
-            '/{{(\w+)}}/',
+            static::$replacePattern,
             function($match) use ($vars) {
                 return isset($vars[$match[1]]) ? $vars[$match[1]] : $match[0];
             },
