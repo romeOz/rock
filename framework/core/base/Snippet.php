@@ -60,7 +60,7 @@ abstract class Snippet implements ComponentsInterface
     {
         if (is_string($function)) {
             $function = trim($function);
-            if (strpos($function, '.')) {
+            if (strpos($function, '.') !== false) {
                 $function = explode('.', $function);
             } else {
                 return $this->template->getSnippet($function, $params);

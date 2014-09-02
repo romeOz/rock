@@ -1452,7 +1452,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
         $labels = $this->attributeLabels();
         if (isset($labels[$attribute])) {
             return ($labels[$attribute]);
-        } elseif (strpos($attribute, '.')) {
+        } elseif (strpos($attribute, '.') !== false) {
             $attributeParts = explode('.', $attribute);
             $neededAttribute = array_pop($attributeParts);
 

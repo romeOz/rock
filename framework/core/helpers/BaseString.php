@@ -430,7 +430,7 @@ class BaseString
             return $string;
         }
 
-        if (strpos($string, '{')) {
+        if (strpos($string, '{') !== false) {
             return preg_replace_callback(
                 $pattern,
                 function($match) use ($dataReplace, $hide) {
