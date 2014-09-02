@@ -6,6 +6,7 @@ use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
 use rock\base\ObjectTrait;
 use rock\helpers\Helper;
+use rock\helpers\Json;
 use rock\helpers\Sanitize;
 use rock\Rock;
 
@@ -934,8 +935,15 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
     public function parseRequest()
     {
         $method = $this->getMethod();
-        if (empty($GLOBALS['_' . $method]) && array_key_exists($method, ['HEAD' => 0, 'PUT' => 1, 'PATCH' => 2 , 'DELETE' => 3])) {
-            parse_str(file_get_contents('php://input'), $array);
+        if (empty($GLOBALS['_' . $method]) && array_key_exists($method, ['HEAD' => 0, 'POST' => 1, 'PUT' => 2, 'PATCH' => 3, 'DELETE' => 4])) {
+
+            $stream = trim(file_get_contents('php://input'));
+            if ($this->getContentType() === 'application/json' || Json::is($stream)) {
+                $array = Json::decode($stream, true);
+            } else {
+                parse_str($stream, $array);
+            }
+
             $GLOBALS['_' . $method] = $array;
             // Add these request vars into _REQUEST, mimicing default behavior, PUT/DELETE will override existing COOKIE/GET vars
             $_REQUEST = $array + $_REQUEST;
