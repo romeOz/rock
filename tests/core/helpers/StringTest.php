@@ -25,6 +25,8 @@ class StringTest extends \PHPUnit_Framework_TestCase
             [['foo'], [], ['foo']],
             ['', [], ''],
             ['hello {value} !!!', ['value'=> 'world'], 'hello world !!!'],
+            ['hello {{name}} !!!', ['name'=> 'world'], 'hello world !!!'],
+            ['hello {{unknown}} !!!', ['name'=> 'world'], 'hello {{unknown}} !!!'],
             ['hello {value} !!!', [], 'hello {value} !!!'],
         ];
     }
