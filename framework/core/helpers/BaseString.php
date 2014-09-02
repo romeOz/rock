@@ -418,27 +418,33 @@ class BaseString
     /**
      * Replace
      *
-     * @param string $string       - string
+     * @param string $string      - string
      * @param array  $dataReplace - array replace
-     * @param bool   $hide - remove placeholder, e.g. {name_placeholder}
+     * @param bool   $hide        - remove placeholder, e.g. {name_placeholder}
+     * @param string $pattern - pattern for replace
      * @return string
      */
-    public static function replace($string, array $dataReplace = [], $hide = false)
+    public static function replace($string, array $dataReplace = [], $hide = false, $pattern = '/\{{1,2}(\\w+)\}{1,2}/')
     {
         if (is_array($string) || empty($dataReplace)) {
             return $string;
         }
-        // build a replacement array with braces around the context keys
-        $replace = [];
-        foreach ($dataReplace as $key => $val) {
-            $replace['{' . $key . '}'] = $val;
-        }
 
-        $string = strtr($string, $replace);
-        // interpolate replacement values into the message and return
-        return $hide === true
-            ? preg_replace(['/{\\w+}/iu', '/\(\\s*\)/', '/\\s+/'], ['', '', ' '], $string)
-            : $string;
+        if (strpos($string, '{')) {
+            return preg_replace_callback(
+                $pattern,
+                function($match) use ($dataReplace, $hide) {
+                    if (isset($dataReplace[$match[1]])) {
+                        return $dataReplace[$match[1]];
+                    } elseif ($hide){
+                        return '';
+                    }
+                    return $match[0];
+                },
+                $string
+            );
+        }
+        return $string;
     }
 
     /**
