@@ -164,7 +164,7 @@ class ActiveForm extends Widget
         if (!isset($this->fieldConfig['class'])) {
             $this->fieldConfig['class'] = ActiveField::className();
         }
-        echo Html::beginForm($this->model->formName(), $this->action, $this->method, $this->options, $this->model);
+        echo Html::beginForm($this->model->formName(), $this->action, $this->method, $this->options);
     }
 
     /**

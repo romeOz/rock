@@ -286,11 +286,11 @@ class BaseHtml
 
             if (strcasecmp($method, 'get') && strcasecmp($method, 'post')) {
                 // simulate PUT, DELETE, etc. via POST
-                $hiddenInputs[] = static::hiddenInput(isset($name) ? $name . "[{$request->methodVar}]" : $request->methodVar, $method);
+                $hiddenInputs[] = static::hiddenInput(isset($name) ? $name . "[{$request->methodVar}]" : $request->methodVar, $method, ArrayHelper::getValue($options, 'hiddenMethod', []));
                 $method = 'post';
             }
             if ($token->enableCsrfValidation && !strcasecmp($method, 'post')) {
-                $hiddenInputs[] = static::hiddenInput(isset($name) ? $name . "[{$token->csrfPrefix}]" : $token->csrfPrefix, $token->create($name));
+                $hiddenInputs[] = static::hiddenInput(isset($name) ? $name . "[{$token->csrfPrefix}]" : $token->csrfPrefix, $token->create($name), ArrayHelper::getValue($options, 'hiddenCsrf', []));
             }
         }
 
@@ -310,6 +310,7 @@ class BaseHtml
             $action = substr($action, 0, $pos);
         }
 
+        unset($options['hiddenMethod'], $options['hiddenCsrf']);
         $options['action'] = $action;
         $options['method'] = $method;
         $form = static::beginTag('form', $options);
