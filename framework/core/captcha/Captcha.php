@@ -496,7 +496,6 @@ class Captcha implements ComponentsInterface, CaptchaInterface
     public function setSession($name = null)
     {
         $this->Rock->session->setFlash(Helper::getValue($name, static::$sessionName), $this->code, false);
-
     }
 
 
