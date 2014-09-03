@@ -60,8 +60,7 @@ class Captcha extends InputWidget implements CaptchaInterface
 
         if ($this->output === self::BASE64) {
             $captcha = $this->Rock->captcha;
-            $src = 'data:image/png;base64,' . $captcha->getBase64();
-            $captcha->setSession();
+            $src = $captcha->getDataUri();
         } else {
             /** @var Url $urlBuilder */
             $urlBuilder = Rock::factory($this->captchaAction, Url::className());

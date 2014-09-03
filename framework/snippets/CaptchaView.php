@@ -15,8 +15,7 @@ class CaptchaView extends Snippet
 
     public function get()
     {
-        if (($dataImage = $this->Rock->captcha->get()) === false) {
-
+        if (!$dataImage = $this->Rock->captcha->get()) {
             return '#';
         }
 
@@ -32,8 +31,6 @@ class CaptchaView extends Snippet
         $path = Rock::getAlias('@assets') . DS . 'cache' . DS . 'captcha' . DS . $uniq . $ext;
 
         if (File::create($path, $dataImage['image'])) {
-
-            $this->Rock->captcha->setSession();
             return Rock::getAlias('@web') . '/cache/captcha/' . $uniq . $ext;
         }
 

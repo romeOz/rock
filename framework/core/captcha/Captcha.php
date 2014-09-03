@@ -130,7 +130,7 @@ class Captcha implements ComponentsInterface, CaptchaInterface
      */
     public $jpegQuality = 90;
 
-    public static $sessionName = 'captcha';
+    public $sessionName = 'captcha';
 
     /**
      * Code of captcha
@@ -161,7 +161,7 @@ class Captcha implements ComponentsInterface, CaptchaInterface
     /**
      * Get captcha
      */
-    protected function generate()
+    protected function generate($session = true)
     {
         $fonts             = [];
         $fontsdir_absolute = dirname(__FILE__) . DS . $this->fontsDir;
@@ -443,7 +443,10 @@ class Captcha implements ComponentsInterface, CaptchaInterface
                 Exception::ERROR, Exception::UNKNOWN_VAR, ['name' => '$return[\'image\']']
             );
 
-            return false;
+            return [];
+        }
+        if ($session) {
+            $this->createSession();
         }
         return $return;
     }
@@ -451,12 +454,13 @@ class Captcha implements ComponentsInterface, CaptchaInterface
     /**
      * Get data captcha
      *
-     * @return bool|array
+     * @param bool $session - create session
+     * @return array
      */
-    public function get()
+    public function get($session = true)
     {
-        if (!$data = $this->generate()) {
-            return false;
+        if (!$data = $this->generate($session)) {
+            return [];
         }
         return $data;
     }
@@ -464,9 +468,9 @@ class Captcha implements ComponentsInterface, CaptchaInterface
     /**
      * View captcha
      */
-    public function display()
+    public function display($session = true)
     {
-        if (!$data = $this->generate()) {
+        if (!$data = $this->generate($session)) {
             return;
         }
         $this->setHttpHeaders($data['mimeType']);
@@ -474,28 +478,38 @@ class Captcha implements ComponentsInterface, CaptchaInterface
     }
 
     /**
-     * Get data-uri (base64)
+     * Get base64
      *
+     * @param bool $session
      * @return bool|string
      */
-    public function getBase64()
+    public function getBase64($session = true)
     {
-        if (!$data = $this->generate()) {
+        if (!$data = $this->generate($session)) {
             return false;
         }
 
         return base64_encode($data['image']);
     }
 
+    /**
+     * Get data-uri
+     *
+     * @param bool $session - create session
+     * @return string
+     */
+    public function getDataUri($session = true)
+    {
+        return 'data:image/png;base64,'.$this->getBase64($session);
+    }
+
 
     /**
-     * Set code to session
-     *
-     * @param string|null $name
+     * Create session
      */
-    public function setSession($name = null)
+    public function createSession()
     {
-        $this->Rock->session->setFlash(Helper::getValue($name, static::$sessionName), $this->code, false);
+        $this->Rock->session->setFlash($this->sessionName, $this->code, false);
     }
 
 
@@ -507,7 +521,7 @@ class Captcha implements ComponentsInterface, CaptchaInterface
      */
     public function hasSession($name = null)
     {
-        return $this->Rock->session->hasFlash(Helper::getValue($name, static::$sessionName));
+        return $this->Rock->session->hasFlash(Helper::getValue($name, $this->sessionName));
     }
 
 
@@ -519,7 +533,7 @@ class Captcha implements ComponentsInterface, CaptchaInterface
      */
     public function getSession($name = null)
     {
-        return $this->Rock->session->getFlash(Helper::getValue($name, static::$sessionName));
+        return $this->Rock->session->getFlash(Helper::getValue($name, $this->sessionName));
     }
 
 
@@ -529,7 +543,7 @@ class Captcha implements ComponentsInterface, CaptchaInterface
      */
     public function removeSession($name = null)
     {
-        $this->Rock->session->removeFlash(Helper::getValue($name, static::$sessionName));
+        $this->Rock->session->removeFlash(Helper::getValue($name, $this->sessionName));
     }
 
     /**

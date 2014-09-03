@@ -14,6 +14,5 @@ class BaseCaptchaController extends Controller
     {
         $captcha = $this->Rock->captcha;
         $captcha->display();
-        $captcha->setSession();
     }
 } 
