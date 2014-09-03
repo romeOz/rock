@@ -13,11 +13,8 @@ use rock\helpers\SerializeInterface;
 use rock\session\SessionFlash;
 use rock\session\SessionInterface;
 
-class Cookie implements \ArrayAccess, CollectionInterface, SerializeInterface, SessionInterface
+class Cookie extends SessionFlash implements \ArrayAccess, CollectionInterface, SerializeInterface, SessionInterface
 {
-    use ComponentsTrait;
-    use SessionFlash;
-
     /**
      * @var array
      */

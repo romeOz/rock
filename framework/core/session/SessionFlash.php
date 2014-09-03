@@ -3,13 +3,20 @@
 namespace rock\session;
 
 
-trait SessionFlash
+use rock\base\ComponentsInterface;
+use rock\base\ComponentsTrait;
+
+abstract class SessionFlash implements ComponentsInterface
 {
+    use ComponentsTrait {
+        ComponentsTrait::__construct as parentConstruct;
+    }
+
     /**
      * @var string the name of the session variable that stores the flash message data.
      */
     public $flashParam = '__flash';
-    public static $enableUpdate = true;
+    public static $skipUpdateFlash = false;
 
     /**
      * Updates the counters for flash messages and removes outdated flash messages.
@@ -17,7 +24,7 @@ trait SessionFlash
      */
     protected function updateFlashCounters()
     {
-        if (!static::$enableUpdate) {
+        if (static::$skipUpdateFlash) {
             return;
         }
         $counters = $this->get($this->flashParam, []);

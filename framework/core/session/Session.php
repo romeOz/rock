@@ -60,13 +60,8 @@ use rock\Rock;
  * @property boolean $useTransparentSessionID Whether transparent sid support is enabled or not, defaults to
  * false.
  */
-class Session implements \ArrayAccess, SessionInterface
+class Session extends SessionFlash implements \ArrayAccess, SessionInterface
 {
-    use ComponentsTrait {
-        ComponentsTrait::__construct as parentConstruct;
-    }
-    use SessionFlash;
-
     const NOT_USE_COOKIES = 1;
     const USE_ONLY_COOKIES = 2;
     const USE_COOKIES = 2;
