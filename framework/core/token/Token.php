@@ -105,8 +105,7 @@ class Token implements \ArrayAccess,CollectionInterface, RequestInterface, Stora
             return true;
         }
         if (!empty($token)) {
-            if ($this->get($name) === $token) {
-                $this->remove($name);
+            if ($this->get($name, true) === $token) {
                 return true;
             }
         }
