@@ -151,6 +151,7 @@ class ActiveForm extends Widget
      * @internal
      */
     public $attributes = [];
+    public $submitted = false;
 
     /**
      * Initializes the widget.
@@ -193,11 +194,12 @@ class ActiveForm extends Widget
         return Rock::factory(
             array_merge(
                 $this->fieldConfig, 
-                $options, [
-                               'model' => $model,
-                               'attribute' => $attribute,
-                               'form' => $this,
-                           ]
+                $options,
+                [
+                   'model' => $model,
+                   'attribute' => $attribute,
+                   'form' => $this,
+                ]
             )
         );
     }

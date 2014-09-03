@@ -56,6 +56,18 @@ class RateLimiter extends ActionFilter
      * @var Response the response to be sent. If not set, the `response` application component will be used.
      */
     public $response;
+    /**
+     * The condition which to run the `\rock\user\User::saveAllowance`.
+     * @var callable|bool
+     */
+    public $dependency = true;
+
+    public function init()
+    {
+        if ($this->dependency instanceof \Closure) {
+            $this->dependency = (bool)call_user_func($this->dependency, $this);
+        }
+    }
 
 
     /**
@@ -114,7 +126,9 @@ class RateLimiter extends ActionFilter
             return false;
         }
 
-        $user->saveAllowance($action, $maxRequests - 1, $current);
+        if ($this->dependency) {
+            $user->saveAllowance($action, $maxRequests - 1, $current);
+        }
         $this->addHeaders($response, $limit, $maxRequests - 1, (int) (($limit - $maxRequests) * $period / $limit));
 
         return true;

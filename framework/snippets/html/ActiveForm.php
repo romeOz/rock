@@ -27,6 +27,7 @@ class ActiveForm extends Snippet
     public $prepareAttributes = [];
     public $validate = false;
     public $after;
+    public $submitted = false;
     /**
      * name of wrapper template
      *
@@ -122,23 +123,16 @@ class ActiveForm extends Snippet
 
     protected function prepareFields(\rock\widgets\ActiveForm $form, array $fields, array &$result)
     {
-        $rateLimiter = new RateLimiter(['enableRateLimitHeaders' => false]);
+        $form->submitted = $this->submitted;
         foreach ($fields as $attributeName => $params) {
             if (is_int($attributeName)) {
                 $attributeName = $params;
                 $params = [];
             }
-            if (isset($params['options']['rateLimiter'])) {
-                list($limit, $period, $enabled) = $params['options']['rateLimiter'];
-
-                if ($rateLimiter->check($limit, $period, get_class($this->model) . '::' . $attributeName) === $enabled) {
-                    continue;
-                }
-            }
             if (isset($params['options']['enabled']) && $params['options']['enabled']=== false) {
                 continue;
             }
-            unset($params['options']['enabled'], $params['options']['rateLimiter']);
+            unset($params['options']['enabled']);
             $field = $form->field($this->model, $attributeName, Helper::getValue($params['options'],[]));
             unset($params['options']);
 
@@ -227,6 +221,7 @@ class ActiveForm extends Snippet
         }
         if (!empty($this->load)) {
             $this->model->load($this->load);
+            $this->submitted = true;
             return;
         }
 

@@ -8,6 +8,7 @@ use rock\base\Model;
 use rock\base\ObjectTrait;
 use rock\base\Widget;
 use rock\cache\CacheInterface;
+use rock\filters\RateLimiter;
 use rock\helpers\Html;
 
 class ActiveField
@@ -37,6 +38,7 @@ class ActiveField
      */
     public $options = ['class' => 'form-group'];
     public $required = false;
+    public $rateLimiter = [];
 
     /**
      * @var string the template that is used to arrange the label, the input field, the error message and the hint text.
@@ -193,6 +195,9 @@ class ActiveField
      */
     public function render($content = null)
     {
+        if ($this->checkRateLimiter()) {
+            return '';
+        }
         if ($content === null) {
             if (!isset($this->parts['{input}'])) {
                 $this->parts['{input}'] = Html::activeTextInput($this->model, $this->attribute, $this->inputOptions);
@@ -802,5 +807,21 @@ class ActiveField
     {
         $model = $this->model;
         return $model::className() . $this->attribute . $method;
+    }
+
+    protected function checkRateLimiter()
+    {
+        if (!empty($this->rateLimiter)) {
+            if (!isset($this->rateLimiter[2])) {
+                $this->rateLimiter[2] = true;
+            }
+            list($limit, $period, $checked) = $this->rateLimiter;
+            $rateLimiter = new RateLimiter(['enableRateLimitHeaders' => false, 'dependency' => $this->form->submitted]);
+            if ($rateLimiter->check($limit, $period, get_class($this->model) . '::' . $this->attribute) === $checked) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
