@@ -122,6 +122,7 @@ class ActiveForm extends Snippet
 
     protected function prepareFields(\rock\widgets\ActiveForm $form, array $fields, array &$result)
     {
+        $rateLimiter = new RateLimiter(['enableRateLimitHeaders' => false]);
         foreach ($fields as $attributeName => $params) {
             if (is_int($attributeName)) {
                 $attributeName = $params;
@@ -129,7 +130,8 @@ class ActiveForm extends Snippet
             }
             if (isset($params['options']['rateLimiter'])) {
                 list($limit, $period, $enabled) = $params['options']['rateLimiter'];
-                if ((new RateLimiter())->check($limit, $period, get_class($this->model) . '::' . $attributeName) === $enabled) {
+
+                if ($rateLimiter->check($limit, $period, get_class($this->model) . '::' . $attributeName) === $enabled) {
                     continue;
                 }
             }

@@ -108,7 +108,6 @@ class RateLimiter extends ActionFilter
         if ($maxRequests < 1) {
             $user->saveAllowance($action, 0, $current);
             $this->addHeaders($response, $limit, 0, $period);
-            $response->setStatusCode(429);
             if ($this->throwException === true) {
                 throw new RateLimiterException(RateLimiterException::ALERT, $this->errorMessage);
             }
@@ -135,6 +134,7 @@ class RateLimiter extends ActionFilter
                 ->set('X-Rate-Limit-Limit', $limit)
                 ->set('X-Rate-Limit-Remaining', $remaining)
                 ->set('X-Rate-Limit-Reset', $reset);
+            $response->setStatusCode(429);
         }
     }
 }
