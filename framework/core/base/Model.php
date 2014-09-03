@@ -41,8 +41,6 @@ use rock\validation\Validatable;
  * @property string         $scenario    The scenario that this model is in. Defaults to [[DEFAULT_SCENARIO]].
  * @property \ArrayObject   $validators  All the validators declared in the model. This property is read-only.
  *
- * @author  Qiang Xue <qiang.xue@gmail.com>
- * @since   2.0
  * @package models
  */
 class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
