@@ -74,7 +74,6 @@ class Rock
             /** Event "beginApp" */
             Event::trigger(static::className(), self::EVENT_BEGIN_APP);
 
-
             /** Routing */
             Rock::$app->route->run();
 

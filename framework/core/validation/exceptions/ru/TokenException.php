@@ -9,10 +9,10 @@ class TokenException extends ValidationException
 {
     public static $defaultTemplates = array(
         self::MODE_DEFAULT => array(
-            self::STANDARD => 'токен должен быть верным',
+            self::STANDARD => 'csrf-токен должен быть верным',
         ),
         self::MODE_NEGATIVE => array(
-            self::STANDARD => 'токен не должен быть верным',
+            self::STANDARD => 'csrf-токен не должен быть верным',
         )
     );
 } 
