@@ -15,8 +15,11 @@ class Captcha extends InputWidget implements CaptchaInterface
      * The action represented by this route must be an action of [[CaptchaAction]].
      */
     public $captchaAction = '/captcha/';
-
-    public $output = self::DISPLAY;
+    /**
+     * Display format (default: data-uri)
+     * @var int
+     */
+    public $output = self::BASE64;
     /**
      * @var array HTML attributes to be applied to the CAPTCHA image tag.
      * @see Html::renderTagAttributes() for details on how attributes are being rendered.
