@@ -126,8 +126,8 @@ class ActiveForm extends Snippet
         $form->submitted = $this->submitted;
         foreach ($fields as $attributeName => $params) {
             if (is_int($attributeName)) {
-                $attributeName = $params;
-                $params = [];
+                $result[] = $params;
+                continue;
             }
             if (isset($params['options']['enabled']) && $params['options']['enabled']=== false) {
                 continue;
