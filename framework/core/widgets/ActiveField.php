@@ -235,10 +235,10 @@ class ActiveField
         $options = $this->options;
         $class = isset($options['class']) ? [$options['class']] : [];
         $class[] = "field-$inputID";
-        if ($this->required) {
+        if ($this->required && isset($this->form)) {
             $class[] = $this->form->requiredCssClass;
         }
-        if ($this->model->hasErrors($attribute)) {
+        if ($this->model->hasErrors($attribute) && isset($this->form)) {
             $class[] = $this->form->errorCssClass;
         }
         $options['class'] = implode(' ', $class);
@@ -816,7 +816,7 @@ class ActiveField
                 $this->rateLimiter[2] = true;
             }
             list($limit, $period, $checked) = $this->rateLimiter;
-            $rateLimiter = new RateLimiter(['enableRateLimitHeaders' => false, 'dependency' => $this->form->submitted]);
+            $rateLimiter = new RateLimiter(['enableRateLimitHeaders' => false, 'dependency' => isset($this->form->submitted) ? $this->form->submitted : true]);
             if ($rateLimiter->check($limit, $period, get_class($this->model) . '::' . $this->attribute) === $checked) {
                 return true;
             }
