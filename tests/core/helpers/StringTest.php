@@ -14,20 +14,21 @@ class StringTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider providerValue
      */
-    public function testReplace($value, array $dataReplace, $result)
+    public function testReplace($value, array $dataReplace, $removeBraces = true, $result)
     {
-        $this->assertSame(String::replace($value, $dataReplace), $result);
+        $this->assertSame($result, String::replace($value, $dataReplace, $removeBraces));
     }
 
     public function providerValue()
     {
         return [
-            [['foo'], [], ['foo']],
-            ['', [], ''],
-            ['hello {value} !!!', ['value'=> 'world'], 'hello world !!!'],
-            ['hello {{name}} !!!', ['name'=> 'world'], 'hello world !!!'],
-            ['hello {{unknown}} !!!', ['name'=> 'world'], 'hello {{unknown}} !!!'],
-            ['hello {value} !!!', [], 'hello {value} !!!'],
+            [['foo'], [],true, ['foo']],
+            ['', [],true, ''],
+            ['hello {value} !!!', ['value'=> 'world'], true, 'hello world !!!'],
+            ['hello {{name}} !!!', ['name'=> 'world'], true,'hello world !!!'],
+            ['hello {{unknown}} !!!', ['name'=> 'world'], true,'hello  !!!'],
+            ['hello {value} !!!', [], true, 'hello  !!!'],
+            ['hello {{unknown}} !!!', ['name'=> 'world'], false,'hello {{unknown}} !!!'],
         ];
     }
 
