@@ -165,7 +165,7 @@ class Template implements ComponentsInterface
             return $resultCache;
         }
         $result = $this->prepareRender($name, $placeholders);
-        foreach (['jsFiles', 'js', 'linkTags', 'cssFiles', 'css','linkTags', 'title', 'metaTags'] as $property) {
+        foreach (['jsFiles', 'js', 'linkTags', 'cssFiles', 'css','linkTags', 'title', 'metaTags', 'head'] as $property) {
             if ($this->$property instanceof \Closure) {
                 $this->$property = call_user_func($this->$property, $this);
             }
