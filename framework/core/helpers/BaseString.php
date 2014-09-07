@@ -420,29 +420,29 @@ class BaseString
      *
      * @param string $string      - string
      * @param array  $dataReplace - array replace
-     * @param bool   $hide        - remove placeholder, e.g. {name_placeholder}
+     * @param bool   $removeBraces        - remove braces `{{...}}`
      * @param string $pattern - pattern for replace
      * @return string
      */
-    public static function replace($string, array $dataReplace = [], $hide = false, $pattern = '/\{{1,2}(\\w+)\}{1,2}/')
+    public static function replace($string, array $dataReplace = [], $removeBraces = true, $pattern = '/\{{1,2}(\\w+)\}{1,2}/')
     {
-        if (is_array($string) || empty($dataReplace)) {
+        if (is_array($string)) {
             return $string;
         }
 
         if (strpos($string, '{') !== false) {
-            return preg_replace_callback(
+            return trim(preg_replace_callback(
                 $pattern,
-                function($match) use ($dataReplace, $hide) {
+                function($match) use ($dataReplace, $removeBraces) {
                     if (isset($dataReplace[$match[1]])) {
                         return $dataReplace[$match[1]];
-                    } elseif ($hide){
+                    } elseif ($removeBraces){
                         return '';
                     }
                     return $match[0];
                 },
                 $string
-            );
+            ));
         }
         return $string;
     }
