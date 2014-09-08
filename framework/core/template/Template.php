@@ -77,8 +77,16 @@ class Template implements ComponentsInterface
     /** @var array  */
     public $extensions = [];
     public $handlerLink;
-    /** @var int|bool  */
+    /**
+     * Is mode auto-escaping.
+     * @var int|bool
+     */
     public $autoEscape = self::ESCAPE;
+    /**
+     * Automatic conversion to JSON.
+     * @var bool
+     */
+    public $autoToJSON = true;
 
     /** @var string */
     public $head = '<!DOCTYPE html>';
@@ -1160,6 +1168,10 @@ class Template implements ComponentsInterface
         // Make a filter
         if (!empty($filters)) {
             $result = $this->makeFilter($result, $filters);
+        }
+
+        if ($this->autoToJSON && is_array($result)) {
+            $result = Json::encode($result);
         }
 
         if (!is_scalar($result) && !empty($result)) {
