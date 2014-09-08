@@ -30,6 +30,11 @@ class Url extends Snippet implements UrlInterface
      */
     public $url;
     /**
+     * Referrer URL for formatting.
+     * @var bool
+     */
+    public $referrer = false;
+    /**
      * URL-arguments for set.
      * @var array
      */
@@ -78,7 +83,7 @@ class Url extends Snippet implements UrlInterface
      */
     public $removeAnchor;
     /**
-     * Adduce URL to: Absolute, Relative, HTTP, HTTPS.
+     * Adduce URL to: `\rock\url\UrlInterface::ABS`, `\rock\url\UrlInterface::HTTP`, `\rock\url\UrlInterface::HTTPS`.
      * @var int
      * @see UrlInterface
      */
@@ -98,6 +103,10 @@ class Url extends Snippet implements UrlInterface
      */
     public function get()
     {
+        if ($this->referrer) {
+            $this->url = $this->Rock->request->getReferrer() ? : '';
+        }
+
         /** @var \rock\url\Url $urlBuilder */
         $urlBuilder = Rock::factory($this->url, \rock\url\Url::className());
         if (isset($this->removeArgs)) {

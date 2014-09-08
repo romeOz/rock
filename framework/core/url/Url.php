@@ -51,7 +51,7 @@ class Url implements UrlInterface
     public function __construct($url = null, $config = [])
     {
         $this->parentConstruct($config);
-        $url = empty($url) ? $this->Rock->request->getAbsoluteUrl() : Rock::getAlias($url);
+        $url = !isset($url) ? $this->Rock->request->getAbsoluteUrl() : Rock::getAlias($url);
         $this->dataUrl = parse_url(trim($url));
         if (isset($this->dataUrl['query'])) {
             parse_str($this->dataUrl['query'], $this->dataUrl['query']);
@@ -199,7 +199,9 @@ class Url implements UrlInterface
             $url .= String::rconcat($data['pass'], '@');
         }
         $url .= Helper::getValue($data['host']);
-        $url .= preg_replace(['/\/+(?!http:\/\/)/', '/\\\+/'], '/', $data['path']);
+        if (isset($data['path'])) {
+            $url .= preg_replace(['/\/+(?!http:\/\/)/', '/\\\+/'], '/', $data['path']);
+        }
         if (isset($data['query'])) {
             if (is_string($data['query'])) {
                 $data['query'] = [$data['query']];
@@ -221,9 +223,6 @@ class Url implements UrlInterface
      */
     public function get($const = 0, $selfHost = false)
     {
-        if (empty($this->dataUrl['path'])) {
-            $this->dataUrl = array_merge(parse_url($this->Rock->request->getAbsoluteUrl()), $this->dataUrl);
-        }
         if ($selfHost == true) {
             $this->dataUrl['scheme'] = $this->Rock->request->getScheme();
             $this->dataUrl['host'] = $this->Rock->request->getHost();
