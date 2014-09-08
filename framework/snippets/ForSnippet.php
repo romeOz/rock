@@ -50,10 +50,10 @@ class ForSnippet extends Snippet
     public function get()
     {
         if (!isset($this->count, $this->tpl)) {
-            return null;
+            return '';
         }
 
-        $result = null;
+        $result = '';
         while ($this->count > 0) {
             $result .= $this->template->replaceParamByPrefix($this->tpl, $this->template->calculateAddPlaceholders($this->addPlaceholders));
             --$this->count;

@@ -2,8 +2,6 @@
 
 namespace rockunit\snippets;
 
-
-
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Cache\Adapter;
 use rock\cache\CacheFile;
@@ -55,6 +53,14 @@ class ListViewTest extends TemplateCommon
         $params['pagination']['toPlaceholder'] = 'pagination';
         $this->assertSame($this->removeSpace($this->template->getSnippet(ListView::className(), $params)), $this->removeSpace(file_get_contents($this->path . '/snippet_as_array.html')));
         $this->assertNotEmpty($this->template->getPlaceholder('pagination', false, true));
+    }
+
+    public function testGetAsSingleArray()
+    {
+        $params['array'] = ['foo', 'bar'];
+        $params['tpl'] = "@INLINE<li>[[!+output]][[+currentItem]]</li>";
+        $params['wrapperTpl'] = "@INLINE<ul>[[!+output]]</ul>";
+        $this->assertSame($this->removeSpace($this->template->getSnippet(ListView::className(), $params)), '<ul><li>foo1</li><li>bar2</li></ul>');
     }
 
 
