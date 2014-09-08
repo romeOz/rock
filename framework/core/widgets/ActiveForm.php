@@ -17,7 +17,7 @@ class ActiveForm extends Widget
      * @param array|string $action the form action URL. This parameter will be processed by `\rock\url\Url::getAbsoluteUrl()`.
      * @see method for specifying the HTTP method for this form.
      */
-    public $action = '';
+    public $action;
     /**
      * @var string the form submission method. This should be either 'post' or 'get'. Defaults to 'post'.
      *

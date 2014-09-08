@@ -270,7 +270,7 @@ class BaseHtml
      * @return string the generated form start tag.
      * @see endForm()
      */
-    public static function beginForm($name = null, $action = '', $method = 'post', $options = [])
+    public static function beginForm($name = null, $action = null, $method = 'post', $options = [])
     {
         /** @var Url $urlBuilder */
         $urlBuilder = Rock::factory($action, Url::className());

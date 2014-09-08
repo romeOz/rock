@@ -6,7 +6,6 @@ namespace rock\snippets\html;
 use rock\base\Model;
 use rock\base\Snippet;
 use rock\file\UploadedFile;
-use rock\filters\RateLimiter;
 use rock\helpers\Helper;
 use rock\helpers\Html;
 use rock\helpers\Serialize;
