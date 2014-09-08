@@ -28,74 +28,79 @@ class UrlTest extends \PHPUnit_Framework_TestCase
     {
         // relative
         $url = new Url();
-        $this->assertSame($url->getRelativeUrl(),'/');
+        $this->assertSame('/', $url->getRelativeUrl());
 
         // http
         $url = new Url();
-        $this->assertSame($url->getHttpUrl(),'http://site.com/');
+        $this->assertSame('http://site.com/', $url->getHttpUrl());
 
         // https
         $url = new Url();
-        $this->assertSame($url->getHttpsUrl(),'https://site.com/');
+        $this->assertSame('https://site.com/', $url->getHttpsUrl());
 
         // absolute
         $_SERVER['HTTP_HOST'] = null;
         $url = new Url();
-        $this->assertSame($url->getAbsoluteUrl(),'http://site.com/');
+        $this->assertSame('http://site.com/', $url->getAbsoluteUrl());
 
-        // remove args
+        // removing args
         $url = new Url();
-        $this->assertSame($url->removeArgs(['page'])->getAbsoluteUrl(),'http://site.com/');
+        $this->assertSame('http://site.com/', $url->removeArgs(['page'])->getAbsoluteUrl());
         $_SERVER['REQUEST_URI'] = '/?page=1&view=all';
         $url = new Url();
-        $this->assertSame($url->removeArgs(['page'])->getAbsoluteUrl(),'http://site.com/?view=all');
+        $this->assertSame('http://site.com/?view=all', $url->removeArgs(['page'])->getAbsoluteUrl());
 
-        // remove all args
+        // removing all args
         $_SERVER['REQUEST_URI'] = '/?page=1&view=all';
         $url = new Url();
-        $this->assertSame($url->removeAllArgs()->getAbsoluteUrl(),'http://site.com/');
+        $this->assertSame('http://site.com/', $url->removeAllArgs()->getAbsoluteUrl());
         $_SERVER['REQUEST_URI'] = '/';
 
-        // add anchor
+        // adding anchor
         $url = new Url();
-        $this->assertSame($url->addAnchor('name')->getAbsoluteUrl(),'http://site.com/#name');
+        $this->assertSame('http://site.com/#name', $url->addAnchor('name')->getAbsoluteUrl());
 
-        // remove anchor
+        // removing anchor
         $url = new Url();
-        $this->assertSame($url->removeAnchor()->getAbsoluteUrl(),'http://site.com/');
+        $this->assertSame('http://site.com/', $url->removeAnchor()->getAbsoluteUrl());
 
-        // add end path
+        // adding end path
         $url = new Url();
-        $this->assertSame($url->addEndPath('news/')->getAbsoluteUrl(),'http://site.com/news/');
+        $this->assertSame('http://site.com/news/', $url->addEndPath('news/')->getAbsoluteUrl());
+
+        // replacing URL
+        $url = new Url();
+        $this->assertSame('http://site.com/', $url->replacePath('news/', '')->getAbsoluteUrl());
 
         // callback
         $url = new Url();
-        $this->assertSame($url->callback(function(Url $url){$url->fragment = 'foo';})->getAbsoluteUrl(),'http://site.com/#foo');
+        $this->assertSame('http://site.com/#foo', $url->callback(function(Url $url){$url->fragment = 'foo';})->getAbsoluteUrl());
 
         // get host
         $url = new Url();
-        $this->assertSame($url->host,'site.com');
+        $this->assertSame('site.com',$url->host);
 
         // get host
         $url = new Url();
         $url->user = 'tom';
         $url->pass = '123';
-        $this->assertSame($url->getAbsoluteUrl(),'http://tom:123@site.com/');
+        $this->assertSame('http://tom:123@site.com/', $url->getAbsoluteUrl());
 
         // build
         $url = new Url();
         $this->assertSame(
+            'https://site.com/parts/news/?page=1#name',
             $url->setArgs(['page' => 1])
                 ->addBeginPath('/parts')
                 ->addEndPath('/news/')
                 ->addAnchor('name')
-                ->getHttpsUrl(),
-            'https://site.com/parts/news/?page=1#name'
+                ->getHttpsUrl()
         );
 
         // build + strip_tags
         $url = new Url();
         $this->assertSame(
+            '/parts/news/?page=1&view=all#name',
             $url
                 ->addBeginPath('/parts')
                 ->addEndPath('/<b>news</b>/')
@@ -103,34 +108,33 @@ class UrlTest extends \PHPUnit_Framework_TestCase
                 ->removeAllArgs()
                 ->setArgs(['page' => 1])
                 ->addArgs(['view'=> 'all'])
-                ->getRelativeUrl(),
-            '/parts/news/?page=1&view=all#name'
+                ->getRelativeUrl()
         );
 
         // build + remove args
         $url = new Url();
         $this->assertSame(
+            '/parts/news/#name',
             $url
                 ->setArgs(['page' => 1])
                 ->addBeginPath('/parts')
                 ->addEndPath('/news/')
                 ->addAnchor('name')
                 ->removeAllArgs()
-                ->getRelativeUrl(),
-            '/parts/news/#name'
+                ->getRelativeUrl()
         );
 
         // build + add args
         $url = new Url();
         $this->assertSame(
+            '/parts/news/?view=all#name',
             $url
                 ->addBeginPath('/parts')
                 ->addEndPath('/news/')
                 ->addAnchor('name')
                 ->removeAllArgs()
                 ->addArgs(['view'=> 'all'])
-                ->getRelativeUrl(),
-            '/parts/news/?view=all#name'
+                ->getRelativeUrl()
         );
 
         // get unknown data of url
@@ -141,43 +145,46 @@ class UrlTest extends \PHPUnit_Framework_TestCase
     {
         // relative
         $url = new Url('http://site.com/?page=2#name');
-        $this->assertSame($url->getRelativeUrl(),'/?page=2#name');
+        $this->assertSame('/?page=2#name',$url->getRelativeUrl());
 
         // https
         $url = Rock::factory('http://site.com/?page=2#name', 'url');
-        $this->assertSame($url->getHttpsUrl(),'https://site.com/?page=2#name');
+        $this->assertSame('https://site.com/?page=2#name', $url->getHttpsUrl());
 
         // http
         $url = Rock::factory('https://site.com/?page=2#name', Url::className());
-        $this->assertSame($url->getHttpUrl(),'http://site.com/?page=2#name');
+        $this->assertSame('http://site.com/?page=2#name', $url->getHttpUrl());
 
-        // remove anchor
+        // removing anchor
         $url = new Url('https://site.com/?page=2#name');
-        $this->assertSame($url->removeAnchor()->getAbsoluteUrl(),'https://site.com/?page=2');
+        $this->assertSame('https://site.com/?page=2', $url->removeAnchor()->getAbsoluteUrl());
+
+        // replacing URL
+        $url =  new Url('http://site.com/news/?page=2#name');
+        $this->assertSame('http://site.com/?page=2#name', $url->replacePath('news/', '')->getAbsoluteUrl());
 
         // build + add args + self host
         $url = new Url('http://site2.com/?page=2#name');
         $this->assertSame(
+            'http://site.com/parts/news/?page=2&view=all#name',
             $url
                 ->addBeginPath('/parts')
                 ->addEndPath('/news/')
                 ->addAnchor('name')
                 ->addArgs(['view'=> 'all'])
-                ->getAbsoluteUrl(true),
-            'http://site.com/parts/news/?page=2&view=all#name'
+                ->getAbsoluteUrl(true)
         );
 
         // build + remove args
         $url = new Url('http://site2.com/?page=2#name');
         $this->assertSame(
+            'http://site2.com/parts/news/?view=all#name',
             $url
                 ->addBeginPath('/parts')
                 ->addEndPath('/news/')
                 ->addArgs(['view'=> 'all'])
                 ->removeArgs(['page'])
-                ->getAbsoluteUrl(),
-            'http://site2.com/parts/news/?view=all#name'
+                ->getAbsoluteUrl()
         );
     }
 }
- 

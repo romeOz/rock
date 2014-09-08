@@ -343,7 +343,15 @@ class TemplateTest extends TemplateCommon
                         &anchor=`name`
                         &const=`32`
                      ]]';
-        $this->assertSame($this->template->replace($replace, ['url'=> '/categories/?view=all']), 'http://site.com/parts/categories/news/?page=1#name');
+        $this->assertSame('http://site.com/parts/categories/news/?page=1#name', $this->template->replace($replace, ['url'=> '/categories/?view=all']));
+        $this->template->removeAllPlaceholders();
+
+        // modify url + replacing URL
+        $replace = '[[+url:modifyUrl
+                        &replace=`["news/"]`
+                        &const=`32`
+                     ]]';
+        $this->assertSame('http://site.com/?view=all', $this->template->replace($replace, ['url'=> '/news/?view=all']));
         $this->template->removeAllPlaceholders();
 
         // modify url + remove args + add args
@@ -352,7 +360,7 @@ class TemplateTest extends TemplateCommon
                         &addArgs=`{"page" : 1}`
                         &const=`32`
                      ]]';
-        $this->assertSame($this->template->replace($replace, ['url'=> '/categories/?view=all']), 'http://site.com/categories/?page=1');
+        $this->assertSame('http://site.com/categories/?page=1', $this->template->replace($replace, ['url'=> '/categories/?view=all']));
         $this->template->removeAllPlaceholders();
 
         // modify url + remove all args
@@ -361,27 +369,27 @@ class TemplateTest extends TemplateCommon
                         &removeAnchor=`true`
                         &const=`32`
                      ]]';
-        $this->assertSame($this->template->replace($replace, ['url'=> '/categories/?view=all#name']), 'http://site.com/categories/');
+        $this->assertSame('http://site.com/categories/', $this->template->replace($replace, ['url'=> '/categories/?view=all#name']));
         $this->template->removeAllPlaceholders();
 
         // modify url + input null
         $replace = '[[+url:modifyUrl]]';
-        $this->assertSame($this->template->replace($replace, ['url'=> '']), '#');
+        $this->assertSame('#', $this->template->replace($replace, ['url'=> '']));
         $this->template->removeAllPlaceholders();
 
         // modify date
         $replace = '[[+date:modifyDate&format=`dmyhm`]]';
-        $this->assertSame($this->template->replace($replace, ['date'=> '2012-02-12 15:01']), '12 February 2012 15:01');
+        $this->assertSame('12 February 2012 15:01', $this->template->replace($replace, ['date'=> '2012-02-12 15:01']));
         $this->template->removeAllPlaceholders();
 
         // modify date
         $replace = '[[+date:modifyDate&format=`dmy`]]';
-        $this->assertSame($this->template->replace($replace, ['date'=> '2012-02-12 15:01']), '12 February 2012');
+        $this->assertSame('12 February 2012', $this->template->replace($replace, ['date'=> '2012-02-12 15:01']));
         $this->template->removeAllPlaceholders();
 
         // modify date + default format
         $replace = '[[+date:modifyDate]]';
-        $this->assertSame($this->template->replace($replace, ['date'=> '2012-02-12 15:01']), '2012-02-12 15:01:00');
+        $this->assertSame('2012-02-12 15:01:00', $this->template->replace($replace, ['date'=> '2012-02-12 15:01']));
         $this->template->removeAllPlaceholders();
 
         // modify date + input null

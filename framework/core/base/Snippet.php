@@ -15,10 +15,10 @@ abstract class Snippet implements ComponentsInterface
     }
 
     /**
+     * Is mode auto-escaping
      * @var int|bool
      */
     public $autoEscape = true;
-
     /** @var  Template */
     public $template;
 
@@ -41,7 +41,6 @@ abstract class Snippet implements ComponentsInterface
     {
         return null;
     }
-
 
     /**
      * @param mixed $function - may be a callable, snippet, and instance
