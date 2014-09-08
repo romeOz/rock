@@ -47,16 +47,16 @@ class HtmlTest extends \PHPUnit_Framework_TestCase
 
     public function testCssFile()
     {
-        $this->assertEquals('<link href="http://example.com/" rel="stylesheet">', Html::cssFile('http://example.com'));
-        $this->assertEquals('<link href="http://site.com/" rel="stylesheet">', Html::cssFile(''));
-        $this->assertEquals("<!--[if IE 9]>\n" . '<link href="http://example.com/" rel="stylesheet">' . "\n<![endif]-->", Html::cssFile('http://example.com', ['condition' => 'IE 9']));
+        $this->assertEquals('<link href="http://example.com" rel="stylesheet">', Html::cssFile('http://example.com'));
+        $this->assertEquals('<link href="http://site.com" rel="stylesheet">', Html::cssFile(''));
+        $this->assertEquals("<!--[if IE 9]>\n" . '<link href="http://example.com" rel="stylesheet">' . "\n<![endif]-->", Html::cssFile('http://example.com', ['condition' => 'IE 9']));
     }
 
     public function testJsFile()
     {
-        $this->assertEquals('<script src="http://example.com/"></script>', Html::jsFile('http://example.com'));
-        $this->assertEquals('<script src="http://site.com/"></script>', Html::jsFile(''));
-        $this->assertEquals("<!--[if IE 9]>\n" . '<script src="http://example.com/"></script>' . "\n<![endif]-->", Html::jsFile('http://example.com', ['condition' => 'IE 9']));
+        $this->assertEquals('<script src="http://example.com"></script>', Html::jsFile('http://example.com'));
+        $this->assertEquals('<script src="http://site.com"></script>', Html::jsFile(''));
+        $this->assertEquals("<!--[if IE 9]>\n" . '<script src="http://example.com"></script>' . "\n<![endif]-->", Html::jsFile('http://example.com', ['condition' => 'IE 9']));
     }
 
     public function testRenderAttributes()
