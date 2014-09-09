@@ -10,7 +10,6 @@ use rock\helpers\Json;
 use rock\helpers\Serialize;
 use rock\image\ThumbInterface;
 use rock\Rock;
-use rock\template\Exception;
 use rock\template\Template;
 use rock\url\Url;
 

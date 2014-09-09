@@ -63,7 +63,6 @@ class ListViewTest extends TemplateCommon
         $this->assertSame($this->removeSpace($this->template->getSnippet(ListView::className(), $params)), '<ul><li>foo1</li><li>bar2</li></ul>');
     }
 
-
     public function testGetAsMethod()
     {
         $class = ListView::className();

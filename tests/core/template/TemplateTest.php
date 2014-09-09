@@ -466,10 +466,9 @@ class TemplateTest extends TemplateCommon
         $this->template->replace('[[+num:formula&operator=`<!<!<`&operand=`4`]]', ['num'=> 2]);
     }
 
-    public function testOutputArrayException()
+    public function testAutomaticConversionArrayToJSON()
     {
-        $replace = '[[!+array:jszonToArray]]';
-        $this->setExpectedException(Exception::className());
+        $replace = '[[!+array:jsonToArray]]';
         $this->template->replace($replace, ['array'=> json_encode(['foo' => 'test'])]);
     }
 

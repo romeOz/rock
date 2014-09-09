@@ -90,6 +90,7 @@ class Template implements ComponentsInterface
 
     /** @var string */
     public $head = '<!DOCTYPE html>';
+    /** @var string  */
     public $body = '<body>';
     /**
      * @var array the registered link tags.
