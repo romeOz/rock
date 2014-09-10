@@ -22,7 +22,7 @@ class BaseLoginForm extends Model
     /** @var  string */
     public $password;
     /** @var  string */
-    public $csrf;
+    public $_csrf;
 
     public $redirectUrl;
     public $enableCsrfToken = true;

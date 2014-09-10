@@ -2,16 +2,15 @@
 namespace rock\token;
 
 
-use rock\base\CollectionInterface;
+use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
 use rock\base\ObjectTrait;
 use rock\base\StorageInterface;
 use rock\cookie\Cookie;
-use rock\helpers\ArrayHelper;
 use rock\request\RequestInterface;
 use rock\session\SessionInterface;
 
-class Token implements \ArrayAccess,CollectionInterface, RequestInterface, StorageInterface
+class Token implements ComponentsInterface, RequestInterface, StorageInterface
 {
     use ComponentsTrait;
 
@@ -19,12 +18,17 @@ class Token implements \ArrayAccess,CollectionInterface, RequestInterface, Stora
      * The name of the HTTP header for sending CSRF token.
      */
     const CSRF_HEADER = 'X-CSRF-Token';
-
-
-
+    /**
+     * The adapter where to store the token: cookies or session (by default).
+     * @var int
+     * @see StorageInterface
+     */
     public $adapterStorage = self::SESSION;
-    /** @var  SessionInterface */
-    protected static $storage;
+    /**
+     * Creating multiple tokens.
+     * @var bool
+     */
+    public $multiToken = false;
     /**
      * @var boolean whether to enable CSRF (Cross-Site Request Forgery) validation. Defaults to true.
      * When CSRF validation is enabled, forms submitted to an Rock Web application must be originated
@@ -34,7 +38,6 @@ class Token implements \ArrayAccess,CollectionInterface, RequestInterface, Stora
      * forms submitted via POST method must contain a hidden input whose name is specified by [[csrfVar]].
      * You may use `\rock\helpers\Html::beginForm()` to generate his hidden input.
      *
-     * @see Controller::enableCsrfValidation
      * @see http://en.wikipedia.org/wiki/Cross-site_request_forgery
      */
     public $enableCsrfValidation = true;
@@ -42,10 +45,9 @@ class Token implements \ArrayAccess,CollectionInterface, RequestInterface, Stora
      * @var string the name of the token used to prevent CSRF. Defaults to '_csrf'.
      * This property is used only when [[enableCsrfValidation]] is true.
      */
-    public $csrfPrefix = 'csrf';
-
-    protected $exception = [];
-
+    public $csrfPrefix = '_csrf';
+    /** @var  SessionInterface */
+    protected static $storage;
 
     public function init()
     {
@@ -62,27 +64,37 @@ class Token implements \ArrayAccess,CollectionInterface, RequestInterface, Stora
     }
 
 
-
     /**
-     * Create csrf-token
+     * Creating csrf-token
      *
      * @param string $name - name of token
      * @return string
      */
-    public function create($name)
+    public function create($name = '')
     {
         if ($this->enableCsrfValidation === false) {
             return null;
         }
-        $name = $this->addPrefix($name);
-        $key = $this->Rock->security->generateRandomKey();
-        static::$storage->setFlash($name, $key, false);
 
-        return $key;
+        if ($this->multiToken === false) {
+            $name = '';
+            if ($token = $this->get($name)) {
+                return $token;
+            }
+        }
+        $name = $this->addPrefix($name);
+        $token = $this->Rock->security->generateRandomKey();
+        static::$storage->add($name, $token);
+        return $token;
     }
 
-
-    public function addPrefix($name)
+    /**
+     * Adding prefix
+     *
+     * @param string $name
+     * @return string
+     */
+    public function addPrefix($name = '')
     {
         if (isset($this->csrfPrefix)) {
             return $this->csrfPrefix . $name;
@@ -91,21 +103,20 @@ class Token implements \ArrayAccess,CollectionInterface, RequestInterface, Stora
         return $name;
     }
 
-
     /**
-     * Validation token
+     * Validation token.
      *
-     * @param string $name  - name of token
-     * @param string $token - value of token
+     * @param string $token - value of token.
+     * @param string $name  - name of token.
      * @return bool
      */
-    public function valid($name, $token = null)
+    public function valid($token = null, $name = '')
     {
         if ($this->enableCsrfValidation === false) {
             return true;
         }
         if (!empty($token)) {
-            if ($this->get($name, true) === $token) {
+            if ($this->getCsrfTokenFromHeader() === $token || $this->get($name, true) === $token) {
                 return true;
             }
         }
@@ -130,74 +141,7 @@ class Token implements \ArrayAccess,CollectionInterface, RequestInterface, Stora
      */
     public function remove($name)
     {
-        static::$storage->removeFlash($this->addPrefix($name));
-    }
-
-
-    /**
-     * Returns an iterator for traversing the tokens in the collection.
-     * This method is required by the SPL interface `IteratorAggregate`.
-     * It will be implicitly called when you use `foreach` to traverse the collection.
-     *
-     * @param array $only
-     * @param array $exclude
-     * @return \ArrayIterator an iterator for traversing the tokens in the collection.
-     */
-    public function getIterator(array $only = [], array $exclude = [])
-    {
-        return new \ArrayIterator($this->getAll($only, $exclude));
-    }
-
-    /**
-     * Returns the number of tokens in the collection.
-     * This method is required by the SPL `Countable` interface.
-     * It will be implicitly called when you use `count($collection)`.
-     *
-     * @return integer the number of tokens in the collection.
-     */
-    public function count()
-    {
-        return $this->getCount();
-    }
-
-    /**
-     * Returns the number of tokens in the collection.
-     *
-     * @return integer the number of tokens in the collection.
-     */
-    public function getCount()
-    {
-        return count($this->getAll());
-    }
-
-    /**
-     * Removes all data resource.
-     */
-    public function removeAll()
-    {
-        static::$storage->removeAllFlashes();
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function getAll(array $only = [], array $exclude = [])
-    {
-        return ArrayHelper::prepareArray(static::$storage->getAllFlashes(), $only, $exclude);
-    }
-
-    /**
-     * Returns whether there is a cookie with the specified name.
-     * This method is required by the SPL interface `ArrayAccess`.
-     * It is implicitly called when you use something like `isset($collection[$name])`.
-     *
-     * @param string $name the cookie name
-     * @return boolean whether the named cookie exists
-     */
-    public function offsetExists($name)
-    {
-        return $this->has($name);
+        static::$storage->remove($this->addPrefix($name));
     }
 
     /**
@@ -208,122 +152,23 @@ class Token implements \ArrayAccess,CollectionInterface, RequestInterface, Stora
      */
     public function has($name)
     {
-        return static::$storage->hasFlash($this->addPrefix($name), true);
-    }
-
-    /**
-     * Returns the cookie with the specified name.
-     * This method is required by the SPL interface `ArrayAccess`.
-     * It is implicitly called when you use something like `$cookie = $collection[$name];`.
-     * This is equivalent to [[get()]].
-     *
-     * @param string $name the cookie name
-     * @return mixed the cookie with the specified name, null if the named cookie does not exist.
-     */
-    public function offsetGet($name)
-    {
-        return $this->get($name);
+        if ($this->multiToken === false) {
+            $name = '';
+        }
+        return static::$storage->has($this->addPrefix($name));
     }
 
     /**
      * Returns the cookie with the specified name.
      *
      * @param string $name the cookie name
-     * @param bool $delete whether to delete this flash message right after this method is called.
      * @return mixed the cookie with the specified name. Null if the named cookie does not exist.
      */
-    public function get($name, $delete = false)
+    public function get($name = '')
     {
-        return static::$storage->getFlash($this->addPrefix($name), null, $delete);
-    }
-
-    /**
-     *
-     * @param string $name the resource name
-     * @param mixed  $value
-     * @return string
-     */
-    public function offsetSet($name, $value = null)
-    {
-        return $this->create($name);
-    }
-
-    /**
-     * Removes the named cookie.
-     * This method is required by the SPL interface `ArrayAccess`.
-     * It is implicitly called when you use something like `unset($collection[$name])`.
-     * This is equivalent to [[remove()]].
-     *
-     * @param string $name the cookie name
-     */
-    public function offsetUnset($name)
-    {
-        $this->remove($name);
-    }
-
-    /**
-     * Get data of resource
-     *
-     * @param string $name - key of array
-     * @return string
-     */
-    public function __get($name)
-    {
-        return $this->get($name);
-    }
-
-
-    /**
-     * @param string     $name
-     * @param null $value
-     * @return string
-     */
-    public function __set($name, $value = null)
-    {
-        return $this->create($name);
-    }
-
-    /**
-     * @param array $names
-     * @return mixed
-     */
-    public function getMulti(array $names)
-    {
-        $result = [];
-        foreach ($names as $name) {
-            $result[$name] = $this->get($name);
+        if ($this->multiToken === false) {
+            $name = '';
         }
-
-        return $result;
-    }
-
-    /**
-     * @param string $name
-     * @param mixed  $value
-     * @return string
-     */
-    public function add($name, $value = null)
-    {
-        return $this->create($name);
-    }
-
-    /**
-     * @param array $names
-     */
-    public function addMulti(array $names)
-    {
-        foreach ($names as $name) {
-            $this->create($name);
-        }
-    }
-
-    /**
-     * @param array $names
-     */
-    public function removeMulti(array $names)
-    {
-        foreach ($names as $name) {
-            $this->remove($name);
-        }
+        return static::$storage->get($this->addPrefix($name));
     }
 }

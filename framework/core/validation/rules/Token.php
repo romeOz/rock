@@ -15,6 +15,6 @@ class Token extends AbstractRule
 
     public function validate($input)
     {
-        return Rock::$app->token->valid($this->nameToken, $input);
+        return Rock::$app->token->valid($input, $this->nameToken);
     }
 } 

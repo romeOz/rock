@@ -24,7 +24,7 @@ class BaseSignupForm extends Model
 
     public $email;
     public $username;
-    public $csrf;
+    public $_csrf;
     public $password_confirm;
     public $captcha;
     public $password;

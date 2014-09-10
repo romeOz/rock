@@ -27,7 +27,7 @@ class BaseRecoveryForm extends Model
     /** @var  string */
     public $captcha;
     /** @var  string */
-    public $csrf;
+    public $_csrf;
 
     public $emailBodyTpl = '@common.views/email/{lang}/recovery';
     public $redirectUrl;
