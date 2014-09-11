@@ -18,6 +18,6 @@ class Token extends Snippet
             return false;
         }
         $token = $this->Rock->token;
-        return $token->has($this->name) ? $token->get($this->name) : $token->create($this->name);
+        return $token->create($this->name);
     }
 }

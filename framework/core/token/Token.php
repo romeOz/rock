@@ -48,6 +48,8 @@ class Token implements ComponentsInterface, RequestInterface, StorageInterface
     public $csrfPrefix = '_csrf';
     /** @var  SessionInterface */
     protected static $storage;
+    /** @var  string */
+    private static $_token;
 
     public function init()
     {
@@ -78,12 +80,12 @@ class Token implements ComponentsInterface, RequestInterface, StorageInterface
 
         if ($this->multiToken === false) {
             $name = '';
-            if ($token = $this->get($name)) {
-                return $token;
+            if (isset(self::$_token)) {
+                return self::$_token;
             }
         }
         $name = $this->addPrefix($name);
-        $token = $this->Rock->security->generateRandomKey();
+        $token = self::$_token = $this->Rock->security->generateRandomKey();
         static::$storage->add($name, $token);
         return $token;
     }
@@ -116,7 +118,7 @@ class Token implements ComponentsInterface, RequestInterface, StorageInterface
             return true;
         }
         if (!empty($token)) {
-            if ($this->getCsrfTokenFromHeader() === $token || $this->get($name, true) === $token) {
+            if ($this->getCsrfTokenFromHeader() === $token || $this->get($name) === $token) {
                 return true;
             }
         }
