@@ -40,7 +40,7 @@ class Token implements ComponentsInterface, RequestInterface, StorageInterface
      * @var string the name of the token used to prevent CSRF. Defaults to '_csrf'.
      * This property is used only when [[enableCsrfValidation]] is true.
      */
-    public $csrfPrefix = '_csrf';
+    public $csrfParam = '_csrf';
     /** @var  SessionInterface */
     protected static $storage;
     /** @var  string */
@@ -71,7 +71,7 @@ class Token implements ComponentsInterface, RequestInterface, StorageInterface
             return null;
         }
         $token = self::$_token = $this->Rock->security->generateRandomKey();
-        static::$storage->add($this->csrfPrefix, $token);
+        static::$storage->add($this->csrfParam, $token);
         return $token;
     }
 
@@ -92,7 +92,6 @@ class Token implements ComponentsInterface, RequestInterface, StorageInterface
                 return true;
             }
         }
-
         return false;
     }
 
@@ -111,7 +110,7 @@ class Token implements ComponentsInterface, RequestInterface, StorageInterface
      */
     public function remove()
     {
-        static::$storage->remove($this->csrfPrefix);
+        static::$storage->remove($this->csrfParam);
     }
 
     /**
@@ -121,7 +120,7 @@ class Token implements ComponentsInterface, RequestInterface, StorageInterface
      */
     public function has()
     {
-        return static::$storage->has($this->csrfPrefix);
+        return static::$storage->has($this->csrfParam);
     }
 
     /**
@@ -131,6 +130,6 @@ class Token implements ComponentsInterface, RequestInterface, StorageInterface
      */
     public function get()
     {
-        return static::$storage->get($this->csrfPrefix);
+        return static::$storage->get($this->csrfParam);
     }
 }

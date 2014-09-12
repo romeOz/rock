@@ -121,7 +121,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
      */
     public function testAllOfFalse(array $data, array $placeholders, array $modelErrors)
     {
-        $_SESSION[Rock::$app->token->csrfPrefix] = '1234';
+        $_SESSION[Rock::$app->token->csrfParam] = '1234';
         $this->assertFalse(
             Rock::$app->validation->notEmpty()->token('registration')->setMessages(['token' => 'token invalid'])
                 ->setPlaceholders('token')->validate($data['token_reg'])

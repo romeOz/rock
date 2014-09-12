@@ -43,7 +43,7 @@ class BaseLoginForm extends Model
                                 ->setName(Rock::t('token'))
                                 ->setPlaceholders('e_login')
                                 ->setModel($this)
-                                ->validate($attributes[$this->Rock->token->csrfPrefix]) === false
+                                ->validate($attributes[$this->Rock->token->csrfParam]) === false
                         ) {
                             return false;
                         }
@@ -92,7 +92,7 @@ class BaseLoginForm extends Model
 
     public function safeAttributes()
     {
-        return ['email', 'password', $this->Rock->token->csrfPrefix];
+        return ['email', 'password', $this->Rock->token->csrfParam];
     }
 
 

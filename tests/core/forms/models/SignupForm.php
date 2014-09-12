@@ -28,7 +28,7 @@ class SignupForm extends BaseSignupForm
                             ->setName(Rock::t('token'))
                             ->setModel($this)
                             ->setPlaceholders('e_signup')
-                            ->validate($attributes[$this->Rock->token->csrfPrefix]) === false
+                            ->validate($attributes[$this->Rock->token->csrfParam]) === false
                     ) {
                         return false;
                     }

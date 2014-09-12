@@ -248,7 +248,7 @@ class BaseHtml
     {
         $token = Rock::$app->token;
         if ($token instanceof Token && $token->enableCsrfValidation) {
-            return static::tag('meta', '', ['name' => 'csrf-param', 'content' => $token->csrfPrefix]) . "\n    "
+            return static::tag('meta', '', ['name' => 'csrf-param', 'content' => $token->csrfParam]) . "\n    "
                    . static::tag('meta', '', ['name' => 'csrf-token', 'content' => $token->create('')]) . "\n";
         } else {
             return '';
