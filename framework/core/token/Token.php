@@ -70,6 +70,9 @@ class Token implements ComponentsInterface, RequestInterface, StorageInterface
         if ($this->enableCsrfValidation === false) {
             return null;
         }
+        if (isset(self::$_token)) {
+            return self::$_token;
+        }
         $token = self::$_token = $this->Rock->security->generateRandomKey();
         static::$storage->add($this->csrfParam, $token);
         return $token;
