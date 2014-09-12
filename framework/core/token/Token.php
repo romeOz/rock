@@ -118,7 +118,7 @@ class Token implements ComponentsInterface, RequestInterface, StorageInterface
             return true;
         }
         if (!empty($token)) {
-            if ($this->getCsrfTokenFromHeader() === $token || $this->get($name) === $token) {
+            if ($this->getCsrfTokenFromHeader() === $this->get($name) || $this->get($name) === $token) {
                 return true;
             }
         }
