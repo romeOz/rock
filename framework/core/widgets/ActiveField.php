@@ -8,8 +8,10 @@ use rock\base\Model;
 use rock\base\ObjectTrait;
 use rock\base\Widget;
 use rock\cache\CacheInterface;
+use rock\exception\ErrorHandler;
 use rock\filters\RateLimiter;
 use rock\helpers\Html;
+use rock\Rock;
 
 class ActiveField
 {
@@ -158,6 +160,15 @@ class ActiveField
      * @see enableCache
      */
     public $cacheClass = 'cache';
+    /** @var string  */
+    protected $formName = 'form';
+
+    public function init()
+    {
+        if ($formName = $this->model->formName()) {
+            $this->formName = $formName;
+        }
+    }
 
     /**
      * PHP magic method that returns the string representation of this object.
@@ -170,7 +181,7 @@ class ActiveField
         try {
             return $this->render();
         } catch (\Exception $e) {
-            new Exception(Exception::ERROR, $e->getMessage(), null, $e);
+            Rock::error(ErrorHandler::convertExceptionToString($e));
             //ErrorHandler::convertExceptionToError($e);
             return '';
         }
@@ -200,6 +211,7 @@ class ActiveField
         }
         if ($content === null) {
             if (!isset($this->parts['{input}'])) {
+                $this->inputOptions['data-ng-model'] = "{$this->formName}.values.{$this->attribute}";
                 $this->parts['{input}'] = Html::activeTextInput($this->model, $this->attribute, $this->inputOptions);
             }
             if (!isset($this->parts['{label}'])) {
@@ -340,6 +352,7 @@ class ActiveField
     public function input($type, $options = [])
     {
         $options = array_merge($this->inputOptions, $options);
+        $options['data-ng-model'] = "{$this->formName}.values.{$this->attribute}";
         $this->adjustLabelFor($options);
         $this->parts['{input}'] = Html::activeInput($type, $this->model, $this->attribute, $options);
 
@@ -357,6 +370,7 @@ class ActiveField
     public function textInput($options = [])
     {
         $options = array_merge($this->inputOptions, $options);
+        $options['data-ng-model'] = "{$this->formName}.values.{$this->attribute}";
         $this->adjustLabelFor($options);
         $this->parts['{input}'] = Html::activeTextInput($this->model, $this->attribute, $options);
 
@@ -379,6 +393,7 @@ class ActiveField
     public function hiddenInput($options = [])
     {
         $options = array_merge($this->inputOptions, $options);
+        $options['data-ng-model'] = "{$this->formName}.values.{$this->attribute}";
         $this->adjustLabelFor($options);
         $this->parts['{input}'] = Html::activeHiddenInput($this->model, $this->attribute, $options);
 
@@ -396,6 +411,7 @@ class ActiveField
     public function passwordInput($options = [])
     {
         $options = array_merge($this->inputOptions, $options);
+        $options['data-ng-model'] = "{$this->formName}.values.{$this->attribute}";
         $this->adjustLabelFor($options);
         $this->parts['{input}'] = Html::activePasswordInput($this->model, $this->attribute, $options);
 
@@ -415,6 +431,7 @@ class ActiveField
         if ($this->inputOptions !== ['class' => 'form-control']) {
             $options = array_merge($this->inputOptions, $options);
         }
+        $options['data-ng-model'] = "{$this->formName}.values.{$this->attribute}";
         $this->adjustLabelFor($options);
         $this->parts['{input}'] = Html::activeFileInput($this->model, $this->attribute, $options);
 
@@ -431,6 +448,7 @@ class ActiveField
     public function textarea($options = [])
     {
         $options = array_merge($this->inputOptions, $options);
+        $options['data-ng-model'] = "{$this->formName}.values.{$this->attribute}";
         $this->adjustLabelFor($options);
         $this->parts['{input}'] = Html::activeTextarea($this->model, $this->attribute, $options);
 

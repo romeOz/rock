@@ -275,22 +275,34 @@ class BaseHtml
         /** @var Url $urlBuilder */
         $urlBuilder = Rock::factory($action, Url::className());
         $action = $urlBuilder->getAbsoluteUrl();
-
         $hiddenInputs = [];
-
         $request = Rock::$app->request;
-        //$hiddenInputs[] = static::hiddenInput('_id', $name);
 
         if ($request instanceof Request) {
             $token = Rock::$app->token;
 
             if (strcasecmp($method, 'get') && strcasecmp($method, 'post')) {
                 // simulate PUT, DELETE, etc. via POST
-                $hiddenInputs[] = static::hiddenInput(isset($name) ? $name . "[{$request->methodVar}]" : $request->methodVar, $method, ArrayHelper::getValue($options, 'hiddenMethod', []));
+                $hiddenInputs[] = static::hiddenInput(
+                    isset($name) ? $name . "[{$request->methodVar}]" : $request->methodVar,
+                    $method,
+                    array_merge(
+                        ['data-ng-model' =>  (isset($name) ? $name : 'form').".values.{$request->methodVar}", 'data-simple-name' => $request->methodVar],
+                        ArrayHelper::getValue($options, 'hiddenMethod', [])
+                    )
+                );
                 $method = 'post';
             }
             if ($token->enableCsrfValidation && !strcasecmp($method, 'post')) {
-                $hiddenInputs[] = static::hiddenInput(isset($name) ? $name . "[{$token->csrfPrefix}]" : $token->csrfPrefix, $token->create($name), ArrayHelper::getValue($options, 'hiddenCsrf', []));
+                $csrf = $token->create($name);
+                $hiddenInputs[] = static::hiddenInput(
+                    isset($name) ? "{$name}[_csrf]" : '_csrf',
+                    $csrf,
+                    array_merge(
+                        ['data-ng-model' => (isset($name) ? $name : 'form') . '.values._csrf', 'data-simple-name' => '_csrf', 'data-ng-init' => (isset($name) ? $name : 'form').".values._csrf='{$csrf}'", 'data-form-csrf' => ''],
+                        ArrayHelper::getValue($options, 'hiddenCsrf', [])
+                    )
+                );
             }
         }
 
@@ -313,6 +325,10 @@ class BaseHtml
         unset($options['hiddenMethod'], $options['hiddenCsrf']);
         $options['action'] = $action;
         $options['method'] = $method;
+        if (!empty($name)) {
+            $options['name'] = $name;
+            $options['data-ng-init'] = 'formName="' . $name . '"';
+        }
         $form = static::beginTag('form', $options);
         if (!empty($hiddenInputs)) {
             $form .= "\n" . implode("\n", $hiddenInputs);

@@ -25,11 +25,6 @@ class Token implements ComponentsInterface, RequestInterface, StorageInterface
      */
     public $adapterStorage = self::SESSION;
     /**
-     * Creating multiple tokens.
-     * @var bool
-     */
-    public $multiToken = false;
-    /**
      * @var boolean whether to enable CSRF (Cross-Site Request Forgery) validation. Defaults to true.
      * When CSRF validation is enabled, forms submitted to an Rock Web application must be originated
      * from the same application. If not, a 400 HTTP exception will be raised.
@@ -65,44 +60,19 @@ class Token implements ComponentsInterface, RequestInterface, StorageInterface
         }
     }
 
-
     /**
-     * Creating csrf-token
+     * Creating CSRF-token
      *
-     * @param string $name - name of token
      * @return string
      */
-    public function create($name = '')
+    public function create()
     {
         if ($this->enableCsrfValidation === false) {
             return null;
         }
-
-        if ($this->multiToken === false) {
-            $name = '';
-            if (isset(self::$_token)) {
-                return self::$_token;
-            }
-        }
-        $name = $this->addPrefix($name);
         $token = self::$_token = $this->Rock->security->generateRandomKey();
-        static::$storage->add($name, $token);
+        static::$storage->add($this->csrfPrefix, $token);
         return $token;
-    }
-
-    /**
-     * Adding prefix
-     *
-     * @param string $name
-     * @return string
-     */
-    public function addPrefix($name = '')
-    {
-        if (isset($this->csrfPrefix)) {
-            return $this->csrfPrefix . $name;
-        }
-
-        return $name;
     }
 
     /**
@@ -137,40 +107,30 @@ class Token implements ComponentsInterface, RequestInterface, StorageInterface
     }
 
     /**
-     * Removes a data resource.
-     *
-     * @param $name
+     * Removes CSRF-token.
      */
-    public function remove($name)
+    public function remove()
     {
-        static::$storage->remove($this->addPrefix($name));
+        static::$storage->remove($this->csrfPrefix);
     }
 
     /**
-     * Returns whether there is a cookie with the specified name.
+     * Has CSRF-token.
      *
-     * @param string $name the cookie name
      * @return boolean whether the named cookie exists
      */
-    public function has($name)
+    public function has()
     {
-        if ($this->multiToken === false) {
-            $name = '';
-        }
-        return static::$storage->has($this->addPrefix($name));
+        return static::$storage->has($this->csrfPrefix);
     }
 
     /**
      * Returns the cookie with the specified name.
      *
-     * @param string $name the cookie name
-     * @return mixed the cookie with the specified name. Null if the named cookie does not exist.
+     * @return string
      */
-    public function get($name = '')
+    public function get()
     {
-        if ($this->multiToken === false) {
-            $name = '';
-        }
-        return static::$storage->get($this->addPrefix($name));
+        return static::$storage->get($this->csrfPrefix);
     }
 }

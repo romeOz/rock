@@ -156,6 +156,7 @@ class ActiveForm extends Snippet
         $submit = (array)$submit;
         $submit[1] = isset($submit[1]) ? $submit[1] : [];
         list($submitContent, $submitOptions) = $submit;
+        $submitOptions['data-ng-disabled'] = 'submitted';
         if (isset($submitOptions['wrapperTpl'])) {
             $wrapper = $submitOptions['wrapperTpl'];
             unset($submitOptions['wrapperTpl']);
