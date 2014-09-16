@@ -111,7 +111,7 @@ class RabbitQueue extends Queue implements QueueInterface
                 }
                 $write = null;
                 $except = null;
-                if (empty($read) || false === ($numChangedStreams = stream_select($read, $write, $except, $this->timeout))) {
+                if (false === ($numChangedStreams = @stream_select($read, $write, $except, $this->timeout))) {
                     break;
                 } elseif ($numChangedStreams > 0) {
                     $channel->wait();
@@ -236,7 +236,7 @@ class RabbitQueue extends Queue implements QueueInterface
                 }
                 $write = null;
                 $except = null;
-                if (empty($read) || false === ($num_changed_streams = stream_select($read, $write, $except, $this->timeout))) {
+                if (false === ($num_changed_streams = @stream_select($read, $write, $except, $this->timeout))) {
                     break;
                 } elseif ($num_changed_streams > 0) {
                     $channel->wait();
