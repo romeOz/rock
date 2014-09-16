@@ -86,7 +86,7 @@ class RateLimiterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($controller->method('actionIndex'), 'test');
         $this->assertSame($_SESSION['user']['_allowance'][$controller::className().'::actionIndex']["maxRequests"], 0);
         $this->assertNull($controller->method('actionIndex'));
-        sleep(3);
+        sleep(4);
 
         $this->assertSame($controller->method('actionIndex'), 'test');
         $this->assertSame($_SESSION['user']['_allowance'][$controller::className().'::actionIndex']["maxRequests"], 1);
@@ -98,7 +98,7 @@ class RateLimiterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($controller->method('actionIndex'), 'test');
         $this->assertSame($_SESSION['user']['_allowance'][$controller::className().'::actionIndex']["maxRequests"], 0);
         $this->assertNull($controller->method('actionIndex'));
-        sleep(3);
+        sleep(4);
 
         $this->assertSame($controller->method('actionIndex'), 'test');
         $this->assertSame($_SESSION['user']['_allowance'][$controller::className().'::actionIndex']["maxRequests"], 1);
