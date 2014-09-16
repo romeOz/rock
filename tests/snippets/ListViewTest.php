@@ -185,7 +185,7 @@ class ListViewTest extends TemplateCommon
             $this->removeSpace(file_get_contents($this->path . '/snippet_as_array.html'))
         );
         $this->assertTrue($cache->has('list'));
-        sleep(3);
+        sleep(4);
         $this->assertFalse($cache->has('list'));
     }
 
