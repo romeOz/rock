@@ -104,7 +104,11 @@ class RabbitQueue extends Queue implements QueueInterface
             // non-blocking
             $count = 0;
             while (count($channel->callbacks) && ($limit == -1 || $count < $limit)) {
-                $read = array($connection->getSocket()); // add here other sockets that you need to attend
+                // add here other sockets that you need to attend
+                $read = [];
+                if(is_resource($connection->getSocket())) {
+                    $read = [$connection->getSocket()];
+                }
                 $write = null;
                 $except = null;
                 if (false === ($numChangedStreams = stream_select($read, $write, $except, $this->timeout))) {
@@ -225,7 +229,11 @@ class RabbitQueue extends Queue implements QueueInterface
         if (count($channel->callbacks)) {
             $count = 0;
             while ($limit == -1 || $count < $limit) {
-                $read = array($connection->getSocket()); // add here other sockets that you need to attend
+                // add here other sockets that you need to attend
+                $read = [];
+                if(is_resource($connection->getSocket())) {
+                    $read = [$connection->getSocket()];
+                }
                 $write = null;
                 $except = null;
                 if (false === ($num_changed_streams = stream_select($read, $write, $except, $this->timeout))) {
