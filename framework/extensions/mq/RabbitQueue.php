@@ -103,11 +103,12 @@ class RabbitQueue extends Queue implements QueueInterface
 
             // non-blocking
             $count = 0;
+            $stdin = fopen('php://stdin', 'r');
             while (count($channel->callbacks) && ($limit == -1 || $count < $limit)) {
                 // add here other sockets that you need to attend
                 $read = [];
                 if(is_resource($connection->getSocket())) {
-                    $read = [$connection->getSocket()];
+                    $read = [$connection->getSocket(), $stdin];
                 }
                 $write = null;
                 $except = null;
@@ -228,11 +229,12 @@ class RabbitQueue extends Queue implements QueueInterface
         // non-blocking
         if (count($channel->callbacks)) {
             $count = 0;
+            $stdin = fopen('php://stdin', 'r');
             while ($limit == -1 || $count < $limit) {
                 // add here other sockets that you need to attend
                 $read = [];
                 if(is_resource($connection->getSocket())) {
-                    $read = [$connection->getSocket()];
+                    $read = [$connection->getSocket(), $stdin];
                 }
                 $write = null;
                 $except = null;
