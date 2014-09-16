@@ -103,16 +103,15 @@ class RabbitQueue extends Queue implements QueueInterface
 
             // non-blocking
             $count = 0;
-            $stdin = fopen('php://stdin', 'r');
             while (count($channel->callbacks) && ($limit == -1 || $count < $limit)) {
                 // add here other sockets that you need to attend
                 $read = [];
                 if(is_resource($connection->getSocket())) {
-                    $read = [$connection->getSocket(), $stdin];
+                    $read = [$connection->getSocket()];
                 }
                 $write = null;
                 $except = null;
-                if (false === ($numChangedStreams = stream_select($read, $write, $except, $this->timeout))) {
+                if (empty($read) || false === ($numChangedStreams = stream_select($read, $write, $except, $this->timeout))) {
                     break;
                 } elseif ($numChangedStreams > 0) {
                     $channel->wait();
@@ -229,16 +228,15 @@ class RabbitQueue extends Queue implements QueueInterface
         // non-blocking
         if (count($channel->callbacks)) {
             $count = 0;
-            $stdin = fopen('php://stdin', 'r');
             while ($limit == -1 || $count < $limit) {
                 // add here other sockets that you need to attend
                 $read = [];
                 if(is_resource($connection->getSocket())) {
-                    $read = [$connection->getSocket(), $stdin];
+                    $read = [$connection->getSocket()];
                 }
                 $write = null;
                 $except = null;
-                if (false === ($num_changed_streams = stream_select($read, $write, $except, $this->timeout))) {
+                if (empty($read) || false === ($num_changed_streams = stream_select($read, $write, $except, $this->timeout))) {
                     break;
                 } elseif ($num_changed_streams > 0) {
                     $channel->wait();
