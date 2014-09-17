@@ -634,7 +634,7 @@ class Response
     }
 
     /**
-     * Set header status 404
+     * Set header status 404 ("Not Found")
      */
     public function status404()
     {
@@ -642,11 +642,27 @@ class Response
     }
 
     /**
-     * Set header status 405
+     * Set header status 403 ("Forbidden")
+     */
+    public function status403()
+    {
+        $this->setStatusCode(403);
+    }
+
+    /**
+     * Set header status 405 ("Method Not Allowed")
      */
     public function status405()
     {
         $this->setStatusCode(405);
+    }
+
+    /**
+     * Set header status 422 ("Unprocessable Entity")
+     */
+    public function status422()
+    {
+        $this->setStatusCode(422);
     }
 
     /**
