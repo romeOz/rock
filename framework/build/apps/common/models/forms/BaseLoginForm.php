@@ -166,7 +166,7 @@ class BaseLoginForm extends Model
         $users = $this->getUsers();
         $users->login_last = $this->Rock->date->isoDatetime();
         if (!$users->save()) {
-            $this->Rock->template->addPlaceholder('e_login', Rock::t('failAuth'), true);
+            $this->Rock->template->addPlaceholder('e_login', Rock::t('failLogin'), true);
             return false;
         }
 
