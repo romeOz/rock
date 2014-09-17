@@ -3,7 +3,6 @@ namespace rock\access;
 
 use rock\base\ObjectTrait;
 use rock\helpers\Helper;
-use rock\Rock;
 use rock\route\ErrorsInterface;
 use rock\route\ErrorsTrait;
 
@@ -16,15 +15,18 @@ class Access implements ErrorsInterface
      * @var array
      */
     public $rules = [];
-
     /**
      * Owner object
      *
      * @var object
      */
     public $owner;
-
     public $data;
+    /**
+     * Sending response headers. `true` by default.
+     * @var bool
+     */
+    public $sendHeaders = true;
 
 //    /**
 //     * Name method (action)
@@ -185,7 +187,9 @@ class Access implements ErrorsInterface
         } elseif (in_array($this->Rock->user->get('username'), $users)) {
             return true;
         }
-
+        if ($this->sendHeaders) {
+            $this->Rock->response->status403();
+        }
         return false;
     }
 
@@ -203,8 +207,11 @@ class Access implements ErrorsInterface
         if (in_array('*', $ips)) {
             return true;
         }
-
-        return $this->Rock->request->isIps($ips);
+        $result = $this->Rock->request->isIps($ips);
+        if (!$result && $this->sendHeaders) {
+            $this->Rock->response->status403();
+        }
+        return $result;
     }
 
     /**
@@ -225,10 +232,12 @@ class Access implements ErrorsInterface
         if ($this->Rock->request->isMethods($verbs)) {
             return true;
         }
-        $response = Rock::$app->response;
-        // http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.7
-        $response->getHeaders()->set('Allow', implode(', ', $verbs));
-        $response->setStatusCode(405);
+        if ($this->sendHeaders) {
+            $response = $this->Rock->response;
+            // http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.7
+            $response->getHeaders()->set('Allow', implode(', ', $verbs));
+            $response->setStatusCode(405);
+        }
         return false;
     }
 
@@ -257,6 +266,9 @@ class Access implements ErrorsInterface
 
         foreach ($roles as $role) {
             if (!$this->Rock->user->check($role)) {
+                if ($this->sendHeaders) {
+                    $this->Rock->response->status403();
+                }
                 return false;
             }
         }
@@ -275,10 +287,14 @@ class Access implements ErrorsInterface
         $rule['custom'][1] = Helper::getValueIsset($rule['custom'][1], []);
         list($function, $args) = $rule['custom'];
 
-        return (bool)call_user_func(
+        $result = (bool)call_user_func(
             $function,
             array_merge(['owner' => $this->owner/*, 'action' => $this->action*/], $args)
         );
+        if (!$result && $this->sendHeaders) {
+            $this->Rock->response->status403();
+        }
+        return $result;
     }
 
     protected function callback($handler)
