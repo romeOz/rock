@@ -83,7 +83,6 @@ class Access implements ErrorsInterface
         return $valid;
     }
 
-
     /**
      * Check Access
      *
@@ -104,7 +103,6 @@ class Access implements ErrorsInterface
 
         return (bool)$valid;
     }
-
 
     /**
      * Match
@@ -312,5 +310,4 @@ class Access implements ErrorsInterface
         $access->data = $data;
         call_user_func($function, $access);
     }
-
 }

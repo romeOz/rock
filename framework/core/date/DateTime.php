@@ -10,7 +10,11 @@ use rock\date\locale\En;
 use rock\date\locale\Locale;
 use rock\i18n\i18nInterface;
 
-/** @noinspection PhpHierarchyChecksInspection */
+/**
+ * @method  date()
+ * @method  time()
+ * @method  datetime()
+ */
 class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
 {
     use ComponentsTrait {
