@@ -5,12 +5,12 @@ namespace rock\widgets;
 
 use rock\base\ComponentsTrait;
 use rock\base\Model;
-use rock\base\ObjectTrait;
 use rock\base\Widget;
 use rock\cache\CacheInterface;
 use rock\exception\ErrorHandler;
 use rock\filters\RateLimiter;
 use rock\helpers\Html;
+use rock\helpers\Json;
 use rock\Rock;
 
 class ActiveField
@@ -62,7 +62,18 @@ class ActiveField
      *
      * @see Html::renderTagAttributes() for details on how attributes are being rendered.
      */
-    public $errorOptions = ['class' => 'form-error bold'];
+    public $errorOptions = ['class' => 'form-error'];
+    /**
+     * @var array the default options for the error tags. The parameter passed to `error()` will be
+     * merged with this property when rendering the error tag.
+     * The following special options are recognized:
+     *
+     * - tag: the tag name of the container element. Defaults to "div".
+     *
+     * @see Html::renderTagAttributes() for details on how attributes are being rendered.
+     */
+    public $ngErrorOptions = ['class' => 'form-error hide'];
+    public $ngErrorMessages = [];
     /**
      * @var array the default options for the label tags. The parameter passed to `label()` will be
      * merged with this property when rendering the label tag.
@@ -211,14 +222,14 @@ class ActiveField
         }
         if ($content === null) {
             if (!isset($this->parts['{input}'])) {
-                $this->inputOptions['data-ng-model'] = "{$this->formName}.values.{$this->attribute}";
+                $this->inputOptions =$this->calculateClientInputOption($this->inputOptions);
                 $this->parts['{input}'] = Html::activeTextInput($this->model, $this->attribute, $this->inputOptions);
             }
             if (!isset($this->parts['{label}'])) {
                 $this->parts['{label}'] = Html::activeLabel($this->model, $this->attribute, $this->labelOptions);
             }
             if (!isset($this->parts['{error}'])) {
-                $this->parts['{error}'] = Html::error($this->model, $this->attribute, $this->errorOptions);
+                $this->parts['{error}'] = $this->renderErrors();
             }
             if (!isset($this->parts['{hint}'])) {
                 $this->parts['{hint}'] = '';
@@ -231,17 +242,55 @@ class ActiveField
         return $this->begin() . "\n" . $content . "\n" . $this->end();
     }
 
+    protected function calculateClientInputOption($options = [])
+    {
+        if (!isset($options['data-ng-model'])) {
+            $options['data-ng-model'] = isset($this->formName)
+                ? "{$this->formName}.values.{$this->attribute}"
+                : "form.values.{$this->attribute}";
+        }
+        if (!isset($options['data-ng-class'])) {
+            $options['data-ng-class'] = isset($this->formName)
+                ? 'showHighlightError("'.$this->formName.'['.$this->attribute.']")'
+                : 'showHighlightError("'.$this->attribute.'")';
+        }
+        if ($this->form->validateOnChanged) {
+            $options['data-ng-focus'] = '';
+        }
+
+        return $options;
+    }
+
+    protected function renderErrors()
+    {
+        $result = '';
+        if ($this->ngErrorMessages) {
+            if (is_array($this->ngErrorMessages)) {
+                $this->ngErrorMessages = Json::encode($this->ngErrorMessages);
+            }
+            $this->ngErrorOptions['data-ng-repeat'] = '(error, errorMsg) in ' . $this->ngErrorMessages;
+            $this->ngErrorOptions['data-ng-class'] = isset($this->formName)
+                ? 'showError("'.$this->formName.'['.$this->attribute.']", error)'
+                : 'showError("'.$this->attribute.'", error)';
+            $this->ngErrorOptions['data-ng-bind'] = 'errorMsg';
+            $tag = isset($this->ngErrorOptions['tag']) ? $this->ngErrorOptions['tag'] : 'div';
+            unset($this->ngErrorOptions['tag']);
+            $result .= Html::tag($tag, '', $this->ngErrorOptions) . "\n";
+        }
+        $this->errorOptions['data-ng-class'] = isset($this->formName)
+            ? 'hideError("'.$this->formName.'['.$this->attribute.']", error)'
+            : 'hideError("'.$this->attribute.'", error)';
+        $result .= Html::error($this->model, $this->attribute, $this->errorOptions);
+
+        return $result;
+    }
+
     /**
      * Renders the opening tag of the field container.
      * @return string the rendering result.
      */
     public function begin()
     {
-        //$clientOptions = $this->getClientOptions();
-        if (!empty($clientOptions)) {
-            $this->form->attributes[$this->attribute] = $clientOptions;
-        }
-
         $inputID = Html::getInputId($this->model, $this->attribute);
         $attribute = Html::getAttributeName($this->attribute);
         $options = $this->options;
@@ -352,7 +401,7 @@ class ActiveField
     public function input($type, $options = [])
     {
         $options = array_merge($this->inputOptions, $options);
-        $options['data-ng-model'] = "{$this->formName}.values.{$this->attribute}";
+        $options = $this->calculateClientInputOption($options);
         $this->adjustLabelFor($options);
         $this->parts['{input}'] = Html::activeInput($type, $this->model, $this->attribute, $options);
 
@@ -370,7 +419,7 @@ class ActiveField
     public function textInput($options = [])
     {
         $options = array_merge($this->inputOptions, $options);
-        $options['data-ng-model'] = "{$this->formName}.values.{$this->attribute}";
+        $options = $this->calculateClientInputOption($options);
         $this->adjustLabelFor($options);
         $this->parts['{input}'] = Html::activeTextInput($this->model, $this->attribute, $options);
 
@@ -393,7 +442,7 @@ class ActiveField
     public function hiddenInput($options = [])
     {
         $options = array_merge($this->inputOptions, $options);
-        $options['data-ng-model'] = "{$this->formName}.values.{$this->attribute}";
+        $options = $this->calculateClientInputOption($options);
         $this->adjustLabelFor($options);
         $this->parts['{input}'] = Html::activeHiddenInput($this->model, $this->attribute, $options);
 
@@ -411,7 +460,7 @@ class ActiveField
     public function passwordInput($options = [])
     {
         $options = array_merge($this->inputOptions, $options);
-        $options['data-ng-model'] = "{$this->formName}.values.{$this->attribute}";
+        $options = $this->calculateClientInputOption($options);
         $this->adjustLabelFor($options);
         $this->parts['{input}'] = Html::activePasswordInput($this->model, $this->attribute, $options);
 
@@ -431,7 +480,7 @@ class ActiveField
         if ($this->inputOptions !== ['class' => 'form-control']) {
             $options = array_merge($this->inputOptions, $options);
         }
-        $options['data-ng-model'] = "{$this->formName}.values.{$this->attribute}";
+        $options = $this->calculateClientInputOption($options);
         $this->adjustLabelFor($options);
         $this->parts['{input}'] = Html::activeFileInput($this->model, $this->attribute, $options);
 
@@ -448,7 +497,7 @@ class ActiveField
     public function textarea($options = [])
     {
         $options = array_merge($this->inputOptions, $options);
-        $options['data-ng-model'] = "{$this->formName}.values.{$this->attribute}";
+        $options = $this->calculateClientInputOption($options);
         $this->adjustLabelFor($options);
         $this->parts['{input}'] = Html::activeTextarea($this->model, $this->attribute, $options);
 
@@ -478,6 +527,7 @@ class ActiveField
      */
     public function radio($options = [], $enclosedByLabel = true)
     {
+        $options = $this->calculateClientInputOption($options);
         if ($enclosedByLabel) {
             if (!isset($options['label'])) {
                 $attribute = Html::getAttributeName($this->attribute);
@@ -573,6 +623,7 @@ class ActiveField
             $items = call_user_func($items, $this);
         }
         $options = array_merge($this->inputOptions, $options);
+        $options = $this->calculateClientInputOption($options);
         $this->adjustLabelFor($options);
         $this->parts['{input}'] = Html::activeDropDownList($this->model, $this->attribute, $items, $options);
 
@@ -705,6 +756,9 @@ class ActiveField
             $items = call_user_func($items, $this);
         }
         $this->adjustLabelFor($options);
+        if (!isset($options['itemOptions']['data-ng-model'])) {
+            $options['itemOptions']['data-ng-model'] = "{$this->formName}.values.{$this->attribute}";
+        }
         $this->parts['{input}'] = Html::activeRadioList($this->model, $this->attribute, $items, $options);
 
         $this->setCache($cacheKey, $this->parts['{input}']);

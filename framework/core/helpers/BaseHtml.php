@@ -286,10 +286,8 @@ class BaseHtml
                 $hiddenInputs[] = static::hiddenInput(
                     isset($name) ? $name . "[{$request->methodVar}]" : $request->methodVar,
                     $method,
-                    array_merge(
-                        ['data-ng-model' =>  (isset($name) ? $name : 'form').".values.{$request->methodVar}", 'data-simple-name' => $request->methodVar],
-                        ArrayHelper::getValue($options, 'hiddenMethod', [])
-                    )
+                    ArrayHelper::getValue($options, 'hiddenMethod', [])
+
                 );
                 $method = 'post';
             }
@@ -298,10 +296,7 @@ class BaseHtml
                 $hiddenInputs[] = static::hiddenInput(
                     isset($name) ? "{$name}[_csrf]" : '_csrf',
                     $csrf,
-                    array_merge(
-                        ['data-ng-model' => (isset($name) ? $name : 'form') . '.values._csrf', 'data-simple-name' => '_csrf', 'data-ng-init' => (isset($name) ? $name : 'form').".values._csrf='{$csrf}'", 'data-form-csrf' => ''],
-                        ArrayHelper::getValue($options, 'hiddenCsrf', [])
-                    )
+                    ArrayHelper::getValue($options, 'hiddenCsrf', [])
                 );
             }
         }

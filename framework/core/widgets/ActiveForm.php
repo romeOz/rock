@@ -7,6 +7,7 @@ use rock\base\ComponentsTrait;
 use rock\base\Model;
 use rock\base\ObjectTrait;
 use rock\base\Widget;
+use rock\helpers\ArrayHelper;
 use rock\helpers\Html;
 use rock\Rock;
 
@@ -90,61 +91,10 @@ class ActiveForm extends Widget
     public $validateOnSubmit = true;
     /**
      * @var boolean whether to perform validation when an input field loses focus and its value is found changed.
-     * If [[ActiveField::validateOnChange]] is set, its value will take precedence for that input field.
-     */
-    public $validateOnChange = true;
-    /**
-     * @var boolean whether to perform validation while the user is typing in an input field.
-     * If [[ActiveField::validateOnType]] is set, its value will take precedence for that input field.
+     * If [[ActiveField::validateOnBlur]] is set, its value will take precedence for that input field.
      * @see validationDelay
      */
-    public $validateOnType = false;
-    /**
-     * @var integer number of milliseconds that the validation should be delayed when an input field
-     * is changed or the user types in the field.
-     * If [[ActiveField::validationDelay]] is set, its value will take precedence for that input field.
-     */
-    public $validationDelay = 200;
-    /**
-     * @var string the name of the GET parameter indicating the validation request is an AJAX request.
-     */
-    public $ajaxParam = 'ajax';
-    /**
-     * @var string the type of data that you're expecting back from the server.
-     */
-    public $ajaxDataType = 'json';
-    /**
-     * @var string|JsExpression a JS callback that will be called when the form is being submitted.
-     * The signature of the callback should be:
-     *
-     * ~~~
-     * function ($form) {
-     *     ...return false to cancel submission...
-     * }
-     * ~~~
-     */
-    public $beforeSubmit;
-    /**
-     * @var string|JsExpression a JS callback that is called before validating an attribute.
-     * The signature of the callback should be:
-     *
-     * ~~~
-     * function ($form, attribute, messages) {
-     *     ...return false to cancel the validation...
-     * }
-     * ~~~
-     */
-    public $beforeValidate;
-    /**
-     * @var string|JsExpression a JS callback that is called after validating an attribute.
-     * The signature of the callback should be:
-     *
-     * ~~~
-     * function ($form, attribute, messages) {
-     * }
-     * ~~~
-     */
-    public $afterValidate;
+    public $validateOnChanged = false;
     /**
      * @var array the client validation options for individual attributes. Each element of the array
      * represents the validation options for a particular attribute.
@@ -165,7 +115,40 @@ class ActiveForm extends Widget
         if (!isset($this->fieldConfig['class'])) {
             $this->fieldConfig['class'] = ActiveField::className();
         }
-        echo Html::beginForm($this->model->formName(), $this->action, $this->method, $this->options);
+        $name = $this->model->formName();
+        $this->clientOptions($name);
+
+        echo Html::beginForm($name, $this->action, $this->method, $this->options);
+    }
+
+    protected function clientOptions($name)
+    {
+        if ($this->validateOnChanged && !isset($this->options['data-validate-on-changed'])) {
+            $this->options['data-validate-on-changed'] = 'true';
+        }
+        if (!isset($this->options['data-action-form'])) {
+            $this->options['data-action-form'] = '';
+        }
+        if (!isset($this->options['data-ng-submit'])) {
+            $this->options['data-ng-submit'] = 'submit($event)';
+        }
+        $request = $this->Rock->request;
+        $this->options['hiddenMethod'] = array_merge(
+            [
+                'data-ng-model' =>  (isset($name) ? $name : 'form').".values.{$request->methodVar}",
+                'data-simple-name' => $request->methodVar
+            ],
+            ArrayHelper::getValue($this->options, 'hiddenMethod', [])
+        );
+        $csrf = $this->Rock->token->create();
+        $this->options['hiddenCsrf'] = array_merge(
+            [
+                'data-ng-model' => (isset($name) ? $name : 'form') . '.values._csrf',
+                'data-simple-name' => '_csrf',
+                'data-ng-init' => (isset($name) ? $name : 'form').".values._csrf='{$csrf}'", 'data-form-csrf' => ''
+            ],
+            ArrayHelper::getValue($this->options, 'hiddenCsrf', [])
+        );
     }
 
     /**

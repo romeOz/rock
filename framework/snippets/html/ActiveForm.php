@@ -211,12 +211,12 @@ class ActiveForm extends Snippet
             if (isset($this->config['method'])) {
                 $verb = strtoupper($this->config['method']);
                 if ($verb == Request::GET) {
-                    $this->load = Rock::$app->request->getAll();
+                    $this->load = Request::getAll();
                 } else {
-                    $this->load = Rock::$app->request->postAll();
+                    $this->load = Request::postAll();
                 }
             } else {
-                $this->load = Rock::$app->request->postAll();
+                $this->load = Request::postAll();
             }
         }
         if (!empty($this->load)) {

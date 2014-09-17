@@ -48,6 +48,9 @@ class Captcha extends InputWidget implements CaptchaInterface
         if (!isset($this->imageOptions['id'])) {
             $this->imageOptions['id'] = $this->options['id'] . '-image';
         }
+        if (!isset($this->imageOptions['data-ng-click'])) {
+            $this->imageOptions['data-ng-click'] = 'reloadCaptcha($event)';
+        }
     }
 
     /**
@@ -56,6 +59,7 @@ class Captcha extends InputWidget implements CaptchaInterface
     public function run()
     {
         if ($this->hasModel()) {
+            $this->calculateClientInputOption();
             $input = Html::activeTextInput($this->model, $this->attribute, $this->options);
         } else {
             $input = Html::textInput($this->name, $this->value, $this->options);
@@ -83,6 +87,18 @@ class Captcha extends InputWidget implements CaptchaInterface
         );
     }
 
+    protected function calculateClientInputOption()
+    {
+        $formName = $this->model->formName();
+        if (!isset($this->options['data-ng-model'])) {
+            $this->options['data-ng-model'] = "{$formName}.values.{$this->attribute}";
+        }
+
+        if (!isset($this->options['data-ng-class'])) {
+            $this->options['data-ng-class'] = 'showHighlightError("'.$formName.'['.$this->attribute.']")';
+
+        }
+    }
 
     /**
      * Checks if there is graphic extension available to generate CAPTCHA images.
