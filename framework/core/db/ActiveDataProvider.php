@@ -4,11 +4,11 @@ namespace rock\db;
 
 use rock\base\ComponentsTrait;
 use rock\base\Model;
-use rock\base\ObjectTrait;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\Pagination;
 use rock\helpers\Sanitize;
+use rock\request\Request;
 use rock\response\Response;
 
 /**
@@ -87,7 +87,7 @@ class ActiveDataProvider
     public function init()
     {
         if (!isset($this->pagination['pageCurrent'])) {
-            $this->pagination['pageCurrent'] = $this->Rock->request->get(self::PAGE_VAR, null, [Sanitize::POSITIVE, 'intval']);
+            $this->pagination['pageCurrent'] = Request::get(self::PAGE_VAR, null, [Sanitize::POSITIVE, 'intval']);
         }
     }
 

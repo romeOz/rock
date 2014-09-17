@@ -2,7 +2,6 @@
 namespace rock\response;
 
 use rock\base\ComponentsTrait;
-use rock\base\ObjectTrait;
 use rock\event\Event;
 use rock\exception\Exception;
 use rock\helpers\File;
@@ -346,7 +345,7 @@ class Response
                 $name = str_replace(' ', '-', ucwords(str_replace('-', ' ', $name)));
                 // set replace for first occurance of header but false afterwards to allow multiple
                 $replace = true;
-                foreach ($values as $value) {
+                foreach ((array)$values as $value) {
                     header("$name: $value", $replace);
                     $replace = false;
                 }

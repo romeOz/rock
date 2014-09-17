@@ -1,9 +1,8 @@
 <?php
 namespace rock\session;
 
-use rock\base\ComponentsTrait;
-use rock\base\ObjectTrait;
 use rock\helpers\ArrayHelper;
+use rock\request\Request;
 use rock\Rock;
 
 /**
@@ -185,11 +184,10 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
     {
         if ($this->_hasSessionId === null) {
             $name = $this->getName();
-            $request = $this->Rock->request;
             if (ini_get('session.use_cookies') && !empty($_COOKIE[$name])) {
                 $this->_hasSessionId = true;
             } elseif (!ini_get('use_only_cookies') && ini_get('use_trans_sid')) {
-                $this->_hasSessionId = $request->get($name) !== null;
+                $this->_hasSessionId = Request::get($name) !== null;
             } else {
                 $this->_hasSessionId = false;
             }

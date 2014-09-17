@@ -1,17 +1,15 @@
 <?php
 namespace rock\request;
 
-
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
-use rock\base\ObjectTrait;
 use rock\helpers\Helper;
 use rock\helpers\Json;
 use rock\helpers\Sanitize;
 use rock\Rock;
 
 /**
- * Class Request
+ * Class `Request`
  *
  * @property-read string scheme
  * @property-read string host
@@ -26,8 +24,11 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
         ComponentsTrait::__get as parentGet;
     }
 
+    /**
+     * Checking referrer on allow domains
+     * @var array
+     */
     public $allowDomains = [];
-
     /**
      * @var string|boolean the name of the POST parameter that is used to indicate if a request is a PUT, PATCH or DELETE
      * request tunneled through POST. Default to '_method'.
@@ -40,7 +41,6 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
      * This property is used only if [[enablePrettyUrl]] is true.
      */
     public $showScriptName = true;
-    //public $depthPrepare = 70;
 
     public function __construct($config = [])
     {
@@ -50,49 +50,93 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
         $this->parseRequest();
     }
 
-    public function getAll($filters = null)
+    /**
+     * @param mixed $filters
+     * @return mixed
+     */
+    public static function getAll($filters = null)
     {
-        return $this->_prepare($GLOBALS['_GET'], $filters);
+        return static::prepareAll($GLOBALS['_GET'], $filters);
     }
 
-    public function postAll($filters = null)
+    /**
+     * @param mixed $filters
+     * @return mixed
+     */
+    public static function postAll($filters = null)
     {
-        return $this->_prepare($GLOBALS['_POST'], $filters);
+        return static::prepareAll($GLOBALS['_POST'], $filters);
     }
 
-    public function putAll($filters = null)
+    /**
+     * @param mixed $filters
+     * @return mixed
+     */
+    public static function putAll($filters = null)
     {
-        return $this->_prepare($GLOBALS['_PUT'], $filters);
+        return static::prepareAll($GLOBALS['_PUT'], $filters);
     }
 
-    public function deleteAll($filters = null)
+    /**
+     * @param mixed $filters
+     * @return mixed
+     */
+    public static function deleteAll($filters = null)
     {
-        return $this->_prepare($GLOBALS['_DELETE'], $filters);
+        return static::prepareAll($GLOBALS['_DELETE'], $filters);
     }
 
-    public function serverAll($filters = null)
+    /**
+     * @param mixed $filters
+     * @return mixed
+     */
+    public static function serverAll($filters = null)
     {
-        return $this->_prepare($GLOBALS['_SERVER'], $filters);
+        return static::prepareAll($GLOBALS['_SERVER'], $filters);
     }
 
-    public function get($name, $default = null, array $filters = null)
+    /**
+     * @param string      $name - name of request-value
+     * @param mixed  $default
+     * @param array $filters
+     * @return mixed
+     */
+    public static function get($name, $default = null, array $filters = null)
     {
-        return $this->_prepareValue('_GET', $name, $default, $filters);
+        return static::prepareValue('_GET', $name, $default, $filters);
     }
 
-    public function post($name, $default = null, array $filters = null)
+    /**
+     * @param string      $name - name of request-value
+     * @param mixed  $default
+     * @param array $filters
+     * @return mixed
+     */
+    public static function post($name, $default = null, array $filters = null)
     {
-        return $this->_prepareValue('_POST', $name, $default, $filters);
+        return static::prepareValue('_POST', $name, $default, $filters);
     }
 
-    public function put($name, $default = null, array $filters = null)
+    /**
+     * @param string      $name - name of request-value
+     * @param mixed  $default
+     * @param array $filters
+     * @return mixed
+     */
+    public static function put($name, $default = null, array $filters = null)
     {
-        return $this->_prepareValue('_PUT', $name, $default, $filters);
+        return static::prepareValue('_PUT', $name, $default, $filters);
     }
 
-    public function delete($name, $default = null, array $filters = null)
+    /**
+     * @param string      $name - name of request-value
+     * @param mixed  $default
+     * @param array $filters
+     * @return mixed
+     */
+    public static function delete($name, $default = null, array $filters = null)
     {
-        return $this->_prepareValue('_DELETE', $name, $default, $filters);
+        return self::prepareValue('_DELETE', $name, $default, $filters);
     }
 
     private static $_contentTypes;
@@ -977,7 +1021,14 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
         $this->_homeUrl = $value;
     }
 
-    private function _prepare($input, $filters = null)
+    /**
+     * Sanitize all request-values.
+     *
+     * @param mixed $input
+     * @param mixed $filters
+     * @return mixed
+     */
+    protected static function prepareAll($input, $filters = null)
     {
         if (empty($input) || $filters === false) {
             return $input;
@@ -986,7 +1037,16 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
         return Sanitize::sanitize($input, $filters);
     }
 
-    private function _prepareValue($method, $name, $default = null, array $filters = null)
+    /**
+     * Sanitize request-value.
+     *
+     * @param string      $method - method request
+     * @param string      $name - name of request-value
+     * @param mixed  $default
+     * @param array $filters
+     * @return null
+     */
+    protected static function prepareValue($method, $name, $default = null, array $filters = null)
     {
         if (!isset($GLOBALS[$method][$name])) {
             return $default;

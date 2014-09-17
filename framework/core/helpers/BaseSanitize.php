@@ -53,6 +53,14 @@ class BaseSanitize implements SanitizeInterface, RequestInterface
         return true;
     }
 
+    /**
+     * Sanitize value or array.
+     *
+     * @param mixed  $input
+     * @param mixed $filters
+     * @return mixed
+     * @throws Exception
+     */
     public static function sanitize($input, $filters = null)
     {
         if (is_scalar($input) || is_array($input)) {
@@ -65,6 +73,7 @@ class BaseSanitize implements SanitizeInterface, RequestInterface
             $filters = static::calculateFilters($input->toArray(), $filters);
             return static::prepare($input, $filters);
         }
+        return $input;
     }
 
     protected static function calculateFilters($input, $filters)
@@ -78,19 +87,18 @@ class BaseSanitize implements SanitizeInterface, RequestInterface
         return $filters;
     }
 
-
     /**
-     * Filter the input data according to the specified filter set
+     * Filter the input data according to the specified filter set.
      *
      * @param  mixed $input
-     * @param  array $filterPull
+     * @param  array $pullFilters
      * @throws \Exception
      * @return mixed
      */
-    protected static function prepare($input, array $filterPull)
+    protected static function prepare($input, array $pullFilters)
     {
-        $filterPull = static::prepareFilters($input, $filterPull);
-        foreach($filterPull as $field => $filters) {
+        $pullFilters = static::prepareFilters($input, $pullFilters);
+        foreach($pullFilters as $field => $filters) {
 
             if (!strstr($field, '.') || (!$value = ArrayHelper::getValue($input, $field))) {
 
@@ -99,7 +107,6 @@ class BaseSanitize implements SanitizeInterface, RequestInterface
                 }
                 $value = $input[$field];
             }
-
 
             foreach($filters as $filter) {
 

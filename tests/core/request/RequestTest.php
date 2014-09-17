@@ -16,14 +16,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $_GET['foo'] = ' <b>foo</b>     ';
         $_GET['bar'] = '    <b>bar   </b>';
-        $this->assertEquals(Rock::$app->request->get('foo', null, ['trim']), '<b>foo</b>');
-        $this->assertEquals(Rock::$app->request->get('bar'), 'bar');
+        $this->assertEquals(Request::get('foo', null, ['trim']), '<b>foo</b>');
+        $this->assertEquals(Request::get('bar'), 'bar');
     }
 
 
     public function testScalarNull()
     {
-        $this->assertNull(Rock::$app->request->get('baz'));
+        $this->assertNull(Request::get('baz'));
     }
 
     public function testSetFilter()
@@ -31,7 +31,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $_GET['foo'] = ' <b>foo</b>     ';
         $_GET['bar'] = '    <b>bar   </b>';
         $_GET['baz'] = '{"baz" : " <b> baz  </b>     "}';
-        $result = Rock::$app->request->getAll([
+        $result = Request::getAll([
                                                 'bar' => [Request::STRIP_TAGS, 'trim'],
                                                 'baz' => ['unserialize', Request::STRIP_TAGS, 'trim'],
                                             ]);
@@ -44,7 +44,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $_GET['foo'] = ' <b>foo</b>     ';
         $_GET['bar'] = '    <b>bar   </b>';
-        $result = Rock::$app->request->getAll(['trim']);
+        $result = Request::getAll(['trim']);
         $this->assertEquals($result['foo'], '<b>foo</b>');
         $this->assertEquals($result['bar'], '<b>bar   </b>');
     }
@@ -54,7 +54,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $_GET['foo'] = '{"foo" : "foo"}';
         $_GET['bar'] = '{"bar" : "bar"}';
-        $result = Rock::$app->request->getAll(['unserialize']);
+        $result = Request::getAll(['unserialize']);
         $this->assertEquals($result['foo'], ['foo' => 'foo']);
         $this->assertEquals($result['bar'], ['bar' => 'bar']);
     }
@@ -63,7 +63,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $_GET['foo'] = ' <b>foo</b>     ';
         $_GET['bar'] = '{"bar" : "bar"}';
-        $result = Rock::$app->request->getAll(['bar' => ['unserialize']]);
+        $result = Request::getAll(['bar' => ['unserialize']]);
         $this->assertEquals($result['foo'], ' <b>foo</b>     ');
         $this->assertEquals($result['bar'], ['bar' => 'bar']);
     }
@@ -73,7 +73,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $_GET['foo'] = '-5.5</b>     ';
         $_GET['bar'] = '5.5';
         $_GET['baz'] = '{"baz" : "5.6"}';
-        $result = Rock::$app->request->getAll([
+        $result = Request::getAll([
                                                 'foo' => ['abs', 'ceil'],
                                                 'bar' => ['floor'],
                                                 'baz' => ['unserialize', 'round'],
@@ -90,7 +90,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $_POST['bar'] = ['foo' => ['  <b>foo</b>'], 'bar' => '{"baz" : "<b>bar</b>baz "}'];
         $_POST['baz'] = '{"foo" : "<b>foo</b>", "bar" : {"foo" : "<b>baz</b>   "}}';
         $_POST['test'] = serialize(['foo' => ['  <b>foo</b>'], 'bar' => '<b>bar</b>baz ']);
-        $result = Rock::$app->request->postAll([Request::UNSERIALIZE, Request::STRIP_TAGS, 'trim']);
+        $result = Request::postAll([Request::UNSERIALIZE, Request::STRIP_TAGS, 'trim']);
         $this->assertEquals($result['foo'], 'foo');
         $this->assertEquals($result['bar'], ['foo' => ['foo'], 'bar' => ['baz'=>'barbaz']]);
         $this->assertEquals($result['baz'], ['foo' => 'foo', 'bar' => ['foo' => 'baz']]);

@@ -13,6 +13,7 @@ use rock\base\ComponentsTrait;
 use rock\exception\ErrorHandler;
 use rock\helpers\Json;
 use rock\helpers\JsonException;
+use rock\request\Request;
 use rock\Rock;
 use rock\url\Url;
 
@@ -80,7 +81,7 @@ class VK implements ComponentsInterface, ClientInterface
     public function getAttributes($code = null)
     {
         if (!isset($code)) {
-            $code = $this->Rock->request->get('code');
+            $code = Request::get('code');
         }
 
         if (empty($code)) {

@@ -1,6 +1,7 @@
 <?php
 namespace rock\snippets\request;
 use rock\base\Snippet;
+use rock\request\Request;
 
 /**
  * Snippet "Post request"
@@ -21,11 +22,11 @@ class Post extends Snippet
     public function get()
     {
         if (empty($this->name)){
-            return $this->Rock->request->postAll($this->filters);
+            return Request::postAll($this->filters);
         }
 
         if (!isset($_POST[$this->name])) {
-            return $this->Rock->request->post($this->name, $this->default, $this->filters);
+            return Request::post($this->name, $this->default, $this->filters);
         }
 
         return null;
