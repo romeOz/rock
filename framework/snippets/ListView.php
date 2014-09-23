@@ -282,14 +282,14 @@ class ListView extends Snippet
             if (is_array($placeholders)) {
                 $placeholders['currentItem'] = $i;
                 $this->prepareItem($placeholders);
-                $result .= $this->template->replaceParamByPrefix(
+                $result .= $this->template->replaceByPrefix(
                     $this->tpl,
                     array_merge($placeholders, $addPlaceholders)
                 );
                 ++$i;
                 continue;
             }
-            $result .= $this->template->replaceParamByPrefix(
+            $result .= $this->template->replaceByPrefix(
                 $this->tpl,
                 array_merge($addPlaceholders, ['output' => $placeholders, 'currentItem' => $i]));
 
@@ -350,7 +350,7 @@ class ListView extends Snippet
     protected function renderWrapperTpl($value, array $placeholders)
     {
         $placeholders['output'] = $value;
-        $value = $this->template->replaceParamByPrefix($this->wrapperTpl, $placeholders);
+        $value = $this->template->replaceByPrefix($this->wrapperTpl, $placeholders);
         $this->template->removePlaceholder('output');
 
         return $value;

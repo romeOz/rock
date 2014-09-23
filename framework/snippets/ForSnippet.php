@@ -55,14 +55,14 @@ class ForSnippet extends Snippet
 
         $result = '';
         while ($this->count > 0) {
-            $result .= $this->template->replaceParamByPrefix($this->tpl, $this->template->calculateAddPlaceholders($this->addPlaceholders));
+            $result .= $this->template->replaceByPrefix($this->tpl, $this->template->calculateAddPlaceholders($this->addPlaceholders));
             --$this->count;
         }
         /**
          * Inserting content into wrapper template (optional)
          */
         if (!empty($this->wrapperTpl)) {
-            $result = $this->template->replaceParamByPrefix($this->wrapperTpl, ['output' => $result]);
+            $result = $this->template->replaceByPrefix($this->wrapperTpl, ['output' => $result]);
         }
 
         return $result;

@@ -130,7 +130,7 @@ class Pagination extends Snippet
         $pageFirstName = $this->calculateFirstPage($data, $pageVar);
         $pageLastName = $this->calculateLastPage($data, $pageVar);
 
-        return $this->template->replaceParamByPrefix(
+        return $this->template->replaceByPrefix(
             isset($this->wrapperTpl) ? $this->wrapperTpl : '@common.views/pagination/wrapper',
             [
                 'num' => $num,
@@ -190,7 +190,7 @@ class Pagination extends Snippet
              */
             if ((int)$data['pageCurrent'] === (int)$num) {
                 $result .=
-                    $this->template->replaceParamByPrefix(
+                    $this->template->replaceByPrefix(
                         isset($this->pageActiveTpl) ? $this->pageActiveTpl
                             : '@common.views/pagination/numActive',
                         [
@@ -204,7 +204,7 @@ class Pagination extends Snippet
              * for default page
              */
             $result .=
-                $this->template->replaceParamByPrefix(
+                $this->template->replaceByPrefix(
                     isset($this->pageNumTpl) ? $this->pageNumTpl : '@common.views/pagination/num',
                     [
                         'num' => $num,
@@ -225,7 +225,7 @@ class Pagination extends Snippet
         $this->pageArgs[$pageVar] = $pageFirst;
 
 
-        return $this->template->replaceParamByPrefix(
+        return $this->template->replaceByPrefix(
             isset($this->pageFirstTpl) ? $this->pageFirstTpl : '@common.views/pagination/first',
             [
                 'url' => $this->Rock->url
@@ -245,7 +245,7 @@ class Pagination extends Snippet
         $pageLastName = !empty($this->pageLastName) ? $this->pageLastName : Rock::t('pageLast');
         $this->pageArgs[$pageVar] = $pageLast;
 
-        return $this->template->replaceParamByPrefix(
+        return $this->template->replaceByPrefix(
             isset($this->pageLastTpl) ? $this->pageLastTpl : '@common.views/pagination/last',
             [
                 'url' => $this->Rock->url

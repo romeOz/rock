@@ -160,7 +160,7 @@ class PHPMorphy
 
         return preg_replace(
             array_reverse($highlightWords),
-            $this->Rock->template->replaceParamByPrefix($this->tpl),
+            $this->Rock->template->replaceByPrefix($this->tpl),
             $content
         );
     }

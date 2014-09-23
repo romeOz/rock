@@ -37,7 +37,7 @@ class ConditionFilter
         $result = '';
 
         if (!empty($params['is'])) {
-            $result = $template->replaceParamByPrefix($params['is'], $placeholders);
+            $result = $template->replaceByPrefix($params['is'], $placeholders);
         }
 
         return $result;
@@ -65,7 +65,7 @@ class ConditionFilter
         );
 
         return !empty($params['is'])
-            ? $template->replaceParamByPrefix($params['is'], $placeholders)
+            ? $template->replaceByPrefix($params['is'], $placeholders)
             : '';
     }
 

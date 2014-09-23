@@ -645,7 +645,7 @@ class Template implements ComponentsInterface
      * @param array  $placeholders
      * @return string
      */
-    public function replaceParamByPrefix($value, array $placeholders = [])
+    public function replaceByPrefix($value, array $placeholders = [])
     {
         $dataPrefix = $this->getNamePrefix($value);
         if (strtolower($dataPrefix['prefix']) === 'inline') {
@@ -669,7 +669,7 @@ class Template implements ComponentsInterface
         if (empty($value)) {
             return null;
         }
-        preg_match('/(?:\@(?P<prefix>INLINE))?(?P<value>.+)/s', $value, $matches);
+        preg_match('/(?:\@(?P<prefix>INLINE))?(?P<value>.+)/is', $value, $matches);
 
         return [
             'prefix' => Helper::getValue($matches['prefix']),
@@ -1049,7 +1049,7 @@ class Template implements ComponentsInterface
         if (empty($options['wrapperTpl'])) {
             return $value;
         }
-        $value = $this->replaceParamByPrefix($options['wrapperTpl'], ['output' => $value]);
+        $value = $this->replaceByPrefix($options['wrapperTpl'], ['output' => $value]);
 
         return $value;
     }

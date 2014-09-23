@@ -41,7 +41,7 @@ class AuthClient extends Snippet
         foreach ($this->clients as $client) {
             $placeholders['clientName'] = $client;
             $placeholders['url'] = $collection->getClient($client)->getAuthorizationUrl();
-            $content .= $this->template->replaceParamByPrefix($this->tpl, $placeholders);
+            $content .= $this->template->replaceByPrefix($this->tpl, $placeholders);
         }
         return isset($this->wrapperTpl) ? $this->renderWrapperTpl($content) : $content;
     }
@@ -65,7 +65,7 @@ class AuthClient extends Snippet
     protected function renderWrapperTpl($value)
     {
         $placeholders['output'] = $value;
-        $value = $this->template->replaceParamByPrefix($this->wrapperTpl);
+        $value = $this->template->replaceByPrefix($this->wrapperTpl);
         $this->template->removePlaceholder('output');
 
         return $value;

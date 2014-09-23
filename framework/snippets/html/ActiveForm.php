@@ -125,7 +125,7 @@ class ActiveForm extends Snippet
         $form->submitted = $this->submitted;
         foreach ($fields as $attributeName => $params) {
             if (is_int($attributeName)) {
-                $result[] = $params;
+                $result[] = $this->template->replaceByPrefix($params);
                 continue;
             }
             if (isset($params['options']['enabled']) && $params['options']['enabled']=== false) {
@@ -174,7 +174,7 @@ class ActiveForm extends Snippet
      */
     protected  function parseWrapperTpl($value, $wrapperTpl)
     {
-        $value = $this->template->replaceParamByPrefix($wrapperTpl, ['output' => $value]);
+        $value = $this->template->replaceByPrefix($wrapperTpl, ['output' => $value]);
         $this->template->removePlaceholder('output');
 
         return $value;
