@@ -4,7 +4,6 @@ namespace rock\template;
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
 use rock\base\Config;
-use rock\base\ObjectTrait;
 use rock\base\Snippet;
 use rock\cache\CacheInterface;
 use rock\event\Event;
