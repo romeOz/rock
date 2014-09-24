@@ -1170,8 +1170,13 @@ class Template implements ComponentsInterface
             $result = $this->makeFilter($result, $filters);
         }
 
-        if ($this->autoToJSON && is_array($result)) {
-            $result = Json::encode($result);
+        if ($this->autoToJSON) {
+            if (is_array($result)) {
+                $result = Json::encode($result);
+            } elseif (is_object($result) && !is_callable($result)) {
+                $result = serialize($result);
+            }
+
         }
 
         if (!is_scalar($result) && !empty($result)) {

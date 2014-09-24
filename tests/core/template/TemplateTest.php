@@ -17,6 +17,21 @@ use rockunit\core\template\controllers\TestController;
 use rockunit\core\template\snippets\NullSnippet;
 use rockunit\core\template\snippets\TestSnippet;
 
+class Foo{
+    public $foo = 'foo';
+    private $bar = 'bar';
+
+    public function getFoo()
+    {
+        return $this->getBar();
+    }
+
+    private function getBar()
+    {
+        return $this->bar;
+    }
+}
+
 /**
  * @group base
  * @group template
@@ -468,8 +483,14 @@ class TemplateTest extends TemplateCommon
 
     public function testAutomaticConversionArrayToJSON()
     {
-        $replace = '[[!+array:jsonToArray]]';
-        $this->template->replace($replace, ['array'=> json_encode(['foo' => 'test'])]);
+        $array = ['foo' => 'test'];
+        $this->assertSame(json_encode($array), $this->template->replace('[[+array]]', ['array'=> $array]));
+    }
+
+    public function testAutomaticConversionObjectToSerialize()
+    {
+        $object = new Foo();
+        $this->assertSame(serialize($object), $this->template->replace('[[+object]]', ['object'=> $object]));
     }
 
     public function testContainsException()

@@ -18,7 +18,7 @@ trait ComponentsTrait
     use ObjectTrait;
 
     /** @var Behavior[]  */
-    private $_behaviors;
+    protected $_behaviors;
 
     protected static $_events = [];
 

@@ -2,8 +2,6 @@
 namespace rock\base;
 
 
-use rock\base\ComponentsTrait;
-use rock\base\ObjectTrait;
 use rock\event\Event;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Inflector;
@@ -79,12 +77,12 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
     /**
      * @var string current scenario
      */
-    private $_scenario = self::DEFAULT_SCENARIO;
+   protected $_scenario = self::DEFAULT_SCENARIO;
 
     /**
      * @var array validation errors (attribute name => array of errors)
      */
-    private $_errors = [];
+    protected $_errors = [];
 
     /**
      * Returns the validation rules for attributes.
@@ -179,7 +177,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
         return $reflector->getShortName();
     }
 
-    private  $_attributeNames;
+    protected $_attributeNames;
     /**
      * Returns the list of attribute names.
      * By default, this method returns all public non-static properties of the class.
@@ -363,7 +361,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
         return $result;
     }
 
-    private $_activeAttributeName;
+    protected $_activeAttributeName;
 
     public function getActiveAttributeName()
     {
@@ -862,49 +860,4 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
     {
         $this->$offset = null;
     }
-
-//    public function __get($name)
-//    {
-//        return $this->getActiveAttribute($name) ? : $this->parentGet($name);
-//    }
-
-//    /**
-//     * Calls the named method which is not a class method.
-//     *
-//     * This method will check if any attached behavior has
-//     * the named method and will execute it if available.
-//     *
-//     * Do not call this method directly as it is a PHP magic method that
-//     * will be implicitly called when an unknown method is being invoked.
-//     * @param string $name the method name
-//     * @param array $params method parameters
-//     * @return mixed the method return value
-//     * @throws Exception when calling unknown method
-//     */
-//    public function __call($name, $params)
-//    {
-////        $this->ensureBehaviors();
-////        foreach ($this->_behaviors as $object) {
-////            if ($object->hasMethod($name)) {
-////                return call_user_func_array([$object, $name], $params);
-////            }
-////        }
-//
-//        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => ObjectHelper::methodName($this, $name)]);
-//    }
-//    public static function allToArray(array $data, $removeEmpty = false)
-//    {
-//        $result = [];
-//        /** @var \rock\db\ActiveRecord $value */
-//        foreach ($data as $key => $value) {
-//            $result[$key] = $removeEmpty === true
-//                ? array_filter($value->getAttributes())
-//                : $value->getAttributes();
-//        }
-//
-//        return $result;
-//    }
-
-
-
 }

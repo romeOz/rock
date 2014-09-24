@@ -3,7 +3,6 @@
 namespace rock\base;
 
 
-use rock\base\ClassName;
 use rock\exception\Exception;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
@@ -42,6 +41,7 @@ trait ObjectTrait
      * - the last parameter of the constructor is a configuration array, like `$config` here.
      * - call the parent implementation at the end of the constructor.
      *
+     * @param array $config
      */
     public function __construct($config = [])
     {
