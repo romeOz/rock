@@ -82,7 +82,10 @@ class Template implements ComponentsInterface
      * @var array
      */
     public $filters = [];
-    /** @var array  */
+    /**
+     * Collection extensions.
+     * @var array
+     */
     public $extensions = [];
     public $handlerLink;
     /**
@@ -159,12 +162,12 @@ class Template implements ComponentsInterface
     /**
      * Rendering layout
      *
-     * @param string      $name - path to layout
+     * @param string      $path - path to layout
      * @param array       $placeholders
      * @param object|null $context
      * @return string
      */
-    public function render($name, array $placeholders = [], $context = null)
+    public function render($path, array $placeholders = [], $context = null)
     {
         if (!isset($this->context)) {
             $this->context = $context;
@@ -172,7 +175,7 @@ class Template implements ComponentsInterface
         if (!$this->before()) {
             return null;
         }
-        $name = Rock::getAlias($name);
+        $path = Rock::getAlias($path);
         list($cacheKey, $cacheExpire, $cacheTags) = $this->calculateCacheParams($placeholders);
         // Get cache
         if (($resultCache = $this->getCache($cacheKey)) !== false) {
@@ -181,7 +184,7 @@ class Template implements ComponentsInterface
             }
             return $resultCache;
         }
-        $result = $this->renderInternal($name, $placeholders);
+        $result = $this->renderInternal($path, $placeholders);
         foreach (['jsFiles', 'js', 'linkTags', 'cssFiles', 'css','linkTags', 'title', 'metaTags', 'head'] as $property) {
             if ($this->$property instanceof \Closure) {
                 $this->$property = call_user_func($this->$property, $this);
@@ -199,14 +202,14 @@ class Template implements ComponentsInterface
 
 
     /**
-     * @param string      $name - path to layout/chunk
+     * @param string      $path - path to layout/chunk
      * @param array       $placeholders
      * @throws Exception
      * @return string
      */
-    protected function renderInternal($name, array $placeholders = [])
+    protected function renderInternal($path, array $placeholders = [])
     {
-        $path = Rock::getAlias($name, ['lang'=>$this->Rock->language]);
+        $path = Rock::getAlias($path, ['lang'=>$this->Rock->language]);
         if (!pathinfo($path, PATHINFO_EXTENSION)) {
             $path .= '.' . $this->engines[$this->defaultEngine];
         }
@@ -275,11 +278,11 @@ class Template implements ComponentsInterface
     /**
      * Rendering chunk
      *
-     * @param string      $name - path to chunk
+     * @param string      $path - path to chunk
      * @param array  $placeholders
      * @return string
      */
-    public function getChunk($name, array $placeholders = [])
+    public function getChunk($path, array $placeholders = [])
     {
         $template = clone $this;
         $template->removeAllPlaceholders();
@@ -288,7 +291,7 @@ class Template implements ComponentsInterface
         if (($resultCache = $template->getCache($cacheKey)) !== false) {
             return $resultCache;
         }
-        $result = $template->renderInternal($name, $placeholders);
+        $result = $template->renderInternal($path, $placeholders);
         // Set cache
         $template->setCache($cacheKey, $result, $cacheExpire, $cacheTags);
         return $result;
@@ -297,7 +300,7 @@ class Template implements ComponentsInterface
     /**
      * Has chunk
      *
-     * @param string $path - path of chunk
+     * @param string $path - path to chunk
      * @return bool
      */
     public function hasChunk($path)
