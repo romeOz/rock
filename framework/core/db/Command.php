@@ -1,7 +1,6 @@
 <?php
 namespace rock\db;
 
-use rock\base\ComponentsTrait;
 use rock\base\ObjectTrait;
 use rock\cache\CacheInterface;
 use rock\helpers\ArrayHelper;

@@ -8,9 +8,6 @@ use rock\base\ObjectTrait;
  *
  * QueryBuilder can also be used to build SQL statements such as INSERT, UPDATE, DELETE, CREATE TABLE,
  * from a [[Query]] object.
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 class QueryBuilder
 {

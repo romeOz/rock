@@ -3,7 +3,6 @@ namespace rock\db;
 
 
 use rock\base\ComponentsTrait;
-use rock\base\ObjectTrait;
 use rock\event\Event;
 use rock\Rock;
 

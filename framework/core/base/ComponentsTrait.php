@@ -1,7 +1,6 @@
 <?php
 namespace rock\base;
 
-use rock\base\ObjectTrait;
 use rock\event\Event;
 use rock\exception\Exception;
 use rock\filters\AccessFilter;
