@@ -27,8 +27,6 @@ abstract class TemplateCommon extends \PHPUnit_Framework_TestCase
         Rock::setAlias('rockunit.tpl', $this->path);
 
         $this->template = Rock::$app->template;
-        $this->template->engine = Template::ENGINE_ROCK;
-        $this->template->fileExtension = 'html';
         $this->template->autoEscape = Template::ESCAPE | Template::TO_TYPE;
         $this->template->removeAllPlaceholders(true);
         $this->template->removeAllResource();

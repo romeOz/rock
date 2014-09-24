@@ -185,21 +185,23 @@ class TemplateTest extends TemplateCommon
         ];
         // Rock engine
         $this->assertSame(
-            static::removeSpace((new Template($config))->render($this->path . '/meta', ['about' => 'demo'])),
+            static::removeSpace((new Template($config))->render($this->path . '/meta.html', ['about' => 'demo'])),
             static::removeSpace(file_get_contents($this->path . '/_meta.html'))
         );
-
-        // PHP engine
-        $config['engine'] = Template::ENGINE_PHP;
-        $config['fileExtension'] = 'php';
+        // Rock engine as default
         $this->assertSame(
             static::removeSpace((new Template($config))->render($this->path . '/meta', ['about' => 'demo'])),
             static::removeSpace(file_get_contents($this->path . '/_meta.html'))
         );
 
+        // PHP engine
+        $this->assertSame(
+            static::removeSpace((new Template($config))->render($this->path . '/meta.php', ['about' => 'demo'])),
+            static::removeSpace(file_get_contents($this->path . '/_meta.html'))
+        );
+
         // register
         $template = new Template;
-        $template->engine = Template::ENGINE_PHP;
         $template->head = '<!DOCTYPE html>
             <!--[if !IE]>--><html class="no-js"><!--<![endif]-->';
         $template->title = 'Demo';
@@ -239,7 +241,7 @@ class TemplateTest extends TemplateCommon
         $template->registerJs('end = "test"', Template::POS_END);
         $template->registerCss('.title {color: #354a57;}');
         $this->assertSame(
-            static::removeSpace($template->render($this->path . '/meta', ['about' => 'demo'])),
+            static::removeSpace($template->render($this->path . '/meta.php', ['about' => 'demo'])),
             static::removeSpace(file_get_contents($this->path . '/_meta.html'))
         );
     }
@@ -251,7 +253,7 @@ class TemplateTest extends TemplateCommon
 
     public function testConditionFilter()
     {
-        $this->assertSame($this->template->getChunk('@rockunit.tpl/condition_filter', ['title' => '<b>test</b>', 'number' => 3]), file_get_contents($this->path . '/_condition_filter.html'));
+        $this->assertSame($this->template->getChunk('@rockunit.tpl/condition_filter.html', ['title' => '<b>test</b>', 'number' => 3]), file_get_contents($this->path . '/_condition_filter.html'));
 
         // unknown param
         $this->setExpectedException(Exception::className());
@@ -618,12 +620,10 @@ class TemplateTest extends TemplateCommon
     public function testRenderAsPHP()
     {
         $this->template = new Template();
-        $this->template->engine = Template::ENGINE_PHP;
-        $this->template->fileExtension = 'php';
         $this->template->addMultiPlaceholders(['foo'=> ['bar' => '<b>text_bar</b>']], true);
         $this->template->addMultiResources(['baz'=> ['bar' => '<b>text_baz</b>']], true);
-        $this->assertSame($this->template->render($this->path . '/layout', ['text' => 'world']), file_get_contents($this->path . '/_layout.html'));
-        $this->assertSame($this->template->getChunk($this->path . '/subchunk', ['title'=> 'test']), '<b>subchunk</b>test');
+        $this->assertSame($this->template->render($this->path . '/layout.php', ['text' => 'world']), file_get_contents($this->path . '/_layout.html'));
+        $this->assertSame($this->template->getChunk($this->path . '/subchunk.php', ['title'=> 'test']), '<b>subchunk</b>test');
     }
 
     protected function getCache()

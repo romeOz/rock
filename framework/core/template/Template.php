@@ -69,9 +69,23 @@ class Template implements ComponentsInterface
      * @var string
      */
     public $fileExtension = 'html';
-    /** @var int  */
-    public $engine = self::ENGINE_ROCK;
-
+    /**
+     * Mapping extensions with engines.
+     * @var array
+     */
+    public $engines = [
+        self::ENGINE_ROCK => 'html',
+        self::ENGINE_PHP => 'php',
+    ];
+    /**
+     * Use of engine default.
+     * @var int
+     */
+    public $defaultEngine = self::ENGINE_ROCK;
+    /**
+     * Collection filters.
+     * @var array
+     */
     public $filters = [];
     /** @var array  */
     public $extensions = [];
@@ -172,7 +186,7 @@ class Template implements ComponentsInterface
             }
             return $resultCache;
         }
-        $result = $this->prepareRender($name, $placeholders);
+        $result = $this->renderInternal($name, $placeholders);
         foreach (['jsFiles', 'js', 'linkTags', 'cssFiles', 'css','linkTags', 'title', 'metaTags', 'head'] as $property) {
             if ($this->$property instanceof \Closure) {
                 $this->$property = call_user_func($this->$property, $this);
@@ -195,17 +209,18 @@ class Template implements ComponentsInterface
      * @throws Exception
      * @return string
      */
-    protected function prepareRender($name, array $placeholders = [])
+    protected function renderInternal($name, array $placeholders = [])
     {
-        $name = Rock::getAlias($name, ['lang'=>$this->Rock->language]);
-        $path = $name .
-              '.' . ($this->engine === self::ENGINE_PHP ? 'php' : $this->fileExtension);
+        $path = Rock::getAlias($name, ['lang'=>$this->Rock->language]);
+        if (!pathinfo($path, PATHINFO_EXTENSION)) {
+            $path .= '.' . $this->engines[$this->defaultEngine];
+        }
         $path = File::normalizePath($path);
 
         if (!file_exists($path)) {
             throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_FILE, ['path' => $path]);
         }
-        if ($this->engine === self::ENGINE_PHP) {
+        if (current(array_keys($this->engines, pathinfo($path, PATHINFO_EXTENSION))) === self::ENGINE_PHP) {
             $this->addMultiPlaceholders($placeholders ? : []);
             return $this->renderPhpFile($path);
         } else {
@@ -278,7 +293,7 @@ class Template implements ComponentsInterface
         if (($resultCache = $template->getCache($cacheKey)) !== false) {
             return $resultCache;
         }
-        $result = $template->prepareRender($name, $placeholders);
+        $result = $template->renderInternal($name, $placeholders);
         // Set cache
         $template->setCache($cacheKey, $result, $cacheExpire, $cacheTags);
         return $result;
@@ -1176,12 +1191,10 @@ class Template implements ComponentsInterface
             } elseif (is_object($result) && !is_callable($result)) {
                 $result = serialize($result);
             }
-
         }
 
         if (!is_scalar($result) && !empty($result)) {
             throw new Exception(Exception::ERROR, 'Wrong type is var: ' . Json::encode($result));
-            //$result = null;
         }
 
         // Set cache
