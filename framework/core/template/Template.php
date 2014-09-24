@@ -82,10 +82,10 @@ class Template implements ComponentsInterface
      */
     public $autoEscape = self::ESCAPE;
     /**
-     * Automatic conversion to JSON.
+     * Automatic serialization value.
      * @var bool
      */
-    public $autoToJSON = true;
+    public $autoSerialize = true;
 
     /** @var string */
     public $head = '<!DOCTYPE html>';
@@ -1170,7 +1170,7 @@ class Template implements ComponentsInterface
             $result = $this->makeFilter($result, $filters);
         }
 
-        if ($this->autoToJSON) {
+        if ($this->autoSerialize) {
             if (is_array($result)) {
                 $result = Json::encode($result);
             } elseif (is_object($result) && !is_callable($result)) {
