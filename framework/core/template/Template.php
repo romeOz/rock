@@ -65,11 +65,6 @@ class Template implements ComponentsInterface
     const POS_END = 3;
 
     /**
-     * Extension file layout/chunk. If used `Template::ENGINE_PHP`, then ".php" by default
-     * @var string
-     */
-    public $fileExtension = 'html';
-    /**
      * Mapping extensions with engines.
      * @var array
      */
@@ -302,12 +297,16 @@ class Template implements ComponentsInterface
     /**
      * Has chunk
      *
-     * @param string $name - name of chunk
+     * @param string $path - path of chunk
      * @return bool
      */
-    public function hasChunk($name)
+    public function hasChunk($path)
     {
-        return file_exists(Rock::getAlias($name) . '.' . $this->fileExtension);
+        $path = Rock::getAlias($path, ['lang'=>$this->Rock->language]);
+        if (!pathinfo($path, PATHINFO_EXTENSION)) {
+            $path .= '.' . $this->engines[$this->defaultEngine];
+        }
+        return file_exists($path);
     }
 
     /**

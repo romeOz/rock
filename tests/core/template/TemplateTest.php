@@ -249,6 +249,7 @@ class TemplateTest extends TemplateCommon
     public function testHasChunk()
     {
         $this->assertTrue($this->template->hasChunk($this->path . '/layout'));
+        $this->assertTrue($this->template->hasChunk($this->path . '/layout.php'));
     }
 
     public function testConditionFilter()
