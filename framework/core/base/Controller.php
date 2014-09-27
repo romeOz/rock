@@ -1,8 +1,6 @@
 <?php
 namespace rock\base;
 
-use rock\base\ComponentsTrait;
-use rock\base\ObjectTrait;
 use rock\helpers\ArrayHelper;
 use rock\helpers\File;
 use rock\helpers\String;
