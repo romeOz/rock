@@ -33,7 +33,6 @@ abstract class Controller implements ComponentsInterface
         }
     }
 
-
     /**
      * Array data by context
      *
@@ -53,7 +52,7 @@ abstract class Controller implements ComponentsInterface
      * @param string $defaultPathLayout
      * @return string the rendering result. Null if the rendering result is not required.
      */
-    public function render($layout, array $placeholders = null,$defaultPathLayout = '@views'){
+    public function render($layout, array $placeholders = [],$defaultPathLayout = '@views'){
 
         $layout = File::normalizePath(Rock::getAlias($layout));
         if (!strstr($layout, DS)) {
@@ -64,43 +63,29 @@ abstract class Controller implements ComponentsInterface
         }
 
         echo $this->template->render($layout, $placeholders, $this);
-        //return null;
     }
 
-
-
-    final public static function context(array $keys = [])
+    public static function context(array $keys = [])
     {
         $keys = array_merge(['context'], $keys);
         return ArrayHelper::getValue(static::defaultData(), $keys);
     }
 
-
     /**
      * Display notPage layout
      *
-     * @param $layout
+     * @param string|null $layout
      * @return string|void
      */
-    public function notPage($layout)
+    public function notPage($layout = null)
     {
         $this->Rock->response->status404();
-
-        $content = Rock::t('notPage');
-        $this->template->title = String::upperFirst($content);
-        $this->render($layout, ['content' => $content]);
+        $this->template->title = String::upperFirst( Rock::t('notPage'));
+        if (!isset($layout)) {
+            $layout = '@common.views/layouts/notPage';
+        }
+        return $this->render($layout);
     }
-
-    /**
-     * Display notContent layout
-     *
-     * @return string|void
-     */
-    public function notContent()
-    {
-        $this->render('@common.views/layout/notContent');
-    }
-
 
     public static function findUrlById($resource)
     {
