@@ -1,13 +1,13 @@
 {
-    "name": "romeo7/rock",
+    "name": "romeoz/rock",
     "description": "The Rock PHP framework",
     "keywords": ["rock", "framework"],
     "type": "library",
     "license": "MIT",
     "support": {
         "email": "serggalka@gmail.com",
-        "issues": "https://github.com/romao7/rock/issues",
-        "source": "https://github.com/romao7/rock"
+        "issues": "https://github.com/romeOz/rock/issues",
+        "source": "https://github.com/romeOz/rock"
     },
     "authors": [
         {
