@@ -35,15 +35,20 @@ class Url extends Snippet implements UrlInterface
      */
     public $referrer = false;
     /**
+     * Adding CSRF-token.
+     * @var bool
+     */
+    public $csrf = false;
+    /**
      * URL-arguments for set.
      * @var array
      */
-    public $args;
+    public $args = [];
     /**
      * URL-arguments for adding.
      * @var array
      */
-    public $addArgs;
+    public $addArgs = [];
     /**
      * Anchor for adding.
      * @var string
@@ -131,10 +136,14 @@ class Url extends Snippet implements UrlInterface
             list($search, $replace) = $this->replace;
             $urlBuilder->replacePath($search, $replace);
         }
-        if (isset($this->args)) {
+        if ($this->csrf) {
+            $token = $this->Rock->token;
+            $this->addArgs[$token->csrfParam] = $token->create();
+        }
+        if (!empty($this->args)) {
             $urlBuilder->setArgs($this->args);
         }
-        if (isset($this->addArgs)) {
+        if (!empty($this->addArgs)) {
             $urlBuilder->addArgs($this->addArgs);
         }
         if (isset($this->anchor)) {

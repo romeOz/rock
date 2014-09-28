@@ -312,26 +312,26 @@ class Route implements RequestInterface, ErrorsInterface
         return $this->validPattern($pattern, $this->data['path']);
     }
 
+    /**
+     * Get format.
+     * @param $key
+     * @return string
+     * @throws Exception
+     */
     protected function getFormat($key)
     {
-        $result = '';
         switch ($key) {
             case self::FORMAT_SCHEME:
-                $result = $this->data['scheme'];
-                break;
+                return $this->data['scheme'];
             case self::FORMAT_HOST:
-                $result = $this->data['host'];
-                break;
+                return $this->data['host'];
             case self::FORMAT_PATH:
-                $result = $this->data['path'];
-                break;
+                return $this->data['path'];
             case self::FORMAT_QUERY:
-                $result = Helper::getValueIsset($this->data['query']);
+                return Helper::getValueIsset($this->data['query']);
+            default:
+                throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_FORMAT, ['format' => $key]);
         }
-        if (!$result) {
-            throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_FORMAT, ['format' => $key]);
-        }
-        return $result;
     }
 
     protected function validPattern($pattern, $url)
