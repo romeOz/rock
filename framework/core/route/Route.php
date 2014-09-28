@@ -5,7 +5,6 @@ namespace rock\route;
 
 use rock\base\ComponentsTrait;
 use rock\base\Config;
-use rock\base\ObjectTrait;
 use rock\di\Container;
 use rock\event\Event;
 use rock\filters\AccessFilter;
@@ -13,7 +12,6 @@ use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\Sanitize;
 use rock\helpers\String;
-use rock\request\Request;
 use rock\request\RequestInterface;
 use rock\response\Response;
 use rock\Rock;
@@ -316,18 +314,24 @@ class Route implements RequestInterface, ErrorsInterface
 
     protected function getFormat($key)
     {
+        $result = '';
         switch ($key) {
             case self::FORMAT_SCHEME:
-                return $this->data['scheme'];
+                $result = $this->data['scheme'];
+                break;
             case self::FORMAT_HOST:
-                return $this->data['host'];
+                $result = $this->data['host'];
+                break;
             case self::FORMAT_PATH:
-                return $this->data['path'];
+                $result = $this->data['path'];
+                break;
             case self::FORMAT_QUERY:
-                return Helper::getValueIsset($this->data['query']);
-            default:
-                throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_FORMAT, ['format' => $key]);
+                $result = Helper::getValueIsset($this->data['query']);
         }
+        if (!$result) {
+            throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_FORMAT, ['format' => $key]);
+        }
+        return $result;
     }
 
     protected function validPattern($pattern, $url)
