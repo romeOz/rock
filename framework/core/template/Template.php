@@ -215,7 +215,7 @@ class Template implements ComponentsInterface
         }
         $path = File::normalizePath($path);
         // Current path
-        if (strpos($path, DIRECTORY_SEPARATOR) === false && !empty($this->path)) {
+        if (strpos($path, DIRECTORY_SEPARATOR) === false && $this->path) {
             $path = dirname($this->path) . DIRECTORY_SEPARATOR . $path;
         }
         $this->path = $path;
