@@ -246,6 +246,13 @@ class TemplateTest extends TemplateCommon
         );
     }
 
+    public function testCurrentPathTpl()
+    {
+        $template = new Template();
+        $this->assertSame('hello', $template->getChunk('@rockunit.tpl\current\chunk'));
+        $this->assertSame('hello', $template->getChunk('@rockunit.tpl\current\chunk.php'));
+    }
+
     public function testHasChunk()
     {
         $this->assertTrue($this->template->hasChunk($this->path . '/layout'));

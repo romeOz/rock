@@ -214,7 +214,11 @@ class Template implements ComponentsInterface
             $path .= '.' . $this->engines[$this->defaultEngine];
         }
         $path = File::normalizePath($path);
-
+        // Current path
+        if (strpos($path, DIRECTORY_SEPARATOR) === false && !empty($this->path)) {
+            $path = dirname($this->path) . DIRECTORY_SEPARATOR . $path;
+        }
+        $this->path = $path;
         if (!file_exists($path)) {
             throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_FILE, ['path' => $path]);
         }
