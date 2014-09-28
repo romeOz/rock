@@ -146,6 +146,7 @@ class Template implements ComponentsInterface
     public $context;
     /** @var \rock\cache\CacheInterface|null  */
     public $cache = 'cache';
+    public $cachePlaceholders = [];
     /**
      * Array global placeholders of variables template engine
      * @var array
@@ -157,7 +158,7 @@ class Template implements ComponentsInterface
      */
     protected $localPlaceholders = [];
     protected $oldPlaceholders = [];
-    public $cachePlaceholders = [];
+    protected $path;
 
     /**
      * Rendering layout
@@ -169,13 +170,12 @@ class Template implements ComponentsInterface
      */
     public function render($path, array $placeholders = [], $context = null)
     {
-        if (!isset($this->context)) {
+        if (isset($context)) {
             $this->context = $context;
         }
         if (!$this->before()) {
             return null;
         }
-        $path = Rock::getAlias($path);
         list($cacheKey, $cacheExpire, $cacheTags) = $this->calculateCacheParams($placeholders);
         // Get cache
         if (($resultCache = $this->getCache($cacheKey)) !== false) {
