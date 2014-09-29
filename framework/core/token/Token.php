@@ -80,7 +80,7 @@ class Token implements ComponentsInterface, RequestInterface, StorageInterface
     /**
      * Validation token.
      *
-     * @param string $token - value of token.
+     * @param string $token value of token.
      * @return bool
      */
     public function valid($token = null)

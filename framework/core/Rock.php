@@ -6,28 +6,30 @@ use apps\common\models\users\Users;
 use League\Flysystem\Util;
 use rock\base\ClassName;
 use rock\base\Config;
-use rock\date\DateTime;
 use rock\di\Container;
 use rock\event\Event;
 use rock\exception\Exception;
-use rock\helpers\Json;
 use rock\helpers\ObjectHelper;
 use rock\helpers\String;
 use rock\helpers\Trace;
 use rock\i18n\i18nInterface;
-use rock\template\Template;
 
 class Rock
 {
     use ClassName;
+    /**
+     *  @event AppEvent an event that is triggered at the beginning
+     */
     const EVENT_BEGIN_APP = 'beginApp';
+    /**
+     *  @event AppEvent an event that is triggered at the end
+     */
     const EVENT_END_APP = 'endApp';
 
     /**
      * @var RockInterface
      */
     public static $app;
-
     /**
      * @var string the charset currently used for the application.
      */
@@ -37,10 +39,11 @@ class Rock
      * @see sourceLanguage
      */
     public $language = i18nInterface::EN;
-
+    /**
+     * @var array
+     */
     public $allowLanguages = [i18nInterface::EN, i18nInterface::RU];
     public $currentController;
-
     /**
      * @var string the application name.
      */
@@ -59,23 +62,16 @@ class Rock
             Container::addMulti($configs['_components']);
 
             Event::on(
-                Template::className(),
-                Template::EVENT_BEGIN_PAGE,
-                function(){
-                    Rock::$app->response->send();
-                }
-            );
-            Event::on(
                 static::className(),
                 self::EVENT_END_APP,
                 function(){
                     Rock::$app->response->send();
                 }
             );
-            /** Event "beginApp" */
+            // Triggered at the beginning
             Event::trigger(static::className(), self::EVENT_BEGIN_APP);
 
-            /** Routing */
+            // Routing
             Rock::$app->route->run();
 
 
@@ -86,7 +82,7 @@ class Rock
         \rock\helpers\Trace::endProfile(\rock\helpers\Trace::APP, \rock\helpers\Trace::TOKEN_APP_RUNTIME);
         //var_dump(Trace::get('db.query'), Trace::get(\rock\helpers\Trace::APP));
 
-        /** Event "endApp" */
+        // Triggered at the end
         Event::trigger(static::className(), self::EVENT_END_APP);
     }
 
@@ -131,7 +127,7 @@ class Rock
      *
      * @param string|array $configs the configuration. It can be either a string representing the class name
      *                             or an array representing the object configuration.
-     * @param mixed ...,$configs - arguments for object
+     * @param mixed ...,$configs arguments for object
      * @return object|null the created object
      */
     public static function factory(/*$args...*/$configs)
@@ -143,7 +139,7 @@ class Rock
     /**
      * Get instance of model
      *
-     * @param $class
+     * @param string $class name of class
      * @return null|object
      */
     public function __get($class)
@@ -291,11 +287,11 @@ class Rock
 
     /**
      * Defines path aliases.
-     * This method calls [[Rock::setAlias()]] to register the path aliases.
+     * This method calls @see Rock::setAlias() to register the path aliases.
      * This method is provided so that you can define path aliases when configuring a module.
      * @property array list of path aliases to be defined. The array keys are alias names
      * (must start with '@') and the array values are the corresponding paths or aliases.
-     * See [[setAliases()]] for an example.
+     * See @see Rock::setAliases() for an example.
      * @param array $aliases list of path aliases to be defined. The array keys are alias names
      * (must start with '@') and the array values are the corresponding paths or aliases.
      * For example,
@@ -356,7 +352,7 @@ class Rock
     }
 
     /**
-     * Logging as INFO
+     * Logging as `INFO`
      * @param string $message
      * @param array  $dataReplace
      */
@@ -366,7 +362,7 @@ class Rock
     }
 
     /**
-     * Logging as DEBUG
+     * Logging as `DEBUG`
      * @param string $message
      * @param array  $dataReplace
      */
@@ -376,7 +372,7 @@ class Rock
     }
 
     /**
-     * Logging as WARNING
+     * Logging as `WARNING`
      * @param string $message
      * @param array  $dataReplace
      */
@@ -386,7 +382,7 @@ class Rock
     }
 
     /**
-     * Logging as ERROR
+     * Logging as `ERROR`
      * @param string $message
      * @param array  $dataReplace
      */
