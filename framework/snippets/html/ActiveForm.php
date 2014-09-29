@@ -18,29 +18,26 @@ class ActiveForm extends Snippet
     /** @var  Model */
     public $model;
     public $configModel = [];
-
     public $fields = [];
     public $submitButton = [];
-
     public $load;
     public $prepareAttributes = [];
     public $validate = false;
     public $after;
     public $submitted = false;
+    public $success;
     /**
-     * name of wrapper template
+     * Name/inline wrapper template
      *
      * @var string
      */
     public $wrapperTpl;
-
     /**
-     * result to placeholder (name of placeholder)
+     * Result to placeholder (name of placeholder).
      *
      * @var string
      */
     public $toPlaceholder;
-
     /**
      * @var int|bool|null
      */
@@ -80,6 +77,9 @@ class ActiveForm extends Snippet
                         call_user_func([$this->model, $methodName], $args);
                     }
                 }
+                if ($this->success) {
+                    return $this->template->replaceByPrefix($this->success);
+                }
             }
         }
 
@@ -100,16 +100,11 @@ class ActiveForm extends Snippet
         $output = ob_get_clean();
         $fields[] = $output;
         $result = implode("\n", $fields);
-        /**
-         * Inserting content into wrapper template (optional)
-         */
+        // Inserting content into wrapper template (optional)
         if (!empty($this->wrapperTpl)) {
             $result = $this->parseWrapperTpl($result, $this->wrapperTpl);
         }
-
-        /**
-         * To placeholder
-         */
+        // To placeholder
         if (!empty($this->toPlaceholder)) {
             $this->template->addPlaceholder($this->toPlaceholder, $result, true);
             $this->template->cachePlaceholders[$this->toPlaceholder] = $result;
@@ -118,7 +113,6 @@ class ActiveForm extends Snippet
 
         return $result;
     }
-
 
     protected function prepareFields(\rock\widgets\ActiveForm $form, array $fields, array &$result)
     {
@@ -156,7 +150,7 @@ class ActiveForm extends Snippet
         $submit = (array)$submit;
         $submit[1] = isset($submit[1]) ? $submit[1] : [];
         list($submitContent, $submitOptions) = $submit;
-        $submitOptions['data-ng-disabled'] = 'submitted';
+        $submitOptions['data-ng-disabled'] = 'responsed';
         if (isset($submitOptions['wrapperTpl'])) {
             $wrapper = $submitOptions['wrapperTpl'];
             unset($submitOptions['wrapperTpl']);
@@ -166,9 +160,9 @@ class ActiveForm extends Snippet
     }
 
     /**
-     * Inserting content into wrapper template
+     * Inserting content into wrapper template.
      *
-     * @param string $value - content
+     * @param string $value content
      * @param        $wrapperTpl
      * @return string
      */
@@ -227,8 +221,6 @@ class ActiveForm extends Snippet
 
         $this->validate = false;
     }
-
-
 
     protected function prepareAttributes()
     {
