@@ -4,7 +4,6 @@ namespace rock\token;
 
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
-use rock\base\ObjectTrait;
 use rock\base\StorageInterface;
 use rock\cookie\Cookie;
 use rock\request\RequestInterface;
@@ -30,10 +29,10 @@ class Token implements ComponentsInterface, RequestInterface, StorageInterface
      * from the same application. If not, a 400 HTTP exception will be raised.
      *
      * Note, this feature requires that the user client accepts cookie. Also, to use this feature,
-     * forms submitted via POST method must contain a hidden input whose name is specified by [[csrfVar]].
-     * You may use `\rock\helpers\Html::beginForm()` to generate his hidden input.
+     * forms submitted via POST method must contain a hidden input whose name is specified by @see \rock\token\Token::csrfParam.
+     * You may use @see \rock\helpers\Html::beginForm() to generate his hidden input.
      *
-     * @see http://en.wikipedia.org/wiki/Cross-site_request_forgery
+     * @link http://en.wikipedia.org/wiki/Cross-site_request_forgery
      */
     public $enableCsrfValidation = true;
     /**
@@ -82,16 +81,15 @@ class Token implements ComponentsInterface, RequestInterface, StorageInterface
      * Validation token.
      *
      * @param string $token - value of token.
-     * @param string $name  - name of token.
      * @return bool
      */
-    public function valid($token = null, $name = '')
+    public function valid($token = null)
     {
         if ($this->enableCsrfValidation === false) {
             return true;
         }
         if (!empty($token)) {
-            if ($this->getCsrfTokenFromHeader() === $this->get($name) || $this->get($name) === $token) {
+            if ($this->getCsrfTokenFromHeader() === $this->get() || $this->get() === $token) {
                 return true;
             }
         }
@@ -99,7 +97,7 @@ class Token implements ComponentsInterface, RequestInterface, StorageInterface
     }
 
     /**
-     * @return string the CSRF token sent via [[CSRF_HEADER]] by browser. Null is returned if no such header is sent.
+     * @return string the CSRF token sent via @see \rock\token\Token::CSRF_HEADER by browser. Null is returned if no such header is sent.
      */
     public function getCsrfTokenFromHeader()
     {
