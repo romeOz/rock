@@ -8,14 +8,16 @@ use rock\Rock;
 /**
  * ContentNegotiator supports response format negotiation and application language negotiation.
  *
- * When the [[formats|supported formats]] property is specified, ContentNegotiator will support response format
- * negotiation based on the value of the GET parameter [[formatParam]] and the `Accept` HTTP header.
- * If a match is found, the [[Response::format]] property will be set as the chosen format.
- * The [[Response::acceptMimeType]] as well as [[Response::acceptParams]] will also be updated accordingly.
+ * When the @see ContentNegotiatorFilter::formats property is specified, ContentNegotiator will support response format
+ * negotiation based on the value of the GET parameter @see ContentNegotiatorFilter::formatParam and the `Accept` HTTP header.
+ * If a match is found, the @see Response::format property will be set as the chosen format.
+ * The @see Response::acceptMimeType as well
+ * as  @see Response::acceptParams will also be updated accordingly.
  *
- * When the [[languages|supported languages]] is specified, ContentNegotiator will support application
- * language negotiation based on the value of the GET parameter [[languageParam]] and the `Accept-Language` HTTP header.
- * If a match is found, the [[Rock::$app->language]] property will be set as the chosen language.
+ * When the @see ContentNegotiatorFilter::languages is specified, ContentNegotiator will support application
+ * language negotiation based on the value of the GET parameter @see ContentNegotiatorFilter::languageParam
+ * and the `Accept-Language` HTTP header.
+ * If a match is found, the @see Rock::language property will be set as the chosen language.
  *
  *
  * The following code shows how you can use ContentNegotiator as an action filter in either a controller or a module.
@@ -23,7 +25,6 @@ use rock\Rock;
  * specific actions if you configure the `only` or `except` property of the filter.
  *
  * ```php
- *
  * public function behaviors()
  * {
  *     return [
@@ -41,23 +42,23 @@ use rock\Rock;
  *     ];
  * }
  * ```
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 class ContentNegotiatorFilter extends ActionFilter
 {
     /**
      * @var string the name of the GET parameter that specifies the response format.
-     * Note that if the specified format does not exist in [[formats]], a [[ContentNegotiatorFilter]]
+     * Note that if the specified format does not exist in @see Response::formats,
+     * a @see ContentNegotiatorFilter
      * exception will be thrown.  If the parameter value is empty or if this property is null,
      * the response format will be determined based on the `Accept` HTTP header only.
      * @see formats
      */
     public $formatParam = '_format';
     /**
-     * @var string the name of the GET parameter that specifies the [[Rock::$app->language|application language]].
-     * Note that if the specified language does not match any of [[languages]], the first language in [[languages]]
+     * @var string the name of the GET parameter that specifies
+     * the @see Rock::language. Note that if the specified language does not match
+     * any of @see ContentNegotiatorFilter::languages,
+     * the first language in @see ContentNegotiatorFilter::languages
      * will be used. If the parameter value is empty or if this property is null,
      * the application language will be determined based on the `Accept-Language` HTTP header only.
      * @see languages
@@ -66,7 +67,7 @@ class ContentNegotiatorFilter extends ActionFilter
     /**
      * @var array list of supported response formats. The keys are MIME types (e.g. `application/json`)
      * while the values are the corresponding formats (e.g. `html`, `json`) which must be supported
-     * as declared in [[Response::formatters]].
+     * as declared in @see Response::formatters.
      *
      * If this property is empty or not set, response format negotiation will be skipped.
      */
@@ -81,6 +82,11 @@ class ContentNegotiatorFilter extends ActionFilter
      * If this property is empty or not set, language negotiation will be skipped.
      */
     public $languages;
+    /**
+     * Sending CSRF-token.
+     * @var bool
+     */
+    public $sendCSRF = false;
     /**
      * @var Request the current request. If not set, the `request` application component will be used.
      */
@@ -124,6 +130,9 @@ class ContentNegotiatorFilter extends ActionFilter
         }
         if (!empty($this->languages)) {
             Rock::$app->language = $this->negotiateLanguage($request);
+        }
+        if (isset($this->sendCSRF)) {
+            $response::$sendCSRF = $this->sendCSRF;
         }
     }
 

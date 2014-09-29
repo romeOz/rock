@@ -7,16 +7,18 @@ use rock\exception\Exception;
 use rock\helpers\File;
 use rock\helpers\String;
 use rock\Rock;
+use rock\token\Token;
 use rock\url\Url;
 
 /**
  * The web Response class represents an HTTP response
  *
- * It holds the [[headers]], [[cookies]] and [[content]] that is to be sent to the client.
- * It also controls the HTTP [[statusCode|status code]].
+ * It holds the @see Response::headers
+ * and @see Response::content that is to be sent to the client.
+ * It also controls the HTTP @see Response::statusCode .
  *
  * Response is configured as an application component.
- * You can access that instance via `Rock::$app->response`.
+ * You can access that instance via @see RockInterface::response.
  *
  * You can modify its configuration by adding an array to your application config under `components`
  * as it is shown in the following example:
@@ -36,7 +38,8 @@ use rock\url\Url;
  * @property boolean $isForbidden Whether this response indicates the current request is forbidden. This
  * property is read-only.
  * @property boolean $isInformational Whether this response is informational. This property is read-only.
- * @property boolean $isInvalid Whether this response has a valid [[statusCode]]. This property is read-only.
+ * @property boolean $isInvalid Whether this response has a
+ * valid @see Response::statusCode . This property is read-only.
  * @property boolean $isNotFound Whether this response indicates the currently requested resource is not
  * found. This property is read-only.
  * @property boolean $isOk Whether this response is OK. This property is read-only.
@@ -50,16 +53,20 @@ class Response
 {
     use ComponentsTrait;
     /**
-     * @event ResponseEvent an event that is triggered at the beginning of [[send()]].
+     * @event ResponseEvent an event that is triggered at the beginning
+     * of @see Response::send().
      */
     const EVENT_BEFORE_SEND = 'beforeSend';
     /**
-     * @event ResponseEvent an event that is triggered at the end of [[send()]].
+     * @event ResponseEvent an event that is triggered at the end
+     * of @see Response::send().
      */
     const EVENT_AFTER_SEND = 'afterSend';
     /**
-     * @event ResponseEvent an event that is triggered right after [[prepare()]] is called in [[send()]].
-     * You may respond to this event to filter the response content before it is sent to the client.
+     * @event ResponseEvent an event that is triggered right
+     * after @see Response::prepare() is called
+     * in @see Response::send() . You may respond to this event to filter the
+     * response content before it is sent to the client.
      */
     const EVENT_AFTER_PREPARE = 'afterPrepare';
 
@@ -74,66 +81,73 @@ class Response
     const FORMAT_SITEMAP = 'sitemap';
 
     /**
-     * @var string the response format. This determines how to convert [[data]] into [[content]]
-     * when the latter is not set. The value of this property must be one of the keys declared in the [[formatters] array.
+     * @var string the response format. This determines how
+     * to convert @see Response::data
+     * into @see Response::content when the latter is not set. The value of this property must be one of
+     * the keys declared in the @see Response::formattes array.
      * By default, the following formats are supported:
      *
-     * - [[FORMAT_RAW]]: the data will be treated as the response content without any conversion.
+     * - `FORMAT_RAW`: the data will be treated as the response content without any conversion.
      *   No extra HTTP header will be added.
-     * - [[FORMAT_HTML]]: the data will be treated as the response content without any conversion.
+     * - `FORMAT_HTML`: the data will be treated as the response content without any conversion.
      *   The "Content-Type" header will set as "text/html" if it is not set previously.
-     * - [[FORMAT_JSON]]: the data will be converted into JSON format, and the "Content-Type"
+     * - `FORMAT_JSON`: the data will be converted into JSON format, and the "Content-Type"
      *   header will be set as "application/json".
-     * - [[FORMAT_JSONP]]: the data will be converted into JSONP format, and the "Content-Type"
+     * - `FORMAT_JSONP`: the data will be converted into JSONP format, and the "Content-Type"
      *   header will be set as "text/javascript". Note that in this case `$data` must be an array
      *   with "data" and "callback" elements. The former refers to the actual data to be sent,
      *   while the latter refers to the name of the JavaScript callback.
-     * - [[FORMAT_XML]]: the data will be converted into XML format. Please refer to [[XmlResponseFormatter]]
+     * - `FORMAT_XML`: the data will be converted into XML format. Please refer to @see Response::XmlResponseFormatter
      *   for more details.
      *
-     * You may customize the formatting process or support additional formats by configuring [[formatters]].
+     * You may customize the formatting process or support additional formats by configuring @see Response::formatters .
      * @see formatters
      */
     public static $format = self::FORMAT_HTML;
     /**
      * @var string the MIME type (e.g. `application/json`) from the request ACCEPT header chosen for this response.
-     * This property is mainly set by [\rock\filters\ContentNegotiatorFilter]].
+     * This property is mainly set by @see ContentNegotiatorFilter.
      */
     public $acceptMimeType;
     /**
-     * @var array the parameters (e.g. `['q' => 1, 'version' => '1.0']`) associated with the [[acceptMimeType|chosen MIME type]].
-     * This is a list of name-value pairs associated with [[acceptMimeType]] from the ACCEPT HTTP header.
-     * This property is mainly set by [\rock\filters\ContentNegotiatorFilter]].
+     * @var array the parameters (e.g. `['q' => 1, 'version' => '1.0']`) associated
+     * with the @see Response::acceptMimeType (chosen MIME type).
+     * This is a list of name-value pairs associated with @see Response::acceptMimeType from the ACCEPT HTTP header.
+     * This property is mainly set by @see ContentNegotiatorFilter.
      */
     public $acceptParams = [];
     /**
-     * @var array the formatters for converting data into the response content of the specified [[format]].
-     * The array keys are the format names, and the array values are the corresponding configurations
+     * @var array the formatters for converting data into the response content of the
+     * specified @see Response::format . The array keys are the format names, and the array
+     * values are the corresponding configurations
      * for creating the formatter objects.
      * @see format
      */
     public $formatters;
     /**
-     * @var mixed the original response data. When this is not null, it will be converted into [[content]]
-     * according to [[format]] when the response is being sent out.
+     * @var mixed the original response data. When this is not null, it will be converted into @see \rock\response\Response::content
+     * according to @see Response::format when the response is being sent out.
      * @see content
      */
     public static $data;
     /**
-     * @var string the response content. When [[data]] is not null, it will be converted into [[content]]
-     * according to [[format]] when the response is being sent out.
+     * @var string the response content.
+     * When @see Response::data is not null, it will be converted
+     * into @see Response::content
+     * according to @see Response::format when the response is being sent out.
      * @see data
      */
     public $content;
     /**
      * @var resource|array the stream to be sent. This can be a stream handle or an array of stream handle,
-     * the begin position and the end position. Note that when this property is set, the [[data]] and [[content]]
-     * properties will be ignored by [[send()]].
+     * the begin position and the end position. Note that when this property is set, the @see Response::data
+     * and @see Response::content
+     * properties will be ignored by @see Response::send() .
      */
     public $stream;
     /**
      * @var string the charset of the text response. If not set, it will use
-     * the value of [[Application::charset]].
+     * the value of @see Rock::charset .
      */
     public $charset;
     /**
@@ -147,9 +161,15 @@ class Response
      */
     public $version;
     /**
-     * @var boolean whether the response has been sent. If this is true, calling [[send()]] will do nothing.
+     * @var boolean whether the response has been sent. If this is true,
+     * calling @see Response::send() will do nothing.
      */
     public $isSent = false;
+    /**
+     * Sending CSRF-token.
+     * @var bool
+     */
+    public static $sendCSRF = false;
     /**
      * @var array list of HTTP status codes and the corresponding texts
      */
@@ -296,6 +316,9 @@ class Response
 
     /**
      * Sends the response to the client.
+     *
+     * @param bool $die
+     * @throws Exception
      */
     public function send($die = false)
     {
@@ -303,6 +326,7 @@ class Response
             return;
         }
         Event::trigger(static::className(), self::EVENT_BEFORE_SEND);
+        $this->sendCSRF();
         $this->prepare();
         Event::trigger(static::className(), self::EVENT_AFTER_PREPARE);
         $this->sendHeaders();
@@ -415,7 +439,7 @@ class Response
      * Sends a file to the browser.
      *
      * Note that this method only prepares the response for file sending. The file is not sent
-     * until [[send()]] is called explicitly or implicitly. The latter is done after you return from a controller action.
+     * until @see Response::send() is called explicitly or implicitly. The latter is done after you return from a controller action.
      *
      * @param string $filePath the path of the file to be sent.
      * @param string $attachmentName the file name shown to the user. If null, it will be determined from `$filePath`.
@@ -440,9 +464,10 @@ class Response
      * Sends the specified content as a file to the browser.
      *
      * Note that this method only prepares the response for file sending. The file is not sent
-     * until [[send()]] is called explicitly or implicitly. The latter is done after you return from a controller action.
+     * until @see Response::send() is called explicitly or implicitly. The latter is done after you return from a controller action.
      *
-     * @param string $content the content to be sent. The existing [[content]] will be discarded.
+     * @param string $content the content to be sent.
+     *                        The existing @see Response::content will be discarded.
      * @param string $attachmentName the file name shown to the user.
      * @param string $mimeType the MIME type of the content.
      * @return static the response object itself
@@ -486,7 +511,7 @@ class Response
      * Sends the specified stream as a file to the browser.
      *
      * Note that this method only prepares the response for file sending. The file is not sent
-     * until [[send()]] is called explicitly or implicitly. The latter is done after you return from a controller action.
+     * until @see Response::send() is called explicitly or implicitly. The latter is done after you return from a controller action.
      *
      * @param resource $handle the handle of the stream to be sent.
      * @param string $attachmentName the file name shown to the user.
@@ -532,7 +557,7 @@ class Response
 
     /**
      * Determines the HTTP range given in the request.
-     * @param integer $fileSize the size of the file that will be used to validate the requested HTTP range.
+     * @param int $fileSize the size of the file that will be used to validate the requested HTTP range.
      * @return array|boolean the range (begin, end), or false if the range request is invalid.
      */
     protected function getHttpRange($fileSize)
@@ -605,9 +630,9 @@ class Response
      *
      * **Example**
      *
-     * ~~~
+     * ```php
      * Rock::$app->response->xSendFile('/home/user/Pictures/picture1.jpg');
-     * ~~~
+     * ```
      *
      * @param string $filePath file name with full path
      * @param string $attachmentName file name shown to the user. If null, it will be determined from `$filePath`.
@@ -676,19 +701,19 @@ class Response
      * Redirects the browser to the specified URL.
      *
      * This method adds a "Location" header to the current response. Note that it does not send out
-     * the header until [[send()]] is called. In a controller action you may use this method as follows:
+     * the header until @see Response::send() is called. In a controller action you may use this method as follows:
      *
-     * ~~~
+     * ```php
      * return Rock::$app->response->redirect($url);
-     * ~~~
+     * ```
      *
      * In other places, if you want to send out the "Location" header immediately, you should use
      * the following code:
      *
-     * ~~~
+     * ```php
      * Rock::$app->response->redirect($url)->send();
      * return;
-     * ~~~
+     * ```
      *
      * In AJAX mode, this normally will not work as expected unless there are some
      * client-side JavaScript code handling the redirection. To help achieve this goal,
@@ -698,27 +723,22 @@ class Response
      * described above. Otherwise, you should write the following JavaScript code to
      * handle the redirection:
      *
-     * ~~~
-     * $document.ajaxComplete(function (event, xhr, settings) {
-     *     var url = xhr.getResponseHeader('X-Redirect');
-     *     if (url) {
-     *         window.location = url;
-     *     }
-     * });
-     * ~~~
+     * ```js
+     * $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
+     * ```
      *
      * @param string $url the URL to be redirected to. This can be in one of the following formats:
      *
      * - a string representing a URL (e.g. "http://example.com")
      * - a string representing a URL alias (e.g. "@example.com")
      *   Note that the route is with respect to the whole application, instead of relative to a controller or module.
-     *   [[Html::url()]] will be used to convert the array into a URL.
+     *   @see Html::url() will be used to convert the array into a URL.
      *
      * Any relative URL will be converted into an absolute one by prepending it with the host info
      * of the current request.
      *
      * @param integer $statusCode the HTTP status code. Defaults to 302.
-     * See <http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html>
+     * See @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
      * for details about HTTP status code
      * @return static the response object itself
      */
@@ -755,9 +775,9 @@ class Response
      *
      * In a controller action you may use this method like this:
      *
-     * ~~~
+     * ``php
      * return Rock::$app->response->refresh();
-     * ~~~
+     * ```
      *
      * @param string $anchor the anchor that should be appended to the redirection URL.
      *                       Defaults to empty. Make sure the anchor starts with '#' if you want to specify it.
@@ -794,7 +814,7 @@ class Response
     /**
      * Redirects the browser to the last visited page.
      *
-     * You can use this method in an action by returning the [[Response]] directly:
+     * You can use this method in an action by returning the @see Response directly:
      *
      * ```php
      * // stop executing this action and redirect to last visited page
@@ -811,7 +831,8 @@ class Response
     }
 
     /**
-     * @return boolean whether this response has a valid [[statusCode]].
+     * @return boolean whether this response has
+     * a valid @see Response::statusCode.
      */
     public function getIsInvalid()
     {
@@ -923,8 +944,10 @@ class Response
 
     /**
      * Prepares for sending the response.
-     * The default implementation will convert [[data]] into [[content]] and set headers accordingly.
-     * @throws Exception if the formatter for the specified format is invalid or [[format]] is not supported
+     * The default implementation will convert @see Response::data
+     * into @see Response::content and set headers accordingly.
+     *
+     * @throws Exception if the formatter for the specified format is invalid or @see Response::format is not supported
      */
     protected function prepare()
     {
@@ -955,6 +978,21 @@ class Response
             } else {
                 throw new Exception(Exception::CRITICAL, "Response content must be a string or an object implementing __toString().");
             }
+        }
+    }
+
+    protected function sendCSRF()
+    {
+        if (!static::$sendCSRF) {
+            return;
+        }
+        $token = $this->Rock->token;
+        $csrf = $token->create();
+        if ($csrf) {
+            if (is_array(static::$data)) {
+                static::$data[$token->csrfParam] = $csrf;
+            }
+            $this->getHeaders()->add(Token::CSRF_HEADER, $csrf);
         }
     }
 }
