@@ -2,10 +2,7 @@
 
 namespace rock\widgets;
 
-
-use rock\base\ComponentsTrait;
 use rock\base\Model;
-use rock\base\ObjectTrait;
 use rock\base\Widget;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Html;
@@ -123,11 +120,14 @@ class ActiveForm extends Widget
 
     protected function clientOptions($name)
     {
-        if ($this->validateOnChanged && !isset($this->options['data-validate-on-changed'])) {
-            $this->options['data-validate-on-changed'] = 'true';
-        }
-        if (!isset($this->options['data-action-form'])) {
-            $this->options['data-action-form'] = '';
+        if (!empty($name)) {
+            $this->options['name'] = $name;
+            if (!isset($this->options['data-ng-init'])) {
+                $this->options['data-ng-init'] = 'formName="' . $name . '";';
+                if ($this->validateOnChanged) {
+                    $this->options['data-ng-init'] .= 'validateOnChanged=true;';
+                }
+            }
         }
         if (!isset($this->options['data-ng-submit'])) {
             $this->options['data-ng-submit'] = 'submit($event)';
@@ -140,12 +140,14 @@ class ActiveForm extends Widget
             ],
             ArrayHelper::getValue($this->options, 'hiddenMethod', [])
         );
-        $csrf = $this->Rock->token->create();
+        $token = $this->Rock->token;
         $this->options['hiddenCsrf'] = array_merge(
             [
-                'data-ng-model' => (isset($name) ? $name : 'form') . '.values._csrf',
-                'data-simple-name' => '_csrf',
-                'data-ng-init' => (isset($name) ? $name : 'form').".values._csrf='{$csrf}'", 'data-form-csrf' => ''
+                'data-ng-model' => (isset($name) ? $name : 'form') . '.values.'. $token->csrfParam,
+                'data-simple-name' => $token->csrfParam,
+                'data-form-csrf' => '',
+                'data-ng-value' => 'csrf.token'
+
             ],
             ArrayHelper::getValue($this->options, 'hiddenCsrf', [])
         );
