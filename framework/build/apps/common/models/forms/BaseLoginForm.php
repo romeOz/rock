@@ -26,7 +26,7 @@ class BaseLoginForm extends Model
 
     public $redirectUrl;
     public $enableCsrfToken = true;
-    public $isLogin = false;
+    public $isLogged = false;
 
 
     public function rules()
@@ -170,7 +170,7 @@ class BaseLoginForm extends Model
             return false;
         }
 
-        $this->isLogin = true;
+        $this->isLogged = true;
         $data = $users->toArray();
         $this->Rock->user->addMulti(ArrayHelper::intersectByKeys($data, ['id', 'username', 'url']));
         $this->Rock->user->login();
@@ -187,7 +187,7 @@ class BaseLoginForm extends Model
      */
     public function redirect($url = null)
     {
-        if (!$this->isLogin) {
+        if (!$this->isLogged) {
             return;
         }
         $response = $this->Rock->response;

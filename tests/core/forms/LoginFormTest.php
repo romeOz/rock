@@ -64,7 +64,7 @@ class LoginFormTest extends DatabaseTestCase
         $_POST = [$loginForm->formName() => $post];
         $loginForm->load($_POST);
         $loginForm->validate();
-        $this->assertFalse($loginForm->isLogin);
+        $this->assertFalse($loginForm->isLogged);
         $this->assertEquals(Rock::$app->template->getAllPlaceholders(false, true), $placeholders);
     }
 
@@ -128,7 +128,7 @@ class LoginFormTest extends DatabaseTestCase
         $_POST = [$loginForm->formName() => $post];
         $loginForm->load($_POST);
         $loginForm->validate();
-        $this->assertTrue($loginForm->isLogin);
+        $this->assertTrue($loginForm->isLogged);
         $this->assertEquals(Rock::$app->user->getAll(['id', 'username']), $loginForm->getUsers()->toArray(['id', 'username']));
     }
 }

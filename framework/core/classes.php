@@ -189,7 +189,7 @@ return array_merge(
                 'user' => function (array $keys) {
                         if (current($keys) === 'isGuest') {
                             return Rock::$app->user->isGuest();
-                        } elseif (in_array(current($keys), ['isLogin', 'isAuthenticated'], true)) {
+                        } elseif (in_array(current($keys), ['isLogged', 'isAuthenticated'], true)) {
                             return !Rock::$app->user->isGuest();
                         }
                         return \rock\helpers\ArrayHelper::getValue(Rock::$app->user->getAll(), $keys);

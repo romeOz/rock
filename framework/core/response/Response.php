@@ -827,7 +827,7 @@ class Response
      */
     public function goBack($defaultUrl = null)
     {
-        //return $this->redirect(Rock::$app->getUser()->getReturnUrl($defaultUrl));
+        return $this->redirect($this->Rock->user->getReturnUrl($defaultUrl));
     }
 
     /**

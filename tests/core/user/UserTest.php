@@ -97,7 +97,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
     {
         Rock::$app->user->add('id', 1);
         Rock::$app->user->add('is_login', 1);
-        $this->assertTrue(Rock::$app->user->isAuthenticated());
+        $this->assertTrue(Rock::$app->user->isLogged());
     }
 
 
@@ -105,13 +105,13 @@ class UserTest extends \PHPUnit_Framework_TestCase
     {
         Rock::$app->user->add('id', 1);
         Rock::$app->user->add('is_login', 0);
-        $this->assertFalse(Rock::$app->user->isAuthenticated());
+        $this->assertFalse(Rock::$app->user->isLogged());
     }
 
 
     public function testIsAuthenticatedWithoutSessionFalse()
     {
-        $this->assertFalse(Rock::$app->user->isAuthenticated());
+        $this->assertFalse(Rock::$app->user->isLogged());
     }
 
     public function testCheckAccessEmptyFalse()

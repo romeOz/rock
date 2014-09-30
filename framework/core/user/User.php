@@ -5,41 +5,34 @@ use apps\common\models\users\Users;
 use rock\base\CollectionInterface;
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
-use rock\base\ObjectTrait;
 use rock\base\StorageInterface;
 use rock\helpers\ArrayHelper;
 
 class User implements \ArrayAccess, CollectionInterface, StorageInterface, ComponentsInterface
 {
     use ComponentsTrait;
-
-    public $adapterStorage = self::SESSION;
+    
     /** @var  CollectionInterface */
     protected static $storage;
-    public $container = 'user';
-
     /**
-     * @var string the session variable name used to store the value of [[returnUrl]].
+     * Session key as container.
+     * @var string
+     */
+    public $container = 'user';
+    /**
+     * @var string the session variable name used to store the
+     * value of @see getReturnUrl() .
      */
     public $returnUrlParam = '__returnUrl';
 
 
     public function init()
     {
-//        if ($this->adapterStorage === self::COOKIE) {
-//            $configs = $this->Rock->di->get(Cookie::className())['args'];
-//            $configs['httpOnly'] = true;
-//            static::$storage = new Cookie($configs);
-//        } else {
-//            static::$storage = $this->Rock->session;
-//        }
-
         if (isset(static::$storage)) {
             return;
         }
         static::$storage = $this->Rock->session;
     }
-
 
     /**
      * @return boolean whether the user session has started
@@ -60,7 +53,6 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
 
         return static::$storage->get($this->prepareKeys($keys), $default);
     }
-
 
     /**
      * @inheritdoc
@@ -180,7 +172,6 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
         return $this->has($name);
     }
 
-
     /**
      * @inheritdoc
      */
@@ -208,7 +199,6 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
 
         static::$storage->remove($this->prepareKeys($keys));
     }
-
 
     /**
      * @inheritdoc
@@ -245,21 +235,21 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
     }
 
     /**
-     * Is guest user
+     * Is guest.
      *
      * @return bool
      */
     public function isGuest()
     {
-        return !$this->isAuthenticated();
+        return !$this->isLogged();
     }
 
     /**
-     * Is login user
+     * Is logged.
      *
      * @return bool
      */
-    public function isAuthenticated()
+    public function isLogged()
     {
         return (bool)$this->get('is_login');
     }
@@ -277,7 +267,6 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
         if (empty($token) || (!$users = Users::findByToken($token, Users::STATUS_NOT_ACTIVE, false, []))) {
             return false;
         }
-
         $users->removeToken();
         $users->setStatus(Users::STATUS_ACTIVE);
         $users->save();
@@ -290,7 +279,10 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
         return true;
     }
 
-
+    /**
+     * Logout user.
+     * @param bool $destroy destroy session.
+     */
     public function logout($destroy = true)
     {
         if ($destroy === true) {
@@ -303,7 +295,12 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
 
     protected static $access = [];
 
-
+    /**
+     * @param       $roleName
+     * @param array $params
+     * @param bool  $allowCaching
+     * @return bool
+     */
     public function check($roleName, array $params = null, $allowCaching = true)
     {
         if (!$this->getIsActive()) {
@@ -315,11 +312,10 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
         return static::$access[$roleName] = $this->Rock->rbac->check($this->get('id'), $roleName, $params);
     }
 
-
     /**
      * Loads the number of allowed requests and the corresponding timestamp from a persistent storage.
      *
-     * @param string $action e.g. FooController::actionIndex
+     * @param string $action name of action e.g. `FooController::actionIndex`
      * @return array an array of two elements. The first element is the number of allowed requests,
      * and the second element is the corresponding UNIX timestamp.
      */
@@ -335,7 +331,7 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
     /**
      * Saves the number of allowed requests and the corresponding timestamp to a persistent storage.
      *
-     * @param string        $action   e.g. FooController::actionIndex
+     * @param string        $action name of action e.g. `FooController::actionIndex`
      * @param integer $maxRequests the number of allowed requests remaining.
      * @param integer $timestamp   the current timestamp.
      */
@@ -354,7 +350,7 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
     /**
      * Saves the number of allowed requests and the corresponding timestamp to a persistent storage.
      *
-     * @param string        $action   e.g. FooController::actionIndex
+     * @param string $action name of action  e.g. `FooController::actionIndex`
      */
     public function removeAllowance($action)
     {
@@ -368,8 +364,7 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
      * may call this method to redirect the browser to where it goes after successful authentication.
      *
      * @param string|array $defaultUrl the default return URL in case it was not set previously.
-     * If this is null and the return URL was not set previously, [[Application::homeUrl]] will be redirected to.
-     * Please refer to [[setReturnUrl()]] on accepted format of the URL.
+     * If this is null and the return URL was not set previously, @see Request::getHomeUrl() will be redirected to.
      * @return string the URL that the user should be redirected to after login.
      * @see loginRequired()
      */
