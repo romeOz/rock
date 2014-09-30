@@ -1,14 +1,12 @@
 <?php
 namespace rock\captcha;
 
-
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
 use rock\base\ObjectTrait;
 use rock\helpers\Helper;
 
 /**
- *
  * @author   Kruglov Sergei (fork by Romeo)
  * @link     http://captcha.ru, http://kruglov.ru
  */
@@ -18,17 +16,14 @@ class Captcha implements ComponentsInterface, CaptchaInterface
         ComponentsTrait::init as parentInit;
     }
 
-
-
     /**
-     * do not change without changing font files!
+     * Do not change without changing font files.
      *
      * @var string
      */
     public $alphabet = '0123456789abcdefghijklmnopqrstuvwxyz';
-
     /**
-     * Symbols used to draw captcha
+     * Symbols used to draw captcha.
      *
      * Example:
      *  "0123456789" digits
@@ -37,74 +32,62 @@ class Captcha implements ComponentsInterface, CaptchaInterface
      * @var string
      */
     public $allowedSymbols = '23456789abcdegikpqsvxyz';
-
     /**
-     * Folder with fonts
+     * Folder with fonts.
      *
      * @var string
      */
     public $fontsDir = 'fonts';
-
     /**
-     * Captcha string length
-     *
+     * Captcha string length.
      * random 5 or 6 or 7
      *
      * @var int
      */
     public $length = 0;
-
     /**
-     * Captcha image size (you do not need to change it, this parameters is optimal)
+     * Captcha image size (you do not need to change it, this parameters is optimal).
      *
      * @var int
      */
     public $width = 160;
     public $height = 80;
-
     /**
-     * Symbol's vertical fluctuation amplitude
+     * Symbol's vertical fluctuation amplitude.
      *
      * @var int
      */
     public $fluctuationAmplitude = 8;
-
     /**
-     * Noise white
-     *
-     * $white_noise_density=0; // no white noise
+     * Noise white.
+     * `0` -  no white noise
      *
      * @var float
      */
     public $whiteNoiseDensity = 0;
 
     /**
-     * Noise black
-     *
-     * $black_noise_density=0; // no black noise
+     * Noise black.
+     * `0` -   no black noise
      *
      * @var float
      */
     public $blackNoiseDensity = 0;
-
     /**
-     * Increase safety by prevention of spaces between symbols
+     * Increase safety by prevention of spaces between symbols.
      *
      * @var bool
      */
     public $noSpaces = true;
-
     /**
-     * Show credits
-     *
-     * set to false to remove credits line. Credits adds 12 pixels to image height
+     * Show credits.
+     * set to false to remove credits line. Credits adds 12 pixels to image height.
      *
      * @var bool
      */
     public $showCredits = false;
-
     /**
-     * Text credit
+     * Text credit.
      *
      * if empty, HTTP_HOST will be shown
      *
@@ -112,28 +95,27 @@ class Captcha implements ComponentsInterface, CaptchaInterface
      */
     public $textCredits = null;
     /**
-     * CAPTCHA image colors (RGB, 0-255)
+     * CAPTCHA image colors (RGB, 0-255).
      *
-     * Example:
-     *      $foreground_color = array(0, 0, 0);
-     *      $background_color = array(220, 230, 255);
+     * ```php
+     * $captcha->foregroundColor = array(0, 0, 0);
+     * $captcha->backgroundColor = array(220, 230, 255);
+     * ```
      *
      * @var array
      */
     public $foregroundColor = [];
     public $backgroundColor = [];
-
     /**
-     * JPEG quality of CAPTCHA image (bigger is better quality, but larger file size)
+     * JPEG quality of CAPTCHA image (bigger is better quality, but larger file size).
      *
      * @var int
      */
     public $jpegQuality = 90;
 
     public $sessionName = 'captcha';
-
     /**
-     * Code of captcha
+     * Code of captcha.
      *
      * @var string
      */
@@ -143,27 +125,41 @@ class Captcha implements ComponentsInterface, CaptchaInterface
     public function init()
     {
         $this->parentInit();
-        $this->length          = Helper::getValue(
-                                           $this->length,
-                                           mt_rand(5, 7)
+        $this->length = Helper::getValue(
+            $this->length,
+            mt_rand(5, 7)
         );
         $this->foregroundColor = Helper::getValue(
-                                           $this->foregroundColor,
-                                           [mt_rand(0, 80), mt_rand(0, 80), mt_rand(0, 80)]
+            $this->foregroundColor,
+            [mt_rand(0, 80), mt_rand(0, 80), mt_rand(0, 80)]
         );
         $this->backgroundColor = Helper::getValue(
-                                           $this->backgroundColor,
-                                           [mt_rand(220, 255), mt_rand(220, 255), mt_rand(220, 255)]
+            $this->backgroundColor,
+            [mt_rand(220, 255), mt_rand(220, 255), mt_rand(220, 255)]
         );
     }
 
+    /**
+     * Get data captcha.
+     *
+     * @param bool $session create session
+     * @return array
+     */
+    public function get($session = true)
+    {
+        if (!$data = $this->generate($session)) {
+            return [];
+        }
+
+        return $data;
+    }
 
     /**
-     * Get captcha
+     * Generate captcha.
      */
     protected function generate($session = true)
     {
-        $fonts             = [];
+        $fonts = [];
         $fontsdir_absolute = dirname(__FILE__) . DS . $this->fontsDir;
         if ($handle = opendir($fontsdir_absolute)) {
             while (false !== ($file = readdir($handle))) {
@@ -174,9 +170,7 @@ class Captcha implements ComponentsInterface, CaptchaInterface
             closedir($handle);
         }
         $alphabet_length = strlen($this->alphabet);
-        /**
-         * generating random keystring
-         */
+        // generating random keystring
         do {
             while (true) {
                 $this->code = null;
@@ -188,12 +182,12 @@ class Captcha implements ComponentsInterface, CaptchaInterface
                 }
             }
             $font_file = $fonts[mt_rand(0, count($fonts) - 1)];
-            $font      = imagecreatefrompng($font_file);
+            $font = imagecreatefrompng($font_file);
             imagealphablending($font, true);
-            $fontfile_width  = imagesx($font);
+            $fontfile_width = imagesx($font);
             $fontfile_height = imagesy($font) - 1;
-            $font_metrics   = [];
-            $symbol         = 0;
+            $font_metrics = [];
+            $symbol = 0;
             $reading_symbol = false;
             // loading font
             for (
@@ -204,11 +198,11 @@ class Captcha implements ComponentsInterface, CaptchaInterface
                 $transparent = (imagecolorat($font, $i, 0) >> 24) == 127;
                 if (empty($reading_symbol) && empty($transparent)) {
                     $font_metrics[$this->alphabet{$symbol}] = ['start' => $i];
-                    $reading_symbol                         = true;
+                    $reading_symbol = true;
                     continue;
                 } elseif (!empty($reading_symbol) && !empty($transparent)) {
                     $font_metrics[$this->alphabet{$symbol}]['end'] = $i;
-                    $reading_symbol                                = false;
+                    $reading_symbol = false;
                     ++$symbol;
                     continue;
                 }
@@ -218,10 +212,9 @@ class Captcha implements ComponentsInterface, CaptchaInterface
             $white = imagecolorallocate($img, 255, 255, 255);
             $black = imagecolorallocate($img, 0, 0, 0);
             imagefilledrectangle($img, 0, 0, $this->width - 1, $this->height - 1, $white);
-            /**
-             * draw text
-             */
-            $x   = 1;
+
+            // draw text
+            $x = 1;
             $odd = mt_rand(0, 1);
             if ($odd == 0) {
                 $odd = -1;
@@ -237,11 +230,11 @@ class Captcha implements ComponentsInterface, CaptchaInterface
                         $shift = 10000;
                         for ($sy = 3; $sy < $fontfile_height - 10; $sy += 1) {
                             for ($sx = $m['start'] - 1; $sx < $m['end']; $sx += 1) {
-                                $rgb     = imagecolorat($font, $sx, $sy);
+                                $rgb = imagecolorat($font, $sx, $sy);
                                 $opacity = $rgb >> 24;
                                 if ($opacity < 127) {
                                     $left = $sx - $m['start'] + $x;
-                                    $py   = $sy + $y;
+                                    $py = $sy + $y;
                                     if ($py > $this->height) {
                                         break;
                                     }
@@ -273,9 +266,9 @@ class Captcha implements ComponentsInterface, CaptchaInterface
                 $x += $m['end'] - $m['start'] - $shift;
             }
         } while ($x >= $this->width - 10); // while not fit in canvas
-        /**
-         * noise
-         */
+
+
+         // noise
         $white = imagecolorallocate($font, 255, 255, 255);
         $black = imagecolorallocate($font, 0, 0, 0);
         for (
@@ -299,7 +292,7 @@ class Captcha implements ComponentsInterface, CaptchaInterface
         }
         $center = $x / 2;
         // credits. To remove, see configuration file
-        $img2       = imagecreatetruecolor(
+        $img2 = imagecreatetruecolor(
             $this->width,
             $this->height + ($this->showCredits === true
                 ? 12
@@ -355,11 +348,10 @@ class Captcha implements ComponentsInterface, CaptchaInterface
         $rand7 = mt_rand(0, 31415926) / 10000000;
         $rand8 = mt_rand(0, 31415926) / 10000000;
         // amplitudes
-        $rand9  = mt_rand(330, 420) / 110;
+        $rand9 = mt_rand(330, 420) / 110;
         $rand10 = mt_rand(330, 450) / 100;
-        /**
-         * wave distortion
-         */
+
+        // wave distortion
         for ($x = 0; $x < $this->width; ++$x) {
             for ($y = 0; $y < $this->height; ++$y) {
                 $sx
@@ -375,9 +367,9 @@ class Captcha implements ComponentsInterface, CaptchaInterface
                 ) {
                     continue;
                 } else {
-                    $color    = imagecolorat($img, $sx, $sy) & 0xFF;
-                    $color_x  = imagecolorat($img, $sx + 1, $sy) & 0xFF;
-                    $color_y  = imagecolorat($img, $sx, $sy + 1) & 0xFF;
+                    $color = imagecolorat($img, $sx, $sy) & 0xFF;
+                    $color_x = imagecolorat($img, $sx + 1, $sy) & 0xFF;
+                    $color_y = imagecolorat($img, $sx, $sy + 1) & 0xFF;
                     $color_xy = imagecolorat($img, $sx + 1, $sy + 1) & 0xFF;
                 }
                 if (
@@ -393,12 +385,12 @@ class Captcha implements ComponentsInterface, CaptchaInterface
                     $color_y === 0 &&
                     $color_xy === 0
                 ) {
-                    $newred   = $this->foregroundColor[0];
+                    $newred = $this->foregroundColor[0];
                     $newgreen = $this->foregroundColor[1];
-                    $newblue  = $this->foregroundColor[2];
+                    $newblue = $this->foregroundColor[2];
                 } else {
-                    $frsx  = $sx - floor($sx);
-                    $frsy  = $sy - floor($sy);
+                    $frsx = $sx - floor($sx);
+                    $frsy = $sy - floor($sy);
                     $frsx1 = 1 - $frsx;
                     $frsy1 = 1 - $frsy;
                     $newcolor = (
@@ -410,14 +402,14 @@ class Captcha implements ComponentsInterface, CaptchaInterface
                     if ($newcolor > 255) {
                         $newcolor = 255;
                     }
-                    $newcolor  = $newcolor / 255;
+                    $newcolor = $newcolor / 255;
                     $newcolor0 = 1 - $newcolor;
-                    $newred   = $newcolor0 * $this->foregroundColor[0] +
-                                $newcolor * $this->backgroundColor[0];
+                    $newred = $newcolor0 * $this->foregroundColor[0] +
+                              $newcolor * $this->backgroundColor[0];
                     $newgreen = $newcolor0 * $this->foregroundColor[1] +
                                 $newcolor * $this->backgroundColor[1];
-                    $newblue  = $newcolor0 * $this->foregroundColor[2] +
-                                $newcolor * $this->backgroundColor[2];
+                    $newblue = $newcolor0 * $this->foregroundColor[2] +
+                               $newcolor * $this->backgroundColor[2];
                 }
                 imagesetpixel($img2, $x, $y, imagecolorallocate($img2, $newred, $newgreen, $newblue));
             }
@@ -437,7 +429,6 @@ class Captcha implements ComponentsInterface, CaptchaInterface
             imagepng($img2);
         }
         $return['image'] = ob_get_clean();
-
         if (empty($return['image'])) {
             new Exception(
                 Exception::ERROR, Exception::UNKNOWN_VAR, ['name' => '$return[\'image\']']
@@ -448,25 +439,20 @@ class Captcha implements ComponentsInterface, CaptchaInterface
         if ($session) {
             $this->createSession();
         }
+
         return $return;
     }
 
     /**
-     * Get data captcha
-     *
-     * @param bool $session - create session
-     * @return array
+     * Create session.
      */
-    public function get($session = true)
+    public function createSession()
     {
-        if (!$data = $this->generate($session)) {
-            return [];
-        }
-        return $data;
+        $this->Rock->session->setFlash($this->sessionName, $this->code, false);
     }
 
     /**
-     * View captcha
+     * Display captcha.
      */
     public function display($session = true)
     {
@@ -478,7 +464,31 @@ class Captcha implements ComponentsInterface, CaptchaInterface
     }
 
     /**
-     * Get base64
+     * Sets the HTTP headers needed by image response.
+     */
+    protected function setHttpHeaders($mimeType)
+    {
+        $this->Rock->response->getHeaders()
+            ->set('Pragma', 'public')
+            ->set('Expires', '0')
+            ->set('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
+            ->set('Content-Transfer-Encoding', 'binary')
+            ->set('Content-type', $mimeType);
+    }
+
+    /**
+     * Get data-uri.
+     *
+     * @param bool $session create session
+     * @return string
+     */
+    public function getDataUri($session = true)
+    {
+        return 'data:image/png;base64,' . $this->getBase64($session);
+    }
+
+    /**
+     * Get base64.
      *
      * @param bool $session
      * @return bool|string
@@ -493,28 +503,7 @@ class Captcha implements ComponentsInterface, CaptchaInterface
     }
 
     /**
-     * Get data-uri
-     *
-     * @param bool $session - create session
-     * @return string
-     */
-    public function getDataUri($session = true)
-    {
-        return 'data:image/png;base64,'.$this->getBase64($session);
-    }
-
-
-    /**
-     * Create session
-     */
-    public function createSession()
-    {
-        $this->Rock->session->setFlash($this->sessionName, $this->code, false);
-    }
-
-
-    /**
-     * Exists session by code of captcha
+     * Exists session by code of captcha.
      *
      * @param string|null $name
      * @return bool
@@ -524,9 +513,8 @@ class Captcha implements ComponentsInterface, CaptchaInterface
         return $this->Rock->session->hasFlash(Helper::getValue($name, $this->sessionName));
     }
 
-
     /**
-     * Get code of captcha
+     * Get code of captcha.
      *
      * @param string|null $name
      * @return string|null
@@ -536,9 +524,9 @@ class Captcha implements ComponentsInterface, CaptchaInterface
         return $this->Rock->session->getFlash(Helper::getValue($name, $this->sessionName));
     }
 
-
     /**
-     * Remove session
+     * Remove session.
+     *
      * @param string|null $name
      */
     public function removeSession($name = null)
@@ -547,25 +535,12 @@ class Captcha implements ComponentsInterface, CaptchaInterface
     }
 
     /**
-     * Get code of captcha
+     * Get code of captcha.
      *
      * @return null|string
      */
     public function getCode()
     {
         return $this->code;
-    }
-
-    /**
-     * Sets the HTTP headers needed by image response.
-     */
-    protected function setHttpHeaders($mimeType)
-    {
-        $this->Rock->response->getHeaders()
-            ->set('Pragma', 'public')
-            ->set('Expires', '0')
-            ->set('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
-            ->set('Content-Transfer-Encoding', 'binary')
-            ->set('Content-type', $mimeType);
     }
 }

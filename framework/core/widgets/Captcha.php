@@ -12,7 +12,7 @@ class Captcha extends InputWidget implements CaptchaInterface
 {
     /**
      * @var string the route of the action that generates the CAPTCHA images.
-     * The action represented by this route must be an action of [[CaptchaAction]].
+     * The action represented by this route must be an action of @see \rock\captcha\Captcha .
      */
     public $captchaAction = '/captcha/';
     /**
@@ -49,7 +49,7 @@ class Captcha extends InputWidget implements CaptchaInterface
             $this->imageOptions['id'] = $this->options['id'] . '-image';
         }
         if (!isset($this->imageOptions['data-ng-click'])) {
-            $this->imageOptions['data-ng-click'] = 'reloadCaptcha($event)';
+            $this->imageOptions['data-ng-click'] = 'reloadCaptcha("/ajax/captcha/", $event)';
         }
     }
 

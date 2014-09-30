@@ -17,14 +17,13 @@ class BaseFilter implements ThumbInterface
 {
     use className;
 
-
     /**
-     * Unserialize
+     * Unserialize.
      *
-     * @param string $value             - serialized array
-     * @param array  $params            - params
-     *                                  => key
-     *                                  => separator
+     * @param string $value serialized array
+     * @param array  $params params
+     *                        - key
+     *                        - separator
      * @return string
      */
     public static function unserialize($value, array $params)
@@ -44,11 +43,11 @@ class BaseFilter implements ThumbInterface
     }
 
     /**
-     * Replace variables template (chunk, snippet...)
+     * Replace variables template (`chunk`, `snippet`...).
      *
-     * @param string                  $content - content
+     * @param string                  $content content
      * @param array                   $placeholders
-     * @param \rock\template\Template $template
+     * @param Template $template
      * @return string
      */
     public static function replaceTpl($content, array $placeholders = null, Template $template)
@@ -60,11 +59,11 @@ class BaseFilter implements ThumbInterface
 
 
     /**
-     * Modify date
+     * Modify date.
      *
-     * @param string $date   - date
-     * @param array  $params - params
-     *                       => format   - date format
+     * @param string $date   date
+     * @param array  $params params
+     *                       - format date format
      * @return string|null
      */
     public static function modifyDate($date, array $params = [])
@@ -81,22 +80,23 @@ class BaseFilter implements ThumbInterface
 
 
     /**
-     * Modify url
+     * Modify url.
      *
      * @param string $url
-     * @param array  $params - params
-     *                  => args        - URL-arguments for set.
-     *                  => addArgs        - URL-arguments for adding.
-     *                  => removeArgs       - URL-arguments for removing.
-     *                  => removeAllArgs        - Remove all URL-arguments.
-     *                  => beginPath     - String to begin of URL-path.
-     *                  => endPath       - String to end of URL-path.
-     *                  => replace       - The replacement data.
-     *                  => anchor       - Anchor for adding.
-     *                  => removeAnchor       - Remove anchor.
-     *                  => referrer - referrer URL for formatting.
-     *                  => const - Adduce URL to: `\rock\url\UrlInterface::ABS`, `\rock\url\UrlInterface::HTTP`,
-     *                  `\rock\url\UrlInterface::HTTPS`. @see UrlInterface.
+     * @param array  $params params
+     *                  - args        URL-arguments for set.
+     *                  - csrf        adding CSRF-token.
+     *                  - addArgs       URL-arguments for adding.
+     *                  - removeArgs      URL-arguments for removing.
+     *                  - removeAllArgs   remove all URL-arguments.
+     *                  - beginPath     string to begin of URL-path.
+     *                  - endPath       string to end of URL-path.
+     *                  - replace       the replacement data.
+     *                  - anchor       anchor for adding.
+     *                  - removeAnchor       remove anchor.
+     *                  - referrer referrer URL for formatting.
+     *                  - const - adduce URL to: @see Url::ABS, Url::HTTP,
+     *                  and @see Url::HTTPS.
      * @return string
      */
     public static function modifyUrl($url, array $params = [])
@@ -134,6 +134,13 @@ class BaseFilter implements ThumbInterface
         if (isset($params['args'])) {
             $urlBuilder->setArgs($params['args']);
         }
+        if (isset($params['csrf'])) {
+            $token = Rock::$app->token;
+            $params['addArgs'] = array_merge(
+                [$token->csrfParam => $token->create()],
+                Helper::getValue($params['csrf'], [])
+            );
+        }
         if (isset($params['addArgs'])) {
             $urlBuilder->addArgs($params['addArgs']);
         }
@@ -144,9 +151,9 @@ class BaseFilter implements ThumbInterface
     }
 
     /**
-     * Converting array to json-object
+     * Converting array to JSON-object.
      *
-     * @param array $array - current array
+     * @param array $array current array
      * @return string
      */
     public static function arrayToJson($array)
@@ -158,17 +165,17 @@ class BaseFilter implements ThumbInterface
     }
 
     /**
-     * Get thumb
+     * Get thumb.
      *
-     * @param string $path    - src to image
-     * @param array  $params - params
-     *                       => type     - get src, link, <img> (default: <img>)
-     *                       => w        - width
-     *                       => h        - height
-     *                       => q        - quality
-     *                       => class    - attr "class"
-     *                       => alt      - attr "alt"
-     *                       => constant
+     * @param string $path    src to image
+     * @param array  $params params
+     *                       - type     get `src`, `<a>`, `<img>` (default: `<img>`)
+     *                       - w        width
+     *                       - h        height
+     *                       - q        quality
+     *                       - class    attr `class`
+     *                       - alt      attr `alt`
+     *                       - constant
      * @return string
      */
     public static function thumb($path, array $params)

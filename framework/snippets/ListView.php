@@ -29,7 +29,7 @@ use rock\helpers\Json;
  * ]]
  * ```
  *
- * As PHP engine
+ * As PHP engine;
  *
  * ```php
  * $template = new \rock\Template;
@@ -80,12 +80,11 @@ use rock\helpers\Json;
 class ListView extends Snippet
 {
     /**
-     * The data as an array
+     * The data as an array.
      *
      * @var array
      */
     public $array = [];
-
     /**
      * The data as an call
      * May be a callable, snippet, and instance
@@ -105,35 +104,33 @@ class ListView extends Snippet
      * @var mixed
      */
     public $call;
-
     /**
      * Adding external placeholders in `tpl` and `wrapperTpl`.
      *
      * @var array
      */
     public $addPlaceholders = [];
-
     /**
      * Params pagination
-     *          => array            - data of pagination as an array
-     *          => call             - data of pagination as an call
-     *          => toPlaceholder    - the name of global placeholder to adding the pagination
-     *          => pageLimit        - count buttons of pagination
-     *          => pageVar          - name url-argument of pagination ("page" by default)
-     *          => pageArgs         - url-arguments of pagination
-     *          => pageAnchor       - url-anchor of pagination
-     *          => wrapperTpl       - wrapper template of pagination
-     *          => pageNumTpl       - template for buttons
-     *          => pageActiveTpl    - template for active button
-     *          => pageFirstTpl     - template for button "first"
-     *          => pageLastTpl      - template for button  "last"
+     *          - array data of pagination as an array
+     *          - call  data of pagination as an call
+     *          - toPlaceholder the name of global placeholder to adding the pagination
+     *          - pageLimit        count buttons of pagination
+     *          - pageVar          name url-argument of pagination ("page" by default)
+     *          - pageArgs         url-arguments of pagination
+     *          - pageAnchor       url-anchor of pagination
+     *          - wrapperTpl       wrapper template for pagination
+     *          - pageNumTpl       template for buttons
+     *          - pageActiveTpl    template for active button
+     *          - pageFirstTpl     template for button "first"
+     *          - pageLastTpl      template for button  "last"
      *
      * @var array
      */
     public $pagination = [];
-
     /**
-     * Prepare item
+     * Prepare item.
+     *
      * @var array
      *
      * ```php
@@ -146,39 +143,35 @@ class ListView extends Snippet
     public $prepare;
 
     /**
-     * name of template
+     * Name/inline template for items.
      *
      * @var string
      */
     public $tpl;
 
     /**
-     * name of wrapper template
+     * Name/inline wrapper template for snippet.
      *
      * @var string
      */
     public $wrapperTpl;
-
     /**
-     * result to global placeholder (name of global placeholder)
+     * Result to global placeholder (name of global placeholder).
      *
      * @var string
      */
     public $toPlaceholder;
-
     /**
-     * text of error
+     * Text of error.
      *
      * @var string
      */
     public $errorText = '';
-
     /**
      * @var int|bool
      */
     public $autoEscape = false;
         
-
 
     public function get()
     {
@@ -194,7 +187,7 @@ class ListView extends Snippet
     }
 
     /**
-     * Get text of error
+     * Get text of error.
      *
      * @return string
      */
@@ -218,7 +211,7 @@ class ListView extends Snippet
     }
 
     /**
-     * Adding pagination
+     * Adding pagination.
      *
      * @return void
      */
@@ -261,7 +254,7 @@ class ListView extends Snippet
 
 
     /**
-     * Parsing template
+     * Parsing template.
      *
      * @return string|null
      */
@@ -341,9 +334,9 @@ class ListView extends Snippet
     }
 
     /**
-     * Inserting content into wrapper template
+     * Inserting content into wrapper template.
      *
-     * @param string $value - content
+     * @param string $value content
      * @param array  $placeholders
      * @return string
      */

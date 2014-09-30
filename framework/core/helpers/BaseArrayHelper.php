@@ -9,22 +9,18 @@ class BaseArrayHelper
      * If need chunk of keys
      */
     const TRACE = 0x01;
-
     /**
      * Escape string quotes
      */
     const ESCAPE = 0x01;
-
     /**
      *  Associative array
      */
     const ASSOC = 0x02;
-
     /**
      * Move element to top
      */
     const MOVE_HEAD = 0x01;
-
     /**
      * Move element to tail
      */
@@ -125,8 +121,8 @@ class BaseArrayHelper
      * Set value in array.
      *
      * @param array $array
-     * @param array|string $keys    chain keys of the array element
-     * @param mixed $value - value of array
+     * @param array|string $keys chain keys of the array element
+     * @param mixed $value value of array
      * @return array
      */
     public static function setValue(array &$array, $keys, $value = null)
@@ -150,9 +146,9 @@ class BaseArrayHelper
     }
 
     /**
-     * Convert object to multi-array (recursive)
+     * Convert object to multi-array (recursive).
      *
-     * @param mixed $value   - current object
+     * @param mixed $value   current object
      * @param array $only    list of items whose value needs to be returned.
      * @param array $exclude list of items whose value should NOT be returned.
      * @param bool   $unserialize
@@ -186,7 +182,7 @@ class BaseArrayHelper
     }
 
     /**
-     * Map recursive
+     * Map recursive.
      *
      * @param array    $array
      * @param callable $callback
@@ -195,7 +191,7 @@ class BaseArrayHelper
      * @param int      $count
      * @return array
      */
-    public static function map(array $array, \Closure $callback, $recursive = false, $depth = null, &$count = 0)
+    public static function map(array $array, callable $callback, $recursive = false, $depth = null, &$count = 0)
     {
         foreach ($array as $key => $value) {
             if (isset($depth) && $count === $depth) {
@@ -213,7 +209,7 @@ class BaseArrayHelper
     }
 
     /**
-     * Convert multi-array to single-array
+     * Convert multi-array to single-array.
      *
      * ```php
      * $array = [
@@ -248,9 +244,9 @@ class BaseArrayHelper
     }
 
     /**
-     * Convert single-array to multi-array
+     * Convert single-array to multi-array.
      *
-     * ~~~
+     * ```php
      * $array = ['aa'=>'text', 'bb.aa' => 'text2', 'cc.aa.gg' => 'text3'];
      * $result = ArrayHelper::toMulti($array);
      * the result is: [
@@ -261,7 +257,7 @@ class BaseArrayHelper
      *                              ['gg' => 'text3']
      *                          ]
      *                   ]
-     * ~~~
+     * ```
      *
      * @param array  $data
      * @param string $separator
@@ -290,13 +286,13 @@ class BaseArrayHelper
     }
 
     /**
-     * Move element of array (top, bottom)
+     * Move element of array (top, bottom).
      *
-     * @param array      $array     - current array
-     * @param string|int $key       - key to move
-     * @param int        $move     - constant
-     *                              => MOVE_HEAD      - move head
-     *                              => MOVE_TAIL    - move tail
+     * @param array      $array current array
+     * @param string|int $key  key to move
+     * @param int        $move constant
+     *                         - `MOVE_HEAD` move head
+     *                         - `MOVE_TAIL` move tail
      * @return array
      */
     public static function moveElement(array $array, $key, $move = self::MOVE_HEAD)
@@ -318,11 +314,11 @@ class BaseArrayHelper
     }
 
     /**
-     * Get found element by value
+     * Get found element by value.
      *
-     * @param string $needle - needle value
-     * @param array  $array  - current array
-     * @param array  $keys   - trace keys
+     * @param string $needle needle value
+     * @param array  $array  current array
+     * @param array  $keys   trace keys
      * @param bool   $toArray
      * @return array|bool
      */
@@ -334,12 +330,12 @@ class BaseArrayHelper
     }
 
     /**
-     * Search
+     * Search.
      *
-     * @param string $needle - needle value/key
-     * @param array  $array  - current array
-     * @param array  $keys   - trace keys
-     * @param int    $const  - constants
+     * @param string $needle needle value/key
+     * @param array  $array  current array
+     * @param array  $keys   trace keys
+     * @param int    $const  constants
      * @param bool   $toArray
      * @throws ArrayException
      * @return string|array
@@ -381,11 +377,11 @@ class BaseArrayHelper
     }
 
     /**
-     * Get found elements by value
+     * Get found elements by value.
      *
-     * @param string $needle - needle value
-     * @param array  $array  - current array
-     * @param array  $keys   - trace keys
+     * @param string $needle needle value
+     * @param array  $array  current array
+     * @param array  $keys   trace keys
      * @param bool   $toArray
      * @return array|null
      */
@@ -397,12 +393,12 @@ class BaseArrayHelper
     }
 
     /**
-     * Search All
+     * Search All.
      *
-     * @param string $needle - needle value/key
-     * @param array  $array  - current array
-     * @param array  $keys   - trace keys
-     * @param int    $const  - constants
+     * @param string $needle needle value/key
+     * @param array  $array  current array
+     * @param array  $keys   trace keys
+     * @param int    $const  constants
      * @param bool   $toArray
      * @throws ArrayException
      * @return null|array
@@ -448,9 +444,9 @@ class BaseArrayHelper
     /**
      * Get found element by key.
      *
-     * @param string $needle - needle key
-     * @param array  $array  - current array
-     * @param array  $keys   - trace keys
+     * @param string $needle needle key
+     * @param array  $array  current array
+     * @param array  $keys   trace keys
      * @param bool   $toArray
      * @return array|null
      */
@@ -462,11 +458,11 @@ class BaseArrayHelper
     }
 
     /**
-     * Get found elements by key
+     * Get found elements by key.
      *
-     * @param string $needle - needle key
-     * @param array  $array  - current array
-     * @param array  $keys   - trace keys
+     * @param string $needle needle key
+     * @param array  $array  current array
+     * @param array  $keys   trace keys
      * @param bool   $toArray
      * @return array|null
      */
@@ -478,11 +474,11 @@ class BaseArrayHelper
     }
 
     /**
-     * Get found element by value (use RegExp-pattern)
+     * Get found element by value (use RegExp-pattern).
      *
-     * @param string $pattern - RegExp-pattern
-     * @param array  $array   - current array
-     * @param array  $keys    - trace keys
+     * @param string $pattern RegExp-pattern
+     * @param array  $array   current array
+     * @param array  $keys    trace keys
      * @param bool   $toArray
      * @return array|null
      */
@@ -492,11 +488,11 @@ class BaseArrayHelper
     }
 
     /**
-     * Get found elements by value (use RegExp-pattern)
+     * Get found elements by value (use RegExp-pattern).
      *
-     * @param string $pattern - RegExp-pattern
-     * @param array  $array   - current array
-     * @param array  $keys    - trace keys
+     * @param string $pattern RegExp-pattern
+     * @param array  $array   current array
+     * @param array  $keys    trace keys
      * @param bool   $toArray
      * @return array|null
      */
@@ -506,11 +502,11 @@ class BaseArrayHelper
     }
 
     /**
-     * Get found element by key (use RegExp-pattern)
+     * Get found element by key (use RegExp-pattern).
      *
-     * @param string $pattern - RegExp-pattern
-     * @param array  $array   - current array
-     * @param array  $keys    - trace keys
+     * @param string $pattern RegExp-pattern
+     * @param array  $array   current array
+     * @param array  $keys    trace keys
      * @param bool   $toArray
      * @return array|null
      */
@@ -520,11 +516,11 @@ class BaseArrayHelper
     }
 
     /**
-     * Get found elements by key (use RegExp-pattern)
+     * Get found elements by key (use RegExp-pattern).
      *
-     * @param string $pattern - RegExp-pattern
-     * @param array  $array   - current array
-     * @param array  $keys    - trace keys
+     * @param string $pattern RegExp-pattern
+     * @param array  $array   current array
+     * @param array  $keys    trace keys
      * @param bool   $toArray
      * @return array|null
      */
@@ -534,12 +530,12 @@ class BaseArrayHelper
     }
 
     /**
-     * Filter by Column
+     * Filter by Column.
      *
-     * @param array           $array    - current array
-     * @param array|string    $keys     - names keys
-     * @param string|int|null $indexKey - the column to use as the index/keys for the returned array
-     * @param bool            $multi    - multi-array
+     * @param array           $array    current array
+     * @param array|string    $keys     names keys
+     * @param string|int|null $indexKey the column to use as the index/keys for the returned array
+     * @param bool            $multi    multi-array
      * @return array
      */
     public static function filterColumn(array $array, $keys = null, $indexKey = null, $multi = false)
@@ -567,7 +563,7 @@ class BaseArrayHelper
      * Filter by Column
      *
      * @param array|string|null $keys
-     * @param array             $value - value of array
+     * @param array             $value value of array
      * @return array|null
      */
     private static function _filterColumn($keys = null, array $value)
@@ -627,7 +623,7 @@ class BaseArrayHelper
      * ```
      *
      * @param array           $array the array that needs to be indexed
-     * @param string|\Closure $key   the column name or anonymous function whose result will be used to index the array
+     * @param string|callable $key   the column name or anonymous function whose result will be used to index the array
      * @return array the indexed array
      */
     public static function index($array, $key)
@@ -668,7 +664,7 @@ class BaseArrayHelper
      * ```
      *
      * @param array|object          $array   array or object to extract value from
-     * @param string|array|\Closure $key     key name of the array element, or property name of the object,
+     * @param string|array|callable $key     key name of the array element, or property name of the object,
      *                                       or an anonymous function returning the value. The anonymous function signature should be:
      *                                       `function($array, $defaultValue)`.
      * @param mixed                 $default the default value to be returned if the specified key does not exist
@@ -706,8 +702,8 @@ class BaseArrayHelper
     }
 
     /**
-     * @param array $keys  - keys
-     * @param array $array - current array
+     * @param array $keys  keys
+     * @param array $array current array
      * @param mixed $default
      * @return mixed
      */
@@ -730,10 +726,10 @@ class BaseArrayHelper
     /**
      * Merge key with value
      *
-     * @param array  $array     - current array
-     * @param string $separator - separator
-     * @param int    $const     - constant
-     *                          => ESCAPE - escape value quotes
+     * @param array  $array     current array
+     * @param string $separator  separator
+     * @param int    $const     constant
+     *                          - `ESCAPE` escape value quotes
      * @return array
      */
     public static function concatKeyValue(array $array, $separator = '=', $const = 0)
@@ -758,7 +754,7 @@ class BaseArrayHelper
      *
      * For example,
      *
-     * ~~~
+     * ```php
      * $array = [
      *     ['id' => '123', 'name' => 'aaa', 'class' => 'x'],
      *     ['id' => '124', 'name' => 'bbb', 'class' => 'x'],
@@ -784,12 +780,12 @@ class BaseArrayHelper
      * //         '345' => 'ccc',
      * //     ],
      * // ]
-     * ~~~
+     * ```
      *
      * @param array           $array
-     * @param string|\Closure $from
-     * @param string|\Closure $to
-     * @param string|\Closure $group
+     * @param string|callable $from
+     * @param string|callable $to
+     * @param string|callable $group
      * @return array
      */
     public static function group($array, $from, $to, $group = null)
@@ -822,8 +818,8 @@ class BaseArrayHelper
     /**
      * Depth
      *
-     * @param array $array - current array
-     * @param bool  $onlyFirst - only first element
+     * @param array $array current array
+     * @param bool  $onlyFirst only first element
      * @throws ArrayException
      * @return int
      */
@@ -920,7 +916,7 @@ class BaseArrayHelper
     /**
      * Sorts an array of objects or arrays (with the same structure) by one or several keys.
      * @param array $array the array to be sorted. The array will be modified after calling this method.
-     * @param string|\Closure|array $key the key(s) to be sorted by. This refers to a key name of the sub-array
+     * @param string|callable|array $key the key(s) to be sorted by. This refers to a key name of the sub-array
      * elements, a property name of the objects, or an anonymous function returning the values for comparison
      * purpose. The anonymous function signature should be: `function($item)`.
      * To sort by multiple keys, provide an array of keys here.
@@ -982,7 +978,7 @@ class BaseArrayHelper
      * ```
      *
      * @param array           $array
-     * @param \Closure|string $name
+     * @param callable|string $name
      * @param boolean         $keepKeys whether to maintain the array keys. If false, the resulting array
      *                                  will be re-indexed with integers.
      * @return array the list of column values
