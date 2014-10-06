@@ -13,7 +13,6 @@ use rock\helpers\Helper;
 use rock\helpers\Sanitize;
 use rock\helpers\String;
 use rock\request\RequestInterface;
-use rock\response\Response;
 use rock\Rock;
 
 class Route implements RequestInterface, ErrorsInterface
@@ -277,7 +276,7 @@ class Route implements RequestInterface, ErrorsInterface
 
 
     /**
-     * Manager URL by Application
+     * Manager URL by Application.
      *
      * @throws Exception
      */
@@ -346,9 +345,9 @@ class Route implements RequestInterface, ErrorsInterface
     }
 
     /**
-     * Match url
+     * Match url.
      *
-     * @param string $pattern - regexp-pattern
+     * @param string $pattern regexp-pattern
      * @param string $url
      * @return bool
      */
@@ -371,7 +370,7 @@ class Route implements RequestInterface, ErrorsInterface
     }
 
     /**
-     * Available Request Method
+     * Available Request Method.
      *
      * @param string[] $verbs
      * @return bool
@@ -540,16 +539,13 @@ class Route implements RequestInterface, ErrorsInterface
         return true;
     }
 
-
     protected function callAction(\Closure $handler)
     {
         $result = call_user_func($handler, $this->data);
 
-        /**
-         * echo other format json, xml...
-         */
+        // echo other format json, xml...
         if (isset($result)) {
-            Response::$data = $result;
+            Rock::$app->response->data = $result;
         }
     }
 

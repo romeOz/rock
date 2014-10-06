@@ -47,13 +47,18 @@ class ContentNegotiatorFilterTest extends \PHPUnit_Framework_TestCase
 {
     public static function setUpBeforeClass()
     {
-        Response::$format = Response::FORMAT_HTML;
+        Rock::$app->response->format = Response::FORMAT_HTML;
+    }
+
+    protected function tearDown()
+    {
+        Rock::$app->response->isSent = false;
     }
 
     public function test_()
     {
         $controller = new FooController();
-        Response::$data = $controller->method('actionIndex');
+        Rock::$app->response->data = $controller->method('actionIndex');
         $this->assertSame(Rock::$app->language, i18nInterface::EN);
         Rock::$app->response->send();
         $this->expectOutputString(json_encode(['foo', 'bar']));
@@ -61,7 +66,7 @@ class ContentNegotiatorFilterTest extends \PHPUnit_Framework_TestCase
 
     public static function tearDownAfterClass()
     {
-        Response::$format = Response::FORMAT_HTML;
+        Rock::$app->response->format = Response::FORMAT_HTML;
     }
 }
  

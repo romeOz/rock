@@ -49,7 +49,7 @@ class XmlResponseFormatter implements ResponseFormatterInterface
         $dom = new DOMDocument($this->version, $charset);
         $root = new DOMElement($this->rootTag);
         $dom->appendChild($root);
-        $this->buildXml($root, $response::$data);
+        $this->buildXml($root, $response->data);
         $response->content = trim($dom->saveXML());
     }
 

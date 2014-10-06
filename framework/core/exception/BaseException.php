@@ -78,7 +78,7 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
      */
     public static function displayFatal()
     {
-        $response = new Response();
+        $response = Rock::$app->response;
         if ($response->getStatusCode() === 200) {
             $response->status500();
         }
@@ -147,7 +147,7 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
     public static function debuger()
     {
         $run = new Run();
-        switch (Response::$format) {
+        switch (Rock::$app->response->format) {
             case Response::FORMAT_JSON:
                 $handler = new JsonResponseHandler();
                 break;
@@ -157,7 +157,7 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
             default:
                 $handler = new PrettyPageHandler();
         }
-        $response = new Response();
+        $response = Rock::$app->response;
         if ($response->getStatusCode() !== 200) {
             $run->setSendHttpCode($response->getStatusCode());
         }
@@ -250,7 +250,7 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
     protected function display($level = self::ERROR, $msg, \Exception $handler = null)
     {
         if ($level > static::$level) {
-            if (DEBUG === true || Response::$format !== Response::FORMAT_HTML) {
+            if (DEBUG === true || Rock::$app->response->format !== Response::FORMAT_HTML) {
                 static::debuger()->handleException(isset($handler) ? $handler : $this);
                 return;
             }

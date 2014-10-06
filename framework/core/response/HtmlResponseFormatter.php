@@ -24,7 +24,7 @@ class HtmlResponseFormatter implements ResponseFormatterInterface
             $this->contentType .= '; charset=' . $response->charset;
         }
         $response->getHeaders()->set('Content-Type', $this->contentType);
-        $response->content = $response::$data;
+        $response->content = $response->data;
     }
 
 } 

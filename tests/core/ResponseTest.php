@@ -13,7 +13,7 @@ class JsonController extends Controller
 {
     public function actionIndex()
     {
-        Response::$format = Response::FORMAT_JSON;
+        Rock::$app->response->format = Response::FORMAT_JSON;
 
         return [
             'foo' => 'text',
@@ -26,7 +26,7 @@ class XmlController extends Controller
 {
     public function actionIndex()
     {
-        Response::$format = Response::FORMAT_XML;
+        Rock::$app->response->format = Response::FORMAT_XML;
 
         return [
             'foo' => 'text',
@@ -42,8 +42,14 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 {
     public static function setUpBeforeClass()
     {
-        Response::$format = Response::FORMAT_HTML;
+        Rock::$app->response->format = Response::FORMAT_HTML;
     }
+
+    protected function tearDown()
+    {
+        Rock::$app->response->isSent = false;
+    }
+
 
     public function testGetJson()
     {
@@ -80,6 +86,6 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
     public static function tearDownAfterClass()
     {
-        Response::$format = Response::FORMAT_HTML;
+        Rock::$app->response->format = Response::FORMAT_HTML;
     }
 }

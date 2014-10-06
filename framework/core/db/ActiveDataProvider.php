@@ -10,6 +10,7 @@ use rock\helpers\Pagination;
 use rock\helpers\Sanitize;
 use rock\request\Request;
 use rock\response\Response;
+use rock\Rock;
 
 /**
  * ActiveDataProvider implements a data provider based on [[\rock\db\Query]] and [[\rock\db\ActiveQuery]].
@@ -265,7 +266,8 @@ class ActiveDataProvider
 
     protected function addHeaders($total, array $data)
     {
-        if (Response::$format == Response::FORMAT_HTML || empty($data)) {
+        $response = Rock::$app->response;
+        if ($response->format == Response::FORMAT_HTML || empty($data)) {
             return;
         }
 
@@ -286,7 +288,7 @@ class ActiveDataProvider
             $links[] = "<{$absoluteUrl}?{$data['pageVar']}={$data['pageLast']}>; rel=last";
         }
 
-        (new Response())->getHeaders()
+        $response->getHeaders()
             ->set('X-Pagination-Total-Count', $total)
             ->set('X-Pagination-Page-Count', $data['pageCount'])
             ->set('X-Pagination-Current-Page', $data['pageCurrent'])

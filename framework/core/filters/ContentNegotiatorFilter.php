@@ -132,7 +132,7 @@ class ContentNegotiatorFilter extends ActionFilter
             Rock::$app->language = $this->negotiateLanguage($request);
         }
         if (isset($this->sendCSRF)) {
-            $response::$sendCSRF = $this->sendCSRF;
+            $response->sendCSRF = $this->sendCSRF;
         }
     }
 
@@ -146,7 +146,7 @@ class ContentNegotiatorFilter extends ActionFilter
     {
         if (!empty($this->formatParam) && ($format = Request::get($this->formatParam)) !== null) {
             if (in_array($format, $this->formats)) {
-                $response::$format = $format;
+                $response->format = $format;
                 $response->acceptMimeType = null;
                 $response->acceptParams = [];
                 return;
@@ -161,7 +161,7 @@ class ContentNegotiatorFilter extends ActionFilter
         }
         foreach ($types as $type => $params) {
             if (isset($this->formats[$type])) {
-                $response::$format = $this->formats[$type];
+                $response->format = $this->formats[$type];
                 $response->acceptMimeType = $type;
                 $response->acceptParams = $params;
                 return;
@@ -171,7 +171,7 @@ class ContentNegotiatorFilter extends ActionFilter
         if (isset($types['*/*'])) {
             // return the first format
             foreach ($this->formats as $type => $format) {
-                $response::$format = $this->formats[$type];
+                $response->format = $this->formats[$type];
                 $response->acceptMimeType = $type;
                 $response->acceptParams = [];
                 return;

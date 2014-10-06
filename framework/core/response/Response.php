@@ -103,7 +103,7 @@ class Response
      * You may customize the formatting process or support additional formats by configuring @see Response::formatters .
      * @see formatters
      */
-    public static $format = self::FORMAT_HTML;
+    public $format = self::FORMAT_HTML;
     /**
      * @var string the MIME type (e.g. `application/json`) from the request ACCEPT header chosen for this response.
      * This property is mainly set by @see ContentNegotiatorFilter.
@@ -129,7 +129,7 @@ class Response
      * according to @see Response::format when the response is being sent out.
      * @see content
      */
-    public static $data;
+    public $data;
     /**
      * @var string the response content.
      * When @see Response::data is not null, it will be converted
@@ -154,7 +154,7 @@ class Response
      * @var string the HTTP status description that comes together with the status code.
      * @see httpStatuses
      */
-    public static $statusText = 'OK';
+    public $statusText = 'OK';
     /**
      * @var string the version of the HTTP protocol to use. If not set, it will be determined via `$_SERVER['SERVER_PROTOCOL']`,
      * or '1.1' if that is not available.
@@ -169,11 +169,11 @@ class Response
      * Sending CSRF-token.
      * @var bool
      */
-    public static $sendCSRF = false;
+    public $sendCSRF = false;
     /**
      * @var array list of HTTP status codes and the corresponding texts
      */
-    public static $httpStatuses = [
+    public $httpStatuses = [
         100 => 'Continue',
         101 => 'Switching Protocols',
         102 => 'Processing',
@@ -244,11 +244,11 @@ class Response
     /**
      * @var integer the HTTP status code to send with the response.
      */
-    private static $_statusCode = 200;
+    private $_statusCode = 200;
     /**
      * @var HeaderCollection
      */
-    private static $_headers;
+    private $_headers;
 
     /**
      * Initializes this component.
@@ -275,7 +275,7 @@ class Response
      */
     public function getStatusCode()
     {
-        return self::$_statusCode;
+        return $this->_statusCode;
     }
 
     /**
@@ -290,14 +290,14 @@ class Response
         if ($value === null) {
             $value = 200;
         }
-        self::$_statusCode = (int)$value;
+        $this->_statusCode = (int)$value;
         if ($this->getIsInvalid()) {
             throw new \Exception("The HTTP status code is invalid: $value");
         }
         if ($text === null) {
-            static::$statusText = isset(static::$httpStatuses[self::$_statusCode]) ? static::$httpStatuses[self::$_statusCode] : '';
+            $this->statusText = isset($this->httpStatuses[$this->_statusCode]) ? $this->httpStatuses[$this->_statusCode] : '';
         } else {
-            static::$statusText = $text;
+            $this->statusText = $text;
         }
     }
 
@@ -308,10 +308,10 @@ class Response
      */
     public function getHeaders()
     {
-        if (self::$_headers === null) {
-            self::$_headers = new HeaderCollection;
+        if ($this->_headers === null) {
+            $this->_headers = new HeaderCollection;
         }
-        return self::$_headers;
+        return $this->_headers;
     }
 
     /**
@@ -342,11 +342,11 @@ class Response
      */
     public function clear()
     {
-        self::$_headers = null;
+        $this->_headers = null;
         //$this->_cookies = null;
-        self::$_statusCode = 200;
-        static::$statusText = 'OK';
-        static::$data = null;
+        $this->_statusCode = 200;
+        $this->statusText = 'OK';
+        $this->data = null;
         $this->stream = null;
         $this->content = null;
         $this->isSent = false;
@@ -361,9 +361,9 @@ class Response
             return;
         }
         $statusCode = $this->getStatusCode();
-        $statusText = static::$statusText;
+        $statusText = $this->statusText;
         header("HTTP/{$this->version} $statusCode {$statusText}");
-        if (self::$_headers) {
+        if ($this->_headers) {
             $headers = $this->getHeaders();
             foreach ($headers as $name => $values) {
                 $name = str_replace(' ', '-', ucwords(str_replace('-', ' ', $name)));
@@ -502,7 +502,7 @@ class Response
             $this->content = $content;
         }
 
-        static::$format = self::FORMAT_RAW;
+        $this->format = self::FORMAT_RAW;
 
         return $this;
     }
@@ -549,7 +549,7 @@ class Response
             ->setDefault('Content-Transfer-Encoding', 'binary')
             ->setDefault('Content-Length', $length)
             ->setDefault('Content-Disposition', "attachment; filename=\"$attachmentName\"");
-        static::$format = self::FORMAT_RAW;
+        $this->format = self::FORMAT_RAW;
         $this->stream = [$handle, $begin, $end];
 
         return $this;
@@ -951,24 +951,24 @@ class Response
      */
     protected function prepare()
     {
-        if ($this->stream !== null || static::$data === null) {
+        if ($this->stream !== null || $this->data === null) {
             return;
         }
-        if (isset($this->formatters[static::$format])) {
-            $formatter = $this->formatters[static::$format];
+        if (isset($this->formatters[$this->format])) {
+            $formatter = $this->formatters[$this->format];
             if (!is_object($formatter)) {
-                $this->formatters[static::$format] = $formatter = Rock::factory($formatter);
+                $this->formatters[$this->format] = $formatter = Rock::factory($formatter);
             }
             if ($formatter instanceof ResponseFormatterInterface) {
                 $formatter->format($this);
             } else {
-                throw new Exception(Exception::CRITICAL, 'The ' . static::$format .
+                throw new Exception(Exception::CRITICAL, 'The ' . $this->format .
                                                          ' response formatter is invalid. It must implement the ResponseFormatterInterface.');
             }
-        } elseif (static::$format === self::FORMAT_RAW) {
-            $this->content = static::$data;
+        } elseif ($this->format === self::FORMAT_RAW) {
+            $this->content = $this->data;
         } else {
-            throw new Exception(Exception::CRITICAL, 'Unsupported response format: ' . static::$format);
+            throw new Exception(Exception::CRITICAL, 'Unsupported response format: ' . $this->format);
         }
         if (is_array($this->content)) {
             throw new Exception(Exception::CRITICAL, "Response content must not be an array.");
@@ -983,14 +983,14 @@ class Response
 
     protected function sendCSRF()
     {
-        if (!static::$sendCSRF) {
+        if (!$this->sendCSRF) {
             return;
         }
         $token = $this->Rock->token;
         $csrf = $token->create();
         if ($csrf) {
-            if (is_array(static::$data)) {
-                static::$data[$token->csrfParam] = $csrf;
+            if (is_array($this->data)) {
+                $this->data[$token->csrfParam] = $csrf;
             }
             $this->getHeaders()->add(Token::CSRF_HEADER, $csrf);
         }

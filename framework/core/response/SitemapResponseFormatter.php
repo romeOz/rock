@@ -57,7 +57,7 @@ class SitemapResponseFormatter implements ResponseFormatterInterface
         }
         $response->getHeaders()->set('Content-Type', $this->contentType);
 
-        foreach ($response::$data as $value) {
+        foreach ($response->data as $value) {
             $this->_sitemap->add($value['loc'], Helper::getValue($value['lastmod']), Helper::getValue($value['changefreq']), Helper::getValueIsset($value['priority']));
         }
 

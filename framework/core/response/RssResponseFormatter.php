@@ -71,7 +71,7 @@ class RssResponseFormatter implements ResponseFormatterInterface
         }
         $response->getHeaders()->set('Content-Type', $this->contentType);
 
-        $data = $response::$data;
+        $data = $response->data;
 
         if (!isset($data['language'])) {
             $this->_feedWriter->setChannelElement('language', $this->Rock->language);
