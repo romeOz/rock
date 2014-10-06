@@ -305,7 +305,6 @@ class QueryTest extends DatabaseTestCase
         $cache->flush();
         $cacheConfig = [
             'class' => CacheFile::className(),
-            'singleton' => true,
             'enabled' => false,
             'adapter' => function (){
                     return new FileManager([

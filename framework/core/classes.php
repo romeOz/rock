@@ -22,7 +22,6 @@ return array_merge(
     [
         'access' => [
             'class' => \rock\access\Access::className(),
-            'singleton' => true
         ],
 
         // Database
@@ -37,11 +36,9 @@ return array_merge(
         ],
         'BatchQueryResult' => [
             'class' => BatchQueryResult::className(),
-            //'singleton' => true,
         ],
         'cache' => [
             'class' => \rock\cache\CacheFile::className(),
-            'singleton' => true,
             'adapter' => function () {
                     return Rock::factory(
                         [
@@ -230,13 +227,11 @@ return array_merge(
 
         'eval' => [
             'class' => \rock\execute\CacheExecute::className(),
-            'singleton' => true,
         ],
 
 
         'i18n' => [
             'class' => \rock\i18n\i18n::className(),
-            'singleton' => true,
             'pathsDicts' => [
                 i18n::RU => [
                     '@common/lang/ru/lang.inc',
@@ -269,17 +264,14 @@ return array_merge(
 
         'mail' => [
             'class' => \rock\mail\Mail::className(),
-            'singleton' => true,
             'From' => 'support@' . (new \rock\request\Request())->getHost(),
             'FromName' => 'Rock Framework',
         ],
         'request' => [
             'class' => \rock\request\Request::className(),
-            'singleton' => true,
         ],
         'requestCollection' => [
             'class' => \rock\request\RequestCollection::className(),
-            'singleton' => true,
         ],
         'response' => [
             'class' => \rock\response\Response::className(),
@@ -287,36 +279,33 @@ return array_merge(
         ],
         'htmlResponseFormatter' => [
             'class' => \rock\response\HtmlResponseFormatter::className(),
-            'singleton' => true,
+            //'singleton' => true,
         ],
         'jsonResponseFormatter' => [
             'class' => \rock\response\JsonResponseFormatter::className(),
-            'singleton' => true,
+            //'singleton' => true,
         ],
         'xmlResponseFormatter' => [
             'class' => \rock\response\XmlResponseFormatter::className(),
-            'singleton' => true,
+            //'singleton' => true,
         ],
         'rssResponseFormatter' => [
             'class' => \rock\response\RssResponseFormatter::className(),
-            'singleton' => true,
+            //'singleton' => true,
         ],
 
         'route' => [
             'class' => \rock\route\Route::className(),
-            'singleton' => true,
         ],
 
         'sphinx' => [
             'class' => \rock\sphinx\Connection::className(),
-            'singleton' => true,
             'dsn' => 'mysql:host=127.0.0.1;port=9306;charset=utf8;',
             'username' => '',
             'password' => '',
         ],
         'session' => [
             'class' => \rock\session\Session::className(),
-            'singleton' => true,
             'cookieParams' => [
                 'httponly' => true,
                 'lifetime' => 60 * 60 * 24 * 60,
@@ -325,12 +314,10 @@ return array_merge(
         ],
         'cookie' => [
             'class' => \rock\cookie\Cookie::className(),
-            'singleton' => true
         ],
 
         'dataImage' => [
             'class' => \rock\image\DataProvider::className(),
-            'singleton' => true,
             'adapterImage' => function () {
                     return Rock::factory(
                         [
@@ -368,19 +355,16 @@ return array_merge(
         ],
         'token' => [
             'class' => \rock\token\Token::className(),
-            'singleton' => true,
         ],
         'url' => [
             'class' => \rock\url\Url::className(),
         ],
         'validation' => [
             'class' => \rock\validation\Validation::className(),
-            'singleton' => true,
             'locale' => function (Validation $validation){ $validation::$locale = Rock::$app->language;}
         ],
         'captcha' => [
             'class' => \rock\captcha\Captcha::className(),
-            'singleton' => true,
             /**
              * Captcha string length
              */
@@ -399,26 +383,21 @@ return array_merge(
         ],
         'user' => [
             'class' => \rock\user\User::className(),
-            'singleton' => true,
             'container' => 'user',
         ],
 
         'activeData' => [
             'class' => \rock\db\ActiveDataProvider::className(),
-            'singleton' => true,
         ],
         'di' => [
             'class' => \rock\di\Container::className(),
-            'singleton' => true,
         ],
         'log' => [
             'class' => \rock\log\Log::className(),
-            'singleton' => true,
         ],
 
         'behavior' => [
             'class' => \rock\base\Behavior::className(),
-            'singleton' => true
         ],
         \rock\filters\AccessFilter::className() => [
             'class' => \rock\filters\AccessFilter::className(),
@@ -434,7 +413,6 @@ return array_merge(
         ],
         'rbac' =>[
             'class' => \rock\rbac\DBManager::className(),
-            'singleton' => true,
         ],
         'markdown' =>[
             'class' => \rock\markdown\Markdown::className(),
@@ -483,21 +461,17 @@ return array_merge(
         ],
         'security' => [
             'class' => Security::className(),
-            'singleton' => true,
             'deriveKeyStrategy' => 'hmac', // for PHP version < 5.5.0
             //'deriveKeyStrategy' => 'pbkdf2', // for PHP version >= 5.5.0
         ],
         Role::className() =>[
             'class' => Role::className(),
-            'singleton' => true,
         ],
         Permission::className() =>[
             'class' => Permission::className(),
-            'singleton' => true,
         ],
         UserRole::className() =>[
             'class' => UserRole::className(),
-            'singleton' => true,
         ],
     ],
     require(__DIR__ . '/widgets.php'),

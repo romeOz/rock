@@ -193,15 +193,12 @@ class SnippetTest extends \PHPUnit_Framework_TestCase {
         static::tearDownAfterClass();
         Rock::$app->di[TestSnippet::className()] = [
             'class' => TestSnippet::className(),
-            'singleton' => true
         ];
         Rock::$app->di[SnippetAccessTrue::className()] = [
             'class' => SnippetAccessTrue::className(),
-            'singleton' => true
         ];
         Rock::$app->di[SnippetAccessFalse::className()] = [
             'class' => SnippetAccessFalse::className(),
-            'singleton' => true
         ];
     }
 

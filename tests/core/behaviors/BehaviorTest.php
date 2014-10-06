@@ -88,11 +88,9 @@ class BehaviorTest extends \PHPUnit_Framework_TestCase
     {
         Rock::$app->di[Foo::className()] = [
             'class' => Foo::className(),
-            'singleton' => true,
         ];
         Rock::$app->di[FooController::className()] = [
             'class' => FooController::className(),
-            'singleton' => true,
         ];
         /** @var ComponentsInterface $controller */
         $controller = Rock::$app->{FooController::className()};
@@ -136,11 +134,9 @@ class BehaviorTest extends \PHPUnit_Framework_TestCase
     {
         Rock::$app->di[Foo::className()] = [
             'class' => Foo::className(),
-            'singleton' => true,
         ];
         Rock::$app->di[FooController::className()] = [
             'class' => FooController::className(),
-            'singleton' => true,
         ];
         /** @var ComponentsInterface $controllerBehavior */
         $controllerBehavior = Rock::$app->{FooController::className()};
@@ -160,11 +156,9 @@ class BehaviorTest extends \PHPUnit_Framework_TestCase
     {
         Rock::$app->di[Foo::className()] = [
             'class' => Foo::className(),
-            'singleton' => true,
         ];
         Rock::$app->di[FooController::className()] = [
             'class' => FooController::className(),
-            'singleton' => true,
         ];
         /** @var ComponentsInterface $controllerBehavior */
         $controllerBehavior = Rock::$app->{FooController::className()};
@@ -186,11 +180,9 @@ class BehaviorTest extends \PHPUnit_Framework_TestCase
     {
         Rock::$app->di[Foo::className()] = [
             'class' => Foo::className(),
-            'singleton' => true,
         ];
         Rock::$app->di[FooController::className()] = [
             'class' => FooController::className(),
-            'singleton' => true,
         ];
         /** @var ComponentsInterface $controllerBehavior */
         $controllerBehavior = Rock::$app->{FooController::className()};

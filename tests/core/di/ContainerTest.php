@@ -184,10 +184,10 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($foo->param, 'test');
 
         $foo = Rock::factory(new Bar, 'test', ['class'=>Foo::className(), 'baz' => Rock::factory(Baz::className())]);
-        $this->assertNull($foo->bar);
-        $this->assertNull($foo->baz2);
+        $this->assertTrue($foo->bar instanceof Bar);
         $this->assertTrue($foo->baz instanceof Baz);
-        $this->assertNull($foo->param);
+        $this->assertTrue($foo->baz2 instanceof Baz);
+        $this->assertSame($foo->param, 'test');
 
 
         /** inline class */

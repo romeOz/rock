@@ -49,7 +49,6 @@ require(dirname(__DIR__) . '/framework/mixins.php');
 
 Rock::$app->di['cache'] = [
     'class' => CacheFile::className(),
-    'singleton' => true,
     'enabled' => false,
     'adapter' => function (){
             return new FileManager([
@@ -63,25 +62,21 @@ Rock::$app->di['cache'] = [
 
 Rock::$app->di['session'] = [
     'class' => SessionMock::className(),
-    'singleton' => true,
 ];
 Rock::$app->session->open();
 Rock::$app->di['cookie'] = [
     'class' => CookieMock::className(),
-    'singleton' => true,
 ];
 
 
 
 Rock::$app->di['eval'] = [
     'class' => CacheExecute::className(),
-    'singleton' => true,
     'path' => '@tests/runtime/cache/_execute'
 ];
 
 Rock::$app->di['rbac'] = [
     'class' => PhpManager::className(),
-    'singleton' => true,
     'path' => '@tests/core/rbac/src/rbac.php'
 ];
 

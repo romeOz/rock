@@ -321,23 +321,18 @@ class SnippetBehaviorsTest extends \PHPUnit_Framework_TestCase
         static::tearDownAfterClass();
         Rock::$app->di[TestSnippet::className()] = [
             'class' => TestSnippet::className(),
-            'singleton' => true
         ];
         Rock::$app->di[SnippetAccessTrue::className()] = [
             'class' => SnippetAccessTrue::className(),
-            'singleton' => true,
         ];
         Rock::$app->di[SnippetAccessFalse::className()] = [
             'class' => SnippetAccessFalse::className(),
-            'singleton' => true
         ];
         Rock::$app->di[SnippetFilters::className()] = [
             'class' => SnippetFilters::className(),
-            'singleton' => true
         ];
         Rock::$app->di[SnippetValidationFalse::className()] = [
             'class' => SnippetValidationFalse::className(),
-            'singleton' => true
         ];
     }
 
@@ -396,7 +391,6 @@ class SnippetBehaviorsTest extends \PHPUnit_Framework_TestCase
     {
        Rock::$app->di[SnippetBehaviorEvent::className()] = [
             'class' => SnippetBehaviorEvent::className(),
-            'singleton' => true,
         ];
         /** @var ComponentsInterface $snippetBehaviorEvent */
         $snippetBehaviorEvent = Rock::$app->{SnippetBehaviorEvent::className()};
@@ -416,7 +410,6 @@ class SnippetBehaviorsTest extends \PHPUnit_Framework_TestCase
     {
         Rock::$app->di[SnippetBehaviorEvent::className()] = [
             'class' => SnippetBehaviorEvent::className(),
-            'singleton' => true,
         ];
 
         /** @var ComponentsInterface $snippetBehaviorEvent */
@@ -447,11 +440,9 @@ class SnippetBehaviorsTest extends \PHPUnit_Framework_TestCase
     {
         Rock::$app->di[Foo::className()] = [
             'class' => Foo::className(),
-            'singleton' => true,
         ];
         Rock::$app->di[SnippetBehavior::className()] = [
             'class' => SnippetBehavior::className(),
-            'singleton' => true,
         ];
 
 
@@ -468,12 +459,10 @@ class SnippetBehaviorsTest extends \PHPUnit_Framework_TestCase
     {
         Rock::$app->di[Foo::className()] = [
             'class' => Foo::className(),
-            'singleton' => true,
         ];
 
         Rock::$app->di[SnippetBehavior::className()] = [
             'class' => SnippetBehavior::className(),
-            'singleton' => true,
         ];
         $snippetBehavior = Rock::$app->{SnippetBehavior::className()};
         $snippetBehavior->detachBehaviors();
@@ -489,12 +478,10 @@ class SnippetBehaviorsTest extends \PHPUnit_Framework_TestCase
     {
         Rock::$app->di[Foo::className()] = [
             'class' => Foo::className(),
-            'singleton' => true,
         ];
 
         Rock::$app->di[SnippetBehavior::className()] = [
             'class' => SnippetBehavior::className(),
-            'singleton' => true,
         ];
         $snippetBehavior = Rock::$app->{SnippetBehavior::className()};
 

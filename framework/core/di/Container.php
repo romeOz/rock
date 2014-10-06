@@ -12,11 +12,11 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
 {
     use ObjectTrait;
     /**
-     * Get instance
+     * Get instance.
      *
      * @param string|array $configs the configuration. It can be either a string representing the class name
      *                             or an array representing the object configuration.
-     * @param mixed ...,$configs - arguments for object
+     * @param mixed ...,$configs arguments for object.
      * @throws Exception
      * @return null|ObjectInterface
      */
@@ -34,11 +34,8 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
             return static::newInstance($class, [$configs], $args);
         }
         $data = static::_provide($class);
-
-        /**
-         * Lazy (single instance)
-         */
-        if (static::hasSingleton($class)) {
+        // Lazy (single instance)
+        if (static::isSingleton($class)) {
             $instance = static::getSingleton($data, $configs, $args);
 
             return $instance;
@@ -48,11 +45,10 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
         return $instance;
     }
 
-
     /**
-     * Exists dependency
+     * Exists dependency.
      *
-     * @param string $name - name/alias of class
+     * @param string $name name/alias of class.
      * @return bool
      */
     public static function has($name)
@@ -60,14 +56,13 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
         return !empty(static::$classNames[$name]) || !empty(static::$classAliases[$name]);
     }
 
-
     /**
-     * Is single of class
+     * Is single of class.
      *
-     * @param string $name - name/alias of class
+     * @param string $name name/alias of class.
      * @return null
      */
-    public static function hasSingleton($name)
+    public static function isSingleton($name)
     {
         if (!static::has($name)) {
             return false;
@@ -115,7 +110,7 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
     }
 
     /**
-     * Get data by classes
+     * Get data by classes.
      *
      * @param bool  $alias by alias
      * @param array $only  list of items whose value needs to be returned.
@@ -144,9 +139,9 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
     }
 
     /**
-     * Get data of class
+     * Get data of class.
      *
-     * @param string $name - name/alias of class
+     * @param string $name name/alias of class.
      * @return null|array
      */
     public function offsetGet($name)
@@ -155,9 +150,9 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
     }
 
     /**
-     * Get data of class
+     * Get data of class.
      *
-     * @param string $name - name/alias of class
+     * @param string $name name/alias of class.
      * @return null|array
      */
     public static function get($name)
@@ -171,9 +166,9 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
     }
 
     /**
-     * Registry dependency
+     * Registry dependency.
      *
-     * @param string $alias - alias of class
+     * @param string $alias alias of class.
      * @param array  $config
      */
     public function offsetSet($alias, $config)
@@ -182,11 +177,11 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
     }
 
     /**
-     * Registry dependency
-     * ~~~~~~~~~~~~~~~~~~~~~~
-     * array(class_alias => <array> params)
-     * ~~~~~~~~~~~~~~~~~~~~~~~
+     * Registry dependency.
      *
+     * ```php
+     * ['class_alias' => $params]
+     * ```
      * @param array $dependencies
      */
     public static function addMulti(array $dependencies)
@@ -197,9 +192,9 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
     }
 
     /**
-     * Registry dependency
+     * Registry dependency.
      *
-     * @param string $alias - alias of class
+     * @param string $alias alias of class.
      * @param array|\Closure  $config
      * @throws Exception
      */
@@ -229,7 +224,7 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
 
 
     /**
-     * @param string $name - name/alias of class
+     * @param string $name name/alias of class.
      */
     public function offsetUnset($name)
     {
@@ -242,18 +237,17 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
     }
 
     /**
-     * @param string $name - name/alias of class
+     * @param string $name name/alias of class.
      */
     public static function remove($name)
     {
         unset(static::$classNames[$name], static::$classAliases[$name], static::$instances[$name]);
     }
 
-
     /**
-     * Get data of class
+     * Get data of class.
      *
-     * @param string $name - name/alias of class
+     * @param string $name name/alias of class.
      * @return mixed
      */
     public function __get($name)
@@ -262,9 +256,9 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
     }
 
     /**
-     * Registry dependency
+     * Registry dependency.
      *
-     * @param string $alias - alias of class
+     * @param string $alias alias of class.
      * @param array $config
      */
     public function __set($alias, $config)
@@ -273,7 +267,7 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
     }
 
     /**
-     * @param array $names - names/aliases of classes
+     * @param array $names names/aliases of classes.
      * @return mixed
      */
     public static function getMulti(array $names)
@@ -287,7 +281,7 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
     }
 
     /**
-     * @param array $names
+     * @param array $names names/aliases of classes.
      */
     public static function removeMulti(array $names)
     {
@@ -296,22 +290,20 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
         }
     }
 
-
-
     /**
-     * Array of pointers to a single instance
+     * Array of pointers to a single instance.
      *
      * @var array
      */
     protected static $instances = [];
     /**
-     * Aliases of class by dependencies
+     * Aliases of class by dependencies.
      *
      * @var array
      */
     protected static $classAliases = [];
     /**
-     * Names of class by dependencies
+     * Names of class by dependencies.
      *
      * @var array
      */
@@ -334,7 +326,7 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
     }
 
     /**
-     * Call SetProperty
+     * Call SetProperty.
      *
      * @param ObjectInterface  $object
      * @param array $data
@@ -346,26 +338,24 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
 //        if (!ObjectHelper::instanceOfTrait($object, ObjectTrait::className())) {
 //            return;
 //        }
-        $object->reset();
+        //$object->reset();
         ObjectHelper::setProperties($object, !empty($configs) ? $configs : $data['properties']);
         call_user_func_array([$object, 'init'], $args);
     }
 
     /**
-     * Get instance
+     * Get instance.
      *
-     * @param array $data - array data of dependency
+     * @param array $data array data of dependency.
      * @param array $configs
-     * @param array $args - array args of class
+     * @param array $args array args of class.
      * @throws Exception
      * @return object
      */
     protected static function getInstance(array $data, array $configs = [], array $args = [])
     {
         $class = $data['class'];
-        /**
-         * if is closure
-         */
+        // if is closure
         if ($data['class'] instanceof \Closure) {
             return call_user_func(
                 $data['class'],
@@ -460,11 +450,10 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
         return [$class, $config];
     }
 
-
     /**
-     * Get dependency
+     * Get dependency.
      *
-     * @param string $name - name/alias of class
+     * @param string $name name/alias of class.
      * @return null|array|\Closure
      */
     protected static function _provide($name)

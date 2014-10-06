@@ -11,7 +11,6 @@ use rock\template\Template;
 return [
     'route' => [
         'class' => \rock\route\Route::className(),
-        'singleton' => true,
         'rules' =>
             [
                 [
