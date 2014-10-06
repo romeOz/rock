@@ -4,8 +4,6 @@ namespace rock\cookie;
 
 
 use rock\base\CollectionInterface;
-use rock\base\ComponentsTrait;
-use rock\base\ObjectTrait;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Sanitize;
 use rock\helpers\Serialize;
@@ -19,20 +17,11 @@ class Cookie extends SessionFlash implements \ArrayAccess, CollectionInterface, 
      * @var array
      */
     protected static $data = [];
-
     /**
      * Serialize handler
      * @var int
      */
     public $serializator = self::SERIALIZE_PHP;
-
-
-    /**
-     * Max iteration
-     * @var int
-     */
-    public $maxPrepare = 70;
-
     /**
      * Filter sanitize
      * @var array
@@ -42,7 +31,6 @@ class Cookie extends SessionFlash implements \ArrayAccess, CollectionInterface, 
      * @var string domain of the cookie
      */
     public $domain = '';
-
     /**
      * @var integer the timestamp at which the cookie expires. This is the server timestamp.
      * Defaults to 0, meaning "until the browser is closed".
@@ -252,7 +240,6 @@ class Cookie extends SessionFlash implements \ArrayAccess, CollectionInterface, 
         }
     }
 
-
     protected function prepare(array $filters = null)
     {
         if (empty($_COOKIE)) {
@@ -261,6 +248,4 @@ class Cookie extends SessionFlash implements \ArrayAccess, CollectionInterface, 
 
         return static::$data = Sanitize::sanitize(Serialize::unserializeRecursive($_COOKIE), $filters);
     }
-
-
 }

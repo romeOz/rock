@@ -306,6 +306,7 @@ return array_merge(
         ],
         'session' => [
             'class' => \rock\session\Session::className(),
+            'singleton' => true,
             'cookieParams' => [
                 'httponly' => true,
                 'lifetime' => 60 * 60 * 24 * 60,
@@ -314,6 +315,7 @@ return array_merge(
         ],
         'cookie' => [
             'class' => \rock\cookie\Cookie::className(),
+            'singleton' => true,
         ],
 
         'dataImage' => [

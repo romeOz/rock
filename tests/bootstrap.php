@@ -62,10 +62,12 @@ Rock::$app->di['cache'] = [
 
 Rock::$app->di['session'] = [
     'class' => SessionMock::className(),
+    'singleton' => true
 ];
 Rock::$app->session->open();
 Rock::$app->di['cookie'] = [
     'class' => CookieMock::className(),
+    'singleton' => true
 ];
 
 

@@ -3,7 +3,6 @@ namespace rock\captcha;
 
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
-use rock\base\ObjectTrait;
 use rock\helpers\Helper;
 
 /**
@@ -453,6 +452,8 @@ class Captcha implements ComponentsInterface, CaptchaInterface
 
     /**
      * Display captcha.
+     *
+     * @param bool $session
      */
     public function display($session = true)
     {

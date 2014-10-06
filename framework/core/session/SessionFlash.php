@@ -20,7 +20,7 @@ abstract class SessionFlash implements ComponentsInterface
 
     /**
      * Updates the counters for flash messages and removes outdated flash messages.
-     * This method should only be called once in [[init()]].
+     * This method should only be called once in @see init() .
      */
     protected function updateFlashCounters()
     {

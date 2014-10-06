@@ -110,7 +110,7 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
         } else {
             $error = error_get_last();
             $message = isset($error['message']) ? $error['message'] : 'Failed to start session.';
-            new Exception (Exception::ERROR, $message);
+            throw new Exception (Exception::ERROR, $message);
         }
     }
 

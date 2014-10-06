@@ -25,6 +25,11 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         static::sessionDown();
     }
 
+    protected function removeFlash(array $data)
+    {
+        unset($data['__flash']);
+        return $data;
+    }
 
     /**
      * @dataProvider providerGet
@@ -92,19 +97,19 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     {
         $_SESSION = ['id' => 1, 'title' => 'text3', 'params' => ['param_1', 'param_2']];
         $this->assertSame(
-            Rock::$app->session->getAll(),
-            ['id' => 1, 'title' => 'text3', 'params' => ['param_1', 'param_2']]
+            ['id' => 1, 'title' => 'text3', 'params' => ['param_1', 'param_2']],
+            Rock::$app->session->getAll([], ['__flash'])
         );
-        $this->assertSame(Rock::$app->session->getAll(['title', 'params'], ['params']), ['title' => 'text3']);
+        $this->assertSame(['title' => 'text3'], Rock::$app->session->getAll(['title', 'params'], ['params', '__flash']));
     }
 
     public function testGetIterator()
     {
         $_SESSION = ['id' => 1, 'title' => 'text3', 'params' => ['param_1', 'param_2']];
-        $this->assertSame(Rock::$app->session->getIterator([], ['title'])->current(), 1);
+        $this->assertSame(1, Rock::$app->session->getIterator([], ['title'])->current());
         $this->assertSame(
-            Rock::$app->session->getIterator([], ['title'])->getArrayCopy(),
-            ['id' => 1, 'params' => ['param_1', 'param_2']]
+            ['id' => 1, 'params' => ['param_1', 'param_2']],
+            $this->removeFlash(Rock::$app->session->getIterator([], ['title'])->getArrayCopy())
         );
     }
 
@@ -128,67 +133,66 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     {
         Rock::$app->session->addMulti(['id' => 1, 'title' => 'text3', 'params' => ['param_1', 'param_2']]);
         $this->assertSame(
-            Rock::$app->session->getAll(),
-            ['id' => 1, 'title' => 'text3', 'params' => ['param_1', 'param_2']]
+            ['id' => 1, 'title' => 'text3', 'params' => ['param_1', 'param_2']],
+            $this->removeFlash(Rock::$app->session->getAll())
         );
 
         Rock::$app->session->add(['params', 1], 'change');
         $this->assertSame(
-            Rock::$app->session->getAll(),
-            ['id' => 1, 'title' => 'text3', 'params' => ['param_1', 'change']]
+            ['id' => 1, 'title' => 'text3', 'params' => ['param_1', 'change']],
+            $this->removeFlash(Rock::$app->session->getAll())
         );
         Rock::$app->session->add('params.0', 'change');
         $this->assertSame(
-            Rock::$app->session->getAll(),
-            ['id' => 1, 'title' => 'text3', 'params' => ['change', 'change']]
+            ['id' => 1, 'title' => 'text3', 'params' => ['change', 'change']],
+            $this->removeFlash(Rock::$app->session->getAll())
         );
     }
 
     public function testRemove()
     {
         $_SESSION = ['id' => 1, 'title' => 'text3', 'params' => ['param_1', 'param_2']];
-        Rock::$app->session->remove('params.1');
-        $this->assertSame(Rock::$app->session->getAll(), ['id' => 1, 'title' => 'text3', 'params' => ['param_1']]);
+        $session =Rock::$app->session;
+        $session->remove('params.1');
+        $this->assertSame(['id' => 1, 'title' => 'text3', 'params' => ['param_1']], $this->removeFlash($session->getAll()));
         Rock::$app->session->removeMulti(['id', 'params']);
-        $this->assertSame(Rock::$app->session->getAll(), ['title' => 'text3']);
+        $this->assertSame(['title' => 'text3'], $this->removeFlash(Rock::$app->session->getAll()));
     }
 
     public function testSetFlash()
     {
-        Rock::$app->session->setFlash('flash_1', 'text');
-        $this->assertSame(Rock::$app->session->getFlash('flash_1'), 'text');
+        $session = Rock::$app->session;
+        $session->setFlash('flash_1', 'text');
+        $this->assertSame($session->getFlash('flash_1'), 'text');
         $this->assertSame(
-            Rock::$app->session->getAll(),
             array(
                 'flash_1' => 'text',
-                '__flash' =>
-                    array(
-                        'flash_1' => 0,
-                    ),
-            )
+            ),
+            $this->removeFlash($session->getAll())
         );
     }
 
     public function testGetAllFlashes()
     {
-        Rock::$app->session->setFlash('flash_1', 'text');
-        Rock::$app->session->setFlash('flash_2');
+        $session = Rock::$app->session;
+        $session->setFlash('flash_1', 'text');
+        $session->setFlash('flash_2');
         $this->assertSame(
-            Rock::$app->session->getAllFlashes(),
             array(
                 'flash_1' => 'text',
                 'flash_2' => true,
-            )
+            ),
+            $session->getAllFlashes()
         );
-        Rock::$app->session->removeFlash('flash_2');
+        $session->removeFlash('flash_2');
         $this->assertSame(
-            Rock::$app->session->getAllFlashes(),
             array(
                 'flash_1' => 'text',
-            )
+            ),
+            $session->getAllFlashes()
         );
-        Rock::$app->session->removeAllFlashes();
-        $this->assertSame(Rock::$app->session->getAllFlashes(), []);
+        $session->removeAllFlashes();
+        $this->assertSame([], $session->getAllFlashes());
     }
 }
  
