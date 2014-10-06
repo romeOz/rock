@@ -81,9 +81,9 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
     public static function displayFatal()
     {
         $response = new Response();
-        //if ($response->getStatusCode() === 200) {
+        if ($response->getStatusCode() === 200) {
             $response->status500();
-        //}
+        }
         $response->send();
         if (!isset(static::$pathFatal) ||
             !file_exists(Rock::getAlias(static::$pathFatal))
@@ -253,11 +253,11 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
      */
     protected function display($level = self::ERROR, $msg, \Exception $handler = null)
     {
-        if (DEBUG === true && $level > static::$level) {
-            static::debuger()->handleException(isset($handler) ? $handler : $this);
-            return;
-        }
         if ($level > static::$level) {
+            if (DEBUG === true || Response::$format !== Response::FORMAT_HTML) {
+                static::debuger()->handleException(isset($handler) ? $handler : $this);
+                return;
+            }
             static::displayFatal();
         }
         $className = explode('\\', get_class($this));
