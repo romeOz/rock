@@ -35,10 +35,10 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
     /**
      * Constructor
      *
-     * @param int|string      $level       - type of exception
-     * @param string|null     $msg         - message or code
-     * @param array|null      $dataReplace - array replace
-     * @param \Exception|null $handler     - handler
+     * @param int|string      $level       type of exception
+     * @param string|null     $msg         message or code
+     * @param array|null      $dataReplace array replace
+     * @param \Exception|null $handler     handler
      */
     public function __construct($level = self::ERROR, $msg = null, array $dataReplace = [], \Exception $handler = null) {
         if (isset($handler)) {
@@ -55,18 +55,16 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
         $this->display($level, $this->message, $handler);
     }
 
-
-
     /**
      * log
      *
-     * @param string $msg         - message
+     * @param string $msg         error message
      * @param int    $level
-     * @param array  $trace       - data of trace
-     *                            => class    - name of class
-     *                            => method   - name of method
-     *                            => file     - path to file
-     *                            => line     - line fo file
+     * @param array  $trace       data of trace
+     *                            - class:  name of class
+     *                            - method: name of method
+     *                            - file:   path to file
+     *                            - line:   line fo file
      * @return bool
      */
     public static function log($level = self::ERROR, $msg, $trace = null)
@@ -98,12 +96,12 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
     /**
      * Get exception
      *
-     * @param string $name - key
+     * @param string $key key of exception
      * @return array|string
      */
-    public static function get($name)
+    public static function get($key)
     {
-        return Helper::getValue(self::$_exceptions[$name]);
+        return Helper::getValue(self::$_exceptions[$key]);
     }
 
     /**
@@ -129,8 +127,8 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
     }
 
     /**
-     * Set path by fatal page
-     * @param string $path
+     * Set path to fatal template
+     * @param string $path path to fatal template
      * @throws Exception
      */
     public static function setPathFatal($path)
@@ -225,8 +223,8 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
     /**
      * Get log message
      *
-     * @param string|null $msg         - message
-     * @param array|null  $dataReplace - array replace
+     * @param string|null $msg         error message
+     * @param array|null  $dataReplace array replace
      * @return null|string
      */
     protected function prepareMsg($msg = null, array $dataReplace = [])
@@ -238,17 +236,15 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
         return $msg;
     }
 
-
-
     /**
      * Display error
      *
-     * @param string     $msg       - message
-     * @param int        $level     - type of exception
-     *                              => FATAL
-     *                              => WARNING
-     *                              => ERROR
-     *                              => INFO
+     * @param string     $msg       error message
+     * @param int        $level     type of exception
+     *                              - `FATAL`
+     *                              - `WARNING`
+     *                              - `ERROR`
+     *                              - `INFO`
      * @param \Exception $handler
      */
     protected function display($level = self::ERROR, $msg, \Exception $handler = null)

@@ -11,7 +11,7 @@ use rock\helpers\ArrayHelper;
 class User implements \ArrayAccess, CollectionInterface, StorageInterface, ComponentsInterface
 {
     use ComponentsTrait;
-    
+
     /** @var  CollectionInterface */
     protected static $storage;
     /**
