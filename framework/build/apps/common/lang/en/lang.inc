@@ -57,6 +57,7 @@ return [
     'loginLogout' => 'You\'re logged in. Authorization is required to <a id="logout" href="{{url}}" rel="nofollow">logout</a> of your profile',
     'signupLogout' => 'You\'re logged in. The registration must be <a id="logout" href="{{url}}" rel="nofollow">logout</a> of your profile',
     'recoveryLogout' => 'You\'re logged in. To recover the password required to <a id="logout" href="{{url}}" rel="nofollow">logout</a> of your profile',
+    'commentsNote' => 'In the message, use markup language <a href="http://ru.wikipedia.org/wiki/Markdown" target="_blank">Markdown</a>.',
     'notJs' => 'Your browser does not support JavaScript. Try to fix this in the browser settings.',
     'logout' => 'logout',
     'notContent' => 'content is empty',

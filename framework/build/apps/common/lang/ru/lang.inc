@@ -72,7 +72,7 @@ return [
     'loginLogout' => 'Вы авторизированы. Для повторной авторизации требуется <a id="logout" href="{{url}}" rel="nofollow">выйти</a> из своего профиля.',
     'signupLogout' => 'Вы авторизированы. Для регистрации требуется <a id="logout" href="{{url}}" rel="nofollow">выйти</a> из своего профиля.',
     'recoveryLogout' => 'Вы авторизированы. Для для восстановлении пароля требуется <a id="logout" href="{{url}}" rel="nofollow">выйти</a> из своего профиля.',
-    'commentsNote' => 'В сообщении допускается использование облегчённого языка разметки <a href="http://ru.wikipedia.org/wiki/Markdown">Markdown</a>.',
+    'commentsNote' => 'В сообщении допускается использование облегчённого языка разметки <a href="http://ru.wikipedia.org/wiki/Markdown" target="_blank">Markdown</a>.',
     'logout' => 'выход',
     'characters' => 'символов',
     'failHTTPRequest' => 'Ошибка HTTP-запроса.',
