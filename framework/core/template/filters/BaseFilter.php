@@ -176,15 +176,19 @@ class BaseFilter implements ThumbInterface
      *                       - class    attr `class`
      *                       - alt      attr `alt`
      *                       - constant
+     *                       - dummy
      * @return string
      */
     public static function thumb($path, array $params)
     {
         if (empty($path)) {
-            return '';
+            if (empty($params['dummy'])) {
+                return '';
+            }
+            $path = $params['dummy'];
         }
 
-        $const = Helper::getValueIsset($params['const'], 0);
+        $const = Helper::getValueIsset($params['const'], 1);
         $dataImage = Rock::$app->dataImage;
         $src = $dataImage->get($path, Helper::getValue($params['w']), Helper::getValue($params['h']));
 
@@ -194,6 +198,6 @@ class BaseFilter implements ThumbInterface
         }
 
         unset($params['h'], $params['w'], $params['type'], $params['const']);
-        return Html::img($src, $params);
+        return $const & self::OUTPUT_IMG ? Html::img($src, $params) : $src;
     }
 }

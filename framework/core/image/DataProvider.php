@@ -5,7 +5,6 @@ namespace rock\image;
 
 
 use rock\base\ComponentsTrait;
-use rock\base\ObjectTrait;
 use rock\file\FileManager;
 use rock\helpers\Image;
 use rock\Rock;

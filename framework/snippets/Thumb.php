@@ -40,24 +40,25 @@ class Thumb extends Snippet implements ThumbInterface
      * @var
      */
     public $class;
-
     /**
      * attr "alt"
      * @var
      */
     public $alt;
-    
     public $title;
-
-    public $const;
-
+    /** @var  string */
+    public $dummy;
+    public $const = 1;
     public $autoEscape = false;
     
 
     public function get()
     {
         if (empty($this->src)) {
-            return '';
+            if (empty($this->dummy)) {
+                return '';
+            }
+            $this->src = $this->dummy;
         }
 
         $options = [
@@ -65,7 +66,6 @@ class Thumb extends Snippet implements ThumbInterface
             'alt' => $this->alt,
             'title' => $this->title,
         ];
-
 
         $dataImage = Rock::$app->dataImage;
         $src = $dataImage->get($this->src, $this->w, $this->h);
@@ -75,6 +75,6 @@ class Thumb extends Snippet implements ThumbInterface
             $options['height'] = $dataImage->height;
         }
 
-        return Html::img($src, $options);
+        return (int)$this->const & self::OUTPUT_IMG ? Html::img($src, $options) : $src;
     }
 }
