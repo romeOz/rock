@@ -26,7 +26,7 @@ abstract class Controller implements ComponentsInterface
             $this->template = $this->Rock->template;
             $this->template->context = $this;
             if (!$this->template->hasResource('context')) {
-                Rock::$app->currentController = $this;
+                Rock::$app->controller = $this;
                 $this->template->addMultiResources(static::defaultData());
             }
         }

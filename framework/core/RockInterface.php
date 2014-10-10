@@ -9,7 +9,7 @@ namespace rock;
  * @property-read string $language
  * @property-read string[] $allowLanguages
  * @property-read string $charset
- * @property-read \rock\base\Controller $currentController
+ * @property-read \rock\base\Controller $controller
  * @property-read string $name
  * @property-read \rock\cache\CacheInterface                                            $cache
  * @property-read \rock\db\Connection                                           $db

@@ -6,6 +6,7 @@ use apps\common\models\users\Users;
 use League\Flysystem\Util;
 use rock\base\ClassName;
 use rock\base\Config;
+use rock\base\Controller;
 use rock\di\Container;
 use rock\event\Event;
 use rock\exception\Exception;
@@ -43,7 +44,11 @@ class Rock
      * @var array
      */
     public $allowLanguages = [i18nInterface::EN, i18nInterface::RU];
-    public $currentController;
+    /**
+     * Current controller
+     * @var Controller
+     */
+    public $controller;
     /**
      * @var string the application name.
      */
