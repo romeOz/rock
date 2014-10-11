@@ -20,8 +20,8 @@ class Markdown extends MarkdownExtra
     public $users = [];
     public $handlerLinkByUsername;
     public $denyTags = [];
-    public $customAttributesTags = [
-        'a' => [
+    public $defaultAttributes = [
+        'link' => [
             'rel' => 'nofollow'
         ]
     ];
@@ -53,38 +53,6 @@ class Markdown extends MarkdownExtra
         return trim(parent::parse($text));
     }
 
-    protected function inlineMarkers()
-    {
-        return parent::inlineMarkers() + [
-            'http'  => 'parseUrl',
-            'ftp'   => 'parseUrl',
-            '@'   => 'parseUsernameLink',
-        ];
-    }
-
-
-    protected function parseUsernameLink($markdown)
-    {
-        if (!preg_match('/@(?P<username>[^\s]+)/', $markdown, $matches)) {
-            return $markdown;
-        }
-        $url = '#';
-        if ($this->handlerLinkByUsername instanceof \Closure &&
-            $_url = call_user_func($this->handlerLinkByUsername, $matches['username'], $this)
-        ) {
-            $url = $_url;
-            $this->users[] = $matches['username'];
-        }
-
-        $url = htmlspecialchars($url, ENT_COMPAT | ENT_HTML401, 'UTF-8');
-        $username = htmlspecialchars($matches['username'], ENT_COMPAT | ENT_HTML401, 'UTF-8');
-        $markdown = str_replace("@{$matches['username']}", '<a href="'.$url.'" title="'.$username.'">@'.$username.'</a>', $markdown);
-        return [
-            $markdown,
-            mb_strlen($markdown, 'UTF-8')
-        ];
-    }
-
 
     protected function renderCode($block)
     {
@@ -92,42 +60,45 @@ class Markdown extends MarkdownExtra
     }
 
 
-    protected function consumeUsernameLink($lines, $current)
+    /**
+     * @marker @
+     */
+    protected function parseUsernameLink($markdown)
     {
-        $username =  ltrim($lines[$current], '@');
-        $url = '#';
+        if (preg_match('/@(?P<username>[^\s\.\,]+)/', $markdown, $matches)) {
+
+            return [
+                // return the parsed tag as an element of the abstract syntax tree and call `parseInline()` to allow
+                // other inline markdown elements inside this tag
+                ['username', $this->parseInline($matches[1])],
+                // return the offset of the parsed text
+                strlen($matches[0])
+            ];
+        }
+
+        return [['text', '@'], 1];
+    }
+
+    protected function renderUsername($element)
+    {
+        $username = $this->renderAbsy($element[1]);
+        $url = '';
         if ($this->handlerLinkByUsername instanceof \Closure &&
-            $_url = call_user_func($this->handlerLinkByUsername, $username, $this)
-        ) {
-            $url = $_url;
+            ($url = call_user_func($this->handlerLinkByUsername, $username, $this))) {
             $this->users[] = $username;
         }
-        $block = [
-            'type' => 'usernameLink',
-            //'content' => [],
-            'url' => $url,
-            'title' => $username,
-            'text' => $lines[$current]
-        ];
 
-        return [$block, $current];
+        $url = $url ? htmlspecialchars($url, ENT_COMPAT | ENT_HTML401, 'UTF-8') : '#';
+        $username = htmlspecialchars($username, ENT_COMPAT | ENT_HTML401, 'UTF-8');
+        return '<a href="'.$url.'" title="'.$username.'">@'.$username.'</a>';
     }
 
-    protected function renderUsernameLink($block)
+    protected function identifyTable($line, $lines, $current)
     {
-        $block['url'] = htmlspecialchars($block['url'], ENT_COMPAT | ENT_HTML401, 'UTF-8');
-        $block['title'] = htmlspecialchars($block['title'], ENT_COMPAT | ENT_HTML401, 'UTF-8');
-        $block['text'] = htmlspecialchars($block['text'], ENT_COMPAT | ENT_HTML401, 'UTF-8');
-        return '<a href="'.$block['url'].'" title="'.$block['title'].'">'.$block['text'].'</a>';
-    }
-
-    protected function identifyTable($lines, $current)
-    {
-        if (strpos($lines[$current], '|') !== false && preg_match('~|.*|~', $lines[$current]) && preg_match('~^[\s\|\:-]+$~', $lines[$current + 1])) {
+        if (strpos($line, '|') !== false && preg_match('~|.*|~', $line) && preg_match('~^[\s\|\:-]+$~', $lines[$current + 1])) {
             return true;
         }
-
-        if (isset($lines[$current+1]) && strpos($lines[$current], '{') !== false  && strpos($lines[$current+1], '|') !== false && preg_match('~|.*|~', $lines[$current+1]) && preg_match('~^[\s\|\:-]+$~', $lines[$current + 2])) {
+        if (isset($lines[$current+1]) && strpos($line, '{') !== false  && strpos($lines[$current+1], '|') !== false && preg_match('~|.*|~', $lines[$current+1]) && preg_match('~^[\s\|\:-]+$~', $lines[$current + 2])) {
             return true;
         }
         return false;
@@ -170,7 +141,7 @@ class Markdown extends MarkdownExtra
         foreach($block['rows'] as $row) {
             $this->_tableCellTag = $first ? 'th' : 'td';
             $align = empty($this->_tableCellAlign[$this->_tableCellCount]) ? '' : ' align="' . $this->_tableCellAlign[$this->_tableCellCount++] . '"';
-            $tds = "<$this->_tableCellTag$align>" . $this->parseInline($row) . "</$this->_tableCellTag>";
+            $tds = "<$this->_tableCellTag$align>" . $this->renderAbsy($this->parseInline($row)) . "</$this->_tableCellTag>";
             $content .= "<tr>$tds</tr>\n";
             if ($first) {
                 $content .= "</thead>\n<tbody>\n";
@@ -187,105 +158,164 @@ class Markdown extends MarkdownExtra
 
     }
 
+    /**
+     * @marker |
+     */
     protected function parseTd($markdown)
     {
-        if ($this->context[1] === 'table') {
+        if (isset($this->context[1]) && $this->context[1] === 'table') {
             $align = empty($this->_tableCellAlign[$this->_tableCellCount]) ? '' : ' align="' . $this->_tableCellAlign[$this->_tableCellCount++] . '"';
-            return ["</$this->_tableCellTag><$this->_tableCellTag$align>", isset($markdown[1]) && $markdown[1] === ' ' ? 2 : 1];
+            return [['text', "</$this->_tableCellTag><$this->_tableCellTag$align>"], isset($markdown[1]) && $markdown[1] === ' ' ? 2 : 1];
         }
-        return [$markdown[0], 1];
+        return [['text', $markdown[0]], 1];
     }
 
 
-    /**
-     * Parses a link indicated by `[`.
-     */
-    protected function parseLink($markdown)
+    protected function renderLink($block)
     {
-        if (!in_array('parseLink', array_slice($this->context, 1)) && ($parts = $this->parseLinkOrImage($markdown)) !== false) {
-            list($text, $url, $title, $offset, $refKey, $data) = $parts;
-
-            $attributes = '';
-            $specialAttributes = [];
-            if (isset($this->references[$refKey]['attributes'])) {
-                $specialAttributes[] = $this->references[$refKey]['attributes'];
+        if (isset($block['refkey'])) {
+            if (($ref = $this->lookupReference($block['refkey'])) !== false) {
+                $block = array_merge($block, $ref);
+            } else {
+                return $block['orig'];
             }
-            if (!empty($data['special'])) {
-                $specialAttributes[] = $data['special'];
-            }
-            if (isset($markdown[$offset]) && $markdown[$offset] === '{' && preg_match("~^$this->_specialAttributesRegex~", substr($markdown, $offset), $matches)) {
-                $attributes = $matches[1];
-                $offset += strlen($matches[0]);
-            }
-            if (!empty($specialAttributes)) {
-                $attributes = $this->renderAttributes(['attributes' => implode(' ', $specialAttributes)]);
-            }
-            if (!empty($this->customAttributesTags['a'])) {
-                $attributes = implode(' ', [$this->renderOtherAttributes($this->customAttributesTags['a']), $attributes]);
-            }
-
-            $link = '<a href="' . htmlspecialchars($url, ENT_COMPAT | ENT_HTML401, 'UTF-8') . '"'
-                    . (empty($title) ? '' : ' title="' . htmlspecialchars($title, ENT_COMPAT | ENT_HTML401, 'UTF-8') . '"')
-                    . $attributes . '>' . $this->parseInline($text) . '</a>';
-
-            return [$link, $offset];
-        } else {
-            return parent::parseLink($markdown);
         }
+        $defaultAttributes = '';
+        if (!empty($this->defaultAttributes['link'])) {
+            $block = $this->concatSpecialAttributes($block, $this->defaultAttributes['link']);
+            $defaultAttributes = $this->renderOtherAttributes($this->defaultAttributes['link']);
+        }
+        $attributes = $this->renderAttributes($block);
+        return '<a href="' . htmlspecialchars($block['url'], ENT_COMPAT | ENT_HTML401, 'UTF-8') . '"'
+               . (empty($block['title']) ? '' : ' title="' . htmlspecialchars($block['title'], ENT_COMPAT | ENT_HTML401 | ENT_SUBSTITUTE, 'UTF-8') . '"')
+               . $attributes
+               . (!empty($defaultAttributes) ? ' ' . $defaultAttributes : '')
+               .'>' . (!empty($block['text']) ? $this->renderAbsy($block['text']) : '') . '</a>';
     }
 
     /**
      * Parses an image indicated by `![`.
+     * @marker ![
      */
     protected function parseImage($markdown)
     {
         if (($parts = $this->parseLinkOrImage(substr($markdown, 1))) !== false) {
-            list($text, $url, $title, $offset, $refKey, $data) = $parts;
-
-            $specialAttributes = [];
-            $attributes = '';
-            if (isset($this->references[$refKey]['attributes'])) {
-                $specialAttributes[] = $this->references[$refKey]['attributes'];
-            }
-            if (!empty($data['special'])) {
-                $specialAttributes[] = $data['special'];
-            }
-            if (isset($markdown[$offset + 1]) && $markdown[$offset + 1] === '{' && preg_match("~^$this->_specialAttributesRegex~", substr($markdown, $offset + 1), $matches)) {
-                $specialAttributes[] = $matches[1];
-                $offset += strlen($matches[0]);
-            }
-            if (!empty($specialAttributes)) {
-                $attributes = $this->renderAttributes(['attributes' => implode(' ', $specialAttributes)]);
-            }
+            list($text, $url, $title, $offset, $key, $data) = $parts;
             if (isset($data['macros'])) {
                 if ($this->isTag('thumb') && $data['macros'] === 'thumb' && isset($data['width'])) {
                     $url = $this->dataImage->get( '/' . ltrim($url, '/'), $data['width'], $data['height']);
                 } elseif ($this->isTag('video') && $data['macros'] !== 'thumb') {
-                    $video = $this->parseVideo(
-                        $data['macros'],
+                    $video = $this->calculateVideo(
                         $url,
                         Helper::getValue($data['width'], $this->defaultWidthVideo),
                         Helper::getValue($data['height'], $this->defaultHeightVideo),
-                        Helper::getValue($title),
-                        $specialAttributes
-                    );
+                        Helper::getValue($title)
 
-                    return [$video, $offset + 1];
+                    );
+                    //return [['text', $video], $offset + 1];
+                    $video['refkey'] = $key;
+                    $video['orig'] = substr($markdown, 0, $offset + 1);
+                    $video['hosting'] = $data['macros'];
+                    return [
+                        $video,
+                        $offset + 1
+                    ];
                 }
             }
-            $image = '<img src="' . htmlspecialchars($url, ENT_COMPAT | ENT_HTML401, 'UTF-8') . '"'
-                     . ' alt="' . htmlspecialchars($text, ENT_COMPAT | ENT_HTML401, 'UTF-8') . '"'
-                     . (empty($title) ? '' : ' title="' . htmlspecialchars($title, ENT_COMPAT | ENT_HTML401, 'UTF-8') . '"')
-                     . $attributes . ($this->html5 ? '>' : ' />');
-
-            return [$image, $offset + 1];
+            return [
+                [
+                    'image',
+                    'text' => $text,
+                    'url' => $url,
+                    'title' => $title,
+                    'refkey' => $key,
+                    'orig' => substr($markdown, 0, $offset + 1),
+                ],
+                $offset + 1
+            ];
         } else {
-            return parent::parseImage($markdown);
+            // remove all starting [ markers to avoid next one to be parsed as link
+            $result = '!';
+            $i = 1;
+            while (isset($markdown[$i]) && $markdown[$i] == '[') {
+                $result .= '[';
+                $i++;
+            }
+            return [['text', $result], $i];
         }
     }
 
 
-    protected function parseVideo($hosting, $url, $width, $height, $title, array $specialAttributes)
+    protected function calculateVideo($url, $width, $height, $title)
+    {
+        if ($this->enabledDummy === true) {
+            return [
+                'a',
+                'text' => '',
+                'url' => $url,
+                'title' => $title,
+                'width' => $width,
+                'height' => $height,
+            ];
+        }
+
+        return [
+            'iframe',
+            'text' => '',
+            'url' => $url,
+            'title' => $title,
+            'width' => $width,
+            'height' => $height
+        ];
+    }
+
+    protected function renderIframe($block)
+    {
+        if (isset($block['refkey'])) {
+            if (($ref = $this->lookupReference($block['refkey'])) !== false) {
+                $block = array_merge($block, $ref);
+            } else {
+                return $block['orig'];
+            }
+        }
+        if (empty($block['hosting'])) {
+            $block['hosting'] = '';
+        }
+        $block['url'] = $this->getHostingUrl($block['hosting'], $block['url']);
+        $attributes = $this->renderAttributes($block);
+        return '<iframe src="' . htmlspecialchars($block['url'], ENT_COMPAT | ENT_HTML401, 'UTF-8') . '"'
+               . (empty($block['title']) ? '' : ' title="' . htmlspecialchars($block['title'], ENT_COMPAT | ENT_HTML401 | ENT_SUBSTITUTE, 'UTF-8') . '"')
+               . ' width="'.$block['width'].'"'
+               . ' height="'.$block['height'].'"'
+               . ' allowfullscreen="allowfullscreen"'
+               . ' frameborder="0"'
+               . $attributes . '></iframe>';
+    }
+
+    protected function renderA($block)
+    {
+        if (isset($block['refkey'])) {
+            if (($ref = $this->lookupReference($block['refkey'])) !== false) {
+                $block = array_merge($block, $ref);
+            } else {
+                return $block['orig'];
+            }
+        }
+        if (empty($block['attributes'])) {
+            $block['attributes'] = '';
+        }
+        if (empty($block['hosting'])) {
+            $block['hosting'] = '';
+        }
+        $block['url'] = $this->getHostingUrl($block['hosting'], $block['url']);
+        $block['attributes'] = "{$this->specialAttributesDummy} " . $block['attributes'];
+        $attributes = $this->renderAttributes($block);
+        return '<a href="' . htmlspecialchars($block['url'], ENT_COMPAT | ENT_HTML401, 'UTF-8') . '"'
+               . (empty($block['title']) ? '' : ' title="' . htmlspecialchars($block['title'], ENT_COMPAT | ENT_HTML401 | ENT_SUBSTITUTE, 'UTF-8') . '"')
+               . ' style="width: '.$block['width'].'px; height: '.$block['height'].'px" target="_blank" rel="nofollow" '.$attributes.'></a>';
+    }
+
+    protected function getHostingUrl($hosting, $url)
     {
         switch ($hosting) {
             case 'youtube':
@@ -312,36 +342,7 @@ class Markdown extends MarkdownExtra
             default:
                 throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_HOSTING, ['name' => $hosting]);
         }
-
-        if ($this->enabledDummy === true) {
-
-            $attributes = [
-                'style'=> "width: {$width}px; height: {$height}px",
-                'target' => '_blank',
-                'rel' => 'nofollow'
-            ];
-            $specialAttributes[] = $this->specialAttributesDummy;
-            $specialAttributes = implode(' ', $specialAttributes);
-            if (!empty($title)) {
-                $attributes['title'] = $title;
-            }
-            $attributes = implode(' ', [$this->renderOtherAttributes($attributes), $this->renderAttributes(['attributes' => $specialAttributes])]);
-            return '<a href="'.htmlspecialchars($url, ENT_COMPAT | ENT_HTML401, 'UTF-8').'"'.$attributes.'><img src="'.htmlspecialchars($this->imgDummy, ENT_COMPAT | ENT_HTML401, 'UTF-8').'"'
-                     . ($this->html5 ? '>' : ' />') . '</a>';
-        }
-        $specialAttributes = implode(' ', $specialAttributes);
-        $attributes = [
-            'frameborder' =>0,
-            'allowfullscreen' => 'allowfullscreen',
-            'width' => $width,
-            'height' => $height
-        ];
-        if (!empty($title)) {
-            $attributes['title'] = $title;
-        }
-        $attributes = implode(' ', [$this->renderOtherAttributes($attributes), $this->renderAttributes(['attributes' => $specialAttributes])]);
-
-        return '<iframe src="'.$url.'" '.$attributes.'></iframe>';
+        return $url;
     }
 
     protected function renderOtherAttributes(array $attributes)
@@ -354,6 +355,20 @@ class Markdown extends MarkdownExtra
         return  $result;
     }
 
+    protected function concatSpecialAttributes(array $block, &$defaultAttributes = null)
+    {
+        if (empty($defaultAttributes['specialAttributes'])) {
+            return $block;
+        }
+
+        if (empty($block['attributes'])) {
+            $block['attributes'] = '';
+        }
+        $block['attributes'] = "{$defaultAttributes['specialAttributes']} " . $block['attributes'];
+        unset($defaultAttributes['specialAttributes']);
+        return $block;
+    }
+
     protected function parseLinkOrImage($markdown)
     {
         if (($markdown = parent::parseLinkOrImage($markdown)) === false) {
@@ -361,12 +376,6 @@ class Markdown extends MarkdownExtra
         }
         list($text, $url, $title, $offset, $key) = $markdown;
         $specialAttributes  = [];
-        if (strpos($text, '{') !== false && preg_match("/{$this->_specialAttributesRegex}/", $text, $matches)) {
-            $text = trim(str_replace($matches[0],'', $text));
-        }
-        if (isset($matches[1])) {
-            $specialAttributes['special'] = $matches[1];
-        }
         if ($text[0] === ':') {
             if (preg_match('/:(?P<macros>thumb|youtube|vimeo|rutube|vk|dailymotion|sapo)/', $text, $matches)) {
                 $text = str_replace(":{$matches['macros']}", '', $text);
@@ -393,46 +402,45 @@ class Markdown extends MarkdownExtra
         }
         return parent::renderAttributes($block);
     }
-    /**
-     * Parses urls and adds auto linking feature.
-     */
-    protected function parseUrl($markdown)
-    {
-        $pattern = <<<REGEXP
-			/(?(R) # in case of recursion match parentheses
-				 \(((?>[^\s()]+)|(?R))*\)
-			|      # else match a link with title
-				^(https?|ftp):\/\/(([^\s()]+)|(?R))+(?<![\.,:;\'"!\?\s])
-			)/x
-REGEXP;
-
-        if (!in_array('parseLink', $this->context) && preg_match($pattern, $markdown, $matches)) {
-            $href = htmlspecialchars($matches[0], ENT_COMPAT | ENT_HTML401, 'UTF-8');
-            $text = htmlspecialchars(urldecode($matches[0]), ENT_NOQUOTES, 'UTF-8');
-            return [
-                "<a href=\"$href\">$text</a>",
-                strlen($matches[0])
-            ];
-        }
-        return [substr($markdown, 0, 4), 4];
-    }
 
     /**
      * @inheritdoc
      *
      * Parses a newline indicated by two spaces on the end of a markdown line.
      */
-    protected function parsePlainText($text)
+    protected function renderText($text)
     {
         if ($this->enableNewlines) {
-            return preg_replace("/(  \n|\n)/", $this->html5 ? "<br>\n" : "<br />\n", $text);
+            return preg_replace("/(  \n|\n)/", $this->html5 ? "<br>\n" : "<br />\n", $text[1]);
         } else {
-            return parent::parsePlainText($text);
+            return parent::renderText($text);
         }
     }
 
     protected function isTag($tag)
     {
         return !array_key_exists($tag, array_flip($this->denyTags));
+    }
+
+
+    protected function parseInline($text)
+    {
+        $elements = parent::parseInline($text);
+        // merge special attribute elements to links and images as they are not part of the final absy later
+        $relatedElement = null;
+        foreach($elements as $i => $element) {
+            if ($element[0] === 'link' || $element[0] === 'image' || $element[0] === 'iframe') {
+                $relatedElement = $i;
+            } elseif ($element[0] === 'specialAttributes') {
+                if ($relatedElement !== null) {
+                    $elements[$relatedElement]['attributes'] = $element[1];
+                    unset($elements[$i]);
+                }
+                $relatedElement = null;
+            } else {
+                $relatedElement = null;
+            }
+        }
+        return $elements;
     }
 } 

@@ -19,24 +19,24 @@ class MarkdownTest extends DatabaseTestCase
 {
     public function testVideoInline()
     {
-        $result = Rock::$app->markdown->parseParagraph('![:youtube {.class1 #id1 .class2} 480x360](6JvDSwFtEC0 "title")');
+        $result = Rock::$app->markdown->parseParagraph('![:youtube 480x360](6JvDSwFtEC0 "title"){.class1 #id1 .class2}');
         $this->assertSame(
-            $result,
-            '<iframe src="//youtube.com/embed/6JvDSwFtEC0/"  frameborder="0" allowfullscreen="allowfullscreen" width="480" height="360" title="title"  class="class1 class2" id="id1"></iframe>'
+            '<iframe src="//youtube.com/embed/6JvDSwFtEC0/" title="title" width="480" height="360" allowfullscreen="allowfullscreen" frameborder="0" class="class1 class2" id="id1"></iframe>',
+            $result
         );
     }
 
     public function testVideoSuccess()
     {
         $markdown = Rock::$app->markdown;
-        $result = $markdown->parse('![:youtube 480x360 {.class1 #id1 .class2}][video]
+        $result = $markdown->parse('![:youtube 480x360][video]
 Test
 
-[video]: 6JvDSwFtEC0');
+[video]: 6JvDSwFtEC0 {.class1 #id1 .class2}');
         $this->assertSame(
-            $result,
-            '<p><iframe src="//youtube.com/embed/6JvDSwFtEC0/"  frameborder="0" allowfullscreen="allowfullscreen" width="480" height="360"  class="class1 class2" id="id1"></iframe>
-Test</p>'
+            '<p><iframe src="//youtube.com/embed/6JvDSwFtEC0/" width="480" height="360" allowfullscreen="allowfullscreen" frameborder="0" class="class1 class2" id="id1"></iframe>
+Test</p>',
+            $result
         );
     }
 
@@ -44,7 +44,7 @@ Test</p>'
     {
         $markdown = Rock::$app->markdown;
         $markdown->denyTags = ['video'];
-        $result = $markdown->parse('![:youtube 480x360 {.class1 #id1 .class2}](6JvDSwFtEC0)');
+        $result = $markdown->parse('![:youtube 480x360](6JvDSwFtEC0){.class1 #id1 .class2}');
         $this->assertSame(
             $result,
             '<p><img src="6JvDSwFtEC0" alt="" class="class1 class2" id="id1" /></p>'
@@ -58,14 +58,14 @@ Test</p>'
         $markdown->imgDummy = '/src/play.png';
         $markdown->specialAttributesDummy = '.dummy-video';
         //$markdown->denyTags = ['code'];
-        $result = $markdown->parse('![:youtube 480x360 {.class1 #id1 .class2}][video]
+        $result = $markdown->parse('![:youtube 480x360][video]
 Test
 
-[video]: 6JvDSwFtEC0');
+[video]: 6JvDSwFtEC0 {.class1 #id1 .class2}');
         $this->assertSame(
-            $result,
-            '<p><a href="https://www.youtube.com/watch?v=6JvDSwFtEC0" style="width: 480px; height: 360px" target="_blank" rel="nofollow"  class="class1 class2 dummy-video" id="id1"><img src="/src/play.png" /></a>
-Test</p>'
+            '<p><a href="https://www.youtube.com/watch?v=6JvDSwFtEC0" style="width: 480px; height: 360px" target="_blank" rel="nofollow"  class="dummy-video class1 class2" id="id1"></a>
+Test</p>',
+            $result
         );
     }
 
@@ -79,7 +79,6 @@ Test</p>'
 
 ');
         $this->assertSame(
-            $result,
         '<table class="class1 class1" id="id1">
 <thead>
 <tr><th align="left">header_1 </th><th align="left">header_2 </th><th align="center">header_3</th></tr>
@@ -87,30 +86,31 @@ Test</p>'
 <tbody>
 <tr><td align="left"><strong>Foo</strong> </td><td align="left">bar </td><td align="center">123</td></tr>
 </tbody>
-</table>'
+</table>',
+        $result
         );
     }
 
 
     public function testLinkInline()
     {
-        $result = Rock::$app->markdown->parseParagraph('[{.class1 #id1 .class2} text](http://test/ "title text")');
+        $result = Rock::$app->markdown->parseParagraph('[text](http://test/ "title text"){.class1 #id1 .class2}');
         $this->assertSame(
-            $result,
-            '<a href="http://test/" title="title text" rel="nofollow"  class="class1 class2" id="id1">text</a>'
+            '<a href="http://test/" title="title text" class="class1 class2" id="id1"  rel="nofollow">text</a>',
+            $result
         );
     }
 
     public function testLink()
     {
-        $result = Rock::$app->markdown->parse('[{.class1 #id1 .class2} text][link]
+        $result = Rock::$app->markdown->parse('[text][link]
 Test
 
-[link]: http://test/');
+[link]: http://test/ {.class1 #id1 .class2}');
         $this->assertSame(
-            $result,
-            '<p><a href="http://test/" rel="nofollow"  class="class1 class2" id="id1">text</a>
-Test</p>'
+            '<p><a href="http://test/" class="class1 class2" id="id1"  rel="nofollow">text</a>
+Test</p>',
+            $result
         );
     }
 
@@ -144,12 +144,12 @@ Test</p>'
         );
         $mark->dataImage = $dataImage;
         $this->assertSame(
-            $mark->parse('![:thumb 50x50{.class2 #id2 .class}](/src/play.png)'),
-            '<p><img src="/src/cache/50x50/play.png" alt="" class="class2 class" id="id2" /></p>'
+            '<p><img src="/src/cache/50x50/play.png" alt="" class="class2 class" id="id2" /></p>',
+            $mark->parse('![:thumb 50x50](/src/play.png){.class2 #id2 .class}')
         );
 
         $this->assertSame(
-            $mark->parse('![:thumb {.class2 #id2 .class}](/src/play.png)'),
+            $mark->parse('![:thumb](/src/play.png){.class2 #id2 .class}'),
             '<p><img src="/src/play.png" alt="" class="class2 class" id="id2" /></p>'
         );
     }
@@ -183,13 +183,13 @@ Test</p>'
         );
         $mark->dataImage = $dataImage;
         $this->assertSame(
-            $mark->parse('![:thumb 50x50{.class2 #id2 .class}](/src/foo.png)'),
+            $mark->parse('![:thumb 50x50](/src/foo.png){.class2 #id2 .class}'),
             '<p><img src="/src/foo.png" alt="" class="class2 class" id="id2" /></p>'
         );
 
         $mark->denyTags = ['thumb'];
         $this->assertSame(
-            $mark->parse('![:thumb 50x50{.class2 #id2 .class}](/src/foo.png)'),
+            $mark->parse('![:thumb 50x50](/src/foo.png){.class2 #id2 .class}'),
             '<p><img src="/src/foo.png" alt="" class="class2 class" id="id2" /></p>'
         );
     }
@@ -202,7 +202,10 @@ Test</p>'
             return Users::findUrlByUsername($username);
         };
         $result = $markdown->parse('@Linda');
-        $this->assertSame($result, '<p><a href="/linda/" title="Linda">@Linda</a></p>');
+        $this->assertSame('<p><a href="/linda/" title="Linda">@Linda</a></p>', $result);
+
+        $result = $markdown->parse('Hi @Linda, foo');
+        $this->assertSame('<p>Hi <a href="/linda/" title="Linda">@Linda</a>, foo</p>', $result);
     }
 
     public function testUsernameLinkFail()
@@ -213,7 +216,7 @@ Test</p>'
             return Users::findUrlByUsername($username);
         };
         $result = $markdown->parse('@Tom');
-        $this->assertSame($result, '<p><a href="#" title="Tom">@Tom</a></p>');
+        $this->assertSame('<p><a href="#" title="Tom">@Tom</a></p>', $result);
     }
 
     public function testDenyTags()
@@ -225,9 +228,9 @@ Test</p>'
 
 text');
         $this->assertSame(
-            $result,
             '<h1>h1</h1>
-<p>text</p>'
+<p>text</p>',
+            $result
         );
     }
 
@@ -238,20 +241,17 @@ text');
         $markdown->denyTags = ['code'];
         $this->assertSame($markdown->parse('     foo'), '');
         $this->assertSame(
+            '<p>foo</p>
+<p>bar</p>',
             $markdown->parse('
-ghgh
+foo
 
 ```php
             gjh
 
 ```
 
-dfdfdf'),
-            '<p>ghgh</p>
-
-<p>dfdfdf</p>'
-
+bar')
         );
     }
 }
- 
