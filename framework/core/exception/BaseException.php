@@ -83,6 +83,10 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
             $response->status500();
         }
         $response->send();
+        if (Rock::$app->response->format !== Response::FORMAT_HTML) {
+            echo 0;
+            return;
+        }
         if (!isset(static::$pathFatal) ||
             !file_exists(Rock::getAlias(static::$pathFatal))
         ) {
@@ -143,6 +147,8 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
 
     /**
      * Run mode debug
+     *
+     * @return \rock\exception\Run
      */
     public static function debuger()
     {
@@ -250,7 +256,7 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
     protected function display($level = self::ERROR, $msg, \Exception $handler = null)
     {
         if ($level > static::$level) {
-            if (DEBUG === true || Rock::$app->response->format !== Response::FORMAT_HTML) {
+            if (DEBUG === true) {
                 static::debuger()->handleException(isset($handler) ? $handler : $this);
                 return;
             }
