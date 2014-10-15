@@ -62,7 +62,9 @@ return [
     'logout' => 'logout',
     'notContent' => 'content is empty',
     'characters' => 'characters',
-    'failHTTPRequest' => 'Fail HTTP-request.',
+    'failHTTPRequest' => 'HTTP-request error.',
+    'failServer' => 'Server error.',
+    'failAccess' => 'Denied access.',
     'validation' => [
         'notEmpty' => NotEmptyException::$defaultTemplates[NotEmptyException::MODE_DEFAULT][NotEmptyException::STANDARD],
         'empty' => NotEmptyException::$defaultTemplates[NotEmptyException::MODE_NEGATIVE][NotEmptyException::STANDARD],

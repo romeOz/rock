@@ -76,6 +76,8 @@ return [
     'logout' => 'выход',
     'characters' => 'символов',
     'failHTTPRequest' => 'Ошибка HTTP-запроса.',
+    'failServer' => 'Ошибка сервера.',
+    'failAccess' => 'Отказано в доступе.',
     'validation' => [
         'notEmpty' => NotEmptyException::$defaultTemplates[NotEmptyException::MODE_DEFAULT][NotEmptyException::STANDARD],
         'empty' => NotEmptyException::$defaultTemplates[NotEmptyException::MODE_NEGATIVE][NotEmptyException::STANDARD],
