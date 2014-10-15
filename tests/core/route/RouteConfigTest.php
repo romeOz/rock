@@ -436,7 +436,7 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
                 'rules' =>
                     [
                         [
-                            Route::RESOURCE,
+                            Route::REST,
                             'orders',
                             OrdersController::className(),
                             ['only' => ['index', 'show', 'update', 'create','delete']]
@@ -486,7 +486,7 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
                 'rules' =>
                     [
                         [
-                            Route::RESOURCE,
+                            Route::REST,
                             'orders',
                             OrdersController::className(),
                             ['only' => ['index', 'show', 'update', 'create','delete']]

@@ -91,7 +91,7 @@ class RouteTest extends RouteConfigTest
                 }
             );
 
-        $this->assertTrue($route->resource(
+        $this->assertTrue($route->REST(
             'orders',
             OrdersController::className(),
             ['only' => ['index', 'show', 'update', 'create', 'delete']]
@@ -121,7 +121,7 @@ class RouteTest extends RouteConfigTest
                 }
             );
 
-        $this->assertFalse($route->resource(
+        $this->assertFalse($route->REST(
             'orders',
             OrdersController::className(),
             ['only' => ['index', 'show', 'update', 'create', 'delete']]

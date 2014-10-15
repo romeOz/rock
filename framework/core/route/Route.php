@@ -24,7 +24,7 @@ class Route implements RequestInterface, ErrorsInterface
     const EVENT_END_ROUTER = 'endRoute';
 
     const ANY = '*';
-    const RESOURCE = 1;
+    const REST = 1;
 
     const FORMAT_SCHEME = 1;
     const FORMAT_HOST   = 2;
@@ -39,7 +39,7 @@ class Route implements RequestInterface, ErrorsInterface
     public $success;
     /** @var  array|\Closure */
     public $fail;
-    public $handlersByResource = [];
+    public $RESTHandlers = [];
     public static $defaultFilters = [
         'urldecode', Sanitize::STRIP_TAGS,
         'trim', Sanitize::TO_TYPE
@@ -50,8 +50,8 @@ class Route implements RequestInterface, ErrorsInterface
     public function init()
     {
         $this->calculateData();
-        $handlers = $this->defaultHandlersByResource();
-        $this->handlersByResource = empty($this->handlersByResource) ? $handlers : array_merge($handlers, $this->handlersByResource);
+        $handlers = $this->defaultRESTHandlers();
+        $this->RESTHandlers = empty($this->RESTHandlers) ? $handlers : array_merge($handlers, $this->RESTHandlers);
     }
 
 
@@ -177,9 +177,7 @@ class Route implements RequestInterface, ErrorsInterface
         return $this->addRoute(self::DELETE, $pattern, $handler, $filters);
     }
 
-
-
-    protected function defaultHandlersByResource()
+    protected function defaultRESTHandlers()
     {
         return [
             'index' => [
@@ -234,7 +232,6 @@ class Route implements RequestInterface, ErrorsInterface
         ];
     }
 
-
     /**
      * Add routers
      *
@@ -243,9 +240,9 @@ class Route implements RequestInterface, ErrorsInterface
      * @param array $filters
      * @return boolean
      */
-    public function resource($url, $controller, array $filters = [])
+    public function REST($url, $controller, array $filters = [])
     {
-        if (!$this->isResource($url, $controller, $filters)) {
+        if (!$this->isREST($url, $controller, $filters)) {
             $this->initFail();
             return false;
         }
@@ -421,13 +418,13 @@ class Route implements RequestInterface, ErrorsInterface
         foreach ($rules as $rule) {
             //$this->calculateData();
 
-            if ($rule[0] === self::RESOURCE) {
+            if ($rule[0] === self::REST) {
                 array_shift($rule);
                 if (empty($rule[2])) {
                     $rule[2] = [];
                 }
                 list($url, $controller, $filters) = $rule;
-                if ($this->isResource($url, $controller, $filters)) {
+                if ($this->isREST($url, $controller, $filters)) {
                     return true;
                 }
                 continue;
@@ -448,10 +445,10 @@ class Route implements RequestInterface, ErrorsInterface
         return false;
     }
     
-    protected function isResource($url, $controller, $filters)
+    protected function isREST($url, $controller, $filters)
     {
         $handlers = ArrayHelper::prepareArray(
-            $this->handlersByResource,
+            $this->RESTHandlers,
             Helper::getValue($filters['only'], []),
             Helper::getValue($filters['exclude'], [])
         );
