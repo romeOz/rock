@@ -49,10 +49,6 @@ class Rock
      * @var Controller
      */
     public $controller;
-    /**
-     * @var string the application name.
-     */
-    public $name = 'My Application';
 
 
     /**
@@ -358,41 +354,45 @@ class Rock
 
     /**
      * Logging as `INFO`
+     *
      * @param string $message
-     * @param array  $dataReplace
+     * @param array $placeholders
      */
-    public static function info($message, $dataReplace = [])
+    public static function info($message, array $placeholders = [])
     {
-        static::$app->log->info($message, $dataReplace);
+        static::$app->log->info($message, $placeholders);
     }
 
     /**
      * Logging as `DEBUG`
+     *
      * @param string $message
-     * @param array  $dataReplace
+     * @param array $placeholders
      */
-    public static function debug($message, $dataReplace = [])
+    public static function debug($message, array $placeholders = [])
     {
-        static::$app->log->debug($message, $dataReplace);
+        static::$app->log->debug($message, $placeholders);
     }
 
     /**
      * Logging as `WARNING`
+     *
      * @param string $message
-     * @param array  $dataReplace
+     * @param array $placeholders
      */
-    public static function warning($message, $dataReplace = [])
+    public static function warning($message, array $placeholders = [])
     {
-        static::$app->log->warning($message, $dataReplace);
+        static::$app->log->warning($message, $placeholders);
     }
 
     /**
      * Logging as `ERROR`
+     *
      * @param string $message
-     * @param array  $dataReplace
+     * @param array $placeholders
      */
-    public static function error($message, $dataReplace = [])
+    public static function error($message, array $placeholders = [])
     {
-        static::$app->log->error($message, $dataReplace);
+        static::$app->log->error($message, $placeholders);
     }
 }

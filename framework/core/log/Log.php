@@ -59,99 +59,99 @@ class Log implements LoggerInterface
      *
      * This method allows for compatibility with common interfaces.
      *
-     * @param  mixed   $level   The log level
-     * @param  string  $message The log message
-     * @param  array   $dataReplace The log context
+     * @param  mixed   $level  log level
+     * @param  string  $message log message
+     * @param  array   $placeholders placeholders for replacement
      * @return bool Whether the record has been processed
      */
-    public function log($level, $message, array $dataReplace = [])
+    public function log($level, $message, array $placeholders = [])
     {
-        return static::$logger->log($level, String::replace($message, $dataReplace), $dataReplace);
+        return static::$logger->log($level, String::replace($message, $placeholders), $placeholders);
     }
 
     /**
-     * Adds a log record at the DEBUG level.
+     * Adds a log record at the `DEBUG` level.
      *
      * This method allows for compatibility with common interfaces.
      *
-     * @param  string  $message The log message
-     * @param  array   $dataReplace The log context
-     * @return Boolean Whether the record has been processed
+     * @param  string  $message log message
+     * @param  array   $placeholders placeholders for replacement
+     * @return bool Whether the record has been processed
      */
-    public function debug($message, array $dataReplace = [])
+    public function debug($message, array $placeholders = [])
     {
-        return static::$logger->debug(String::replace($message, $dataReplace), $dataReplace);
+        return static::$logger->debug(String::replace($message, $placeholders), $placeholders);
     }
 
     /**
-     * Adds a log record at the INFO level.
+     * Adds a log record at the `INFO` level.
      *
      * This method allows for compatibility with common interfaces.
      *
-     * @param  string  $message The log message
-     * @param  array   $dataReplace The log context
-     * @return Boolean Whether the record has been processed
+     * @param  string  $message log message
+     * @param  array   $placeholders placeholders for replacement
+     * @return bool Whether the record has been processed
      */
-    public function info($message, array $dataReplace = [])
+    public function info($message, array $placeholders = [])
     {
-        return static::$logger->info(String::replace($message, $dataReplace), $dataReplace);
+        return static::$logger->info(String::replace($message, $placeholders), $placeholders);
     }
 
     /**
-     * Adds a log record at the INFO level.
+     * Adds a log record at the `NOTICE` level.
      *
      * This method allows for compatibility with common interfaces.
      *
-     * @param  string  $message The log message
-     * @param  array   $dataReplace The log context
-     * @return Boolean Whether the record has been processed
+     * @param  string  $message log message
+     * @param  array   $placeholders placeholders for replacement
+     * @return bool Whether the record has been processed
      */
-    public function notice($message, array $dataReplace = [])
+    public function notice($message, array $placeholders = [])
     {
-        return static::$logger->notice(String::replace($message, $dataReplace), $dataReplace);
+        return static::$logger->notice(String::replace($message, $placeholders), $placeholders);
     }
 
     /**
-     * Adds a log record at the WARNING level.
+     * Adds a log record at the `WARNING` level.
      *
      * This method allows for compatibility with common interfaces.
      *
-     * @param  string  $message The log message
-     * @param  array   $dataReplace The log context
-     * @return Boolean Whether the record has been processed
+     * @param  string  $message log message
+     * @param  array   $placeholders placeholders for replacement
+     * @return bool Whether the record has been processed
      */
-    public function warn($message, array $dataReplace = [])
+    public function warn($message, array $placeholders = [])
     {
-        return static::$logger->warn(String::replace($message, $dataReplace), $dataReplace);
+        return static::$logger->warn(String::replace($message, $placeholders), $placeholders);
     }
 
     /**
-     * Adds a log record at the WARNING level.
+     * Adds a log record at the `WARNING` level.
      *
      * This method allows for compatibility with common interfaces.
      *
-     * @param  string  $message The log message
-     * @param  array   $dataReplace The log context
-     * @return Boolean Whether the record has been processed
+     * @param  string  $message log message
+     * @param  array   $placeholders placeholders for replacement
+     * @return bool Whether the record has been processed
      */
-    public function warning($message, array $dataReplace = [])
+    public function warning($message, array $placeholders = [])
     {
-        return static::$logger->warn(String::replace($message, $dataReplace), $dataReplace);
+        return static::$logger->warn(String::replace($message, $placeholders), $placeholders);
     }
 
     /**
-     * Adds a log record at the ERROR level.
+     * Adds a log record at the `ERROR` level.
      *
      * This method allows for compatibility with common interfaces.
      *
-     * @param  string  $message The log message
-     * @param  array   $dataReplace The log context
-     * @return Boolean Whether the record has been processed
+     * @param  string  $message log message
+     * @param  array   $placeholders placeholders for replacement
+     * @return bool Whether the record has been processed
      */
-    public function err($message, array $dataReplace = [])
+    public function err($message, array $placeholders = [])
     {
 
-        return static::$logger->err(String::replace($message, $dataReplace), $dataReplace);
+        return static::$logger->err(String::replace($message, $placeholders), $placeholders);
     }
 
     /**
@@ -169,72 +169,72 @@ class Log implements LoggerInterface
     }
 
     /**
-     * Adds a log record at the CRITICAL level.
+     * Adds a log record at the `CRITICAL` level.
      *
      * This method allows for compatibility with common interfaces.
      *
-     * @param  string  $message The log message
-     * @param  array   $dataReplace The log context
-     * @return Boolean Whether the record has been processed
+     * @param  string  $message log message
+     * @param  array   $placeholders placeholders for replacement
+     * @return bool Whether the record has been processed
      */
-    public function crit($message, array $dataReplace = [])
+    public function crit($message, array $placeholders = [])
     {
-        return static::$logger->crit(String::replace($message, $dataReplace), $dataReplace);
+        return static::$logger->crit(String::replace($message, $placeholders), $placeholders);
     }
 
     /**
-     * Adds a log record at the CRITICAL level.
+     * Adds a log record at the `CRITICAL` level.
      *
      * This method allows for compatibility with common interfaces.
      *
      * @param  string  $message The log message
-     * @param  array   $dataReplace The log context
-     * @return Boolean Whether the record has been processed
+     * @param  array   $placeholders placeholders for replacement
+     * @return bool Whether the record has been processed
      */
-    public function critical($message, array $dataReplace = [])
+    public function critical($message, array $placeholders = [])
     {
-        return static::$logger->crit(String::replace($message, $dataReplace), $dataReplace);
+        return static::$logger->crit(String::replace($message, $placeholders), $placeholders);
     }
 
     /**
-     * Adds a log record at the ALERT level.
+     * Adds a log record at the `ALERT` level.
      *
      * This method allows for compatibility with common interfaces.
      *
-     * @param  string  $message The log message
-     * @param  array   $dataReplace The log context
-     * @return Boolean Whether the record has been processed
+     * @param  string  $message log message
+     * @param  array   $placeholders placeholders for replacement
+     * @return bool Whether the record has been processed
      */
-    public function alert($message, array $dataReplace = [])
+    public function alert($message, array $placeholders = [])
     {
-        return static::$logger->alert(String::replace($message, $dataReplace), $dataReplace);
+        return static::$logger->alert(String::replace($message, $placeholders), $placeholders);
     }
 
     /**
-     * Adds a log record at the EMERGENCY level.
+     * Adds a log record at the `EMERGENCY` level.
      *
      * This method allows for compatibility with common interfaces.
      *
-     * @param  string  $message The log message
-     * @param  array   $dataReplace The log context
-     * @return Boolean Whether the record has been processed
+     * @param  string  $message log message
+     * @param  array   $placeholders placeholders for replacement
+     * @return bool Whether the record has been processed
      */
-    public function emerg($message, array $dataReplace = [])
+    public function emerg($message, array $placeholders = [])
     {
-        return static::$logger->emerg(String::replace($message, $dataReplace), $dataReplace);
+        return static::$logger->emerg(String::replace($message, $placeholders), $placeholders);
     }
 
     /**
-     * Adds a log record at the EMERGENCY level.
+     * Adds a log record at the `EMERGENCY` level.
      *
      * This method allows for compatibility with common interfaces.
      *
-     * @param  string  $message The log message
-     * @param  array   $context The log context
-     * @return Boolean Whether the record has been processed
+     * @param  string  $message log message
+     * @param  array   $placeholders placeholders for replacement
+     * @return bool Whether the record has been processed
      */
-    public function emergency($message, array $context = [])
+    public function emergency($message, array $placeholders = [])
     {
-        return static::$logger->emerg(String::replace($message, $context), $context);
+        return static::$logger->emerg(String::replace($message, $placeholders), $placeholders);
     }
 }

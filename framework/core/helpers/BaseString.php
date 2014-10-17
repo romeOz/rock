@@ -84,9 +84,9 @@ class BaseString
     }
 
     /**
-     * String to uppercase
+     * String to uppercase.
      *
-     * @param string $string - string
+     * @param string $string string
      * @param string $encoding The charset to use, defaults to charset currently used by application.
      * @return string
      */
@@ -101,9 +101,9 @@ class BaseString
     }
 
     /**
-     * String to lowercase
+     * String to lowercase.
      *
-     * @param string $string - string
+     * @param string $string string
      * @param string $encoding The charset to use, defaults to charset currently used by application.
      * @return string
      */
@@ -118,9 +118,9 @@ class BaseString
     }
 
     /**
-     * Upper first char
+     * Upper first char.
      *
-     * @param string $string - string
+     * @param string $string string.
      * @param string $encoding The charset to use, defaults to charset currently used by application.
      * @return string
      */
@@ -134,6 +134,22 @@ class BaseString
         return $fc . mb_substr($string, 1, mb_strlen($string, $encoding), $encoding);
     }
 
+    /**
+     * Lower first char.
+     *
+     * @param string $string string.
+     * @param string $encoding The charset to use, defaults to charset currently used by application.
+     * @return string
+     */
+    public static function lowerFirst($string, $encoding = 'UTF-8')
+    {
+        if (empty($string)) {
+            return $string;
+        }
+        $fc = mb_strtolower(mb_substr($string, 0, 1, $encoding), $encoding);
+
+        return $fc . mb_substr($string, 1, mb_strlen($string, $encoding), $encoding);
+    }
 
     /**
      * Encodes special characters into HTML entities.
@@ -164,9 +180,9 @@ class BaseString
     }
 
     /**
-     * Escaping slashes
+     * Escaping slashes.
      *
-     * @param string $string - string
+     * @param string $string string
      * @return string
      */
     public static function addSlashes($string)
@@ -175,9 +191,9 @@ class BaseString
     }
 
     /**
-     * Escape string single-quotes
+     * Escape string single-quotes.
      *
-     * @param string $string - string
+     * @param string $string string
      * @return string
      */
     public static function quotes($string)
@@ -190,9 +206,9 @@ class BaseString
     }
 
     /**
-     * Escape string double-quotes
+     * Escape string double-quotes.
      *
-     * @param string $string - string
+     * @param string $string string
      * @return string
      */
     public static function doubleQuotes($string)
@@ -211,8 +227,8 @@ class BaseString
      * @return string
      *
      * ```php
-     * \rock\String::ltrimWord('foo text', ['foo', 'bar']); // ' text'
-     * \rock\String::ltrimWord('bar text', ['foo', 'bar']); // ' text'
+     * String::ltrimWord('foo text', ['foo', 'bar']); // ' text'
+     * String::ltrimWord('bar text', ['foo', 'bar']); // ' text'
      * ```
      */
     public static function ltrimWords($string, array $words)
@@ -232,9 +248,9 @@ class BaseString
     }
 
     /**
-     * Trim spaces
+     * Trim spaces.
      *
-     * @param string $string - string
+     * @param string $string string
      * @return string
      */
     public static function trimSpaces($string)
@@ -243,10 +259,10 @@ class BaseString
     }
 
     /**
-     * Trim by pattern
+     * Trim by pattern.
      *
      * @param string $string
-     * @param string $pattern - regexp pattern
+     * @param string $pattern regexp pattern.
      * @param int       $limit
      * @return string
      */
@@ -256,7 +272,7 @@ class BaseString
     }
 
     /**
-     * Check contains word or char in string
+     * Check contains word or char in string.
      * @param $string
      * @param $contains
      * @return bool
@@ -267,10 +283,10 @@ class BaseString
     }
 
     /**
-     * Trim a list of characters from a string
+     * Trim a list of characters from a string.
      *
-     * @param string $string   - string
-     * @param array  $chars - array of characters to delete
+     * @param string $string   string
+     * @param array  $chars array of characters to delete.
      * @return string
      */
     public static function trimChars($string, array $chars = [])
@@ -286,11 +302,10 @@ class BaseString
         return str_replace($chars, "", $string);
     }
 
-
     /**
      * Get string transliteration
      *
-     * @param string $string - string
+     * @param string $string string
      * @return string
      */
     public static function translit($string)
@@ -314,11 +329,10 @@ class BaseString
         return strtr($string, $ret);
     }
 
-
     /**
      * Generator of random character string
      *
-     * @param int $len - length of string
+     * @param int $len length of string
      * @return string
      */
     public static function randChars($len = 6)
@@ -341,11 +355,10 @@ class BaseString
         return $result;
     }
 
-
     /**
-     * Replacement of random characters in the string
+     * Replacement of random characters in the string.
      *
-     * @param string $string - string
+     * @param string $string string
      * @param string $replaceTo
      * @return string
      */
@@ -366,11 +379,10 @@ class BaseString
         return implode("", $chars);
     }
 
-
     /**
-     * Get all the words with uppercase
+     * Get all the words with uppercase.
      *
-     * @param string $string - string
+     * @param string $string string
      * @return string
      */
     public static function getWordsUppFirst($string)
@@ -397,9 +409,8 @@ class BaseString
         return $value ? $concat . $value : $default;
     }
 
-
     /**
-     * Concat end
+     * Concat end.
      * @param string     $value
      * @param string     $concat
      * @param null $default
@@ -416,15 +427,15 @@ class BaseString
     }
 
     /**
-     * Replace
+     * Replace.
      *
-     * @param string $string      - string
-     * @param array  $dataReplace - array replace
-     * @param bool   $removeBraces        - remove braces `{{...}}`
-     * @param string $pattern - pattern for replace
+     * @param string $string      string.
+     * @param array  $placeholders array placeholders for replace.
+     * @param bool   $removeBraces        remove braces `{{...}}`.
+     * @param string $pattern pattern for replace.
      * @return string
      */
-    public static function replace($string, array $dataReplace = [], $removeBraces = true, $pattern = '/\{{1,2}(\\w+)\}{1,2}/')
+    public static function replace($string, array $placeholders = [], $removeBraces = true, $pattern = '/\{{1,2}(\\w+)\}{1,2}/')
     {
         if (is_array($string)) {
             return $string;
@@ -433,9 +444,9 @@ class BaseString
         if (strpos($string, '{') !== false) {
             return trim(preg_replace_callback(
                 $pattern,
-                function($match) use ($dataReplace, $removeBraces) {
-                    if (isset($dataReplace[$match[1]])) {
-                        return $dataReplace[$match[1]];
+                function($match) use ($placeholders, $removeBraces) {
+                    if (isset($placeholders[$match[1]])) {
+                        return $placeholders[$match[1]];
                     } elseif ($removeBraces){
                         return '';
                     }
