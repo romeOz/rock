@@ -83,4 +83,3 @@ Rock::$app->di['rbac'] = [
 ];
 
 //(new SessionsMigration())->up();
-

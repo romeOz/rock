@@ -1,21 +1,22 @@
 <?php
 namespace rock\base;
 
-use rock\helpers\Instance;
+use rock\helpers\ArrayHelper;
 use rock\helpers\ObjectHelper;
 
 /**
- * ArrayableTrait provides a common implementation of the `Arrayable` interface.
+ * ArrayableTrait provides a common implementation of the @see Arrayable interface.
  *
- * ArrayableTrait implements [[toArray()]] by respecting the field definitions as declared
- * in `fields()` and `extraFields()`.
+ * ArrayableTrait implements @see Model::toArray() by respecting the field definitions as declared
+ * in @see Model::fields()
+ * and @see Model::extraFields() .
  */
 trait ArrayableTrait
 {
     /**
-     * Returns the list of fields that should be returned by default by [[toArray()]] when no specific fields are specified.
+     * Returns the list of fields that should be returned by default by @see toArray() when no specific fields are specified.
      *
-     * A field is a named element in the returned array by [[toArray()]].
+     * A field is a named element in the returned array by @see toArray() .
      *
      * This method should return an array of field names or field definitions.
      * If the former, the field name will be treated as an object property name whose value will be used
@@ -65,11 +66,11 @@ trait ArrayableTrait
     }
 
     /**
-     * Returns the list of fields that can be expanded further and returned by [[toArray()]].
+     * Returns the list of fields that can be expanded further and returned by  @see toArray() .
      *
-     * This method is similar to `fields()` except that the list of fields returned
-     * by this method are not returned by default by [[toArray()]]. Only when field names
-     * to be expanded are explicitly specified when calling [[toArray()]], will their values
+     * This method is similar to @see fields() except that the list of fields returned
+     * by this method are not returned by default by @see toArray() . Only when field names
+     * to be expanded are explicitly specified when calling @see toArray() , will their values
      * be exported.
      *
      * The default implementation returns an empty array.
@@ -78,7 +79,7 @@ trait ArrayableTrait
      * (e.g. the current application user).
      *
      * @return array the list of expandable field names or field definitions. Please refer
-     * to `fields()` on the format of the return value.
+     * to @see fields() on the format of the return value.
      * @see toArray()
      * @see fields()
      */
@@ -90,17 +91,18 @@ trait ArrayableTrait
     /**
      * Converts the model into an array.
      *
-     * This method will first identify which fields to be included in the resulting array by calling [[resolveFields()]].
+     * This method will first identify which fields to be included in the resulting array by calling @see resolveFields() .
      * It will then turn the model into an array with these fields. If `$recursive` is true,
      * any embedded objects will also be converted into arrays.
      *
      * If the model implements the [[Linkable]] interface, the resulting array will also have a `_link` element
      * which refers to a list of links as specified by the interface.
      *
-     * @param array   $only      the fields being requested. If empty, all fields as specified by `fields()` will be returned.
+     * @param array $only        the fields being requested. If empty, all fields as specified
+     *                           by @see fields() will be returned.
      * @param array   $exclude
-     * @param array   $expand    the additional fields being requested for exporting. Only fields declared in `extraFields()`
-     *                           will be considered.
+     * @param array   $expand    the additional fields being requested for exporting. Only fields declared
+     *                           in @see extraFields() will be considered.
      * @param boolean $recursive whether to recursively return array representation of embedded objects.
      * @return array the array representation of the object
      */
@@ -115,13 +117,13 @@ trait ArrayableTrait
 //            $data['_links'] = Link::serialize($this->getLinks());
 //        }
 
-        return $recursive ? Instance::toArray($data) : $data;
+        return $recursive ? static::convert($data) : $data;
     }
 
     /**
-     * Determines which fields can be returned by [[toArray()]].
-     * This method will check the requested fields against those declared in `fields()` and `extraFields()`
-     * to determine which fields can be returned.
+     * Determines which fields can be returned by @see toArray() .
+     * This method will check the requested fields against those declared in @see fields()
+     * and @see extraFields() to determine which fields can be returned.
      *
      * @param array $only   the fields being requested for exporting
      * @param array $expand the additional fields being requested for exporting
@@ -160,5 +162,83 @@ trait ArrayableTrait
         }
 
         return $result;
+    }
+
+    /**
+     * Converts an object or an array of objects into an array.
+     * @param object|array $object the object to be converted into an array
+     * @param array $properties a mapping from object class names to the properties that need to put into the resulting arrays.
+     * The properties specified for each class is an array of the following format:
+     *
+     * ```php
+     * [
+     *     'apps\models\Post' => [
+     *         'id',
+     *         'title',
+     *         // the key name in array result => property name
+     *         'createTime' => 'created_at',
+     *         // the key name in array result => anonymous function
+     *         'length' => function ($post) {
+     *             return strlen($post->content);
+     *         },
+     *     ],
+     * ]
+     * ```
+     *
+     * The result of `Model::convert($post, $properties)` could be like the following:
+     *
+     * ```php
+     * [
+     *     'id' => 123,
+     *     'title' => 'test',
+     *     'createTime' => '2013-01-01 12:00AM',
+     *     'length' => 301,
+     * ]
+     * ```
+     *
+     * @param boolean $recursive whether to recursively converts properties which are objects into arrays.
+     * @return array the array representation of the object
+     */
+    public static function convert($object, $properties = [], $recursive = true)
+    {
+        if (is_array($object)) {
+            if ($recursive) {
+                foreach ($object as $key => $value) {
+                    if (is_array($value) || is_object($value)) {
+                        $object[$key] = static::convert($value, $properties, true);
+                    }
+                }
+            }
+
+            return $object;
+        } elseif (is_object($object)) {
+            if (!empty($properties)) {
+                $className = get_class($object);
+                if (!empty($properties[$className])) {
+                    $result = [];
+                    foreach ($properties[$className] as $key => $name) {
+                        if (is_int($key)) {
+                            $result[$name] = $object->$name;
+                        } else {
+                            $result[$key] = ArrayHelper::getValue($object, $name);
+                        }
+                    }
+
+                    return $recursive ? static::convert($result) : $result;
+                }
+            }
+            if ($object instanceof Arrayable) {
+                $result = $object->toArray();
+            } else {
+                $result = [];
+                foreach ($object as $key => $value) {
+                    $result[$key] = $value;
+                }
+            }
+
+            return $recursive ? static::convert($result) : $result;
+        } else {
+            return [$object];
+        }
     }
 }

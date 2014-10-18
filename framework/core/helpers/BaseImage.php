@@ -244,4 +244,4 @@ class BaseImage
 
         return $image;
     }
-} 
+}

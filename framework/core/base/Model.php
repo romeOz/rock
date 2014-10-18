@@ -21,22 +21,22 @@ use rock\validation\Validatable;
  *
  * Model also raises the following events when performing data validation:
  *
- * - [[EVENT_BEFORE_VALIDATE]]: an event raised at the beginning of [[validate()]]
- * - [[EVENT_AFTER_VALIDATE]]: an event raised at the end of [[validate()]]
+ * - @see Model::EVENT_BEFORE_VALIDATE: an event raised at
+ * the beginning of @see Model::validate()
+ * - @see Model::EVENT_AFTER_VALIDATE : an event raised at
+ * the end of @see Model::validate()
  *
  * You may directly use Model to store model data, or extend it with customization.
- * You may also customize Model by attaching [[ModelBehavior|model behaviors]].
- *
- * [[scenario]]. This property is read-only.
  *
  * @property array          $attributes  Attribute values (name => value).
  * @property array          $errors      An array of errors for all attributes. Empty array is returned if no error. The
- *          result is a two-dimensional array. See [[getErrors()]] for detailed description. This property is read-only.
+ *          result is a two-dimensional array. See @see Model::getErrors() for detailed description. This property is read-only.
  * @property array          $firstErrors The first errors. An empty array will be returned if there is no error. This
  *          property is read-only.
  * @property \ArrayIterator $iterator    An iterator for traversing the items in the list. This property is
  *          read-only.
- * @property string         $scenario    The scenario that this model is in. Defaults to [[DEFAULT_SCENARIO]].
+ * @property string         $scenario    The scenario that this model is in.
+ * Defaults to @see Model::DEFAULT_SCENARIO .
  * @property \ArrayObject   $validators  All the validators declared in the model. This property is read-only.
  *
  * @package models
@@ -59,64 +59,63 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
      */
     const DEFAULT_SCENARIO = 'default';
 
-
     /**
-     * @event ModelEvent an event raised at the beginning of [[validate()]]. You may set
-     * [[ModelEvent::isValid]] to be false to stop the validation.
+     * @event ModelEvent an event raised at the beginning
+     * of @see validate() .
      */
     const EVENT_BEFORE_VALIDATE = 'beforeValidate';
 
-
-
     /**
-     * @event Event an event raised at the end of [[validate()]]
+     * @event Event an event raised at the end
+     * of @see validate()
      */
     const EVENT_AFTER_VALIDATE = 'afterValidate';
 
-    //private $_events = [self::EVENT_BEFORE_VALIDATE, self::EVENT_AFTER_VALIDATE, BaseActiveRecord::EVENT_AFTER_UPDATE];
     /**
      * @var string current scenario
      */
-   protected $_scenario = self::DEFAULT_SCENARIO;
+    protected $_scenario = self::DEFAULT_SCENARIO;
 
     /**
      * @var array validation errors (attribute name => array of errors)
      */
     protected $_errors = [];
 
+    protected $enableCsrfValidation = true;
+
     /**
      * Returns the validation rules for attributes.
      *
-     * Validation rules are used by [[validate()]] to check if attribute values are valid.
+     * Validation rules are used by @see validate() to check if attribute values are valid.
      * Child classes may override this method to declare different validation rules.
      *
      * Each rule is an array with the following structure:
      *
-     * ~~~
+     * ```php
      * [
      *     'type',
      *     'handler',
      *     ['scenario1', 'scenario2']
      * ]
-     * ~~~
+     * ```
      *
      * where
      *
      *  - attribute list: required, specifies the attributes array to be validated, for single attribute you can pass string;
      *  - validator type: required, specifies the validator to be used. It can be a built-in validator name,
      *    a method name of the model class, an anonymous function, or a validator class name.
-     *  - on: optional, specifies the [[scenario|scenarios]] array when the validation
+     *  - on: optional, specifies the @see scenario array when the validation
      *    rule can be applied. If this option is not set, the rule will apply to all scenarios.
      *  - additional name-value pairs can be specified to initialize the corresponding validator properties.
      *    Please refer to individual validator class API for possible properties.
      *
-     * A validator can be either an object of a class extending [[Validator]], or a model class method
+     * A validator can be either an object of a class extending @see \rock\validate\Validate , or a model class method
      * (called *inline validator*) that has the following signature:
      *
-     * ~~~
+     * ```php
      * // $params refers to validation parameters given in the rule
      * function validatorName($attribute, $params)
-     * ~~~
+     * ```
      *
      * In the above `$attribute` refers to currently validated attribute name while `$params` contains an array of
      * validator configuration options such as `max` in case of `string` validator. Currently validate attribute value
@@ -139,7 +138,6 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
      * merge the parent rules with child rules using functions such as `array_merge()`.
      *
      * @return array validation rules
-     * @see scenarios()
      */
     public function rules()
     {
@@ -226,23 +224,28 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
     /**
      * Performs the data validation.
      *
-     * This method executes the validation rules applicable to the current [[scenario]].
+     * This method executes the validation rules applicable to the current @see scenario.
      * The following criteria are used to determine whether a rule is currently applicable:
      *
      * - the rule must be associated with the attributes relevant to the current scenario;
      * - the rules must be effective for the current scenario.
      *
-     * This method will call [[beforeValidate()]] and [[afterValidate()]] before and
-     * after the actual validation, respectively. If [[beforeValidate()]] returns false,
-     * the validation will be cancelled and [[afterValidate()]] will not be called.
+     * This method will call @see beforeValidate()
+     * and @see afterValidate() before and
+     * after the actual validation, respectively. If @see beforeValidate() returns false,
+     * the validation will be cancelled and @see afterValidate() will not be called.
      *
-     * Errors found during the validation can be retrieved via [[getErrors()]],
-     * [[getFirstErrors()]] and [[getFirstError()]].
+     * Errors found during the validation
+     * can be retrieved via @see getErrors() ,
+     *
+     * @see getFirstErrors()
+     * and @see getFirstError() .
      *
      * @param array $attributes list of attributes that should be validated.
      *                          If this parameter is empty, it means any attribute listed in the applicable
      *                          validation rules should be validated.
-     * @param boolean $clearErrors whether to call [[clearErrors()]] before performing validation
+     * @param boolean $clearErrors whether to
+     * call @see clearErrors() before performing validation
      * @return boolean whether the validation is successful without any error.
      */
     public function validate(array $attributes = null, $clearErrors = true)
@@ -277,7 +280,6 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
         $this->afterValidate();
         return true;
     }
-
 
     private function _filtersRulesControl(array $attributes, array $rules, $const = self::RULE_BEFORE_FILTERS)
     {
@@ -399,7 +401,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
 
     /**
      * This method is invoked before validation starts.
-     * The default implementation raises a `beforeValidate` event.
+     * The default implementation raises a @see beforeValidate() event.
      * You may override this method to do preliminary checks before validation.
      * Make sure the parent implementation is invoked so that the event can be raised.
      * @return boolean whether the validation should be executed. Defaults to true.
@@ -417,7 +419,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
 
     /**
      * This method is invoked after validation ends.
-     * The default implementation raises an `afterValidate` event.
+     * The default implementation raises an @see afterValidate() event.
      * You may override this method to do postprocessing after validation.
      * Make sure the parent implementation is invoked so that the event can be raised.
      */
@@ -473,11 +475,11 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
      *
      * @param string   $attribute attribute name. Use null to retrieve errors for all attributes.
      * @property array An         array of errors for all attributes. Empty array is returned if no error.
-     *                            The result is a two-dimensional array. See [[getErrors()]] for detailed description.
+     *                            The result is a two-dimensional array. See @see getErrors() for detailed description.
      * @return array errors for all attributes or the specified attribute. Empty array is returned if no error.
      *                            Note that when returning errors for all attributes, the result is a two-dimensional array, like the following:
      *
-     * ~~~
+     * ```php
      * array(
      *     'username' => array(
      *         'Username is required.',
@@ -487,7 +489,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
      *         'Email address is invalid.',
      *     )
      * )
-     * ~~~
+     * ```
      *
      * @see getFirstErrors
      * @see getFirstError
@@ -591,7 +593,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
      * Returns attribute values.
      *
      * @param array $only  list of attributes whose value needs to be returned.
-     *                      Defaults to null, meaning all attributes listed in [[attributes()]] will be returned.
+     *                      Defaults to null, meaning all attributes listed in @see attributes() will be returned.
      *                      If it is an array, only the attributes in the array will be returned.
      * @param array $exclude list of attributes whose value should NOT be returned.
      * @return array attribute values (name => value).
@@ -617,7 +619,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
      * Sets the attribute values in a massive way.
      * @param array $values attribute values (name => value) to be assigned to the model.
      * @param boolean $safeOnly whether the assignments should only be done to the safe attributes.
-     * A safe attribute is one that is associated with a validation rule in the current [[scenario]].
+     * A safe attribute is one that is associated with a validation rule in the current @see scenario .
      * @see safeAttributes()
      * @see attributes()
      */
@@ -673,12 +675,12 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
 
     /**
      * Populates the model with the data from end user.
-     * The data to be loaded is `$data[formName]`, where `formName` refers to the value of [[formName()]].
-     * If [[formName()]] is empty, the whole `$data` array will be used to populate the model.
-     * The data being populated is subject to the safety check by [[setAttributes()]].
+     * The data to be loaded is `$data[formName]`, where `formName` refers to the value of @see formName() .
+     * If @see formName() is empty, the whole `$data` array will be used to populate the model.
+     * The data being populated is subject to the safety check by @see setAttributes() .
      * @param array $data the data array. This is usually `$_POST` or `$_GET`, but can also be any valid array
      * supplied by end user.
-     * @return boolean whether the model is successfully populated with some data.
+     * @return bool whether the model is successfully populated with some data.
      */
     public function load($data)
     {
@@ -698,13 +700,13 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
      * Populates a set of models with the data from end user.
      * This method is mainly used to collect tabular data input.
      * The data to be loaded for each model is `$data[formName][index]`, where `formName`
-     * refers to the value of [[formName()]], and `index` the index of the model in the `$models` array.
-     * If [[formName()]] is empty, `$data[index]` will be used to populate each model.
-     * The data being populated to each model is subject to the safety check by [[setAttributes()]].
+     * refers to the value of @see formName() , and `index` the index of the model in the `$models` array.
+     * If @see formName() is empty, `$data[index]` will be used to populate each model.
+     * The data being populated to each model is subject to the safety check by @see setAttributes() .
      * @param array $models the models to be populated. Note that all models should have the same class.
      * @param array $data the data array. This is usually `$_POST` or `$_GET`, but can also be any valid array
      * supplied by end user.
-     * @return boolean whether the model is successfully populated with some data.
+     * @return bool whether the model is successfully populated with some data.
      */
     public static function loadMultiple($models, $data)
     {
@@ -730,24 +732,10 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
         return $success;
     }
 
-
-//    /**
-//     * Converts the object into an array.
-//     * The default implementation will return [[attributes]].
-//     *
-//     * @param array  $only
-//     * @param array $exclude
-//     * @return array the array representation of the object
-//     */
-//    public function toArray(array $only = [], array $exclude = [])
-//    {
-//        return $this->getAttributes($only, $exclude);
-//    }
-
     /**
-     * Returns the list of fields that should be returned by default by [[toArray()]] when no specific fields are specified.
+     * Returns the list of fields that should be returned by default by @see toArray() when no specific fields are specified.
      *
-     * A field is a named element in the returned array by [[toArray()]].
+     * A field is a named element in the returned array by @see toArray() .
      *
      * This method should return an array of field names or field definitions.
      * If the former, the field name will be treated as an object property name whose value will be used
@@ -781,10 +769,10 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
      * ```
      *
      * In this method, you may also want to return different lists of fields based on some context
-     * information. For example, depending on [[scenario]] or the privilege of the current application user,
+     * information. For example, depending on @see scenario or the privilege of the current application user,
      * you may return different sets of visible fields or filter out some fields.
      *
-     * The default implementation of this method returns [[attributes()]] indexed by the same attribute names.
+     * The default implementation of this method returns @see attributes() indexed by the same attribute names.
      *
      * @return array the list of field names or field definitions.
      * @see toArray()
@@ -816,7 +804,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
      * It is implicitly called when you use something like `isset($model[$offset])`.
      *
      * @param mixed $offset the offset to check on
-     * @return boolean
+     * @return bool
      */
     public function offsetExists($offset)
     {
@@ -859,5 +847,14 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
     public function offsetUnset($offset)
     {
         $this->$offset = null;
+    }
+
+    protected function error($msg, $placeholder = null)
+    {
+        if (!isset($placeholder)) {
+            $placeholder = 'e_' . $this->formName();
+        }
+
+        $this->Rock->template->addPlaceholder($placeholder, $msg, true);
     }
 }

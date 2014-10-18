@@ -1,9 +1,10 @@
 <?php
 
-namespace rockunit\core\helpers;
+namespace rockunit\core;
 
+
+use rock\base\Model;
 use rock\base\ObjectTrait;
-use rock\helpers\Instance;
 
 class Post1
 {
@@ -43,16 +44,15 @@ class Post3
 
 /**
  * @group base
- * @group helpers
  */
-class InstanceHelperTest extends \PHPUnit_Framework_TestCase
+class ModelTest extends \PHPUnit_Framework_TestCase
 {
     public function testToArray()
     {
         $object = new Post1;
-        $this->assertEquals(get_object_vars($object), Instance::toArray($object));
+        $this->assertEquals(get_object_vars($object), Model::convert($object));
         $object = new Post2;
-        $this->assertEquals(get_object_vars($object), Instance::toArray($object));
+        $this->assertEquals(get_object_vars($object), Model::convert($object));
         $object1 = new Post1;
         $object2 = new Post2;
         $this->assertEquals(
@@ -60,7 +60,7 @@ class InstanceHelperTest extends \PHPUnit_Framework_TestCase
                 get_object_vars($object1),
                 get_object_vars($object2),
             ],
-            Instance::toArray(
+            Model::convert(
                 [
                     $object1,
                     $object2,
@@ -75,21 +75,21 @@ class InstanceHelperTest extends \PHPUnit_Framework_TestCase
                 '_content' => 'test',
                 'length' => 4,
             ],
-            Instance::toArray(
+            Model::convert(
                 $object,
                 [
                     $object->className() => [
                         'id', 'secret',
                         '_content' => 'content',
                         'length' => function ($post) {
-                                return strlen($post->content);
-                            }
+                            return strlen($post->content);
+                        }
                     ]
                 ]
             )
         );
         $object = new Post3();
-        $this->assertEquals(get_object_vars($object), Instance::toArray($object, [], false));
+        $this->assertEquals(get_object_vars($object), Model::convert($object, [], false));
         $this->assertEquals(
             [
                 'id' => 33,
@@ -98,13 +98,7 @@ class InstanceHelperTest extends \PHPUnit_Framework_TestCase
                     'content' => 'test',
                 ],
             ],
-            Instance::toArray($object)
+            Model::convert($object)
         );
     }
-
-
-    public function testPrepareArray()
-    {
-    }
 }
- 
