@@ -62,36 +62,25 @@ class Pagination extends Snippet
      * @var string|array
      */
     public $call;
-
     public $pageVar;
-
     /**
      * tpl active
      *
      * @var string
      */
     public $pageActiveTpl;
-
     public $pageNumTpl;
-
     public $pageFirstName;
-
     public $pageFirstTpl;
-
     public $pageLastName;
-
     public $pageLastTpl;
-
     public $wrapperTpl;
-
     /**
-     * url-arguments
-     *
-     * @var
+     * URL-arguments
+     * @var array
      */
-    public $pageArgs;
+    public $pageArgs = [];
     public $pageAnchor;
-
     public $autoEscape = false;
 
 
@@ -108,24 +97,18 @@ class Pagination extends Snippet
             return null;
         }
         $data = $this->array;
-        /**
-         * if exits args-url
-         */
+        // if exits args-url
         if (!$this->calculateArgs()) {
             return null;
         }
-        /**
-         * set name of arg-url by pagination
-         */
+        // set name of arg-url by pagination
         $pageVar = !empty($this->pageVar)
             ? $this->pageVar
             : (!empty($data['pageVar'])
                 ? $data['pageVar']
                 : \rock\helpers\Pagination::PAGE_VAR
             );
-        /**
-         * Numeration
-         */
+        // Numeration
         $num = $this->calculateNum($data, $pageVar);
         $pageFirstName = $this->calculateFirstPage($data, $pageVar);
         $pageLastName = $this->calculateLastPage($data, $pageVar);
@@ -185,9 +168,7 @@ class Pagination extends Snippet
         foreach ($data['pageDisplay'] as $num) {
             $this->pageArgs[$pageVar] = $num;
             $url = $this->Rock->url->addArgs($this->pageArgs)->addAnchor($this->pageAnchor)->get();
-            /**
-             * for active page
-             */
+            // for active page
             if ((int)$data['pageCurrent'] === (int)$num) {
                 $result .=
                     $this->template->replaceByPrefix(

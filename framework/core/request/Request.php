@@ -13,6 +13,8 @@ use rock\Rock;
  *
  * @property-read string scheme
  * @property-read string host
+ * @property-read string hostInfo
+ * @property-read string queryString
  * @property-read array $eTags The entity tags. This property is read-only.
  *
  * @package rock\request
@@ -38,7 +40,6 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
     public $methodVar = '_method';
     /**
      * @var boolean whether to show entry script name in the constructed URL. Defaults to true.
-     * This property is used only if [[enablePrettyUrl]] is true.
      */
     public $showScriptName = true;
 
@@ -176,7 +177,7 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
 
     /**
      * Sets the acceptable content types.
-     * Please refer to [[getAcceptableContentTypes()]] on the format of the parameter.
+     * Please refer to @see getAcceptableContentTypes() on the format of the parameter.
      * @param array $value the content types that are acceptable by the end user. They should
      * be ordered by the preference level.
      * @see getAcceptableContentTypes()
@@ -190,9 +191,9 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
     /**
      * Returns request content-type
      * The Content-Type header field indicates the MIME type of the data
-     * contained in [[getRawBody()]] or, in the case of the HEAD method, the
+     * contained in the case of the HEAD method, the
      * media type that would have been sent had the request been a GET.
-     * For the MIME-types the user expects in response, see [[acceptableContentTypes]].
+     * For the MIME-types the user expects in response, see @see getAcceptableContentTypes() .
      * @return string request content-type. Null is returned if this information is not available.
      * @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.17
      * HTTP 1.1 header field definitions
@@ -480,7 +481,8 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
 
     /**
      * Returns the currently requested absolute URL.
-     * This is a shortcut to the concatenation of [[hostInfo]] and [[url]].
+     * This is a shortcut to the concatenation of @see getHostInfo()
+     * and @see getUrl() .
      *
      * @param bool $strip
      * @return string the currently requested absolute URL.
@@ -495,8 +497,8 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
 
     /**
      * Returns the currently requested relative URL.
-     * This refers to the portion of the URL that is after the [[hostInfo]] part.
-     * It includes the [[queryString]] part if any.
+     * This refers to the portion of the URL that is after the @see getHostInfo() part.
+     * It includes the @see getQueryString() part if any.
      * @return string the currently requested relative URL. Note that the URI returned is URL-encoded.
      * @throws Exception if the URL cannot be determined due to unusual server configuration
      */
@@ -510,7 +512,7 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
 
     /**
      * Sets the currently requested relative URL.
-     * The URI must refer to the portion that is after [[hostInfo]].
+     * The URI must refer to the portion that is after @see getHostInfo() .
      * Note that the URI should be URL-encoded.
      * @param string $value the request URI to be set
      */
@@ -521,8 +523,10 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
 
     /**
      * Resolves the request URI portion for the currently requested URL.
-     * This refers to the portion that is after the [[hostInfo]] part. It includes the [[queryString]] part if any.
+     * This refers to the portion that is after the @see hostInfo part. It includes
+     * the @see queryString part if any.
      * The implementation of this method referenced Zend_Controller_Request_Http in Zend Framework.
+     *
      * @return string|boolean the request URI portion for the currently requested URL.
      * Note that the URI returned is URL-encoded.
      * @throws Exception if the request URI cannot be determined due to unusual server configuration
@@ -555,9 +559,8 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
      * Returns the schema and host part of the current request URL.
      * The returned URL does not have an ending slash.
      * By default this is determined based on the user request information.
-     * You may explicitly specify it by setting the [[setHostInfo()|hostInfo]] property.
+     * You may explicitly specify it by setting the @see hostInfo property.
      * @return string schema and hostname part (with port number if needed) of the request URL (e.g. `http://www.site.com`)
-     * @see setHostInfo()
      */
     public function getHostInfo()
     {
@@ -613,7 +616,7 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
 
     /**
      * Returns the relative URL for the application.
-     * This is similar to [[scriptUrl]] except that it does not include the script file name,
+     * This is similar to @see getScriptUrl() except that it does not include the script file name,
      * and the ending slashes are removed.
      * @return string the relative URL for the application
      * @see setScriptUrl()
@@ -853,7 +856,6 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
     {
         return in_array($this->getMethod(), $methods, true);
     }
-
 
     /**
      * Is ips request

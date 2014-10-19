@@ -13,12 +13,14 @@ class NumericFilter
     use ClassName;
 
     /**
-     * Check numeric is parity
+     * Check numeric is parity.
      *
      * @param string   $value
-     * @param array    $params
-     *                 => then
-     *                 => else
+     * @param array    $params:
+     *
+     * - then
+     * - else
+     *
      * @param Template $template
      * @throws \rock\template\Exception
      * @return string
@@ -39,7 +41,8 @@ class NumericFilter
     }
 
     /**
-     * Number convert to positive
+     * Number convert to positive.
+     *
      * @param int $value
      * @return int
      */
@@ -52,9 +55,11 @@ class NumericFilter
      * The value is calculated by the formula
      *
      * @param float|int|number $value
-     * @param array $params
-     *                  => operator - arithmetic and bitwise operators: *, **, +, -, /, %, |, &, ^, <<, >>
-     *                  => operand
+     * @param array $params:
+     *
+     * - operator: arithmetic and bitwise operators: `*`, `**`, `+`, `-`, `/`, `%`, `|`, `&`, `^`, `<<`, `>>`
+     * - operand
+     *
      * @return float|int|number
      * @throws \rock\template\Exception
      *
@@ -98,4 +103,4 @@ class NumericFilter
         }
         throw new Exception(Exception::ERROR, "Unknown operator: {$params['operator']}");
     }
-} 
+}

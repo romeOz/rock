@@ -3,6 +3,7 @@ namespace rock\helpers;
 
 use League\Flysystem\Util;
 use rock\file\Exception;
+use rock\Rock;
 
 /**
  * Helper "FileBase"
@@ -11,20 +12,19 @@ use rock\file\Exception;
  */
 class BaseFile extends Util
 {
-
     const PATTERN_NODIR = 1;
     const PATTERN_ENDSWITH = 4;
     const PATTERN_MUSTBEDIR = 8;
     const PATTERN_NEGATIVE = 16;
 
     /**
-     * Create of file
+     * Create of file.
      *
-     * @param string $pathFile - path to file.
-     * @param string $value    - value.
-     * @param int    $const    - constant for file_put_contents.
+     * @param string $pathFile path to file.
+     * @param string $value    value.
+     * @param int    $const    constant for `file_put_contents`.
      * @param bool   $recursive
-     * @param int    $mode - the permission to be set for the created file.
+     * @param int    $mode the permission to be set for the created file.
      * @return bool
      */
     public static function create($pathFile, $value = "", $const = 0, $recursive = true, $mode = 0775)
@@ -36,8 +36,7 @@ class BaseFile extends Util
         }
 
         if (!file_put_contents($pathFile, $value, $const)) {
-            new Exception(Exception::WARNING, Exception::NOT_CREATE_FILE, ['name' => $pathFile]);
-
+            Rock::warning(Exception::NOT_CREATE_FILE, ['name' => $pathFile]);
             return false;
         }
         chmod($pathFile, $mode);
@@ -45,9 +44,9 @@ class BaseFile extends Util
     }
 
     /**
-     * Delete of file
+     * Delete of file.
      *
-     * @param string $path - path to file
+     * @param string $path path to file
      * @return bool
      */
     public static function delete($path)
@@ -55,38 +54,25 @@ class BaseFile extends Util
         if (!file_exists($path)) {
             return false;
         }
-
         @unlink($path);
-
         return true;
     }
 
-
     /**
-     * Rename file
+     * Rename file.
      *
-     * @param string $oldPath - old path
-     * @param string $newPath - new path
+     * @param string $oldPath old path.
+     * @param string $newPath new path.
      * @return bool
      */
     public static function rename($oldPath, $newPath)
     {
         if (!rename($oldPath, $newPath)) {
-            new Exception(
-                Exception::ERROR,
-                null,
-                [
-                                    'name' => $oldPath,
-                                    'action' => 'rename'
-                ]
-            );
-
+            Rock::error("Error when renaming file: {$oldPath}");
             return false;
         }
-
         return true;
     }
-
 
     /**
      * Determines the MIME type of the specified file.
@@ -96,7 +82,7 @@ class BaseFile extends Util
      * @param string $file the file name.
      * @param string $magicFile name of the optional magic database file, usually something like `/path/to/magic.mime`.
      * This will be passed as the second parameter to [finfo_open](http://php.net/manual/en/function.finfo-open.php).
-     * @param boolean $checkExtension whether to use the file extension to determine the MIME type in case
+     * @param bool $checkExtension whether to use the file extension to determine the MIME type in case
      * `finfo_open()` cannot determine it.
      * @return string the MIME type (e.g. `text/plain`). Null is returned if the MIME type cannot be determined.
      */
@@ -112,10 +98,8 @@ class BaseFile extends Util
                 }
             }
         }
-
         return $checkExtension ? static::getMimeTypeByExtension($file) : null;
     }
-
 
     /**
      * Determines the MIME type based on the extension name of the specified file.
@@ -135,7 +119,6 @@ class BaseFile extends Util
                 return $mimeTypes[$ext];
             }
         }
-
         return null;
     }
 
@@ -200,7 +183,7 @@ class BaseFile extends Util
      *   apply to file paths only. For example, '/a/b' matches all file paths ending with '/a/b';
      *   and '.svn/' matches directory paths ending with '.svn'. Note, the '/' characters in a pattern matches
      *   both '/' and '\' in the paths.
-     * - recursive: boolean, whether the files under the subdirectories should also be copied. Defaults to true.
+     * - recursive: bool, whether the files under the subdirectories should also be copied. Defaults to true.
      * - beforeCopy: callback, a PHP callback that is called before copying each sub-directory or file.
      *   If the callback returns false, the copy operation for the sub-directory or file will be cancelled.
      *   The signature of the callback should be: `function ($from, $to)`, where `$from` is the sub-directory or
@@ -242,7 +225,6 @@ class BaseFile extends Util
         closedir($handle);
     }
 
-
     /**
      * Removes a directory (and all its content) recursively.
      *
@@ -271,13 +253,11 @@ class BaseFile extends Util
         return true;
     }
 
-
     /**
      * Checks if the given file path satisfies the filtering options.
      * @param string $path the path of the file or directory to be checked
-     * @param array $options the filtering options. See [[findFiles()]] for explanations of
-     * the supported options.
-     * @return boolean whether the file or directory satisfies the filtering options.
+     * @param array $options the filtering options.
+     * @return bool whether the file or directory satisfies the filtering options.
      */
     public static function filterPath($path, $options)
     {
@@ -319,8 +299,8 @@ class BaseFile extends Util
      *
      * @param string $path path of the directory to be created.
      * @param integer $mode the permission to be set for the created directory.
-     * @param boolean $recursive whether to create parent directories if they do not exist.
-     * @return boolean whether the directory is created successfully
+     * @param bool $recursive whether to create parent directories if they do not exist.
+     * @return bool whether the directory is created successfully
      */
     public static function createDirectory($path, $mode = 0775, $recursive = true)
     {
@@ -332,17 +312,17 @@ class BaseFile extends Util
             static::createDirectory($parentDir, $mode, true);
         }
         if (!$result = mkdir($path, $mode)) {
-            new Exception(Exception::WARNING, Exception::NOT_CREATE_DIR, ['name' => $path]);
+            Rock::warning(Exception::NOT_CREATE_DIR, ['name' => $path]);
+            return false;
         }
         chmod($path, $mode);
         return $result;
     }
 
-
     /**
      * Normalizes a file/directory path.
      * After normalization, the directory separators in the path will be `DIRECTORY_SEPARATOR`,
-     * and any trailing directory separators will be removed. For example, '/home\demo/' on Linux
+     * and any trailing directory separators will be removed. For example, `/home\demo/` on Linux
      * will be normalized as '/home/demo'.
      * @param string $path the file/directory path to be normalized
      * @param string $ds the directory separator to be used in the normalized result. Defaults to `DIRECTORY_SEPARATOR`.
@@ -352,15 +332,14 @@ class BaseFile extends Util
     {
         return rtrim(strtr($path, ['/' => $ds, '\\' => $ds]), $ds);
     }
-    
 
     /**
      * Returns the trailing name component of a path.
      * This method is similar to the php function `basename()` except that it will
-     * treat both \ and / as directory separators, independent of the operating system.
+     * treat both `\` and `/` as directory separators, independent of the operating system.
      * This method was mainly created to work on php namespaces. When working with real
      * file paths, php's `basename()` should work fine for you.
-     * Note: this method is not aware of the actual filesystem, or path components such as "..".
+     * Note: this method is not aware of the actual filesystem, or path components such as `..`.
      *
      * @param string $path   A path string.
      * @param string $suffix If the name component ends in suffix this will also be cut off.
@@ -383,13 +362,13 @@ class BaseFile extends Util
     /**
      * Performs a simple comparison of file or directory names.
      *
-     * Based on match_basename() from dir.c of git 1.8.5.3 sources.
+     * Based on `match_basename()` from dir.c of git 1.8.5.3 sources.
      *
      * @param string $baseName file or directory name to compare with the pattern
      * @param string $pattern the pattern that $baseName will be compared against
-     * @param integer|boolean $firstWildcard location of first wildcard character in the $pattern
+     * @param integer|bool $firstWildcard location of first wildcard character in the $pattern
      * @param integer $flags pattern flags
-     * @return boolean wheter the name matches against pattern
+     * @return bool wheter the name matches against pattern
      */
     private static function matchBasename($baseName, $pattern, $firstWildcard, $flags)
     {
@@ -406,12 +385,11 @@ class BaseFile extends Util
         }
         return fnmatch($pattern, $baseName, 0);
     }
-    
 
     /**
      * Returns parent directory's path.
      * This method is similar to `dirname()` except that it will treat
-     * both \ and / as directory separators, independent of the operating system.
+     * both `\` and `/` as directory separators, independent of the operating system.
      *
      * @param string $path A path string.
      * @return string the parent directory's path.
@@ -428,9 +406,9 @@ class BaseFile extends Util
     }
 
     /**
-     * Converts php.ini style size to bytes
+     * Converts php.ini style size to bytes.
      *
-     * @param string $sizeStr $sizeStr
+     * @param string $sizeStr
      * @return int
      */
     public static function sizeToBytes($sizeStr)
@@ -471,14 +449,14 @@ class BaseFile extends Util
     /**
      * Compares a path part against a pattern with optional wildcards.
      *
-     * Based on match_pathname() from dir.c of git 1.8.5.3 sources.
+     * Based on `match_pathname()` from dir.c of git 1.8.5.3 sources.
      *
      * @param string $path full path to compare
      * @param string $basePath base of path that will not be compared
      * @param string $pattern the pattern that path part will be compared against
-     * @param integer|boolean $firstWildcard location of first wildcard character in the $pattern
+     * @param integer|bool $firstWildcard location of first wildcard character in the $pattern
      * @param integer $flags pattern flags
-     * @return boolean wheter the path part matches against pattern
+     * @return bool wheter the path part matches against pattern
      */
     private static function matchPathname($path, $basePath, $pattern, $firstWildcard, $flags)
     {
@@ -523,7 +501,7 @@ class BaseFile extends Util
      * any, determines the fate.  Returns the element which
      * matched, or null for undecided.
      *
-     * Based on last_exclude_matching_from_list() from dir.c of git 1.8.5.3 sources.
+     * Based on `last_exclude_matching_from_list()` from dir.c of git 1.8.5.3 sources.
      *
      * @param string $basePath
      * @param string $path
@@ -558,12 +536,10 @@ class BaseFile extends Util
         return null;
     }
 
-
-
     /**
      * Processes the pattern, stripping special characters like / and ! from the beginning and settings flags instead.
      * @param string $pattern
-     * @return array with keys: (string)pattern, (int)flags, (int|boolean)firstWildcard
+     * @return array with keys: (string)pattern, (int)flags, (int|bool)firstWildcard
      * @throws \Exception if the pattern is not a string.
      */
     private static function parseExcludePattern($pattern)
@@ -598,11 +574,10 @@ class BaseFile extends Util
         return $result;
     }
 
-
     /**
      * Searches for the first wildcard character in the pattern.
      * @param string $pattern the pattern to search in
-     * @return integer|boolean position of first wildcard character or false if not found
+     * @return integer|bool position of first wildcard character or false if not found
      */
     private static function firstWildcardInPattern($pattern)
     {

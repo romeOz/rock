@@ -2,7 +2,7 @@
 
 namespace rock\url;
 
-use rock\base\ComponentsTrait;
+use rock\base\ObjectTrait;
 use rock\helpers\Helper;
 use rock\helpers\String;
 use rock\Rock;
@@ -21,8 +21,8 @@ use rock\Rock;
  */
 class Url implements UrlInterface
 {
-    use ComponentsTrait {
-        ComponentsTrait::__construct as parentConstruct;
+    use ObjectTrait {
+        ObjectTrait::__construct as parentConstruct;
     }
 
     /**
@@ -44,7 +44,7 @@ class Url implements UrlInterface
     public $strip = true;
 
     /**
-     * @param string|null  $url - URL for formatting. If url as `NULL`, then use current (self) URL.
+     * @param string|null  $url URL for formatting. If url as `NULL`, then use current (self) URL.
      * @param array $config
      */
     public function __construct($url = null, $config = [])
@@ -58,9 +58,9 @@ class Url implements UrlInterface
     }
 
     /**
-     * Set URL-args
+     * Set URL-args.
      *
-     * @param array $args - array args
+     * @param array $args array args
      * @return $this
      */
     public function setArgs(array $args)
@@ -71,9 +71,9 @@ class Url implements UrlInterface
     }
 
     /**
-     * Adding URL-arguments
+     * Adding URL-arguments.
      *
-     * @param array $args - arguments
+     * @param array $args arguments
      * @return $this
      */
     public function addArgs(array $args)
@@ -84,9 +84,9 @@ class Url implements UrlInterface
     }
 
     /**
-     * Removing URL-args
+     * Removing URL-args.
      *
-     * @param array $args - arguments
+     * @param array $args arguments
      * @return $this
      */
     public function removeArgs(array $args)
@@ -217,7 +217,7 @@ class Url implements UrlInterface
      * Get formatted URL.
      *
      * @param int  $const
-     * @param bool $selfHost - to use current host (security).
+     * @param bool $selfHost to use current host (security).
      * @return null|string
      */
     public function get($const = 0, $selfHost = false)

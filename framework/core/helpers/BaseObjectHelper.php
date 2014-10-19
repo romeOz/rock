@@ -1,23 +1,24 @@
 <?php
 namespace rock\helpers;
 
-
-
 class BaseObjectHelper
 {
     /**
-     * Array of data optimization
+     * Array of data optimization.
      *
      * @var array
      */
     protected static $caching = [];
+    protected static $objects = [];
+    protected static $staticProperties;
 
     /**
-     * Set value
+     * Set value.
+     *
      * @param object $object
      * @param array  $keys
      * @param mixed  $value
-     * @param bool  $throwException
+     * @param bool   $throwException
      * @return object
      * @throws ObjectHelperException
      */
@@ -28,10 +29,10 @@ class BaseObjectHelper
             if (!isset($object->$property) && $throwException === true) {
                 throw new ObjectHelperException(
                     ObjectHelperException::CRITICAL, ObjectHelperException::SETTING_UNKNOWN_PROPERTY, [
-                                                       'class' => get_class(
-                                                           $object
-                                                       ), 'property' => $property
-                                                   ]
+                        'class' => get_class(
+                            $object
+                        ), 'property' => $property
+                    ]
                 );
             } else {
                 $object->$property = new \stdClass();
@@ -42,28 +43,28 @@ class BaseObjectHelper
             if (!isset($object->$property) && $throwException === true) {
                 throw new ObjectHelperException(
                     ObjectHelperException::CRITICAL, ObjectHelperException::SETTING_UNKNOWN_PROPERTY, [
-                                                       'class' => get_class(
-                                                           $object
-                                                       ), 'property' => $property
-                                                   ]
+                        'class' => get_class(
+                            $object
+                        ), 'property' => $property
+                    ]
                 );
             } else {
                 $object->$property = new \stdClass();
             }
-
             $object->$property = $value;
         }
 
         return $object;
     }
 
-
-
     /**
-     * Get method name
-     * ~~~~~~~~~~~~~~~~
-     * methodName('namespace\Foo', 'method') => namespace\Foo::method
-     * ~~~~~~~~~~~~~~~~
+     * Get method name.
+     *
+     * ```php
+     * ObjectHelper::methodName('namespace\Foo', 'method');
+     * // output: namespace\Foo::method
+     * ```
+     *
      * @param object|string $object
      * @param string        $method
      * @return string
@@ -77,9 +78,8 @@ class BaseObjectHelper
         return "{$object}::{$method}";
     }
 
-    protected static $objects = [];
     /**
-     * Convert multi-array in object
+     * Convert multi-array in object.
      *
      * @param array $array
      * @param bool  $recursive
@@ -97,7 +97,6 @@ class BaseObjectHelper
 
         return static::$objects[$hash] = static::prepareToObject($array, $recursive);
     }
-
 
     protected static function prepareToObject(array $array, $recursive = false)
     {
@@ -118,7 +117,7 @@ class BaseObjectHelper
     /**
      * Returns the public member variables of an object.
      * This method is provided such that we can get the public member variables of an object.
-     * It is different from "get_object_vars()" because the latter will return private
+     * It is different from `get_object_vars()` because the latter will return private
      * and protected variables if it is called within the object itself.
      *
      * @param object $object the object to be handled
@@ -128,8 +127,6 @@ class BaseObjectHelper
     {
         return get_object_vars($object);
     }
-
-    protected static $staticProperties;
 
     /**
      * Configures an object with the initial property values.
@@ -193,19 +190,6 @@ class BaseObjectHelper
         return $result;
     }
 
-
-    /**
-     * Value to namespace
-     *
-     * @param string $class - value
-     * @return string
-     */
-    public static function normalizeNamespace($class)
-    {
-        return preg_replace('/[\/_\\\]+/', '\\', $class);
-    }
-
-
     public static function basename($class)
     {
         $class = static::getClass($class);
@@ -226,20 +210,29 @@ class BaseObjectHelper
         return ltrim(static::normalizeNamespace($class), '\\');
     }
 
-
+    /**
+     * Value to namespace.
+     *
+     * @param string $class value
+     * @return string
+     */
+    public static function normalizeNamespace($class)
+    {
+        return preg_replace('/[\/_\\\]+/', '\\', $class);
+    }
 
     public static function isNamespace($value)
     {
-       return (bool)strstr($value, '\\');
+        return (bool)strstr($value, '\\');
     }
 
 
     /**
-     * Get result method (dynamic args)
+     * Get result method (dynamic args).
      *
      * @param object|string $object
-     * @param string        $method_name - name of method
-     * @param array         $args        - args of method
+     * @param string        $method_name name of method
+     * @param array         $args        args of method
      * @return mixed
      */
     public static function call($object, $method_name, array $args = null)
@@ -261,18 +254,6 @@ class BaseObjectHelper
         return $reflection->invokeArgs($object, $pass);
     }
 
-
-    public static function getTraitsRecursive($class, $autoload = true) {
-        $traits = [];
-        do {
-            $traits = array_merge(class_uses($class, $autoload), $traits);
-        } while($class = get_parent_class($class));
-        foreach ($traits as $trait => $same) {
-            $traits = array_merge(class_uses($trait, $autoload), $traits);
-        }
-        return array_unique($traits);
-    }
-
     public static function instanceOfTrait($class, $trait, $recursive = true)
     {
         return $recursive === true
@@ -280,11 +261,23 @@ class BaseObjectHelper
             : isset(class_uses($class)[$trait]);
     }
 
+    public static function getTraitsRecursive($class, $autoload = true)
+    {
+        $traits = [];
+        do {
+            $traits = array_merge(class_uses($class, $autoload), $traits);
+        } while ($class = get_parent_class($class));
+        foreach ($traits as $trait => $same) {
+            $traits = array_merge(class_uses($trait, $autoload), $traits);
+        }
+
+        return array_unique($traits);
+    }
 
     public static function calculateArgsConstructor($args)
     {
         $configs = current(array_slice($args, -1, 1));
-        $args = array_slice($args, 0, count($args)-1);
+        $args = array_slice($args, 0, count($args) - 1);
         if (!empty($configs) && !is_array($configs)) {
             $args = [$configs];
             $configs = [];

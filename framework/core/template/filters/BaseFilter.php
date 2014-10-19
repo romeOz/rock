@@ -20,10 +20,12 @@ class BaseFilter implements ThumbInterface
     /**
      * Unserialize.
      *
-     * @param string $value serialized array
-     * @param array  $params params
-     *                        - key
-     *                        - separator
+     * @param string $value  serialized array
+     * @param array  $params params:
+     *
+     * - key
+     * - separator
+     *
      * @return string
      */
     public static function unserialize($value, array $params)
@@ -31,7 +33,6 @@ class BaseFilter implements ThumbInterface
         if (empty($value)) {
             return null;
         }
-
         if (!empty($params['key'])) {
             return ArrayHelper::getValue(
                 Serialize::unserialize($value, false),
@@ -45,8 +46,8 @@ class BaseFilter implements ThumbInterface
     /**
      * Replace variables template (`chunk`, `snippet`...).
      *
-     * @param string                  $content content
-     * @param array                   $placeholders
+     * @param string   $content content
+     * @param array    $placeholders
      * @param Template $template
      * @return string
      */
@@ -54,6 +55,7 @@ class BaseFilter implements ThumbInterface
     {
         $template = clone $template;
         $template->removeAllPlaceholders();
+
         return $template->replace($content, $placeholders);
     }
 
@@ -62,8 +64,10 @@ class BaseFilter implements ThumbInterface
      * Modify date.
      *
      * @param string $date   date
-     * @param array  $params params
-     *                       - format date format
+     * @param array  $params params:
+     *
+     * - format: date format
+     *
      * @return string|null
      */
     public static function modifyDate($date, array $params = [])
@@ -75,7 +79,9 @@ class BaseFilter implements ThumbInterface
         $params['config']['class'] = DateTime::className();
         /** @var DateTime $dateTime */
         $dateTime = Rock::factory($date, null, $params['config']);
-        return $dateTime->convertTimezone(Helper::getValue($params['timezone']))->format(Helper::getValue($params['format']));
+
+        return $dateTime->convertTimezone(Helper::getValue($params['timezone']))->format(
+            Helper::getValue($params['format']));
     }
 
 
@@ -83,19 +89,20 @@ class BaseFilter implements ThumbInterface
      * Modify url.
      *
      * @param string $url
-     * @param array  $params params
-     *                  - args        URL-arguments for set.
-     *                  - csrf        adding CSRF-token.
-     *                  - addArgs       URL-arguments for adding.
-     *                  - removeArgs      URL-arguments for removing.
-     *                  - removeAllArgs   remove all URL-arguments.
-     *                  - beginPath     string to begin of URL-path.
-     *                  - endPath       string to end of URL-path.
-     *                  - replace       the replacement data.
-     *                  - anchor       anchor for adding.
-     *                  - removeAnchor       remove anchor.
-     *                  - referrer referrer URL for formatting.
-     *                  - const - adduce URL to: @see Url::ABS, Url::HTTP,
+     * @param array  $params params:
+     *
+     * - args:        URL-arguments for set.
+     * - csrf:        adding CSRF-token.
+     * - addArgs:       URL-arguments for adding.
+     * - removeArgs:      URL-arguments for removing.
+     * - removeAllArgs:   remove all URL-arguments.
+     * - beginPath:     string to begin of URL-path.
+     * - endPath:       string to end of URL-path.
+     * - replace:       the replacement data.
+     * - anchor:       anchor for adding.
+     * - removeAnchor:       remove anchor.
+     * - referrer: referrer URL for formatting.
+     * - const: - adduce URL to: @see Url::ABS, Url::HTTP,
      *                  and @see Url::HTTPS.
      * @return string
      */
@@ -105,7 +112,7 @@ class BaseFilter implements ThumbInterface
             return '#';
         }
         if (isset($params['referrer'])) {
-            $url = Rock::$app->request->getReferrer() ? : '';
+            $url = Rock::$app->request->getReferrer() ?: '';
         }
         /** @var Url $urlBuilder */
         $urlBuilder = Rock::factory($url, Url::className());
@@ -147,6 +154,7 @@ class BaseFilter implements ThumbInterface
         if (isset($params['anchor'])) {
             $urlBuilder->addAnchor($params['anchor']);
         }
+
         return $urlBuilder->get(Helper::getValue($params['const'], 0), (bool)Helper::getValue($params['selfHost']));
     }
 
@@ -161,22 +169,25 @@ class BaseFilter implements ThumbInterface
         if (empty($array)) {
             return null;
         }
-        return Json::encode($array) ? : null;
+
+        return Json::encode($array) ?: null;
     }
 
     /**
      * Get thumb.
      *
-     * @param string $path    src to image
-     * @param array  $params params
-     *                       - type     get `src`, `<a>`, `<img>` (default: `<img>`)
-     *                       - w        width
-     *                       - h        height
-     *                       - q        quality
-     *                       - class    attr `class`
-     *                       - alt      attr `alt`
-     *                       - constant
-     *                       - dummy
+     * @param string $path   src to image
+     * @param array  $params params:
+     *
+     * - type:     get `src`, `<a>`, `<img>` (default: `<img>`)
+     * - w:        width
+     * - h:        height
+     * - q:        quality
+     * - class:    attr `class`
+     * - alt:      attr `alt`
+     * - const
+     * - dummy
+     *
      * @return string
      */
     public static function thumb($path, array $params)
@@ -187,17 +198,15 @@ class BaseFilter implements ThumbInterface
             }
             $path = $params['dummy'];
         }
-
         $const = Helper::getValueIsset($params['const'], 1);
         $dataImage = Rock::$app->dataImage;
         $src = $dataImage->get($path, Helper::getValue($params['w']), Helper::getValue($params['h']));
-
         if (!($const & self::WITHOUT_WIDTH_HEIGHT)) {
             $params['width'] = $dataImage->width;
             $params['height'] = $dataImage->height;
         }
-
         unset($params['h'], $params['w'], $params['type'], $params['const']);
+
         return $const & self::OUTPUT_IMG ? Html::img($src, $params) : $src;
     }
 }

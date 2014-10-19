@@ -24,14 +24,14 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
 
     const DEFAULT_FORMAT = 'Y-m-d H:i:s';
 
+    /**
+     * Default format: `Y-m-d H:i:s`.
+     * @var string
+     */
     public $format = self::DEFAULT_FORMAT;
-
     /** @var  string */
     public $locale;
-
     public $formats = [];
-
-    public $clientTimezone;
 
     /** @var  array */
     protected  static $formatsOption;
@@ -97,7 +97,7 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
     }
 
     /**
-     * Set locale
+     * Set locale.
      *
      * @param string    $locale (e.g. en)
      */
@@ -107,7 +107,7 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
     }
 
     /**
-     * Conversion in accordance with the client
+     * Conversion in accordance with the client.
      *
      * @param string|DateTimeZone|null $timezone
      * @return $this|\DateTime
@@ -115,15 +115,14 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
     public function convertTimezone($timezone = null)
     {
         if (!isset($timezone)) {
-            if (!isset($this->clientTimezone)) {
-                return $this;
-            }
-            $timezone = $this->clientTimezone;
+            return $this;
         }
         return parent::setTimezone($this->calculateTimezone($timezone));
     }
 
     /**
+     * Get formatting date.
+     *
      * @param string|null $format http://php.net/date format or format name. Default value is current
      * @return string
      */
@@ -136,7 +135,8 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
     }
 
     /**
-     * Get date in YYYY-MM-DD format, in server timezone
+     * Get date in `YYYY-MM-DD` format, in server timezone.
+     *
      * @return string
      */
     public function isoDate()
@@ -145,7 +145,8 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
     }
 
     /**
-     * Get date in HH-II-SS format, in server timezone
+     * Get date in `HH-II-SS` format, in server timezone.
+     *
      * @return string
      */
     public function isoTime()
@@ -154,7 +155,8 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
     }
 
     /**
-     * Get datetime in YYYY-MM-DD HH:II:SS format, in server timezone
+     * Get datetime in `YYYY-MM-DD HH:II:SS` format, in server timezone.
+     *
      * @return string
      */
     public function isoDatetime()
@@ -164,6 +166,7 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
 
     /**
      * Magic call of $dater->format($datetimeOrTimestamp, $formatAlias).
+     *
      * @param $formatAlias
      * @param $params
      * @throws Exception
@@ -185,7 +188,7 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
     }
 
     /**
-     * Validation exist date in the format of timestamp
+     * Validation exist date in the format of timestamp.
      *
      * @param string|int $timestamp
      * @return bool
@@ -201,7 +204,7 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
     }
 
     /**
-     * Validate is date
+     * Validate is date.
      *
      * @param string|int $date
      * @return bool
@@ -216,7 +219,7 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
     }
 
     /**
-     * Get microtime
+     * Get microtime.
      *
      * @param int|null $microtime
      * @return float
@@ -228,7 +231,7 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
     }
 
     /**
-     * Get millisecond
+     * Get millisecond.
      * @return float
      */
     public static function millitime()
@@ -329,7 +332,8 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
     }
 
     /**
-     * Get Datetimezone object by timezone name
+     * Get @see \DateTimezone object by timezone name.
+     *
      * @param string|\DateTimezone $timezone
      * @return \DateTimezone|null
      */
@@ -347,7 +351,8 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
     }
 
     /**
-     * Format \DateTime object to http://php.net/date format or format name
+     * Format \DateTime object to http://php.net/date format or format name.
+     *
      * @param $format
      * @return string
      */
@@ -386,7 +391,8 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
     }
 
     /**
-     * Stash custom format options from standard PHP \DateTime format parser
+     * Stash custom format options from standard PHP `\DateTime` format parser.
+     *
      * @param $format
      * @return bool Return true if there was any custom options in $format
      */
@@ -397,7 +403,8 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
     }
 
     /**
-     * Stash custom format options from standard PHP \DateTime format parser
+     * Stash custom format options from standard PHP `\DateTime` format parser.
+     *
      * @param $format
      * @return bool Return true if there was any custom options in $format
      */

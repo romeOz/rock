@@ -14,27 +14,26 @@ use rock\Rock;
  */
 class Thumb extends Snippet implements ThumbInterface
 {
-
+    /**
+     * Src to image.
+     * @var string
+     */
     public $src;
-
     /**
      * width
      * @var
      */
     public $w;
-
     /**
      * height
      * @var
      */
     public $h;
-
     /**
      * quality
      * @var
      */
     public $q;
-
     /**
      * attr "class"
      * @var

@@ -10,24 +10,25 @@ use rock\base\ClassName;
  */
 class BasePagination
 {
-    use className;
+    use ClassName;
 
-
-    const SORT       = SORT_ASC;
-    const LIMIT      = 10;
+    const SORT = SORT_ASC;
+    const LIMIT = 10;
     const PAGE_LIMIT = 5;
-    const PAGE_VAR   = 'page';
+    const PAGE_VAR = 'page';
 
     /**
-     * Get array of pages
+     * Get array of pages.
      *
-     * @param int       $count     - total count of items
-     * @param int|null  $pageCurrent
-     * @param int       $sort      - sort pages
-     *                          => SORT_ASC - asc (by default)
-     *                          => SORT_DESC - desc
-     * @param int       $limit     - limit items
-     * @param int       $pageLimit - limit pages
+     * @param int      $count     total count of items
+     * @param int|null $pageCurrent
+     * @param int      $sort      sort pages:
+     *
+     * - `SORT_ASC`: asc (by default)
+     * - `SORT_DESC`: desc
+     *
+     * @param int      $limit     limit items
+     * @param int      $pageLimit limit pages
      * @return array
      */
     public static function get(
@@ -35,23 +36,20 @@ class BasePagination
         $pageCurrent = null,
         $limit = self::LIMIT,
         $sort = self::SORT,
-        $pageLimit = self::PAGE_LIMIT)
-    {
+        $pageLimit = self::PAGE_LIMIT
+    ) {
         if (empty($count) || !is_numeric($count) || !is_numeric($pageLimit)) {
             return [];
         }
         if (empty($pageVar) || !is_string($pageVar)) {
             $pageVar = 'page';
         }
-        $result['pageVar']   = $pageVar;
-        $count                = (int)$count;
-        $pageLimit            = (int)$pageLimit;
-        $pageCount            = intval(($count - 1) / $limit) + 1;
+        $result['pageVar'] = $pageVar;
+        $count = (int)$count;
+        $pageLimit = (int)$pageLimit;
+        $pageCount = intval(($count - 1) / $limit) + 1;
         $result['pageCount'] = $pageCount;
-
-        /**
-         * DESC
-         */
+        // DESC
         if ($sort === SORT_DESC) {
             if (!isset($pageCurrent)) {
                 $pageCurrent = $pageCount;
@@ -62,9 +60,7 @@ class BasePagination
                 $pageCurrent = $pageCount;
             }
             $result['pageCurrent'] = $pageCurrent;
-            /**
-             *    if count of pages is less, than the limit
-             */
+            // if count of pages is less, than the limit
             if ($pageCount >= $pageLimit) {
                 $pageStart = $pageCurrent + floor(($pageLimit - 1) / 2);
                 if ($pageStart > $pageCount) {
@@ -73,47 +69,40 @@ class BasePagination
                 $pageEnd = $pageStart - $pageLimit + 1;
                 if ($pageEnd <= 1) {
                     $pageStart = $pageLimit;
-                    $pageEnd   = 1;
+                    $pageEnd = 1;
                 }
             } else {
                 $pageStart = $pageCount;
-                $pageEnd   = 1;
+                $pageEnd = 1;
             }
             $result['pageStart'] = (int)$pageStart;
-            $result['pageEnd']   = (int)$pageEnd;
+            $result['pageEnd'] = (int)$pageEnd;
             for ($i = $pageStart; $i >= $pageEnd; --$i) {
                 $result['pageDisplay'][] = $i;
                 if ($i === $result['pageCurrent']) {
-                    if (!(($i+1) > $pageStart)) {
-                        $result['pagePrev'] = $i+1;
+                    if (!(($i + 1) > $pageStart)) {
+                        $result['pagePrev'] = $i + 1;
                     }
-                    if (!(($i-1) < $pageEnd)) {
-                        $result['pageNext'] = $i-1;
+                    if (!(($i - 1) < $pageEnd)) {
+                        $result['pageNext'] = $i - 1;
                     }
                 }
             }
-
-            /**
-             *    page first number
-             */
+            // page first number
             if ($pageCurrent < $pageCount) {
                 $result['pageFirst'] = $pageCount;
             } else {
                 $result['pageFirst'] = null;
             }
-            /**
-             *    page last number
-             */
+            // page last number
             if ($pageCurrent > 1) {
                 $result['pageLast'] = 1;
             } else {
                 $result['pageLast'] = null;
             }
             $result['offset'] = ($pageCount - $pageCurrent) * $limit;
-            $result['limit']   = $limit;
-            /**
-             * ASC
-             */
+            $result['limit'] = $limit;
+            // ASC
         } else {
             if (!isset($pageCurrent)) {
                 $pageCurrent = 1;
@@ -124,9 +113,7 @@ class BasePagination
                 $pageCurrent = $pageCount;
             }
             $result['pageCurrent'] = $pageCurrent;
-            /**
-             *    if count of pages is less, than the limit
-             */
+            // if count of pages is less, than the limit
             if ($pageCount >= $pageLimit) {
                 $pageStart = $pageCurrent - floor(($pageLimit - 1) / 2);
                 if ($pageStart < 1) {
@@ -134,48 +121,42 @@ class BasePagination
                 }
                 $pageEnd = $pageStart + $pageLimit - 1;
                 if ($pageEnd > $pageCount) {
-                    $pageEnd   = $pageCount;
+                    $pageEnd = $pageCount;
                     $pageStart = $pageEnd - $pageLimit + 1;
                 }
             } else {
                 $pageStart = 1;
-                $pageEnd   = $pageCount;
+                $pageEnd = $pageCount;
             }
             $result['pageStart'] = (int)$pageStart;
-            $result['pageEnd']   = (int)$pageEnd;
+            $result['pageEnd'] = (int)$pageEnd;
             for ($i = $pageStart; $i <= $pageEnd; ++$i) {
                 $result['pageDisplay'][] = $i;
                 if ($i === $result['pageCurrent']) {
-                    if (!(($i-1) < $pageStart)) {
-                        $result['pagePrev'] = $i-1;
+                    if (!(($i - 1) < $pageStart)) {
+                        $result['pagePrev'] = $i - 1;
                     }
-                    if (!(($i+1) > $pageEnd)) {
-                        $result['pageNext'] = $i+1;
+                    if (!(($i + 1) > $pageEnd)) {
+                        $result['pageNext'] = $i + 1;
                     }
                 }
             }
-            /**
-             *    page first number
-             */
+            // page first number
             if ($pageCurrent > 1) {
                 $result['pageFirst'] = 1;
             } else {
                 $result['pageFirst'] = null;
             }
-            /**
-             *    page last number
-             */
+            // page last number
             if ($pageCurrent < $pageCount) {
                 $result['pageLast'] = $pageCount;
             } else {
                 $result['pageLast'] = null;
             }
             $result['offset'] = ($pageCurrent - 1) * $limit;
-            $result['limit']   = $limit;
+            $result['limit'] = $limit;
         }
-        /**
-         * Count items of more
-         */
+        // Count items of more
         $result['countMore'] = $count - ($result['offset'] + $result['limit']);
         $result['countMore'] =
             $result['countMore'] >= 0

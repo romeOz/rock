@@ -111,19 +111,20 @@ class ListView extends Snippet
      */
     public $addPlaceholders = [];
     /**
-     * Params pagination
-     *          - array data of pagination as an array
-     *          - call  data of pagination as an call
-     *          - toPlaceholder the name of global placeholder to adding the pagination
-     *          - pageLimit        count buttons of pagination
-     *          - pageVar          name url-argument of pagination ("page" by default)
-     *          - pageArgs         url-arguments of pagination
-     *          - pageAnchor       url-anchor of pagination
-     *          - wrapperTpl       wrapper template for pagination
-     *          - pageNumTpl       template for buttons
-     *          - pageActiveTpl    template for active button
-     *          - pageFirstTpl     template for button "first"
-     *          - pageLastTpl      template for button  "last"
+     * Params pagination:
+     *
+     * - array: data of pagination as an array
+     * - call:  data of pagination as an call
+     * - toPlaceholder: the name of global placeholder to adding the pagination
+     * - pageLimit:        count buttons of pagination
+     * - pageVar:          name url-argument of pagination ("page" by default)
+     * - pageArgs:         url-arguments of pagination
+     * - pageAnchor:       url-anchor of pagination
+     * - wrapperTpl:       wrapper template for pagination
+     * - pageNumTpl:       template for buttons
+     * - pageActiveTpl:    template for active button
+     * - pageFirstTpl:     template for button "first"
+     * - pageLastTpl:      template for button  "last"
      *
      * @var array
      */

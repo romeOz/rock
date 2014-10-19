@@ -180,16 +180,16 @@ class Rock
      * Note, this method does not check if the returned path exists or not.
      *
      * @param string  $alias          the alias to be translated.
-     * @param array   $dataReplace
+     * @param array   $placeholders
      * @param boolean $throwException whether to throw an exception if the given alias is invalid.
      *                                If this is false and an invalid alias is given, false will be returned by this method.
      * @throws \Exception if the alias is invalid while $throwException is true.
      * @return string|boolean the path corresponding to the alias, false if the root alias is not previously registered.
      * @see setAlias()
      */
-    public static function getAlias($alias, array $dataReplace = [],  $throwException = true)
+    public static function getAlias($alias, array $placeholders = [],  $throwException = true)
     {
-        $alias = String::replace($alias, $dataReplace);
+        $alias = String::replace($alias, $placeholders);
         if (strncmp($alias, '@', 1)) {
             // not an alias
             return $alias;
