@@ -60,7 +60,7 @@ class LoginFormTest extends DatabaseTestCase
     public function testFail(array $post, array $placeholders)
     {
         $loginForm = new LoginForm();
-        $post[Rock::$app->token->csrfParam] = call_user_func($post[Rock::$app->token->csrfParam]);
+        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
         $_POST = [$loginForm->formName() => $post];
         $loginForm->load($_POST);
         $loginForm->validate();
@@ -75,7 +75,7 @@ class LoginFormTest extends DatabaseTestCase
                 [
                     'email' => ' FOOgmail.ru    ',
                     'password' => 'abc',
-                    Rock::$app->token->csrfParam => function(){ return Rock::$app->token->create((new LoginForm())->formName());},
+                    Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new LoginForm())->formName());},
                 ],
                 [
                     'e_email' => '"foogmail.ru" must be valid email',
@@ -86,7 +86,7 @@ class LoginFormTest extends DatabaseTestCase
                 [
                     'email' => 'linda@gmail.com',
                     'password' => '123456f',
-                    Rock::$app->token->csrfParam => function(){return '';},
+                    Rock::$app->csrf->csrfParam => function(){return '';},
                 ],
                 [
                     'e_login' => 'the value must not be empty',
@@ -96,7 +96,7 @@ class LoginFormTest extends DatabaseTestCase
                 [
                     'email' => 'linda@gmail.com',
                     'password' => '123456f',
-                    Rock::$app->token->csrfParam => function(){ return Rock::$app->token->create((new LoginForm())->formName());},
+                    Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new LoginForm())->formName());},
                 ],
                 [
                     'e_login' => 'Password or email is invalid.',
@@ -106,7 +106,7 @@ class LoginFormTest extends DatabaseTestCase
                 [
                     'email' => 'jane@hotmail.com',
                     'password' => '123456',
-                    Rock::$app->token->csrfParam => function(){ return Rock::$app->token->create((new LoginForm())->formName());},
+                    Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new LoginForm())->formName());},
                 ],
                 [
                     'e_login' => 'Account is not activated',
@@ -117,7 +117,7 @@ class LoginFormTest extends DatabaseTestCase
 
     public function testSuccess()
     {
-        $token = Rock::$app->token;
+        $token = Rock::$app->csrf;
         $post = [
             'email' => 'Linda@gmail.com',
             'password' => '123456',

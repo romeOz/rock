@@ -140,13 +140,13 @@ class ActiveForm extends Widget
             ],
             ArrayHelper::getValue($this->options, 'hiddenMethod', [])
         );
-        $token = $this->Rock->token;
+        $token = $this->Rock->csrf;
         $this->options['hiddenCsrf'] = array_merge(
             [
                 'data-ng-model' => (isset($name) ? $name : 'form') . '.values.'. $token->csrfParam,
                 'data-simple-name' => $token->csrfParam,
-                'data-form-csrf' => '',
-                'data-ng-value' => 'csrf.token'
+                'data-rock-form-add-csrf' => '',
+                'data-ng-value' => 'getCSRF()'
 
             ],
             ArrayHelper::getValue($this->options, 'hiddenCsrf', [])

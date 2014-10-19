@@ -2,12 +2,12 @@
 namespace rock\response;
 
 use rock\base\ComponentsTrait;
+use rock\csrf\CSRF;
 use rock\event\Event;
 use rock\exception\Exception;
 use rock\helpers\File;
 use rock\helpers\String;
 use rock\Rock;
-use rock\token\Token;
 use rock\url\Url;
 
 /**
@@ -986,13 +986,13 @@ class Response
         if (!$this->sendCSRF) {
             return;
         }
-        $token = $this->Rock->token;
+        $token = $this->Rock->csrf;
         $csrf = $token->create();
         if ($csrf) {
             if (is_array($this->data)) {
                 $this->data[$token->csrfParam] = $csrf;
             }
-            $this->getHeaders()->add(Token::CSRF_HEADER, $csrf);
+            $this->getHeaders()->add(CSRF::CSRF_HEADER, $csrf);
         }
     }
 }

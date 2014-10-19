@@ -57,7 +57,7 @@ class BaseSignupForm extends Model
                                 ->setName(Rock::t('token'))
                                 ->setModel($this)
                                 ->setPlaceholders('e_signup')
-                                ->validate($attributes[$this->Rock->token->csrfParam]) === false
+                                ->validate($attributes[$this->Rock->csrf->csrfParam]) === false
                         ) {
                             return false;
                         }
@@ -132,7 +132,7 @@ class BaseSignupForm extends Model
 
     public function safeAttributes()
     {
-        return ['email', 'username', 'password', 'password_confirm', 'captcha', $this->Rock->token->csrfParam];
+        return ['email', 'username', 'password', 'password_confirm', 'captcha', $this->Rock->csrf->csrfParam];
     }
 
     public function attributeLabels()

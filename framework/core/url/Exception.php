@@ -20,16 +20,16 @@ class Exception extends BaseException
      *
      * @param int|string      $level       - type of exception
      * @param string|null     $msg         - message
-     * @param array           $dataReplace - array replace
+     * @param array           $placeholders - array replace
      * @param \Exception|null $handler     - handler
      * @internal param int|null|string $code - code
      */
     public function __construct(
         $level = self::ERROR,
         $msg = null,
-        array $dataReplace = [],
+        array $placeholders = [],
         \Exception $handler = null
     ){
-        parent::__construct($level, $msg, $dataReplace, $handler);
+        parent::__construct($level, $msg, $placeholders, $handler);
     }
 }

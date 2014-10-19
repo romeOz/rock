@@ -2,22 +2,21 @@
 namespace rock\snippets;
 use rock\base\Snippet;
 
-class Token extends Snippet
+class CSRF extends Snippet
 {
     /**
-     * name of token
+     * Name of CSRF-token.
      *
      * @var string
      */
     public $name;
-
 
     public function get()
     {
         if (empty($this->name)) {
             return false;
         }
-        $token = $this->Rock->token;
+        $token = $this->Rock->csrf;
         return $token->create($this->name);
     }
 }

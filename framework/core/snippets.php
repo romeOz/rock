@@ -33,8 +33,8 @@ return [
         'class'        => 'rock\snippets\request\Post',
     ],
 
-    'Token' => [
-        'class'        => \rock\snippets\Token::className(),
+    'CSRF' => [
+        'class'        => \rock\snippets\CSRF::className(),
     ],
 
     'Url' => [

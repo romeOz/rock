@@ -61,7 +61,7 @@ class SignupFormTest extends DatabaseTestCase
     public function testFail(array $post, array $placeholders)
     {
         $signupForm = new SignupForm();
-        $post[Rock::$app->token->csrfParam] = call_user_func($post[Rock::$app->token->csrfParam]);
+        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
         $_POST = [$signupForm->formName() => $post];
         $signupForm->load($_POST);
         $signupForm->validate();
@@ -77,7 +77,7 @@ class SignupFormTest extends DatabaseTestCase
                     'email' => ' FOOgmail.ru    ',
                     'username' => '',
                     'password' => 'abc',
-                    Rock::$app->token->csrfParam => function(){ return Rock::$app->token->create((new SignupForm())->formName());},
+                    Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new SignupForm())->formName());},
                     'password_confirm' => 'abc',
                     'captcha' => '12345'
                 ],
@@ -94,7 +94,7 @@ class SignupFormTest extends DatabaseTestCase
                     'username' => 'foo',
                     'password' => '123456',
                     'password_confirm' => '123456',
-                    Rock::$app->token->csrfParam => function(){ return Rock::$app->token->create((new SignupForm())->formName());},
+                    Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new SignupForm())->formName());},
                     'captcha' => ''
                 ],
                 [
@@ -108,7 +108,7 @@ class SignupFormTest extends DatabaseTestCase
                     'username' => 'foo',
                     'password' => 'abc',
                     'password_confirm' => 'abcde',
-                    Rock::$app->token->csrfParam => function(){ return Rock::$app->token->create((new SignupForm())->formName());},
+                    Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new SignupForm())->formName());},
                 ],
                 [
                     'e_email' => '"foo@gmail" must be valid email',
@@ -122,7 +122,7 @@ class SignupFormTest extends DatabaseTestCase
                     'email' => 'foogmail.ru',
                     'username' => '',
                     'password' => 'abc',
-                    Rock::$app->token->csrfParam => function () {
+                    Rock::$app->csrf->csrfParam => function () {
                             return '';
                         },
                     'password_confirm' => 'abc',
@@ -142,12 +142,12 @@ class SignupFormTest extends DatabaseTestCase
             'username' => 'Jane',
             'password' => '123456',
             'password_confirm' => '123456',
-            Rock::$app->token->csrfParam => function(){ return Rock::$app->token->create((new SignupForm())->formName());},
+            Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new SignupForm())->formName());},
             'captcha' => '12345'
         ];
         Rock::$app->session->setFlash('captcha', '12345');
         $signupForm = (new SignupForm());
-        $post[Rock::$app->token->csrfParam] = call_user_func($post[Rock::$app->token->csrfParam]);
+        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
         $_POST = [$signupForm->formName() => $post];
         $signupForm->load($_POST);
         $signupForm->validate();
@@ -168,11 +168,11 @@ class SignupFormTest extends DatabaseTestCase
             'username' => 'Chuck',
             'password' => '123456',
             'password_confirm' => '123456',
-            Rock::$app->token->csrfParam => function(){ return Rock::$app->token->create((new SignupForm())->formName());},
+            Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new SignupForm())->formName());},
             'captcha' => '12345'
         ];
         Rock::$app->session->setFlash('captcha', '12345');
-        $post[Rock::$app->token->csrfParam] = call_user_func($post[Rock::$app->token->csrfParam]);
+        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
         $signupForm = (new SignupForm());
         $_POST = [$signupForm->formName() => $post];
         $signupForm->load($_POST);
@@ -195,11 +195,11 @@ class SignupFormTest extends DatabaseTestCase
             'username' => 'Jane',
             'password' => '123456',
             'password_confirm' => '123456',
-            Rock::$app->token->csrfParam => function(){ return Rock::$app->token->create((new SignupForm())->formName());},
+            Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new SignupForm())->formName());},
             'captcha' => '1234'
         ];
         Rock::$app->session->setFlash('captcha', '12345');
-        $post[Rock::$app->token->csrfParam] = call_user_func($post[Rock::$app->token->csrfParam]);
+        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
         $signupForm = (new SignupForm());
         $_POST = [$signupForm->formName() => $post];
         $signupForm->load($_POST);
@@ -222,11 +222,11 @@ class SignupFormTest extends DatabaseTestCase
             'username' => 'Chuck',
             'password' => '123456',
             'password_confirm' => '123456',
-            Rock::$app->token->csrfParam => function(){ return Rock::$app->token->create((new SignupForm())->formName());},
+            Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new SignupForm())->formName());},
             'captcha' => '12345'
         ];
         Rock::$app->session->setFlash('captcha', '12345');
-        $post[Rock::$app->token->csrfParam] = call_user_func($post[Rock::$app->token->csrfParam]);
+        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
         $signupForm = (new SignupForm());
         $_POST = [$signupForm->formName() => $post];
         $signupForm->load($_POST);

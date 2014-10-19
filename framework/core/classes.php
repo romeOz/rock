@@ -17,7 +17,6 @@ use rock\security\Security;
 use rock\template\Template;
 use rock\validation\Validation;
 
-
 return array_merge(
     [
         'access' => [
@@ -355,8 +354,8 @@ return array_merge(
                     );
                 },
         ],
-        'token' => [
-            'class' => \rock\token\Token::className(),
+        'csrf' => [
+            'class' => \rock\csrf\CSRF::className(),
         ],
         'url' => [
             'class' => \rock\url\Url::className(),
@@ -364,6 +363,10 @@ return array_merge(
         'validation' => [
             'class' => \rock\validation\Validation::className(),
             'locale' => function (Validation $validation){ $validation::$locale = Rock::$app->language;}
+        ],
+        'validate' => [
+            'class' => \rock\validate\Validate::className(),
+            'locale' => function (){ return Rock::$app->language;}
         ],
         'captcha' => [
             'class' => \rock\captcha\Captcha::className(),

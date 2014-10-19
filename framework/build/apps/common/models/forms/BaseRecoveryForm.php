@@ -46,7 +46,7 @@ class BaseRecoveryForm extends Model
                             ->token($this->formName())
                             ->setName(Rock::t('token'))
                             ->setPlaceholders('e_recovery')
-                            ->validate($attributes[$this->Rock->token->csrfParam]) === false
+                            ->validate($attributes[$this->Rock->csrf->csrfParam]) === false
                     ) {
                         return false;
                     }
@@ -91,7 +91,7 @@ class BaseRecoveryForm extends Model
 
     public function safeAttributes()
     {
-        return ['email', 'captcha', $this->Rock->token->csrfParam];
+        return ['email', 'captcha', $this->Rock->csrf->csrfParam];
     }
 
     public function attributeLabels()

@@ -63,7 +63,7 @@ class RecoveryFormTest extends DatabaseTestCase
      */
     public function testFail(array $post, array $placeholders)
     {
-        $post[Rock::$app->token->csrfParam] = call_user_func($post[Rock::$app->token->csrfParam]);
+        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
         $recoveryForm = (new RecoveryForm());
         $_POST = [$recoveryForm->formName() => $post];
         $recoveryForm->load($_POST);
@@ -78,7 +78,7 @@ class RecoveryFormTest extends DatabaseTestCase
             [
                 [
                     'email' => '        fooGMAIL.ru  ',
-                    Rock::$app->token->csrfParam => function(){ return Rock::$app->token->create((new RecoveryForm())->formName());},
+                    Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new RecoveryForm())->formName());},
                     'captcha' => '12345'
                 ],
                 [
@@ -89,7 +89,7 @@ class RecoveryFormTest extends DatabaseTestCase
             [
                 [
                     'email' => '',
-                    Rock::$app->token->csrfParam => function(){ return Rock::$app->token->create((new RecoveryForm())->formName());},
+                    Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new RecoveryForm())->formName());},
                     'captcha' => ''
                 ],
                 [
@@ -100,7 +100,7 @@ class RecoveryFormTest extends DatabaseTestCase
             [
                 [
                     'email' => 'foogmail.ru',
-                    Rock::$app->token->csrfParam => function () {
+                    Rock::$app->csrf->csrfParam => function () {
                             return '';
                         },
                     'captcha' => '12345'
@@ -119,11 +119,11 @@ class RecoveryFormTest extends DatabaseTestCase
             'username' => 'Chuck',
             'password' => '123456',
             'password_confirm' => '123456',
-            Rock::$app->token->csrfParam => function(){ return Rock::$app->token->create((new RecoveryForm())->formName());},
+            Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new RecoveryForm())->formName());},
             'captcha' => '12345'
         ];
         Rock::$app->session->setFlash('captcha', '12345');
-        $post[Rock::$app->token->csrfParam] = call_user_func($post[Rock::$app->token->csrfParam]);
+        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
         $recoveryForm = (new RecoveryForm());
         $_POST = [$recoveryForm->formName() => $post];
         $recoveryForm->load($_POST);
@@ -146,11 +146,11 @@ class RecoveryFormTest extends DatabaseTestCase
             'username' => 'Jane',
             'password' => '123456',
             'password_confirm' => '123456',
-            Rock::$app->token->csrfParam => function(){ return Rock::$app->token->create((new RecoveryForm())->formName());},
+            Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new RecoveryForm())->formName());},
             'captcha' => '1234'
         ];
         Rock::$app->session->setFlash('captcha', '12345');
-        $post[Rock::$app->token->csrfParam] = call_user_func($post[Rock::$app->token->csrfParam]);
+        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
         $recoveryForm = (new RecoveryForm());
         $_POST = [$recoveryForm->formName() => $post];
         $recoveryForm->load($_POST);
@@ -173,11 +173,11 @@ class RecoveryFormTest extends DatabaseTestCase
             'username' => 'Chuck',
             'password' => '123456',
             'password_confirm' => '123456',
-            Rock::$app->token->csrfParam => function(){ return Rock::$app->token->create((new SignupForm())->formName());},
+            Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new SignupForm())->formName());},
             'captcha' => '12345'
         ];
         Rock::$app->session->setFlash('captcha', '12345');
-        $post[Rock::$app->token->csrfParam] = call_user_func($post[Rock::$app->token->csrfParam]);
+        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
         $signupForm = (new SignupForm());
         $_POST = [$signupForm->formName() => $post];
         $signupForm->load($_POST);
@@ -196,11 +196,11 @@ class RecoveryFormTest extends DatabaseTestCase
 
         $post = [
             'email' => $email,
-            Rock::$app->token->csrfParam => function(){ return Rock::$app->token->create((new RecoveryForm())->formName());},
+            Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new RecoveryForm())->formName());},
             'captcha' => '12345'
         ];
         Rock::$app->session->setFlash('captcha', '12345');
-        $post[Rock::$app->token->csrfParam] = call_user_func($post[Rock::$app->token->csrfParam]);
+        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
         $recoveryForm = (new RecoveryForm());
         $_POST = [$recoveryForm->formName() => $post];
         $recoveryForm->load($_POST);

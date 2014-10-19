@@ -1,5 +1,5 @@
 <?php
-namespace rock\token;
+namespace rock\csrf;
 
 
 use rock\base\ComponentsInterface;
@@ -9,7 +9,7 @@ use rock\cookie\Cookie;
 use rock\request\RequestInterface;
 use rock\session\SessionInterface;
 
-class Token implements ComponentsInterface, RequestInterface, StorageInterface
+class CSRF implements ComponentsInterface, RequestInterface, StorageInterface
 {
     use ComponentsTrait;
 
@@ -29,7 +29,7 @@ class Token implements ComponentsInterface, RequestInterface, StorageInterface
      * from the same application. If not, a 400 HTTP exception will be raised.
      *
      * Note, this feature requires that the user client accepts cookie. Also, to use this feature,
-     * forms submitted via POST method must contain a hidden input whose name is specified by @see Token::csrfParam.
+     * forms submitted via POST method must contain a hidden input whose name is specified by @see \rock\csrf\CSRF::csrfParam.
      * You may use @see Html::beginForm() to generate his hidden input.
      *
      * @link http://en.wikipedia.org/wiki/Cross-site_request_forgery
@@ -37,7 +37,7 @@ class Token implements ComponentsInterface, RequestInterface, StorageInterface
     public $enableCsrfValidation = true;
     /**
      * @var string the name of the token used to prevent CSRF. Defaults to `_csrf`.
-     * This property is used only when @see Token::enableCsrfValidation is true.
+     * This property is used only when @see \rock\csrf\CSRF::enableCsrfValidation is true.
      */
     public $csrfParam = '_csrf';
     /** @var  SessionInterface */
@@ -98,7 +98,7 @@ class Token implements ComponentsInterface, RequestInterface, StorageInterface
 
     /**
      * @return string the CSRF token
-     * sent via @see \rock\token\Token::CSRF_HEADER by browser. Null is returned if no such header is sent.
+     * sent via @see \rock\csrf\CSRF::CSRF_HEADER by browser. Null is returned if no such header is sent.
      */
     public function getCsrfTokenFromHeader()
     {

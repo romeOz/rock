@@ -9,8 +9,8 @@ class Exception extends BaseException
 {
     const UNKNOWN_HOSTING = 'Unknown hosting: {name}';
 
-    public function __construct($level = self::ERROR, $msg = null, array $dataReplace = [], \Exception $handler = null)
+    public function __construct($level = self::ERROR, $msg = null, array $placeholders = [], \Exception $handler = null)
     {
-        return parent::__construct($level, $msg, $dataReplace, $handler);
+        return parent::__construct($level, $msg, $placeholders, $handler);
     }
 }

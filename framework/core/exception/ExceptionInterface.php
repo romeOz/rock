@@ -25,8 +25,8 @@ interface ExceptionInterface
     /**
      * @param int             $level
      * @param string|null     $msg
-     * @param array|null      $dataReplace
+     * @param array|null      $placeholders
      * @param \Exception|null $handler
      */
-    public function __construct($level, $msg = null, array $dataReplace = [], \Exception $handler = null);
+    public function __construct($level, $msg = null, array $placeholders = [], \Exception $handler = null);
 }

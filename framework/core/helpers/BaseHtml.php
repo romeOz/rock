@@ -4,10 +4,10 @@ namespace rock\helpers;
 
 
 use rock\base\Model;
+use rock\csrf\CSRF;
 use rock\db\ActiveRecordInterface;
 use rock\request\Request;
 use rock\Rock;
-use rock\token\Token;
 use rock\url\Url;
 
 class BaseHtml
@@ -250,8 +250,8 @@ class BaseHtml
      */
     public static function csrfMetaTags()
     {
-        $token = Rock::$app->token;
-        if ($token instanceof Token && $token->enableCsrfValidation) {
+        $token = Rock::$app->csrf;
+        if ($token instanceof CSRF && $token->enableCsrfValidation) {
             return static::tag('meta', '', ['name' => 'csrf-param', 'content' => $token->csrfParam]) . "\n    "
                    . static::tag('meta', '', ['name' => 'csrf-token', 'content' => $token->create('')]) . "\n";
         } else {
@@ -285,7 +285,7 @@ class BaseHtml
         $request = Rock::$app->request;
 
         if ($request instanceof Request) {
-            $token = Rock::$app->token;
+            $token = Rock::$app->csrf;
 
             if (strcasecmp($method, 'get') && strcasecmp($method, 'post')) {
                 // simulate PUT, DELETE, etc. via POST

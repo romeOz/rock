@@ -142,7 +142,7 @@ class BaseFilter implements ThumbInterface
             $urlBuilder->setArgs($params['args']);
         }
         if (isset($params['csrf'])) {
-            $token = Rock::$app->token;
+            $token = Rock::$app->csrf;
             $params['addArgs'] = array_merge(
                 [$token->csrfParam => $token->create()],
                 Helper::getValue($params['csrf'], [])

@@ -37,17 +37,17 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
      *
      * @param int|string      $level       type of exception
      * @param string|null     $msg         message or code
-     * @param array|null      $dataReplace array replace
+     * @param array|null      $placeholders array replace
      * @param \Exception|null $handler     handler
      */
-    public function __construct($level = self::ERROR, $msg = null, array $dataReplace = [], \Exception $handler = null) {
+    public function __construct($level = self::ERROR, $msg = null, array $placeholders = [], \Exception $handler = null) {
         if (isset($handler)) {
             if (method_exists($handler, 'setLevelLog')) {
                 return;
             }
             $msg = $msg ? : $handler->getMessage();
         }
-        $this->message = $this->prepareMsg($msg, $dataReplace);
+        $this->message = $this->prepareMsg($msg, $placeholders);
         //parent::__construct($this->message);
         /** Add log */
         static::log($level, $this->message, $this->_inlineTrace($handler));

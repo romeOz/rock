@@ -24,7 +24,7 @@ namespace rock;
  * @property-read \rock\i18n\i18n                                               $i18n
  * @property-read \rock\mail\Mail                                               $mail
  * @property-read \rock\route\Route                                             $route
- * @property-read \rock\token\Token                                             $token
+ * @property-read \rock\csrf\CSRF                                             $csrf
  * @property-read \rock\execute\Execute                                         $eval
  * @property-read \rock\helpers\Trace                                             $trace
  * @property-read \rock\captcha\Captcha                                         $captcha
@@ -34,6 +34,7 @@ namespace rock;
  * @property-read \rock\response\Response                                       $response
  * @property-read \rock\log\Log                                                 $log
  * @property-read \rock\validation\Validation                                                 $validation
+ * @property-read \rock\validate\Validate                                                $validate
  * @property-read \rock\di\Container                                            $di
  * @property-read \rock\rbac\RBAC                                            $rbac
  * @property-read \rock\markdown\Markdown                                            $markdown

@@ -137,7 +137,7 @@ class Url extends Snippet implements UrlInterface
             $urlBuilder->replacePath($search, $replace);
         }
         if ($this->csrf) {
-            $token = $this->Rock->token;
+            $token = $this->Rock->csrf;
             $this->addArgs[$token->csrfParam] = $token->create();
         }
         if (!empty($this->args)) {

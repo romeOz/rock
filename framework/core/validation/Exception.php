@@ -11,10 +11,10 @@ class Exception extends BaseException
      *
      * @param int|string      $level       - type of exception
      * @param string|null     $msg         - message
-     * @param array           $dataReplace - array replace
+     * @param array           $placeholders - array replace
      * @param \Exception|null $handler     - handler
      */
-    public function __construct($level = self::ERROR, $msg = null, array $dataReplace = [], \Exception $handler = null){
-        parent::__construct($level, $msg, $dataReplace, $handler);
+    public function __construct($level = self::ERROR, $msg = null, array $placeholders = [], \Exception $handler = null){
+        parent::__construct($level, $msg, $placeholders, $handler);
     }
 }
