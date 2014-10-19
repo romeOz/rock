@@ -364,10 +364,10 @@ return array_merge(
             'class' => \rock\validation\Validation::className(),
             'locale' => function (Validation $validation){ $validation::$locale = Rock::$app->language;}
         ],
-        'validate' => [
-            'class' => \rock\validate\Validate::className(),
-            'locale' => function (){ return Rock::$app->language;}
-        ],
+//        'validate' => [
+//            'class' => \rock\validate\Validate::className(),
+//            'locale' => function (){ return Rock::$app->language;}
+//        ],
         'captcha' => [
             'class' => \rock\captcha\Captcha::className(),
             /**
