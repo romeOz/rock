@@ -227,7 +227,6 @@ return array_merge(
             'class' => \rock\execute\CacheExecute::className(),
         ],
 
-
         'i18n' => [
             'class' => \rock\i18n\i18n::className(),
             'pathsDicts' => [

@@ -333,7 +333,7 @@ class TemplateTest extends TemplateCommon
         $this->template->removeAllPlaceholders();
 
         // contains fail
-        $this->assertSame($this->template->replace('[[+title:contains&is=`wo`&then=`[[+title]]`]]', ['title'=> 'Hello World']), '');
+        $this->assertSame($this->template->replace('[[+title:contains&is=`woo`&then=`[[+title]]`]]', ['title'=> 'Hello World']), '');
         $this->template->removeAllPlaceholders();
 
         // isParity success

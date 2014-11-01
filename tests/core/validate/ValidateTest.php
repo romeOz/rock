@@ -1,6 +1,6 @@
 <?php
 
-namespace rockunit\validation;
+namespace rockunit\core\validate;
 
 use rock\validate\Exception;
 use rock\validate\locale\en\Date;
