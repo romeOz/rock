@@ -6,6 +6,21 @@ use rock\i18n\i18n;
 
 class i18nTest extends \PHPUnit_Framework_TestCase
 {
+    protected static $buffer = [];
+    public static function setUpBeforeClass()
+    {
+        $i18n = new i18n();
+        $i18n->locale = null;
+        static::$buffer = $i18n->getAll();
+        $i18n->clear();
+    }
+
+    public static function tearDownAfterClass()
+    {
+        (new i18n())->load(static::$buffer);
+    }
+
+
     public function testAdd()
     {
         $i18n = new i18n();

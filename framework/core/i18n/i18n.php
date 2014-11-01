@@ -105,7 +105,11 @@ class i18n implements ObjectInterface, i18nInterface
      */
     public function getAll(array $only = [], array $exclude = [])
     {
-        return ArrayHelper::only(static::$data[$this->locale], $only, $exclude);
+        $data = static::$data;
+        if (isset($this->locale)) {
+            $data = $data[$this->locale];
+        }
+        return ArrayHelper::only($data, $only, $exclude);
     }
 
     /**
@@ -159,8 +163,12 @@ class i18n implements ObjectInterface, i18nInterface
         ArrayHelper::removeValue(static::$data[$this->locale][$this->category], !is_array($keys) ? explode('.', $keys) : $keys);
     }
 
+    public function load(array $data)
+    {
+        static::$data = $data;
+    }
 
-    public function removeAll()
+    public function clear()
     {
         static::$data = [];
     }
