@@ -17,7 +17,7 @@ Features
  * MVC
  * DI
  * Route
- * Template engine (in a separate project [Rock Template](https://github.com/romeOz/rock-template))
+ * Template engine (in an independent project [Rock Template](https://github.com/romeOz/rock-template))
     * Snippets (ListView, Pagination,...)
     * HTML Builder (fork by [Yii2](https://github.com/yiisoft/yii2))
     * Widgets (fork by [Yii2](https://github.com/yiisoft/yii2))
@@ -28,14 +28,14 @@ Features
  * Url Builder
  * DateTime Builder
  * FileManager (abstraction over the [thephpleague/flysystem](https://github.com/thephpleague/flysystem))
- * Sanitize
+ * Sanitize (in an independent project [Rock Sanitize](https://github.com/romeOz/rock-sanitize))
  * Request
  * Response + Formatters (HtmlResponseFormatter, JsonResponseFormatter, XmlResponseFormatter, RssResponseFormatter, SitemapResponseFormatter)
  * Session
  * Cookie
  * i18n
- * Validation (fork by [Respect/Validation](https://github.com/Respect/Validation))
- * Cache (in a separate project [Rock Cache](https://github.com/romeOz/rock-cache))
+ * Validation (in an independent project [Rock Validate](https://github.com/romeOz/rock-validate))
+ * Cache (in an independent project [Rock Cache](https://github.com/romeOz/rock-cache))
  * Behaviors + Filters (AccessFilter, ContentNegotiatorFilter, EventFilter, RateLimiter, SanitizeFilter, ValidationFilters, VerbFilter, TimestampBehavior)
  * Mail
  * Security + Tokenization
@@ -99,7 +99,7 @@ Use a specially prepared environment (Vagrant + Ansible) with preinstalled and c
  * Composer
  * MySQL 5.5
  * For caching
-    * Couhbase 2.2.0 + pecl couchbase-1.2.2 (**option**)
+    * Couhbase 3.0.0 + pecl couchbase-1.2.2 (**option**)
     * Redis 2.8 + php5-redis (**option**)
     * Memcached 1.4.14 + php5_memcached, php5_memcache
  * For message queue
