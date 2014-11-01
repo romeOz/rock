@@ -31,6 +31,11 @@ class QueryTest extends SphinxTestCase
         static::clearRuntime();
     }
 
+    protected function setUp()
+    {
+        unset($_POST['_method']);
+    }
+
 
     public function testSelect()
     {
