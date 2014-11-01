@@ -165,61 +165,61 @@ class SignupFormTest extends DatabaseTestCase
         ];
     }
 
-//    public function testExistsUserByUsernameFail()
-//    {
-//        $post = [
-//            'email' => 'foo@gmail.ru',
-//            'username' => 'Jane',
-//            'password' => '123456',
-//            'password_confirm' => '123456',
-//            Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new SignupForm())->formName());},
-//            'captcha' => '12345'
-//        ];
-//        Rock::$app->session->setFlash('captcha', '12345');
-//        $model = new SignupForm();
-//        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
-//        $_POST = [$model->formName() => $post];
-//        $model->load($_POST);
-//        $this->assertFalse($model->validate());
-//        $this->assertFalse($model->isSignup);
-//        $this->assertEquals(
-//            [
-//                'e_signup' =>
-//                    [
-//                        'User with this name/e-mail already exists.',
-//                    ],
-//            ],
-//            $model->getErrors()
-//        );
-//    }
-//
-//    public function testExistsUserByEmailFail()
-//    {
-//        $post = [
-//            'email' => 'jane@hotmail.com',
-//            'username' => 'Chuck',
-//            'password' => '123456',
-//            'password_confirm' => '123456',
-//            Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new SignupForm())->formName());},
-//            'captcha' => '12345'
-//        ];
-//        Rock::$app->session->setFlash('captcha', '12345');
-//        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
-//        $model = (new SignupForm());
-//        $_POST = [$model->formName() => $post];
-//        $model->load($_POST);
-//        $this->assertFalse($model->validate());
-//        $this->assertFalse($model->isSignup);
-//        $this->assertEquals(
-//            [
-//                'e_signup' =>
-//                    [
-//                        'User with this name/e-mail already exists.',
-//                    ],
-//            ],
-//            $model->getErrors()
-//        );
-//    }
+    public function testExistsUserByUsernameFail()
+    {
+        $post = [
+            'email' => 'foo@gmail.ru',
+            'username' => 'Jane',
+            'password' => '123456',
+            'password_confirm' => '123456',
+            Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new SignupForm())->formName());},
+            'captcha' => '12345'
+        ];
+        Rock::$app->session->setFlash('captcha', '12345');
+        $model = new SignupForm();
+        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
+        $_POST = [$model->formName() => $post];
+        $model->load($_POST);
+        $this->assertFalse($model->validate());
+        $this->assertFalse($model->isSignup);
+        $this->assertEquals(
+            [
+                'e_signup' =>
+                    [
+                        'User with this name/e-mail already exists.',
+                    ],
+            ],
+            $model->getErrors()
+        );
+    }
+
+    public function testExistsUserByEmailFail()
+    {
+        $post = [
+            'email' => 'jane@hotmail.com',
+            'username' => 'Chuck',
+            'password' => '123456',
+            'password_confirm' => '123456',
+            Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new SignupForm())->formName());},
+            'captcha' => '12345'
+        ];
+        Rock::$app->session->setFlash('captcha', '12345');
+        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
+        $model = (new SignupForm());
+        $_POST = [$model->formName() => $post];
+        $model->load($_POST);
+        $this->assertFalse($model->validate());
+        $this->assertFalse($model->isSignup);
+        $this->assertEquals(
+            [
+                'e_signup' =>
+                    [
+                        'User with this name/e-mail already exists.',
+                    ],
+            ],
+            $model->getErrors()
+        );
+    }
 
 
     public function testCaptchaFail()

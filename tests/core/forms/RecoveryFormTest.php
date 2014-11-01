@@ -224,7 +224,7 @@ class RecoveryFormTest extends DatabaseTestCase
         ];
         Rock::$app->session->setFlash('captcha', '12345');
         $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
-        $model = (new SignupForm());
+        $model = new SignupForm();
         $_POST = [$model->formName() => $post];
         $model->load($_POST);
         $this->assertTrue($model->validate());
