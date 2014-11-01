@@ -6,8 +6,8 @@ if (php --version | grep -i HipHop > /dev/null); then
 fi
 
 # Download and uncompress Couchbase Server
-wget http://packages.couchbase.com/releases/2.2.0/couchbase-server-community_2.2.0_x86_64.deb
-sudo dpkg -i couchbase-server-community_2.2.0_x86_64.deb
+wget http://packages.couchbase.com/releases/3.0.0/couchbase-server-community_3.0.0-ubuntu12.04_amd64.deb
+sudo dpkg -i couchbase-server-community_3.0.0-ubuntu12.04_amd64.deb
 
 # Add couchbase.list to sources.list
 sudo wget -O/etc/apt/sources.list.d/couchbase.list http://packages.couchbase.com/ubuntu/couchbase-ubuntu1204.list
@@ -39,4 +39,4 @@ phpize && ./configure && make install && echo "Installed ext/couchbase-${VERSION
 echo "extension = couchbase.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 # Create test bucket
-/opt/couchbase/bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket=default --bucket-type=memcached --bucket-ramsize=200 --enable-flush=1
+/opt/couchbase/bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket=default --bucket-type=memcached --bucket-ramsize=64 --enable-flush=1 -u demo -p demo
