@@ -42,4 +42,13 @@ class MemcachedTest extends CommonTraitTest
         $this->assertTrue($cache->set('key6', ['bar', 'baz']), 'should be get: true');
         $this->assertFalse($cache->getAll());
     }
+
+    /**
+     * @dataProvider providerCache
+     */
+    public function testStatus(CacheInterface $cache)
+    {
+        /** @var $this \PHPUnit_Framework_TestCase */
+        $this->assertFalse($cache->status());
+    }
 }

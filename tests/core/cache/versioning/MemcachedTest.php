@@ -99,4 +99,13 @@ class MemcachedTest extends CommonTraitTest
             $this->assertEquals($expected, $actual, 'should be get: ' . json_encode($actual));
         }
     }
+
+    /**
+     * @dataProvider providerCache
+     */
+    public function testStatus(CacheInterface $cache)
+    {
+        /** @var $this \PHPUnit_Framework_TestCase */
+        $this->assertFalse($cache->status());
+    }
 }
