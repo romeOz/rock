@@ -69,7 +69,7 @@ class Cookie extends SessionFlash implements \ArrayAccess, CollectionInterface, 
             return $default;
         }
         if (!isset($sanitize)) {
-            $sanitize = Sanitize::removeTags()->call('trim')->toType();
+            $sanitize = Sanitize::removeTags()->trim()->toType();
         }
         return $sanitize->sanitize($result);
     }
@@ -115,7 +115,7 @@ class Cookie extends SessionFlash implements \ArrayAccess, CollectionInterface, 
         }
         static::$data = Serialize::unserializeRecursive($_COOKIE);
         if (!isset($sanitize)) {
-            $sanitize = Sanitize::removeTags()->call('trim')->toType();
+            $sanitize = Sanitize::removeTags()->trim()->toType();
         }
         static::$data = $sanitize->sanitize(static::$data);
 
