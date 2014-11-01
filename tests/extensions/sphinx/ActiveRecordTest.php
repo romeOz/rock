@@ -52,6 +52,7 @@ class ActiveRecordTest extends SphinxTestCase
         parent::setUp();
         ActiveRecord::$db = $this->getConnection();
         Trace::removeAll();
+        unset($_POST['_method']);
     }
 
     protected function tearDown()
@@ -469,11 +470,9 @@ class ActiveRecordTest extends SphinxTestCase
         $_POST['_method'] = 'POST';
         $query = ArticleFilterIndex::find()
             ->where(['id' => 1]);
-        $this->assertSame($query->one()->author_id, '1');
+        $this->assertEquals($query->one()->author_id, 1);
         $this->assertEmpty(Event::getAll());
         $this->expectOutputString('1fail1success');
-
-        unset($_POST['_method']);
     }
 
 
@@ -654,9 +653,7 @@ class ActiveRecordTest extends SphinxTestCase
         $runtime->type_id = 'test';
         $runtime->category = [1, 2];
         $this->assertFalse($runtime->save());
-        $this->assertTrue(Rock::$app->template->hasPlaceholder('e_test', true));
-
-        Rock::$app->template->removeAllPlaceholders(true);
+        $this->assertNotEmpty($runtime->getErrors());
 
         $runtime = new  RuntimeRulesIndex();
         $runtime->checkAccess(
@@ -683,7 +680,7 @@ class ActiveRecordTest extends SphinxTestCase
         $runtime->type_id = 'test';
         $runtime->category = [1, 2];
         $this->assertFalse($runtime->save());
-        $this->assertFalse(Rock::$app->template->hasPlaceholder('e_test', true));
+        $this->assertEmpty($runtime->getErrors());
 
         // success
         $runtime = new RuntimeRulesIndex();
@@ -694,8 +691,6 @@ class ActiveRecordTest extends SphinxTestCase
         $runtime->category = [1, 2];
         $this->assertTrue($runtime->save());
         $this->expectOutputString('fail');
-
-        Rock::$app->template->removeAllPlaceholders(true);
     }
 
     /**
