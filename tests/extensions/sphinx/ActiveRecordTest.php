@@ -6,14 +6,11 @@ namespace rockunit\extensions\sphinx;
 use League\Flysystem\Adapter\Local;
 use rock\access\Access;
 use rock\cache\CacheFile;
-use rock\db\Expression;
 use rock\event\Event;
 use rock\file\FileManager;
 use rock\helpers\Trace;
-use rock\i18n\i18n;
 use rock\Rock;
 use rock\sphinx\ActiveQuery;
-use rock\validation\Validation;
 use rock\sphinx\Connection;
 use rockunit\common\CommonTrait;
 use rockunit\extensions\sphinx\models\ActiveRecord;
@@ -34,7 +31,6 @@ class ActiveRecordTest extends SphinxTestCase
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
-        Validation::setLocale(i18n::EN);
         $cache = Rock::$app->cache;
         $cache->enabled();
         $cache->flush();
@@ -700,52 +696,6 @@ class ActiveRecordTest extends SphinxTestCase
         $this->expectOutputString('fail');
 
         Rock::$app->template->removeAllPlaceholders(true);
-    }
-
-    public function testSmartFilter()
-    {
-        $result = ArticleIndex::find()
-            ->filters(
-                [
-                    'author_id' =>
-                        [
-                            function ($value) {
-                                return $value * -1;
-                            }
-                        ]
-                ]
-            )
-            ->asArray()
-            ->one();
-        $this->assertSame($result['author_id'], -1);
-
-        $result = ArticleIndex::find()
-            ->filters(
-                [
-                    '1.author_id' =>
-                        [
-                            function ($value) {
-                                return $value * -1;
-                            }
-                        ]
-                ]
-            )
-            ->asArray()
-            ->all();
-        $this->assertSame($result[0]['author_id'], 1);
-        $this->assertSame($result[1]['author_id'], -2);
-
-        // validate fail
-        $query = ArticleIndex::find()
-            ->validation(Validation::create()->key('tag', Validation::int()))
-            ->asArray();
-        $this->assertEmpty($query->one());
-
-        // validate success
-        $query = ArticleIndex::find()
-            ->validation(Validation::create()->key('tag', Validation::string()))
-            ->asArray();
-        $this->assertNotEmpty($query->one());
     }
 
     /**

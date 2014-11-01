@@ -18,7 +18,7 @@ class LoginForm extends BaseLoginForm
     {
         if (!isset($this->_users)) {
             if (!$this->_users = BaseUsers::findOneByEmail($this->email, null, false)) {
-                $this->Rock->template->addPlaceholder('e_login', Rock::t('notExistsUser'), true);
+                $this->addErrorAsPlaceholder(Rock::t('notExistsUser'), 'e_login');
             }
         }
 

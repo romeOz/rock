@@ -75,6 +75,6 @@ class IfSnippet extends Snippet
                 : null
             );
 
-        return $this->Rock->eval->get(String::trimSpaces($value), $paramsTpl, $data);
+        return $this->Rock->eval->get(String::removeSpaces($value), $paramsTpl, $data);
     }
 }

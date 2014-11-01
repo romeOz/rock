@@ -6,13 +6,12 @@ namespace apps\common\models\forms;
 use apps\common\models\users\BaseUsers;
 use rock\base\Model;
 use rock\event\Event;
+use rock\exception\ErrorHandler;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
-use rock\helpers\Sanitize;
 use rock\helpers\String;
-use rock\mail\Exception;
 use rock\Rock;
-use rock\validation\Validation;
+use rock\validate\Validate;
 
 class BaseRecoveryForm extends Model
 {
@@ -36,58 +35,88 @@ class BaseRecoveryForm extends Model
 
     public function rules()
     {
-        //$timestamp = time();
         return [
             [
-                self::RULE_VALIDATION,
-                function(array $attributes){
-                    if ($this->Rock->validation
-                            ->notEmpty()
-                            ->token($this->formName())
-                            ->setName(Rock::t('token'))
-                            ->setPlaceholders('e_recovery')
-                            ->validate($attributes[$this->Rock->csrf->csrfParam]) === false
-                    ) {
-                        return false;
-                    }
-                    if ($this->Rock->validation
-                            ->key(
-                                'email',
-                                Validation::notEmpty()
-                                    ->length(4, 80, true)
-                                    ->email()
-                            //->setName($this->Rock->i18n->get('email'))
-                            )
-                            ->key(
-                                'captcha',
-                                Validation::notEmpty()
-                                    ->captcha($this->Rock->captcha->getSession(), true)
-                                    ->setName(Rock::t('captcha'))
-                            )
-                            ->setModel($this)
-                            ->setPlaceholders(
-                                [
-                                    'email.first',
-                                    'captcha.first'
-                                ]
-                            )
-                            ->validate($attributes) === false) {
-                        return false;
-                    }
-
-                    return $this->validateEmail();
-
-                }],
-                [
-                    self::RULE_BEFORE_FILTERS,
-                    [
-                        Sanitize::ANY => [Sanitize::STRIP_TAGS, 'trim'],
-                        'email' => [(object)['mb_strtolower', [Rock::$app->charset]]],
-                    ],
-
-                ],
+                self::RULE_VALIDATE, '_csrf', 'validateCSRF', 'one'
+            ],
+            [
+                self::RULE_SANITIZE, ['email', 'captcha'], 'trim'
+            ],
+            [
+                self::RULE_VALIDATE, ['email', 'captcha'], 'required',
+            ],
+            [
+                self::RULE_VALIDATE, 'email', 'length' => [4, 80, true], 'email'
+            ],
+            [
+                self::RULE_VALIDATE, 'captcha', 'captcha' => [$this->Rock->captcha->getSession()]
+            ],
+            [
+                self::RULE_SANITIZE, 'email', 'lowercase'
+            ],
+            [
+                self::RULE_SANITIZE, ['email', 'captcha'], 'removeTags'
+            ],
+            [
+                self::RULE_VALIDATE, 'email', 'validateEmail'
+            ],
         ];
     }
+
+    //    public function rules()
+    //    {
+    //        //$timestamp = time();
+    //        return [
+    //            [
+    //                self::RULE_VALIDATION,
+    //                function(array $attributes){
+    //                    if ($this->Rock->validation
+    //                            ->notEmpty()
+    //                            ->token($this->formName())
+    //                            ->setName(Rock::t('token'))
+    //                            ->setPlaceholders('e_recovery')
+    //                            ->validate($attributes[$this->Rock->csrf->csrfParam]) === false
+    //                    ) {
+    //                        return false;
+    //                    }
+    //                    if ($this->Rock->validation
+    //                            ->key(
+    //                                'email',
+    //                                Validation::notEmpty()
+    //                                    ->length(4, 80, true)
+    //                                    ->email()
+    //                            //->setName($this->Rock->i18n->get('email'))
+    //                            )
+    //                            ->key(
+    //                                'captcha',
+    //                                Validation::notEmpty()
+    //                                    ->captcha($this->Rock->captcha->getSession(), true)
+    //                                    ->setName(Rock::t('captcha'))
+    //                            )
+    //                            ->setModel($this)
+    //                            ->setPlaceholders(
+    //                                [
+    //                                    'email.first',
+    //                                    'captcha.first'
+    //                                ]
+    //                            )
+    //                            ->validate($attributes) === false) {
+    //                        return false;
+    //                    }
+    //
+    //                    return $this->validateEmail();
+    //
+    //                }],
+    //                [
+    //                    self::RULE_BEFORE_FILTERS,
+    //                    [
+    //                        Sanitize::ANY => [Sanitize::STRIP_TAGS, 'trim'],
+    //                        'email' => [(object)['mb_strtolower', [Rock::$app->charset]]],
+    //                    ],
+    //
+    //                ],
+    //        ];
+    //    }
 
     public function safeAttributes()
     {
@@ -102,21 +131,6 @@ class BaseRecoveryForm extends Model
         ];
     }
 
-    /**
-     * Validates the email.
-     * This method serves as the inline validation for password.
-     */
-    public function validateEmail()
-    {
-        if (!$this->getUsers()) {
-            $this->Rock->template->addPlaceholder('e_recovery', Rock::t('invalidEmail'), true);
-            return false;
-        }
-
-        return true;
-
-    }
-
     protected $_users;
 
     /**
@@ -128,7 +142,7 @@ class BaseRecoveryForm extends Model
     {
         if (!isset($this->_users)) {
             if (!$this->_users = BaseUsers::findOneByEmail($this->email, BaseUsers::STATUS_ACTIVE, false)) {
-                $this->Rock->template->addPlaceholder('e_recovery', Rock::t('invalidEmail'), true);
+                $this->addErrorAsPlaceholder(Rock::t('invalidEmail'), 'e_recovery');
             }
         }
 
@@ -143,7 +157,6 @@ class BaseRecoveryForm extends Model
 
         return $this->afterRecovery();
     }
-
 
     protected function prepareBody($chunk)
     {
@@ -179,8 +192,8 @@ class BaseRecoveryForm extends Model
                 ->body($body)
                 ->send();
         } catch (\Exception $e) {
-            $this->Rock->template->addPlaceholder('e_recovery', Rock::t('failSendEmail'), true);
-            new Exception(Exception::ERROR, $e->getMessage(), null, $e);
+            $this->addErrorAsPlaceholder(Rock::t('failSendEmail'), 'e_recovery');
+            Rock::warning(ErrorHandler::convertExceptionToString($e));
         }
 
         return $this;
@@ -222,7 +235,7 @@ class BaseRecoveryForm extends Model
         $this->password = Rock::$app->security->generateRandomKey(7);
         $users->setPassword($this->password);
         if (!$users->save()) {
-            $this->Rock->template->addPlaceholder('e_recovery', Rock::t('failRecovery'), true);
+            $this->addErrorAsPlaceholder(Rock::t('failRecovery'), 'e_recovery');
             return false;
         }
         $this->isRecovery = true;
@@ -230,6 +243,33 @@ class BaseRecoveryForm extends Model
         if ($this->trigger(self::EVENT_AFTER_RECOVERY, Event::AFTER)->after(null, $result) === false) {
             return false;
         }
+        return true;
+    }
+
+    protected function validateCSRF($input)
+    {
+        $v = Validate::required()->csrf()->placeholders(['name' => 'CSRF-token']);
+        if (!$v->validate($input)) {
+            $this->addErrorAsPlaceholder($v->getFirstError(), 'e_recovery');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Validates the email.
+     * This method serves as the inline validation for password.
+     */
+    protected function validateEmail()
+    {
+        if ($this->hasErrors()) {
+            return true;
+        }
+        if (!$this->getUsers()) {
+            return false;
+        }
+
         return true;
     }
 } 

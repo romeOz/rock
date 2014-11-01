@@ -145,7 +145,7 @@ class Pagination extends Snippet
         }
         if (is_string($this->pageArgs)) {
             parse_str(
-                String::trimSpaces($this->pageArgs),
+                String::removeSpaces($this->pageArgs),
                 $this->pageArgs
             );
         }

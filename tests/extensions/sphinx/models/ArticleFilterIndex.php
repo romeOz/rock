@@ -28,19 +28,4 @@ class ArticleFilterIndex extends ArticleIndex
 
         return parent::beforeFind();
     }
-
-    public function afterFind(&$result = null)
-    {
-        $this->filters(
-            [
-                'author_id' => [
-                    function ($value) {
-                        return (string)$value;
-                    }
-                ],
-            ]
-        );
-
-        return parent::afterFind($result);
-    }
 } 

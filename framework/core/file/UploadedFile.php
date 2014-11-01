@@ -102,7 +102,6 @@ class UploadedFile implements ComponentsInterface
         return null;
     }
 
-
     /**
      * String output.
      * This is PHP magic method that returns string representation of an object.

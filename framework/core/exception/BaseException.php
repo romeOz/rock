@@ -117,7 +117,7 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
      */
     public static function getAll(array $only = [], array $exclude = [])
     {
-        return ArrayHelper::prepareArray(self::$_exceptions, $only, $exclude);
+        return ArrayHelper::only(self::$_exceptions, $only, $exclude);
     }
 
     /**

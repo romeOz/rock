@@ -67,7 +67,7 @@ class RequestCollection implements \ArrayAccess, CollectionInterface
      */
     public function getAll(array $only = [], array $exclude = [])
     {
-        return ArrayHelper::prepareArray($this->data, $only, $exclude);
+        return ArrayHelper::only($this->data, $only, $exclude);
     }
 
     /**

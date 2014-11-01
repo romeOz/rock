@@ -186,7 +186,7 @@ class Event implements WhenInterface
      */
     public static function getAll(array $only = [], array $exclude = [])
     {
-        return ArrayHelper::prepareArray(static::$events, $only, $exclude);
+        return ArrayHelper::only(static::$events, $only, $exclude);
     }
 
 

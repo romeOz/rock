@@ -5,9 +5,9 @@ namespace rock\cookie;
 
 use rock\base\CollectionInterface;
 use rock\helpers\ArrayHelper;
-use rock\helpers\Sanitize;
 use rock\helpers\Serialize;
 use rock\helpers\SerializeInterface;
+use rock\sanitize\Sanitize;
 use rock\session\SessionFlash;
 use rock\session\SessionInterface;
 
@@ -22,11 +22,6 @@ class Cookie extends SessionFlash implements \ArrayAccess, CollectionInterface, 
      * @var int
      */
     public $serializator = self::SERIALIZE_PHP;
-    /**
-     * Filter sanitize
-     * @var array
-     */
-    public $filter = [Sanitize::UNSERIALIZE, Sanitize::STRIP_TAGS, 'trim'];
     /**
      * @var string domain of the cookie
      */
@@ -65,16 +60,18 @@ class Cookie extends SessionFlash implements \ArrayAccess, CollectionInterface, 
     /**
      * @param string|array $keys        - chain keys
      * @param mixed   $default
-     * @param array  $filters
+     * @param Sanitize  $sanitize
      * @return mixed|null
      */
-    public function get($keys, $default = null, array $filters = null)
+    public function get($keys, $default = null, Sanitize $sanitize = null)
     {
         if (!$result = ArrayHelper::getValue(Serialize::unserializeRecursive($_COOKIE), $keys)) {
             return $default;
         }
-
-        return Sanitize::sanitize($result, $filters);
+        if (!isset($sanitize)) {
+            $sanitize = Sanitize::removeTags()->call('trim')->toType();
+        }
+        return $sanitize->sanitize($result);
     }
 
     public function __get($name)
@@ -111,21 +108,30 @@ class Cookie extends SessionFlash implements \ArrayAccess, CollectionInterface, 
     /**
      * @inheritdoc
      */
-    public function getAll(array $only = [], array $exclude = [], array $filters = null)
+    public function getAll(array $only = [], array $exclude = [], Sanitize $sanitize = null)
     {
-        return ArrayHelper::prepareArray($this->prepare($filters), $only, $exclude);
+        if (empty($_COOKIE)) {
+            return [];
+        }
+        static::$data = Serialize::unserializeRecursive($_COOKIE);
+        if (!isset($sanitize)) {
+            $sanitize = Sanitize::removeTags()->call('trim')->toType();
+        }
+        static::$data = $sanitize->sanitize(static::$data);
+
+        return static::$data = ArrayHelper::only(static::$data, $only, $exclude);
     }
 
     /**
      *
      * @param array $only
      * @param array $exclude
-     * @param array $filters
+     * @param Sanitize $sanitize
      * @return \ArrayIterator an iterator for traversing the cookies in the collection.
      */
-    public function getIterator(array $only = [], array $exclude = [], array $filters = null)
+    public function getIterator(array $only = [], array $exclude = [], Sanitize $sanitize = null)
     {
-        return new \ArrayIterator($this->getAll($only, $exclude, $filters));
+        return new \ArrayIterator($this->getAll($only, $exclude, $sanitize));
     }
 
     /**
@@ -133,7 +139,6 @@ class Cookie extends SessionFlash implements \ArrayAccess, CollectionInterface, 
      */
     public function add($name, $value)
     {
-        $value = Sanitize::sanitize($value);
         if (is_array($value)) {
             $value = Serialize::serialize($value, $this->serializator);
         }
@@ -238,14 +243,5 @@ class Cookie extends SessionFlash implements \ArrayAccess, CollectionInterface, 
         foreach ($_COOKIE as $name => $value) {
             $this->remove($name);
         }
-    }
-
-    protected function prepare(array $filters = null)
-    {
-        if (empty($_COOKIE)) {
-            return [];
-        }
-
-        return static::$data = Sanitize::sanitize(Serialize::unserializeRecursive($_COOKIE), $filters);
     }
 }

@@ -2,10 +2,8 @@
 
 namespace rockunit\core\forms;
 
-
 use rock\i18n\i18n;
 use rock\Rock;
-use rock\validation\Validation;
 use rockunit\core\db\DatabaseTestCase;
 use rockunit\core\db\models\ActiveRecord;
 use rockunit\core\db\models\BaseUsers;
@@ -26,14 +24,12 @@ class RecoveryFormTest extends DatabaseTestCase
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
-        Validation::setLocale(i18n::EN);
         Rock::$app->language = i18n::EN;
     }
 
     public static function tearDownAfterClass()
     {
         parent::tearDownAfterClass();
-        Validation::setLocale(i18n::RU);
         Rock::$app->language = i18n::RU;
     }
 
@@ -61,15 +57,15 @@ class RecoveryFormTest extends DatabaseTestCase
     /**
      * @dataProvider providerFail
      */
-    public function testFail(array $post, array $placeholders)
+    public function testFail(array $post, array $errors)
     {
         $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
-        $recoveryForm = (new RecoveryForm());
-        $_POST = [$recoveryForm->formName() => $post];
-        $recoveryForm->load($_POST);
-        $recoveryForm->validate();
-        $this->assertFalse($recoveryForm->isRecovery);
-        $this->assertEquals(Rock::$app->template->getAllPlaceholders(false, true), $placeholders);
+        $model = new RecoveryForm();
+        $_POST = [$model->formName() => $post];
+        $model->load($_POST);
+        $this->assertFalse($model->validate());
+        $this->assertFalse($model->isRecovery);
+        $this->assertEquals($errors, $model->getErrors());
     }
 
     public function providerFail()
@@ -78,36 +74,55 @@ class RecoveryFormTest extends DatabaseTestCase
             [
                 [
                     'email' => '        fooGMAIL.ru  ',
-                    Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new RecoveryForm())->formName());},
+                    Rock::$app->csrf->csrfParam => function () {
+                        return Rock::$app->csrf->create((new RecoveryForm())->formName());
+                    },
                     'captcha' => '12345'
                 ],
                 [
-                    'e_email' => '"foogmail.ru" must be valid email',
-                    'e_captcha' => 'captcha must be valid'
+                    'email' =>
+                        [
+                           'e-mail must be valid',
+                        ],
+                    'captcha' =>
+                        [
+                            'captcha must be valid',
+                        ],
                 ]
             ],
             [
                 [
                     'email' => '',
-                    Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new RecoveryForm())->formName());},
+                    Rock::$app->csrf->csrfParam => function () {
+                        return Rock::$app->csrf->create((new RecoveryForm())->formName());
+                    },
                     'captcha' => ''
                 ],
-                [
-                    'e_email' => 'the value must not be empty',
-                    'e_captcha' => 'the value must not be empty'
-                ]
+                array(
+                    'email' =>
+                        [
+                           'e-mail must not be empty',
+                        ],
+                    'captcha' =>
+                        [
+                            'captcha must not be empty',
+                        ],
+                )
             ],
             [
                 [
                     'email' => 'foogmail.ru',
                     Rock::$app->csrf->csrfParam => function () {
-                            return '';
-                        },
+                        return '';
+                    },
                     'captcha' => '12345'
                 ],
-                [
-                    'e_recovery' => 'the value must not be empty',
-                ]
+                array(
+                    'e_recovery' =>
+                        [
+                            'CSRF-token must not be empty',
+                        ],
+                )
             ],
         ];
     }
@@ -119,22 +134,26 @@ class RecoveryFormTest extends DatabaseTestCase
             'username' => 'Chuck',
             'password' => '123456',
             'password_confirm' => '123456',
-            Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new RecoveryForm())->formName());},
+            Rock::$app->csrf->csrfParam => function () {
+                return Rock::$app->csrf->create((new RecoveryForm())->formName());
+            },
             'captcha' => '12345'
         ];
         Rock::$app->session->setFlash('captcha', '12345');
         $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
-        $recoveryForm = (new RecoveryForm());
-        $_POST = [$recoveryForm->formName() => $post];
-        $recoveryForm->load($_POST);
-        $recoveryForm->validate();
-        $this->assertFalse($recoveryForm->isRecovery);
+        $model = new RecoveryForm();
+        $_POST = [$model->formName() => $post];
+        $model->load($_POST);
+        $this->assertFalse($model->validate());
+        $this->assertFalse($model->isRecovery);
         $this->assertEquals(
-            Rock::$app->template->getAllPlaceholders(false, true),
-            [
+            array(
                 'e_recovery' =>
-                    "Email is invalid."
-            ]
+                    array(
+                        0 => 'Email is invalid.',
+                    ),
+            ),
+            $model->getErrors()
         );
     }
 
@@ -146,25 +165,50 @@ class RecoveryFormTest extends DatabaseTestCase
             'username' => 'Jane',
             'password' => '123456',
             'password_confirm' => '123456',
-            Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new RecoveryForm())->formName());},
+            Rock::$app->csrf->csrfParam => function () {
+                return Rock::$app->csrf->create((new RecoveryForm())->formName());
+            },
             'captcha' => '1234'
         ];
         Rock::$app->session->setFlash('captcha', '12345');
         $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
-        $recoveryForm = (new RecoveryForm());
-        $_POST = [$recoveryForm->formName() => $post];
-        $recoveryForm->load($_POST);
-        $recoveryForm->validate();
-        $this->assertFalse($recoveryForm->isRecovery);
+        $model = (new RecoveryForm());
+        $_POST = [$model->formName() => $post];
+        $model->load($_POST);
+        $this->assertFalse($model->validate());
+        $this->assertFalse($model->isRecovery);
         $this->assertEquals(
-            Rock::$app->template->getAllPlaceholders(false, true),
             [
-                'e_captcha' =>
-                    "captcha must be valid"
-            ]
+                'captcha' =>
+                    [
+                        'captcha must be valid',
+                    ],
+            ],
+            $model->getErrors()
         );
     }
 
+    public function testSuccess()
+    {
+        $email = 'chuck@gmail.com';
+        $this->signUp($email);
+        $post = [
+            'email' => $email,
+            Rock::$app->csrf->csrfParam => function () {
+                return Rock::$app->csrf->create((new RecoveryForm())->formName());
+            },
+            'captcha' => '12345'
+        ];
+        Rock::$app->session->setFlash('captcha', '12345');
+        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
+        $model = new RecoveryForm();
+        $_POST = [$model->formName() => $post];
+        $model->load($_POST);
+        $this->assertTrue($model->validate());
+        $this->assertTrue($model->isRecovery);
+        $this->assertTrue($model->getUsers()->validatePassword($model->password));
+        $this->assertTrue((bool)BaseUsers::deleteByUsername('Chuck'));
+    }
 
     protected function signUp($email)
     {
@@ -173,42 +217,20 @@ class RecoveryFormTest extends DatabaseTestCase
             'username' => 'Chuck',
             'password' => '123456',
             'password_confirm' => '123456',
-            Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new SignupForm())->formName());},
+            Rock::$app->csrf->csrfParam => function () {
+                return Rock::$app->csrf->create((new SignupForm())->formName());
+            },
             'captcha' => '12345'
         ];
         Rock::$app->session->setFlash('captcha', '12345');
         $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
-        $signupForm = (new SignupForm());
-        $_POST = [$signupForm->formName() => $post];
-        $signupForm->load($_POST);
-        $signupForm->validate();
-        $this->assertTrue($signupForm->isSignup);
-        $this->assertTrue((new UserMock())->activate($signupForm->getUsers()->token));
+        $model = (new SignupForm());
+        $_POST = [$model->formName() => $post];
+        $model->load($_POST);
+        $this->assertTrue($model->validate());
+        $this->assertTrue($model->isSignup);
+        $this->assertTrue((new UserMock())->activate($model->getUsers()->token));
         $this->assertTrue(BaseUsers::existsByUsername('Chuck'));
-    }
-
-
-    public function testSuccess()
-    {
-        $email = 'chuck@gmail.com';
-
-        $this->signUp($email);
-
-        $post = [
-            'email' => $email,
-            Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new RecoveryForm())->formName());},
-            'captcha' => '12345'
-        ];
-        Rock::$app->session->setFlash('captcha', '12345');
-        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
-        $recoveryForm = (new RecoveryForm());
-        $_POST = [$recoveryForm->formName() => $post];
-        $recoveryForm->load($_POST);
-        $recoveryForm->validate();
-        $this->assertTrue($recoveryForm->isRecovery);
-
-        $this->assertTrue($recoveryForm->getUsers()->validatePassword($recoveryForm->password));
-        $this->assertTrue((bool)BaseUsers::deleteByUsername('Chuck'));
     }
 }
  

@@ -7,10 +7,10 @@ use rock\base\Model;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\Pagination;
-use rock\helpers\Sanitize;
 use rock\request\Request;
 use rock\response\Response;
 use rock\Rock;
+use rock\sanitize\Sanitize;
 
 /**
  * ActiveDataProvider implements a data provider based on [[\rock\db\Query]] and [[\rock\db\ActiveQuery]].
@@ -88,7 +88,7 @@ class ActiveDataProvider
     public function init()
     {
         if (!isset($this->pagination['pageCurrent'])) {
-            $this->pagination['pageCurrent'] = Request::get(self::PAGE_VAR, null, [Sanitize::POSITIVE, 'intval']);
+            $this->pagination['pageCurrent'] = Request::get(self::PAGE_VAR, null, Sanitize::positive()->int());
         }
     }
 
@@ -168,14 +168,14 @@ class ActiveDataProvider
 
         // as Array
         if (ArrayHelper::depth($data, true) === 0) {
-            return $this->prepareDataWithCallback(ArrayHelper::prepareArray($data, $this->only, $this->exclude));
+            return $this->prepareDataWithCallback(ArrayHelper::only($data, $this->only, $this->exclude));
         }
 
         if (!empty($this->only) || !empty($this->exclude)) {
             return $this->prepareDataWithCallback(
                 array_map(
                     function($value){
-                        return ArrayHelper::prepareArray($value, $this->only, $this->exclude);
+                        return ArrayHelper::only($value, $this->only, $this->exclude);
                     },
                     $data
                 )

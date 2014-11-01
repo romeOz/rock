@@ -543,7 +543,7 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
      */
     public function getAll(array $only = [], array $exclude = [])
     {
-        return ArrayHelper::prepareArray($_SESSION, $only, $exclude);
+        return ArrayHelper::only($_SESSION, $only, $exclude);
     }
 
     /**

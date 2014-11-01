@@ -10,10 +10,10 @@ use rock\event\Event;
 use rock\filters\AccessFilter;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
-use rock\helpers\Sanitize;
 use rock\helpers\String;
 use rock\request\RequestInterface;
 use rock\Rock;
+use rock\sanitize\Sanitize;
 
 class Route implements RequestInterface, ErrorsInterface
 {
@@ -40,10 +40,7 @@ class Route implements RequestInterface, ErrorsInterface
     /** @var  array|\Closure */
     public $fail;
     public $RESTHandlers = [];
-    public static $defaultFilters = [
-        'urldecode', Sanitize::STRIP_TAGS,
-        'trim', Sanitize::TO_TYPE
-    ];
+    public static $defaultFilters = ['removeTags', 'trim', /*'urldecode', */'toType'];
 
     protected $errors = 0;
 
@@ -356,7 +353,7 @@ class Route implements RequestInterface, ErrorsInterface
                 if (is_int($key)) {
                     continue;
                 }
-                $result[$key] = Sanitize::sanitize($value, static::$defaultFilters);
+                $result[$key] = Sanitize::rules(static::$defaultFilters)->sanitize($value);
             }
             $this->data = array_merge($this->data, $result);
 
@@ -447,7 +444,7 @@ class Route implements RequestInterface, ErrorsInterface
     
     protected function isREST($url, $controller, $filters)
     {
-        $handlers = ArrayHelper::prepareArray(
+        $handlers = ArrayHelper::only(
             $this->RESTHandlers,
             Helper::getValue($filters['only'], []),
             Helper::getValue($filters['exclude'], [])

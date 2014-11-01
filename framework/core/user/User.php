@@ -99,7 +99,7 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
         if (!$this->getIsActive()) {
             return null;
         }
-        return ArrayHelper::prepareArray(static::$storage->get($this->container), $only, $exclude);
+        return ArrayHelper::only(static::$storage->get($this->container), $only, $exclude);
     }
 
     /**

@@ -9,19 +9,7 @@ class RuntimeRulesIndex extends RuntimeIndex
     {
         return [
             [
-                self::RULE_VALIDATION,
-                function (array $attributes) {
-                    if ($this->Rock->validation
-                            ->notEmpty()
-                            ->int()
-                            ->setPlaceholders('e_test')
-                            ->validate($attributes['type_id']) === false
-                    ) {
-                        return false;
-                    }
-
-                    return true;
-                }
+                self::RULE_VALIDATE, 'type_id', 'required', 'int'
             ],
         ];
     }

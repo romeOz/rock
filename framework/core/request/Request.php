@@ -5,8 +5,8 @@ use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
 use rock\helpers\Helper;
 use rock\helpers\Json;
-use rock\helpers\Sanitize;
 use rock\Rock;
+use rock\sanitize\Sanitize;
 
 /**
  * Class `Request`
@@ -19,7 +19,7 @@ use rock\Rock;
  *
  * @package rock\request
  */
-class Request implements SanitizeInterface, RequestInterface, ComponentsInterface
+class Request implements RequestInterface, ComponentsInterface
 {
     use ComponentsTrait {
         ComponentsTrait::__construct as parentConstruct;
@@ -52,92 +52,92 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
     }
 
     /**
-     * @param mixed $filters
+     * @param Sanitize $sanitize
      * @return mixed
      */
-    public static function getAll($filters = null)
+    public static function getAll(Sanitize $sanitize = null)
     {
-        return static::prepareAll($GLOBALS['_GET'], $filters);
+        return static::prepareAll($GLOBALS['_GET'], $sanitize);
     }
 
     /**
-     * @param mixed $filters
+     * @param Sanitize $sanitize
      * @return mixed
      */
-    public static function postAll($filters = null)
+    public static function postAll(Sanitize $sanitize = null)
     {
-        return static::prepareAll($GLOBALS['_POST'], $filters);
+        return static::prepareAll($GLOBALS['_POST'], $sanitize);
     }
 
     /**
-     * @param mixed $filters
+     * @param Sanitize $sanitize
      * @return mixed
      */
-    public static function putAll($filters = null)
+    public static function putAll(Sanitize $sanitize = null)
     {
-        return static::prepareAll($GLOBALS['_PUT'], $filters);
+        return static::prepareAll($GLOBALS['_PUT'], $sanitize);
     }
 
     /**
-     * @param mixed $filters
+     * @param Sanitize $sanitize
      * @return mixed
      */
-    public static function deleteAll($filters = null)
+    public static function deleteAll(Sanitize $sanitize = null)
     {
-        return static::prepareAll($GLOBALS['_DELETE'], $filters);
+        return static::prepareAll($GLOBALS['_DELETE'], $sanitize);
     }
 
     /**
-     * @param mixed $filters
+     * @param Sanitize $sanitize
      * @return mixed
      */
-    public static function serverAll($filters = null)
+    public static function serverAll(Sanitize $sanitize = null)
     {
-        return static::prepareAll($GLOBALS['_SERVER'], $filters);
-    }
-
-    /**
-     * @param string      $name - name of request-value
-     * @param mixed  $default
-     * @param array $filters
-     * @return mixed
-     */
-    public static function get($name, $default = null, array $filters = null)
-    {
-        return static::prepareValue('_GET', $name, $default, $filters);
+        return static::prepareAll($GLOBALS['_SERVER'], $sanitize);
     }
 
     /**
      * @param string      $name - name of request-value
      * @param mixed  $default
-     * @param array $filters
+     * @param Sanitize $sanitize
      * @return mixed
      */
-    public static function post($name, $default = null, array $filters = null)
+    public static function get($name, $default = null, Sanitize $sanitize = null)
     {
-        return static::prepareValue('_POST', $name, $default, $filters);
+        return static::prepareValue('_GET', $name, $default, $sanitize);
     }
 
     /**
      * @param string      $name - name of request-value
      * @param mixed  $default
-     * @param array $filters
+     * @param Sanitize $sanitize
      * @return mixed
      */
-    public static function put($name, $default = null, array $filters = null)
+    public static function post($name, $default = null, Sanitize $sanitize = null)
     {
-        return static::prepareValue('_PUT', $name, $default, $filters);
+        return static::prepareValue('_POST', $name, $default, $sanitize);
     }
 
     /**
      * @param string      $name - name of request-value
      * @param mixed  $default
-     * @param array $filters
+     * @param Sanitize $sanitize
      * @return mixed
      */
-    public static function delete($name, $default = null, array $filters = null)
+    public static function put($name, $default = null, Sanitize $sanitize = null)
     {
-        return self::prepareValue('_DELETE', $name, $default, $filters);
+        return static::prepareValue('_PUT', $name, $default, $sanitize);
+    }
+
+    /**
+     * @param string      $name - name of request-value
+     * @param mixed  $default
+     * @param Sanitize $sanitize
+     * @return mixed
+     */
+    public static function delete($name, $default = null, Sanitize $sanitize = null)
+    {
+        return self::prepareValue('_DELETE', $name, $default, $sanitize);
     }
 
     private static $_contentTypes;
@@ -1027,16 +1027,18 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
      * Sanitize all request-values.
      *
      * @param mixed $input
-     * @param mixed $filters
+     * @param Sanitize $sanitize
      * @return mixed
      */
-    protected static function prepareAll($input, $filters = null)
+    protected static function prepareAll($input, Sanitize $sanitize = null)
     {
-        if (empty($input) || $filters === false) {
+        if (empty($input)) {
             return $input;
         }
-
-        return Sanitize::sanitize($input, $filters);
+        if (!isset($sanitize)) {
+            $sanitize = Sanitize::allOf(Sanitize::removeTags()->trim()->toType());
+        }
+        return $sanitize->sanitize($input);
     }
 
     /**
@@ -1045,16 +1047,17 @@ class Request implements SanitizeInterface, RequestInterface, ComponentsInterfac
      * @param string      $method - method request
      * @param string      $name - name of request-value
      * @param mixed  $default
-     * @param array $filters
+     * @param Sanitize $sanitize
      * @return null
      */
-    protected static function prepareValue($method, $name, $default = null, array $filters = null)
+    protected static function prepareValue($method, $name, $default = null, Sanitize $sanitize = null)
     {
         if (!isset($GLOBALS[$method][$name])) {
             return $default;
         }
-
-        $result = Sanitize::sanitize($GLOBALS[$method][$name], $filters);
-        return Helper::getValueIsset($result, $default);
+        if (!isset($sanitize)) {
+            $sanitize = Sanitize::removeTags()->trim()->toType();
+        }
+        return $sanitize->sanitize($GLOBALS[$method][$name]);
     }
 }

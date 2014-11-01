@@ -2,8 +2,8 @@
 
 namespace rockunit\core\cookie;
 
-use rock\helpers\Sanitize;
 use rock\Rock;
+use rock\sanitize\Sanitize;
 
 /**
  * @group base
@@ -91,7 +91,7 @@ class CookieTest extends \PHPUnit_Framework_TestCase
                 '1',
                 ['params', '0'],
                 null,
-                [Sanitize::STRIP_TAGS, 'trim', Sanitize::NUMBERS]
+                Sanitize::removeTags()->call('trim')->numbers()
             ],
         ];
     }

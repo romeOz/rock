@@ -96,7 +96,10 @@ class Captcha extends InputWidget implements CaptchaInterface
 
         if (!isset($this->options['data-ng-class'])) {
             $this->options['data-ng-class'] = 'showHighlightError("'.$formName.'['.$this->attribute.']")';
+        }
 
+        if (isset($this->options['value']) && empty($this->options['value']) && !isset($this->options['data-rock-reset-field'])) {
+            $this->options['data-rock-reset-field'] = '';
         }
     }
 

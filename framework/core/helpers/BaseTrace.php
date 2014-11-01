@@ -171,7 +171,7 @@ class BaseTrace
     protected static function getHash($token)
     {
         if (is_array($token)) {
-            $token = ArrayHelper::prepareArray($token, [], static::$exclude);
+            $token = ArrayHelper::only($token, [], static::$exclude);
             $token = serialize($token);
         }
         return crc32($token);

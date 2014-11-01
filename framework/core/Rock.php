@@ -13,6 +13,7 @@ use rock\exception\Exception;
 use rock\helpers\ObjectHelper;
 use rock\helpers\String;
 use rock\helpers\Trace;
+use rock\i18n\i18n;
 use rock\i18n\i18nInterface;
 
 class Rock
@@ -313,15 +314,20 @@ class Rock
 
     /**
      * Translate
+     *
      * @param string|array  $keys
-     * @param array $dataReplace
+     * @param array $placeholders
      * @param string|null  $category
-     * @param null  $language
+     * @param string $locale
      * @return null|string.
      */
-    public static function t($keys, array $dataReplace = [], $category = null, $language = null)
+    public static function t($keys, array $placeholders = [], $category = null, $locale = null)
     {
-        return static::$app->i18n->get($keys, $dataReplace, $category, $language ? : static::$app->language);
+        return static::$app->i18n
+            ->locale($locale ? : static::$app->language)
+            ->category($category)
+            ->removeBraces(true)
+            ->translate($keys, $placeholders);
     }
 
     /**

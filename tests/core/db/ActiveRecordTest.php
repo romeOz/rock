@@ -5,7 +5,6 @@ namespace rockunit\core\db;
 use rock\helpers\Trace;
 use rock\Rock;
 use rockunit\common\CommonTrait;
-use rockunit\core\db\ActiveRecordTestTrait;
 use rockunit\core\db\models\ActiveRecord;
 use rockunit\core\db\models\Customer;
 use rockunit\core\db\models\CustomerFilter;

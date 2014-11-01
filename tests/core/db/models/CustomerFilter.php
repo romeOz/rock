@@ -27,19 +27,4 @@ class CustomerFilter extends Customer
 
         return parent::beforeFind();
     }
-
-    public function afterFind(&$result = null)
-    {
-        $this->filters(
-            [
-                'name' => [
-                    function ($value) {
-                        return (int)$value;
-                    }
-                ],
-            ]
-        );
-
-        return parent::afterFind($result);
-    }
 }

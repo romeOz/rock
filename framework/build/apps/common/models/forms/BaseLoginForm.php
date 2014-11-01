@@ -7,9 +7,8 @@ use apps\common\models\users\BaseUsers;
 use rock\base\Model;
 use rock\event\Event;
 use rock\helpers\ArrayHelper;
-use rock\helpers\Sanitize;
 use rock\Rock;
-use rock\validation\Validation;
+use rock\validate\Validate;
 
 class BaseLoginForm extends Model
 {
@@ -25,70 +24,98 @@ class BaseLoginForm extends Model
     public $_csrf;
 
     public $redirectUrl;
-    public $enableCsrfToken = true;
+//    public $enableCsrfToken = true;
     public $isLogged = false;
+
 
 
     public function rules()
     {
-        //$timestamp = time();
         return [
             [
-                self::RULE_VALIDATION,
-                function(array $attributes){
-                    if ($this->enableCsrfToken) {
-                        if ($this->Rock->validation
-                                ->notEmpty()
-                                ->token($this->formName())
-                                ->setName(Rock::t('token'))
-                                ->setPlaceholders('e_login')
-                                ->setModel($this)
-                                ->validate($attributes[$this->Rock->csrf->csrfParam]) === false
-                        ) {
-                            return false;
-                        }
-                    }
-
-                    if ($this->Rock->validation
-                            ->key(
-                                'email',
-                                Validation::notEmpty()
-                                    ->length(4, 80, true)
-                                    ->email()
-                            //->setName($this->Rock->i18n->get('email'))
-                            )
-                            ->key(
-                                'password',
-                                Validation::notEmpty()
-                                    ->length(6, 20, true)
-                                    ->regex('/^[a-z\d\-\_\.]+$/i')
-                                    ->setName(Rock::t('password'))
-                            )
-                            ->setModel($this)
-                            ->setPlaceholders(['email.first', 'password.first'])
-                            ->validate($attributes) === false) {
-                        return false;
-                    }
-
-
-
-                    if (!$this->validatePassword()) {
-                        return false;
-                    }
-
-                    return $this->validateStatus();
-
-                }],
+                self::RULE_VALIDATE, '_csrf', 'validateCSRF', 'one'
+            ],
             [
-                self::RULE_BEFORE_FILTERS,
-                [
-                    Sanitize::ANY => [Sanitize::STRIP_TAGS, 'trim'],
-                    'email' => [(object)['mb_strtolower', [Rock::$app->charset]]],
-                ],
-
+                self::RULE_SANITIZE, ['email', 'password'], 'trim'
+            ],
+            [
+                self::RULE_VALIDATE, ['email', 'password'], 'required',
+            ],
+            [
+                self::RULE_VALIDATE, 'email', 'length' => [4, 80, true], 'email'
+            ],
+            [
+                self::RULE_VALIDATE, 'password', 'length' => [6, 20, true], 'regex' => ['/^[a-z\d\-\_\.]+$/i']
+            ],
+            [
+                self::RULE_SANITIZE, 'email', 'lowercase'
+            ],
+            [
+                self::RULE_SANITIZE, ['email', 'password'], 'removeTags'
+            ],
+            [
+                self::RULE_VALIDATE, 'password', 'validatePassword', 'validateStatus'
             ],
         ];
     }
+//    public function rules()
+//    {
+//        //$timestamp = time();
+//        return [
+//            [
+//                self::RULE_VALIDATION,
+//                function(array $attributes){
+//
+//                    if ($this->enableCsrfToken) {
+//                        if ($this->Rock->validation
+//                                ->notEmpty()
+//                                ->token($this->formName())
+//                                ->setName(Rock::t('token'))
+//                                ->setPlaceholders('e_login')
+//                                ->setModel($this)
+//                                ->validate($attributes[$this->Rock->csrf->csrfParam]) === false
+//                        ) {
+//                            return false;
+//                        }
+//                    }
+//                    if ($this->Rock->validation
+//                            ->key(
+//                                'email',
+//                                Validation::notEmpty()
+//                                    ->length(4, 80, true)
+//                                    ->email()
+//                            //->setName($this->Rock->i18n->get('email'))
+//                            )
+//                            ->key(
+//                                'password',
+//                                Validation::notEmpty()
+//                                    ->length(6, 20, true)
+//                                    ->regex('/^[a-z\d\-\_\.]+$/i')
+//                                    ->setName(Rock::t('password'))
+//                            )
+//                            ->setModel($this)
+//                            ->setPlaceholders(['email.first', 'password.first'])
+//                            ->validate($attributes) === false) {
+//                        return false;
+//                    }
+//
+//                    if (!$this->validatePassword()) {
+//                        return false;
+//                    }
+//
+//                    return $this->validateStatus();
+//
+//                }],
+//            [
+//                self::RULE_BEFORE_FILTERS,
+//                [
+//                    Sanitize::ANY => [Sanitize::STRIP_TAGS, 'trim'],
+//                    'email' => [(object)['mb_strtolower', [Rock::$app->charset]]],
+//                ],
+//
+//            ],
+//        ];
+//    }
 
     public function safeAttributes()
     {
@@ -105,39 +132,6 @@ class BaseLoginForm extends Model
     }
 
 
-    /**
-     * Validates the password.
-     * This method serves as the inline validation for password.
-     */
-    public function validatePassword()
-    {
-        if (!$user = $this->getUsers()) {
-            return false;
-        }
-
-        if (!$user->validatePassword($this->password)) {
-            $this->Rock->template->addPlaceholder('e_login', Rock::t('invalidPasswordOrEmail'), true);
-            return false;
-        }
-        return true;
-
-    }
-
-    public function validateStatus()
-    {
-        if (!$user = $this->getUsers()) {
-            return false;
-        }
-
-        if ($user->status !== BaseUsers::STATUS_ACTIVE) {
-            $this->Rock->template->addPlaceholder('e_login', Rock::t('notActivatedUser'), true);
-            return false;
-        }
-        return true;
-    }
-
-
-
     protected $_users;
 
     /**
@@ -149,7 +143,7 @@ class BaseLoginForm extends Model
     {
         if (!isset($this->_users)) {
             if (!$this->_users = BaseUsers::findOneByEmail($this->email, null, false)) {
-                $this->Rock->template->addPlaceholder('e_login', Rock::t('notExistsUser'), true);
+                $this->addErrorAsPlaceholder(Rock::t('notExistsUser'), 'e_login');
             }
         }
 
@@ -166,7 +160,7 @@ class BaseLoginForm extends Model
         $users = $this->getUsers();
         $users->login_last = $this->Rock->date->isoDatetime();
         if (!$users->save()) {
-            $this->Rock->template->addPlaceholder('e_login', Rock::t('failLogin'), true);
+            $this->addErrorAsPlaceholder(Rock::t('failLogin'), 'e_login');
             return false;
         }
 
@@ -216,4 +210,54 @@ class BaseLoginForm extends Model
         }
         return true;
     }
+
+
+
+    /**
+     * Validates the password.
+     * This method serves as the inline validation for password.
+     */
+    protected function validatePassword($password)
+    {
+        if ($this->hasErrors()) {
+            return true;
+        }
+        if (!$user = $this->getUsers()) {
+            return false;
+        }
+        if (!$user->validatePassword($password)) {
+            $this->addErrorAsPlaceholder(Rock::t('invalidPasswordOrEmail'), 'e_login');
+            return false;
+        }
+        return true;
+
+    }
+
+    protected function validateCSRF($input)
+    {
+        $v = Validate::required()->csrf()->placeholders(['name' => 'CSRF-token']);
+        if (!$v->validate($input)) {
+            $this->addErrorAsPlaceholder($v->getFirstError(), 'e_login');
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function validateStatus()
+    {
+        if ($this->hasErrors()) {
+            return true;
+        }
+        if (!$user = $this->getUsers()) {
+            return false;
+        }
+
+        if ($user->status !== BaseUsers::STATUS_ACTIVE) {
+            $this->addErrorAsPlaceholder(Rock::t('notActivatedUser'), 'e_login');
+            return false;
+        }
+        return true;
+    }
+
 }

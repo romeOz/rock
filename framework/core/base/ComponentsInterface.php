@@ -26,22 +26,6 @@ interface ComponentsInterface extends ObjectInterface
     public function behaviors();
 
     /**
-     * Add filters
-     *
-     * @param array $filters
-     * @return static|ActiveQueryInterface
-     */
-    public function filters(array $filters);
-
-    /**
-     * Add validation
-     *
-     * @param \Closure|Validation $validation
-     * @return static|ActiveQueryInterface
-     */
-    public function validation($validation);
-
-    /**
      * Subscribing in event
      *
      * @param string $name - name of event

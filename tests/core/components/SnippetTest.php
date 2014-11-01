@@ -250,47 +250,5 @@ class SnippetTest extends \PHPUnit_Framework_TestCase {
                      ->getSnippet(TestSnippet::className()));
         $this->expectOutputString('1fail');
     }
-
-
-    public function testFilter()
-    {
-        $this->assertEquals(Rock::$app->template
-                            ->filters(['abs'])
-                            ->getSnippet(TestSnippet::className()),
-                            5
-        );
-
-    }
-
-
-    public function testValidationTrue()
-    {
-        $this->assertEquals(Rock::$app->template
-                                ->filters(['abs'])
-                                ->on('after_event', function(){echo 'after_event';}, Event::AFTER)
-                                ->trigger('after_event', Event::AFTER)
-                                ->validation(Rock::$app->validation->numeric())
-                                ->getSnippet(TestSnippet::className()),
-                            5
-        );
-
-        $this->expectOutputString('after_event');
-
-    }
-
-    public function testValidationFalse()
-    {
-        $this->assertNull(Rock::$app->template
-                                ->filters(['abs'])
-                                ->on('after_event', function(){echo 'after_event';}, Event::AFTER)
-                                ->validation(Rock::$app->validation->string())
-                                ->trigger('after_event', Event::AFTER)
-                                ->getSnippet(TestSnippet::className())
-
-        );
-
-    }
-
-
 }
  

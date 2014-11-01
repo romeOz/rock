@@ -4,7 +4,6 @@ namespace rockunit\mocks;
 
 
 use rock\cookie\Cookie;
-use rock\helpers\Sanitize;
 use rock\helpers\Serialize;
 
 class CookieMock extends Cookie
@@ -17,7 +16,6 @@ class CookieMock extends Cookie
 
     public function add($name, $value)
     {
-        $value = Sanitize::sanitize($value);
         if (is_array($value)) {
             $value = Serialize::serialize($value, $this->serializator);
         }

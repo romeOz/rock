@@ -1094,7 +1094,7 @@ class BaseArrayHelper
         }
     }
 
-    public static function prepareArray(array $array = [], array $only = [], array $exclude = [])
+    public static function only(array $array = [], array $only = [], array $exclude = [])
     {
         if (empty($array)) {
             return [];

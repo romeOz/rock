@@ -229,75 +229,6 @@ class SnippetBehaviorEvent extends Snippet
 }
 
 
-class SnippetFilters extends Snippet
-{
-    public function behaviors()
-    {
-        return [
-            'access_1' => [
-                'class' => AccessFilter::className(),
-                'rules' =>
-                    [
-                        'allow' => true,
-                        'verbs' => ['GET'],
-                    ],
-            ],
-            'filter_1' => [
-                'class' => SanitizeFilter::className(),
-                'filters' => ['abs']
-            ],
-            'filter_2' => [
-                'class' => SanitizeFilter::className(),
-                'filters' => ['round']
-            ],
-        ];
-    }
-
-    public function get()
-    {
-        return -5.5;
-    }
-}
-
-
-class SnippetValidationFalse extends Snippet
-{
-    public function behaviors()
-    {
-        return [
-            'access_1' => [
-                'class' => AccessFilter::className(),
-                'rules' =>
-                    [
-                        'allow' => true,
-                        'verbs' => ['GET'],
-                    ],
-            ],
-            'filter_1' => [
-                'class' => SanitizeFilter::className(),
-                'filters' => ['abs']
-            ],
-            'filter_2' => [
-                'class' => SanitizeFilter::className(),
-                'filters' => ['round']
-            ],
-            'validation_1' => [
-                'class' => ValidationFilters::className(),
-                'validation' => Validation::numeric()
-            ],
-            'validation_2' => [
-                'class' => ValidationFilters::className(),
-                'validation' => Validation::string()
-            ]
-        ];
-    }
-
-    public function get()
-    {
-        return -5.5;
-    }
-}
-
 
 class FooBehavior extends Behavior
 {
@@ -328,12 +259,6 @@ class SnippetBehaviorsTest extends \PHPUnit_Framework_TestCase
         Rock::$app->di[SnippetAccessFalse::className()] = [
             'class' => SnippetAccessFalse::className(),
         ];
-        Rock::$app->di[SnippetFilters::className()] = [
-            'class' => SnippetFilters::className(),
-        ];
-        Rock::$app->di[SnippetValidationFalse::className()] = [
-            'class' => SnippetValidationFalse::className(),
-        ];
     }
 
     public static function tearDownAfterClass()
@@ -343,8 +268,6 @@ class SnippetBehaviorsTest extends \PHPUnit_Framework_TestCase
                                         TestSnippet::className(),
                                         SnippetAccessTrue::className(),
                                         SnippetAccessFalse::className(),
-                                        SnippetFilters::className(),
-                                        SnippetValidationFalse::className()
                                     ]);
 
         Event::offAll();
@@ -369,23 +292,6 @@ class SnippetBehaviorsTest extends \PHPUnit_Framework_TestCase
         );
         $this->expectOutputString('1success_11fail_2');
     }
-
-    public function testFilters()
-    {
-        $this->assertEquals(Rock::$app->template
-                              ->getSnippet(SnippetFilters::className()),
-            6
-        );
-    }
-
-    public function testValidationFalse()
-    {
-        $this->assertNull(Rock::$app->template
-                                ->getSnippet(SnippetValidationFalse::className())
-
-        );
-    }
-
 
     public function testEventWithoutTrigger()
     {
@@ -494,4 +400,3 @@ class SnippetBehaviorsTest extends \PHPUnit_Framework_TestCase
         Rock::$app->di->remove(SnippetBehavior::className());
     }
 }
- 

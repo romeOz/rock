@@ -256,7 +256,11 @@ class ActiveField
                 : 'showHighlightError("'.$this->attribute.'")';
         }
         if ($this->form->validateOnChanged) {
-            $options['data-ng-focus'] = '';
+            $options['data-rock-form-focus'] = '';
+        }
+
+        if (isset($options['value']) && empty($options['value']) && !isset($options['data-rock-reset-field'])) {
+            $options['data-rock-reset-field'] = '';
         }
 
         return $options;
@@ -449,6 +453,11 @@ class ActiveField
     {
         $options = array_merge($this->inputOptions, $options);
         $options = $this->calculateClientInputOption($options);
+        if (!isset($options['data-ng-init']) && isset($options['value'])) {
+            $options['data-ng-init'] = isset($this->formName)
+                ? "{$this->formName}.values.{$this->attribute}={$options['value']}"
+                : "form.values.{$this->attribute}={$options['value']}";
+        }
         $this->adjustLabelFor($options);
         $this->parts['{input}'] = Html::activeHiddenInput($this->model, $this->attribute, $options);
 

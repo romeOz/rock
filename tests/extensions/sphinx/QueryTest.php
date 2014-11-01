@@ -11,7 +11,6 @@ use rock\file\FileManager;
 use rock\helpers\Trace;
 use rock\Rock;
 use rock\sphinx\Query;
-use rock\validation\Validation;
 use rockunit\common\CommonTrait;
 
 /**
@@ -485,53 +484,5 @@ class QueryTest extends SphinxTestCase
         $this->assertNotEmpty($query->all($connection));
         $this->assertEmpty(Event::getAll());
         $this->expectOutputString('failsuccessbeforeaftersuccess');
-    }
-
-
-    public function testSmartFilter()
-    {
-        $query = new Query();
-        $query->from('article_index');
-        $query->filters(
-            [
-                'author_id' =>
-                    [
-                        function ($value) {
-                            return $value * -1;
-                        }
-                    ]
-            ]
-        );
-
-        $this->assertSame($query->one()['author_id'], -1);
-
-        $query = new Query();
-        $query->from('article_index');
-        $query->filters(
-            [
-                '1.author_id' =>
-                    [
-                        function ($value) {
-                            return $value * -1;
-                        }
-                    ]
-            ]
-        );
-
-        $result = $query->all();
-        $this->assertSame($result[0]['author_id'], 1);
-        $this->assertSame($result[1]['author_id'], -2);
-
-        // validate fail
-        $query = new Query();
-        $query->from('article_index');
-        $query->validation(Validation::create()->key('tag', Validation::int()));
-        $this->assertEmpty($query->one());
-
-        // validate success
-        $query = new Query();
-        $query->from('article_index');
-        $query->validation(Validation::create()->key('tag', Validation::string()));
-        $this->assertNotEmpty($query->one());
     }
 }

@@ -754,10 +754,10 @@ class Template implements ComponentsInterface
     public function getAllPlaceholders($autoEscape = true, $global = false, array $only = [], array $exclude = [])
     {
         if ($global === true) {
-            return $this->autoEscape(ArrayHelper::prepareArray(static::$placeholders, $only, $exclude), $autoEscape);
+            return $this->autoEscape(ArrayHelper::only(static::$placeholders, $only, $exclude), $autoEscape);
         }
 
-        return $this->autoEscape(ArrayHelper::prepareArray($this->localPlaceholders, $only, $exclude), $autoEscape);
+        return $this->autoEscape(ArrayHelper::only($this->localPlaceholders, $only, $exclude), $autoEscape);
     }
 
     /**
@@ -793,7 +793,7 @@ class Template implements ComponentsInterface
      */
     public function getAllResources($autoEscape = true, array $only = [], array $exclude = [])
     {
-        return $this->autoEscape(ArrayHelper::prepareArray(static::$resources, $only, $exclude), $autoEscape);
+        return $this->autoEscape(ArrayHelper::only(static::$resources, $only, $exclude), $autoEscape);
     }
 
     /**
@@ -1153,7 +1153,7 @@ class Template implements ComponentsInterface
                 $matches['name'],
                 Helper::getValue($params['dataReplace'], []),
                 Helper::getValue($params['lang']),
-                Helper::getValue($params['context'])
+                Helper::getValue($params['category'])
             );
             // link to resource
         } elseif ($matches['type'] === '~') {

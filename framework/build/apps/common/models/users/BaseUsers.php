@@ -60,7 +60,6 @@ class BaseUsers extends ActiveRecord
 
     /**
      * Finds user by `id`
-     *
      * @param int  $id      - `id` of user
      * @param int|null  $status - `status` of user
      * @param bool $asArray - result as `Array`
@@ -76,7 +75,7 @@ class BaseUsers extends ActiveRecord
     }
 
     /**
-     * Finds user by username
+     * Finds user by `username`
      *
      * @param  string $username - `username` of user
      * @param int|null  $status - `status` of user
@@ -197,7 +196,6 @@ class BaseUsers extends ActiveRecord
         if (isset($status)) {
             $query->byStatus($status);
         }
-
         return $query->exists();
     }
 

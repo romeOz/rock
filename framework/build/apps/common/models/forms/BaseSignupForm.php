@@ -2,7 +2,6 @@
 
 namespace apps\common\models\forms;
 
-
 use apps\common\models\users\BaseUsers;
 use rock\base\Model;
 use rock\db\Connection;
@@ -10,11 +9,10 @@ use rock\event\Event;
 use rock\exception\ErrorHandler;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
-use rock\helpers\Sanitize;
 use rock\helpers\String;
 use rock\Rock;
 use rock\url\Url;
-use rock\validation\Validation;
+use rock\validate\Validate;
 
 class BaseSignupForm extends Model
 {
@@ -34,8 +32,6 @@ class BaseSignupForm extends Model
     public $activateUrl = '/activation.html';
     public $defaultStatus = BaseUsers::STATUS_NOT_ACTIVE;
     public $generateToken = true;
-    public $enableCaptcha = true;
-    public $enableCsrfToken = true;
 
     public $isSignup = false;
 
@@ -44,90 +40,63 @@ class BaseSignupForm extends Model
 
     public function rules()
     {
-        //$timestamp = time();
         return [
             [
-                self::RULE_VALIDATION,
-                function(array $attributes){
-
-                    if ($this->enableCsrfToken) {
-                        if ($this->Rock->validation
-                                ->notEmpty()
-                                ->token($this->formName())
-                                ->setName(Rock::t('token'))
-                                ->setModel($this)
-                                ->setPlaceholders('e_signup')
-                                ->validate($attributes[$this->Rock->csrf->csrfParam]) === false
-                        ) {
-                            return false;
-                        }
-                    }
-
-                    $validation = $this->Rock->validation
-                        ->key(
-                            'email',
-                            Validation::notEmpty()
-                                ->length(4, 80, true)
-                                ->email()
-                        )
-                        ->key(
-                            'username',
-                            Validation::notEmpty()
-                                ->length(3, 80, true)
-                                ->regex('/^[\w\s\-\*\@\%\#\!\?\.\)\(\+\=\~\:]+$/iu')
-                        )
-                        ->key(
-                            'password',
-                            Validation::notEmpty()
-                                ->length(6, 20, true)
-                                ->regex('/^[\\w\\d\-\.]+$/i')
-                                ->setName(Rock::t('password'))
-                        )
-                        ->key(
-                            'password_confirm',
-                            Validation::notEmpty()
-                                ->confirm(Helper::getValue($attributes['password']), true)
-                        );
-
-                    if ($this->enableCaptcha) {
-                        $validation->key(
-                            'captcha',
-                            Validation::notEmpty()
-                                ->captcha($this->Rock->captcha->getSession(), true)
-                        );
-                    }
-
-                    if ($validation
-                            ->setModel($this)
-                            ->setPlaceholders(
-                                [
-                                    'email.first',
-                                    'username.first' => 'e_username',
-                                    'password.first' => 'e_password',
-                                    'password_confirm.first' => 'e_password_confirm',
-                                    'captcha.first' => 'e_captcha'
-                                ]
-                            )
-                            ->validate($attributes) === false) {
-                        return false;
-                    }
-
-                    if (BaseUsers::existsByUsernameOrEmail($attributes['email'], $attributes['username'], null) === true) {
-                        $this->Rock->template->addPlaceholder('e_signup', Rock::t('existsUsernameOrEmail'), true);
-                        return false;
-                    }
-                    return true;
-
-                }],
-                [
-                    self::RULE_BEFORE_FILTERS,
-                    [
-                        Sanitize::ANY => [Sanitize::STRIP_TAGS, 'trim'],
-                        'email' => [(object)['mb_strtolower', [Rock::$app->charset]]],
-                    ],
-
-                ],
+                self::RULE_VALIDATE, '_csrf', 'validateCSRF', 'one'
+            ],
+            [
+                self::RULE_SANITIZE, ['email', 'username', 'password', 'password_confirm', 'captcha'], 'trim'
+            ],
+            [
+                self::RULE_VALIDATE, ['email', 'username', 'password', 'password_confirm', 'captcha'], 'required',
+            ],
+            [
+                self::RULE_VALIDATE, 'email', 'length' => [4, 80, true], 'email'
+            ],
+            [
+                self::RULE_VALIDATE, 'username', 'length' => [3, 80, true], 'regex' => ['/^[\w\s\-\*\@\%\#\!\?\.\)\(\+\=\~\:]+$/iu']
+            ],
+            [
+                self::RULE_VALIDATE, 'password', 'length' => [6, 20, true], 'regex' => ['/^[a-z\d\-\_\.]+$/i']
+            ],
+            [
+                self::RULE_VALIDATE, 'password_confirm', 'confirm' => [$this->password]
+            ],
+            [
+                self::RULE_VALIDATE, 'captcha', 'captcha' => [$this->Rock->captcha->getSession()]
+            ],
+            [
+                self::RULE_SANITIZE, 'email', 'lowercase'
+            ],
+            [
+                self::RULE_SANITIZE, ['email', 'username', 'password', 'password_confirm', 'captcha'], 'removeTags'
+            ],
+            [
+                self::RULE_VALIDATE, 'username', 'validateExistsUser'
+            ],
         ];
+    }
+
+    protected function validateExistsUser()
+    {
+        if ($this->hasErrors()) {
+            return true;
+        }
+        if (BaseUsers::existsByUsernameOrEmail($this->email, $this->username, null)) {
+            $this->addErrorAsPlaceholder(Rock::t('existsUsernameOrEmail'), 'e_signup');
+            return false;
+        }
+        return true;
+    }
+
+    protected function validateCSRF($input)
+    {
+        $v = Validate::required()->csrf()->placeholders(['name' => 'CSRF-token']);
+        if (!$v->validate($input)) {
+            $this->addErrorAsPlaceholder($v->getFirstError(), 'e_signup');
+            return false;
+        }
+        return true;
     }
 
     public function safeAttributes()
@@ -164,6 +133,7 @@ class BaseSignupForm extends Model
     {
         $this->connection = $connection;
     }
+
     /**
      * @return BaseUsers
      */
@@ -171,7 +141,6 @@ class BaseSignupForm extends Model
     {
         return $this->users;
     }
-
 
     /**
      * @param string|null $url
@@ -197,13 +166,12 @@ class BaseSignupForm extends Model
     protected function prepareBody(array $data, $chunk)
     {
         $name = $data['username'];
-
         if (isset($data['firstname']) || isset($data['lastname'])) {
             $name = implode(' ', ArrayHelper::intersectByKeys($data, ['firstname', 'lastname']));
         }
+
         $data['fullname'] = $name;
         $data['password'] = $this->password;
-
         if ($this->generateToken) {
             /** @var Url $urlBuilder */
             $urlBuilder = Rock::factory($this->activateUrl, Url::className());
@@ -215,6 +183,10 @@ class BaseSignupForm extends Model
         return $this->Rock->template->getChunk($chunk, $data);
     }
 
+    /**
+     * @param null $subject
+     * @param null $chunkBody
+     */
     public function sendMail($subject = null, $chunkBody = null)
     {
         if ($this->isSignup === false) {
@@ -234,7 +206,7 @@ class BaseSignupForm extends Model
                 ->body($body)
                 ->send();
         } catch (\Exception $e) {
-            $this->Rock->template->addPlaceholder('e_signup', Rock::t('failSendEmail'), true);
+            $this->addErrorAsPlaceholder(Rock::t('failSendEmail'), 'e_signup');
             Rock::warning(ErrorHandler::convertExceptionToString($e));
         }
     }
@@ -244,7 +216,7 @@ class BaseSignupForm extends Model
         $users = $this->getUsers();
         $users->login_last = $this->Rock->date->isoDatetime();
         if (!$users->save()) {
-            $this->Rock->template->addPlaceholder('e_signup', Rock::t('failLogin'), true);
+            $this->addErrorAsPlaceholder(Rock::t('failSignup'), 'e_signup');
             return;
         }
 
@@ -267,7 +239,7 @@ class BaseSignupForm extends Model
     public function afterSignup()
     {
         if (!$users = BaseUsers::create($this->getAttributes(), $this->defaultStatus, $this->generateToken)) {
-            $this->Rock->template->addPlaceholder('e_signup', Rock::t('failSignup'), true);
+            $this->addErrorAsPlaceholder(Rock::t('failSignup'), 'e_signup');
             return false;
         }
         $this->users = $users;
@@ -277,7 +249,6 @@ class BaseSignupForm extends Model
         if ($this->trigger(self::EVENT_AFTER_SIGNUP, Event::AFTER)->after(null, $result) === false) {
             return false;
         }
-
 
         return true;
     }

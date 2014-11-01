@@ -19,6 +19,7 @@ namespace rock;
  * @property-read \rock\request\Request                                         $request
  * @property-read \rock\user\User                                               $user
  * @property-read \rock\url\Url                                                 $url
+ * @property-read \rock\sanitize\Sanitize                                         $sanitize
  * @property-read \rock\session\Session                                         $session
  * @property-read \rock\cookie\Cookie                                                                $cookie
  * @property-read \rock\i18n\i18n                                               $i18n
@@ -33,7 +34,6 @@ namespace rock;
  * @property-read \rock\image\DataProvider                                       $dataImage
  * @property-read \rock\response\Response                                       $response
  * @property-read \rock\log\Log                                                 $log
- * @property-read \rock\validation\Validation                                                 $validation
  * @property-read \rock\validate\Validate                                                $validate
  * @property-read \rock\di\Container                                            $di
  * @property-read \rock\rbac\RBAC                                            $rbac

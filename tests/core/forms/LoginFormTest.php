@@ -2,10 +2,8 @@
 
 namespace rockunit\core\forms;
 
-
 use rock\i18n\i18n;
 use rock\Rock;
-use rock\validation\Validation;
 use rockunit\common\CommonTrait;
 use rockunit\core\db\DatabaseTestCase;
 use rockunit\core\db\models\ActiveRecord;
@@ -17,7 +15,6 @@ use rockunit\core\forms\models\LoginForm;
  */
 class LoginFormTest extends DatabaseTestCase
 {
-
     use CommonTrait;
 
     public static $post = [];
@@ -25,10 +22,14 @@ class LoginFormTest extends DatabaseTestCase
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
-        Validation::setLocale(i18n::EN);
         Rock::$app->language = i18n::EN;
     }
 
+    public static function tearDownAfterClass()
+    {
+        parent::tearDownAfterClass();
+        Rock::$app->language = i18n::RU;
+    }
 
     public function setUp()
     {
@@ -47,25 +48,18 @@ class LoginFormTest extends DatabaseTestCase
         static::$post = $_POST;
     }
 
-    public static function tearDownAfterClass()
-    {
-        parent::tearDownAfterClass();
-        Validation::setLocale(i18n::RU);
-        Rock::$app->language = i18n::RU;
-    }
-
     /**
      * @dataProvider providerFail
      */
-    public function testFail(array $post, array $placeholders)
+    public function testFail(array $post, array $errors)
     {
-        $loginForm = new LoginForm();
+        $model = new LoginForm();
         $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
-        $_POST = [$loginForm->formName() => $post];
-        $loginForm->load($_POST);
-        $loginForm->validate();
-        $this->assertFalse($loginForm->isLogged);
-        $this->assertEquals(Rock::$app->template->getAllPlaceholders(false, true), $placeholders);
+        $_POST = [$model->formName() => $post];
+        $model->load($_POST);
+        $this->assertFalse($model->validate());
+        $this->assertFalse($model->isLogged);
+        $this->assertEquals($errors, $model->getErrors());
     }
 
     public function providerFail()
@@ -75,41 +69,64 @@ class LoginFormTest extends DatabaseTestCase
                 [
                     'email' => ' FOOgmail.ru    ',
                     'password' => 'abc',
-                    Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new LoginForm())->formName());},
+                    Rock::$app->csrf->csrfParam => function () {
+                        return Rock::$app->csrf->create((new LoginForm())->formName());
+                    },
                 ],
                 [
-                    'e_email' => '"foogmail.ru" must be valid email',
-                    'e_password' => "password must have a length between 6 and 20",
+                    'email' =>
+                        [
+                            'e-mail must be valid',
+                        ],
+                    'password' =>
+                        [
+                            'password must have a length between 6 and 20',
+                        ],
                 ]
             ],
             [
                 [
                     'email' => 'linda@gmail.com',
                     'password' => '123456f',
-                    Rock::$app->csrf->csrfParam => function(){return '';},
+                    Rock::$app->csrf->csrfParam => function () {
+                        return '';
+                    },
                 ],
                 [
-                    'e_login' => 'the value must not be empty',
+                    'e_login' =>
+                        [
+                            'CSRF-token must not be empty',
+                        ],
                 ]
             ],
             [
                 [
                     'email' => 'linda@gmail.com',
                     'password' => '123456f',
-                    Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new LoginForm())->formName());},
+                    Rock::$app->csrf->csrfParam => function () {
+                        return Rock::$app->csrf->create((new LoginForm())->formName());
+                    },
                 ],
                 [
-                    'e_login' => 'Password or email is invalid.',
+                    'e_login' =>
+                        [
+                            'Password or email is invalid.',
+                        ],
                 ]
             ],
             [
                 [
                     'email' => 'jane@hotmail.com',
                     'password' => '123456',
-                    Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new LoginForm())->formName());},
+                    Rock::$app->csrf->csrfParam => function () {
+                        return Rock::$app->csrf->create((new LoginForm())->formName());
+                    },
                 ],
                 [
-                    'e_login' => 'Account is not activated',
+                    'e_login' =>
+                        [
+                            'Account is not activated',
+                        ],
                 ]
             ],
         ];
@@ -122,14 +139,15 @@ class LoginFormTest extends DatabaseTestCase
             'email' => 'Linda@gmail.com',
             'password' => '123456',
         ];
-
-        $loginForm = new LoginForm();
-        $post[$token->csrfParam] = $token->create($loginForm->formName());
-        $_POST = [$loginForm->formName() => $post];
-        $loginForm->load($_POST);
-        $loginForm->validate();
-        $this->assertTrue($loginForm->isLogged);
-        $this->assertEquals(Rock::$app->user->getAll(['id', 'username']), $loginForm->getUsers()->toArray(['id', 'username']));
+        $model = new LoginForm();
+        $post[$token->csrfParam] = $token->create($model->formName());
+        $_POST = [$model->formName() => $post];
+        $model->load($_POST);
+        $this->assertTrue($model->validate());
+        $this->assertTrue($model->isLogged);
+        $this->assertEquals(
+            Rock::$app->user->getAll(['id', 'username']),
+            $model->getUsers()->toArray(['id', 'username']));
     }
 }
  

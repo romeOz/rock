@@ -41,7 +41,7 @@ class Formula extends Snippet
         }
 
         return $this->Rock->eval->get(
-            String::trimSpaces('return ' . preg_replace('/:([\\w]+)/', '$data[\'$1\']', $this->subject) . ';'),
+            String::removeSpaces('return ' . preg_replace('/:([\\w]+)/', '$data[\'$1\']', $this->subject) . ';'),
             [
                 'subject'   => $this->subject,
                 'operands'    => $this->operands

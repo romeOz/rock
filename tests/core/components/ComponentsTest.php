@@ -6,9 +6,6 @@ use rock\access\Access;
 use rock\base\ClassName;
 use rock\base\ComponentsTrait;
 use rock\event\Event;
-use rock\helpers\Sanitize;
-use rock\Rock;
-
 
 class Foo
 {
@@ -304,43 +301,6 @@ class ComponentsTest extends \PHPUnit_Framework_TestCase
                 ->foo()
         );
         $this->expectOutputString('fail');
-    }
-
-
-    public function testFilters()
-    {
-        $this->assertEquals(
-            (new Foo())
-                ->filters([Sanitize::STRIP_TAGS])
-                ->method('filter'),
-            'test'
-        );
-    }
-
-    public function testValidationTrue()
-    {
-        $this->assertEquals(
-            (new Foo())
-                ->filters([Sanitize::STRIP_TAGS])
-                ->validation(Rock::$app->validation->string())
-                ->method('filter'),
-            'test'
-        );
-    }
-
-
-    public function testValidationFalse()
-    {
-        $this->assertNull(
-            (new Foo())
-                ->filters([Sanitize::STRIP_TAGS])
-                ->validation(
-                    function ($result) {
-                        return Rock::$app->validation->numeric()->validate($result);
-                    }
-                )
-                ->method('filter')
-        );
     }
 }
  

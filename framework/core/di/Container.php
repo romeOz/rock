@@ -120,8 +120,8 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
     public static function getAll(array $only = [], array $exclude = [], $alias = false)
     {
         return $alias === true
-            ? ArrayHelper::prepareArray(static::$classAliases, $only, $exclude)
-            : ArrayHelper::prepareArray(static::$classNames, $only, $exclude);
+            ? ArrayHelper::only(static::$classAliases, $only, $exclude)
+            : ArrayHelper::only(static::$classNames, $only, $exclude);
     }
 
     public function __isset($name)

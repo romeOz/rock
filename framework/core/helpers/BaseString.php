@@ -24,14 +24,14 @@ class BaseString
      * Returns the portion of string specified by the start and length parameters.
      * This method ensures the string is treated as a byte array by using `mb_substr()`.
      * @param string $string the input string. Must be one character or longer.
-     * @param integer $start the starting position
-     * @param integer $length the desired portion length
+     * @param int $start the starting position
+     * @param int|null $length the desired portion length
      * @return string the extracted part of string, or FALSE on failure or an empty string.
      * @see http://www.php.net/manual/en/function.substr.php
      */
-    public static function byteSubstr($string, $start, $length)
+    public static function byteSubstr($string, $start, $length = null)
     {
-        return mb_substr($string, $start, $length, '8bit');
+        return mb_substr($string, $start, $length === null ? mb_strlen($string, '8bit') : $length, '8bit');
     }
 
     /**
@@ -180,17 +180,6 @@ class BaseString
     }
 
     /**
-     * Escaping slashes.
-     *
-     * @param string $string string
-     * @return string
-     */
-    public static function addSlashes($string)
-    {
-        return addslashes($string);
-    }
-
-    /**
      * Escape string single-quotes.
      *
      * @param string $string string
@@ -233,7 +222,7 @@ class BaseString
      */
     public static function ltrimWords($string, array $words)
     {
-        return static::trimPattern($string, '/^('.preg_quote(implode('|', $words), '/').')/u');
+        return static::trimPattern($string, '/^('.implode('|', $words).')\\s?/u');
     }
 
     /**
@@ -244,7 +233,7 @@ class BaseString
      */
     public static function rtrimWords($string, array $words)
     {
-        return static::trimPattern($string, '/('.preg_quote(implode('|', $words), '/').')$/u');
+        return static::trimPattern($string, '/\\s?('.implode('|', $words).')$/u');
     }
 
     /**
@@ -253,7 +242,7 @@ class BaseString
      * @param string $string string
      * @return string
      */
-    public static function trimSpaces($string)
+    public static function removeSpaces($string)
     {
         return static::trimPattern($string, '/\s+/i');
     }
@@ -273,33 +262,19 @@ class BaseString
 
     /**
      * Check contains word or char in string.
-     * @param $string
-     * @param $contains
+     *
+     * @param string     $string
+     * @param string     $contains
+     * @param bool $caseSensitive Case sensitive search. Default is false.
      * @return bool
      */
-    public static function contains($string, $contains)
+    public static function contains($string, $contains, $caseSensitive = false)
     {
-        return strpos($string, $contains) !== false;
-    }
-
-    /**
-     * Trim a list of characters from a string.
-     *
-     * @param string $string   string
-     * @param array  $chars array of characters to delete.
-     * @return string
-     */
-    public static function trimChars($string, array $chars = [])
-    {
-        if (empty($chars)) {
-            $chars = [
-                '*', '@', '%', '#', '!', '?', '.', ')', '(',
-                '+', '=', '~', ':', '.', '«', '»', '`', '\'',
-                '"', '/', '\\', '“', '”'
-            ];
+        $encoding = 'UTF-8';
+        if ($caseSensitive === false) {
+            return false !== mb_stripos($string, $contains, 0, $encoding);
         }
-
-        return str_replace($chars, "", $string);
+        return false !== mb_strpos($string, $contains, 0, $encoding);
     }
 
     /**
@@ -310,32 +285,77 @@ class BaseString
      */
     public static function translit($string)
     {
-        $ret = [
-            'А' => 'a', 'Б' => 'b', 'В' => 'v', 'Г' => 'g',
-            'Д' => 'd', 'Е' => 'e', 'Ж' => 'j', 'З' => 'z', 'И' => 'i',
-            'Й' => 'y', 'К' => 'k', 'Л' => 'l', 'М' => 'm', 'Н' => 'n',
-            'О' => 'o', 'П' => 'p', 'Р' => 'r', 'С' => 's', 'Т' => 't',
-            'У' => 'u', 'Ф' => 'f', 'Х' => 'h', 'Ц' => 'ts', 'Ч' => 'ch',
-            'Ш' => 'sh', 'Щ' => 'sch', 'Ъ' => "", 'Ы' => 'yi', 'Ь' => "",
-            'Э' => 'e', 'Ю' => 'yu', 'Я' => 'ya', 'а' => 'a', 'б' => 'b',
+        $replace = [
+            'А' => 'A', 'Б' => 'B', 'В' => 'V', 'Г' => 'G',
+            'Д' => 'D', 'Е' => 'E', 'Ж' => 'J', 'З' => 'Z', 'И' => 'I',
+            'Й' => 'Y', 'К' => 'K', 'Л' => 'L', 'М' => 'M', 'Н' => 'N',
+            'О' => 'O', 'П' => 'P', 'Р' => 'R', 'С' => 'S', 'Т' => 'T',
+            'У' => 'U', 'Ф' => 'F', 'Х' => 'H', 'Ц' => 'Ts', 'Ч' => 'Ch',
+            'Ш' => 'Sh', 'Щ' => 'Sch', 'Ъ' => "", 'Ы' => 'Yi', 'Ь' => "'",
+            'Э' => 'E', 'Ю' => 'Yu', 'Я' => 'Ya', 'а' => 'a', 'б' => 'b',
             'в' => 'v', 'г' => 'g', 'д' => 'd', 'е' => 'e', 'ж' => 'j',
             'з' => 'z', 'и' => 'i', 'й' => 'y', 'к' => 'k', 'л' => 'l',
             'м' => 'm', 'н' => 'n', 'о' => 'o', 'п' => 'p', 'р' => 'r',
             'с' => 's', 'т' => 't', 'у' => 'u', 'ф' => 'f', 'х' => 'h',
             'ц' => 'ts', 'ч' => 'ch', 'ш' => 'sh', 'щ' => 'sch', 'ъ' => 'y',
-            'ы' => 'yi', 'ь' => "", 'э' => 'e', 'ю' => 'yu', 'я' => 'ya'
+            'ы' => 'yi', 'ь' => "'", 'э' => 'e', 'ю' => 'yu', 'я' => 'ya'
         ];
+        return strtr($string, $replace);
+    }
 
-        return strtr($string, $ret);
+    /**
+     * Translate characters or replace substrings (case insensitive version of strtr).
+     *
+     * @param string $string
+     * @param string|array $from
+     * @param string|null $to
+     * @link http://php.net/manual/ru/function.strtr.php#82051
+     * @return string
+     */
+    public static function stritr($string, $from, $to = null)
+    {
+        if(function_exists('stritr')) {
+            return stritr($string, $from, $to);
+        }
+        $encoding = 'UTF-8';
+        if (is_string($from) ){
+            $to = strval($to);
+            $from = mb_substr($from, 0, min(mb_strlen($from, $encoding), mb_strlen($to, $encoding)), $encoding);
+            $to = mb_substr($to, 0, min(mb_strlen($from, $encoding), mb_strlen($to, $encoding)), $encoding);
+            $product = strtr($string, (mb_strtoupper($from, $encoding) . mb_strtolower($from, $encoding)), ($to . $to));
+            return $product;
+        } elseif(is_array($from)){
+            $pos1 = 0;
+            $product = $string;
+            while(count($from) > 0){
+                $positions = [];
+                foreach($from as $_from => $to){
+                    if(($pos2 = mb_stripos($product, $_from, $pos1, $encoding)) === false){
+                        unset($from[$_from]);
+                    } else{
+                        $positions[$_from] = $pos2;
+                    }
+                }
+                if (count($from) <= 0) {
+                    break;
+                }
+                $winner = min($positions);
+                $key = array_search($winner, $positions);
+                $product = (mb_substr($product, 0, $winner, $encoding) . $from[$key] . mb_substr($product, $winner + mb_strlen($key, $encoding), null, $encoding));
+                $pos1 = ($winner + mb_strlen($from[$key], $encoding));
+            }
+            return $product;
+        }
+        return $string;
     }
 
     /**
      * Generator of random character string
      *
-     * @param int $len length of string
+     * @param int $length length of string
      * @return string
      */
-    public static function randChars($len = 6)
+    public static function randChars($length = 6)
     {
         $chars     = [
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
@@ -347,9 +367,9 @@ class BaseString
 
         $result = '';
         $count = count($chars) - 1;
-        while ($len > 0) {
+        while ($length > 0) {
             $result .= $chars[mt_rand(0, $count)];
-            --$len;
+            --$length;
         }
 
         return $result;
@@ -459,9 +479,9 @@ class BaseString
     }
 
     /**
-     * Validate value is regexp pattern
+     * Check value is regexp pattern.
      *
-     * @param string $subject - string
+     * @param string $subject string
      * @return bool
      */
     public static function isRegexp(&$subject)
@@ -497,7 +517,54 @@ class BaseString
         if (($pos = mb_strrpos($path, '/')) !== false) {
             return mb_substr($path, $pos + 1);
         }
-
         return $path;
+    }
+
+    /**
+     * Check if given string starts with specified substring.
+     * Binary and multibyte safe.
+     *
+     * @param string $string Input string
+     * @param string $with Part to search
+     * @param bool $caseSensitive Case sensitive search. Default is true.
+     * @return bool Returns true if first input starts with second input, false otherwise
+     */
+    public static function startsWith($string, $with, $caseSensitive = true)
+    {
+        if (!$bytes = static::byteLength($with)) {
+            return true;
+        }
+        $ecoding = 'UTF-8';
+        if ($caseSensitive) {
+            return strncmp($string, $with, $bytes) === 0;
+        } else {
+            return mb_strtolower(mb_substr($string, 0, $bytes, '8bit'), $ecoding) === mb_strtolower($with, $ecoding);
+        }
+    }
+
+    /**
+     * Check if given string ends with specified substring.
+     * Binary and multibyte safe.
+     *
+     * @param string $string
+     * @param string $with
+     * @param bool $caseSensitive Case sensitive search. Default is true.
+     * @return bool Returns true if first input ends with second input, false otherwise
+     */
+    public static function endsWith($string, $with, $caseSensitive = true)
+    {
+        if (!$bytes = static::byteLength($with)) {
+            return true;
+        }
+        $ecoding = 'UTF-8';
+        if ($caseSensitive) {
+            // Warning check, see http://php.net/manual/en/function.substr-compare.php#refsect1-function.substr-compare-returnvalues
+            if (static::byteLength($string) < $bytes) {
+                return false;
+            }
+            return substr_compare($string, $with, -$bytes, $bytes) === 0;
+        } else {
+            return mb_strtolower(mb_substr($string, -$bytes, null, '8bit'), $ecoding) === mb_strtolower($with, $ecoding);
+        }
     }
 }

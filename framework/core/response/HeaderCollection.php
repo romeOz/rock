@@ -161,7 +161,7 @@ class HeaderCollection implements \IteratorAggregate, \ArrayAccess, \Countable
      */
     public function getAll(array $only = [], array $exclude = [])
     {
-        return ArrayHelper::prepareArray($this->_headers, $only, $exclude);
+        return ArrayHelper::only($this->_headers, $only, $exclude);
     }
 
     /**

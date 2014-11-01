@@ -13,7 +13,6 @@ use rock\db\SelectBuilder;
 use rock\event\Event;
 use rock\helpers\Trace;
 use rock\Rock;
-use rock\validation\Validation;
 use rockunit\core\db\models\Customer;
 use rockunit\core\db\models\CustomerRules;
 use rockunit\core\db\models\Order;
@@ -1141,7 +1140,7 @@ trait ActiveRecordTestTrait
         $query = $customerFilterClass::find()
             ->where(['id' => 1])
             ->asArray();
-        $this->assertSame($query->one()['name'], 0);
+        $this->assertSame($query->one()['name'], 'user1');
         $this->assertEmpty(Event::getAll());
         $this->expectOutputString('1success');
 
@@ -1429,9 +1428,7 @@ trait ActiveRecordTestTrait
         $customer->name = 'user4';
         $customer->address = 'address4';
         $this->assertFalse($customer->save());
-        $this->assertTrue(Rock::$app->template->hasPlaceholder('e_test', true));
-
-        Rock::$app->template->removeAllPlaceholders(true);
+        $this->assertNotEmpty($customer->getErrors());
 
         /** @var Customer $customer */
         $customer = new $customerRulesClass;
@@ -1461,7 +1458,7 @@ trait ActiveRecordTestTrait
         $customer->name = 'user4';
         $customer->address = 'address4';
         $this->assertFalse($customer->save());
-        $this->assertFalse(Rock::$app->template->hasPlaceholder('e_test', true));
+        $this->assertEmpty($customer->getErrors());
 
         // success
         /** @var Customer $customer */
@@ -1471,68 +1468,5 @@ trait ActiveRecordTestTrait
         $customer->address = 'address4';
         $this->assertTrue($customer->save());
         $this->expectOutputString('fail');
-
-        Rock::$app->template->removeAllPlaceholders(true);
-    }
-
-    public function testSmartFilter()
-    {
-        /* @var $this \PHPUnit_Framework_TestCase|ActiveRecordTestTrait */
-
-        /* @var $customerClass ActiveRecordInterface */
-        $customerClass = $this->getCustomerClass();
-        $query = $customerClass::find()
-            ->filters(
-                [
-                    'name' =>
-                        [
-                            function ($value) {
-                                return (int)$value;
-                            }
-                        ]
-                ]
-            )
-            ->where(['id' => 1])
-            ->asArray();
-
-        $this->assertSame($query->one()['name'], 0);
-
-        $query = $customerClass::find()
-            ->with('orders')
-            ->filters(
-                [
-                    '0.name' =>
-                        [
-                            function ($value) {
-                                return (int)$value;
-                            }
-                        ],
-                    '0.orders.0.total' =>
-                        [
-                            function ($value) {
-                                return $value * -1;
-                            }
-                        ]
-                ]
-            )
-            ->asArray();
-        $result = $query->all();
-        $this->assertSame($result[0]['name'], 0);
-        $this->assertSame($result[0]['orders'][0]['total'], -110);
-        $this->assertSame($result[1]['name'], 'user2');
-
-        // validate fail
-        $query = $customerClass::find()
-            ->validation(Validation::create()->key('name', Validation::int()))
-            ->where(['id' => 1])
-            ->asArray();
-        $this->assertEmpty($query->one());
-
-        // validate success
-        $query = $customerClass::find()
-            ->validation(Validation::create()->key('name', Validation::string()))
-            ->where(['id' => 1])
-            ->asArray();
-        $this->assertNotEmpty($query->one());
     }
 }

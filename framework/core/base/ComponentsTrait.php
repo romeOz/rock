@@ -6,11 +6,8 @@ use rock\exception\Exception;
 use rock\filters\AccessFilter;
 use rock\filters\ActionFilter;
 use rock\filters\EventFilter;
-use rock\filters\SanitizeFilter;
-use rock\filters\ValidationFilters;
 use rock\helpers\Helper;
 use rock\Rock;
-use rock\validation\Validation;
 
 trait ComponentsTrait
 {
@@ -25,8 +22,8 @@ trait ComponentsTrait
     /**
      * Get method
      *
-     * @param string $actionName - name of method
-     * @param array  $args - args action method
+     * @param string $actionName name of method
+     * @param array  $args args action method
      * @return mixed
      * @throws Exception
      */
@@ -50,7 +47,6 @@ trait ComponentsTrait
         return $result;
     }
 
-
     /**
      * Get data behaviors
      *
@@ -62,35 +58,9 @@ trait ComponentsTrait
     }
 
     /**
-     * Add filters
-     *
-     * @param array $filters
-     * @return static
-     */
-    public function filters(array $filters)
-    {
-        $data = ['class' => SanitizeFilter::className(), 'filters' => $filters];
-        $this->_attachBehaviorInternal(Helper::hash($data, Helper::SERIALIZE_JSON), $data);
-        return $this;
-    }
-
-    /**
-     * Add validation
-     *
-     * @param \Closure|Validation $validation
-     * @return static
-     */
-    public function validation($validation)
-    {
-        $data  = ['class' => ValidationFilters::className(), 'validation' => $validation];
-        $this->_attachBehaviorInternal(Helper::hash($data, Helper::SERIALIZE_JSON), $data);
-        return $this;
-    }
-
-    /**
      * Subscribing in event
      *
-     * @param string            $name - name of event
+     * @param string            $name name of event
      * @param string            $when
      * @param Event $event
      * @return static
@@ -110,8 +80,8 @@ trait ComponentsTrait
     /**
      * Publishing event
      *
-     * @param string         $name    - name of event
-     * @param array|\Closure $handler - handler
+     * @param string         $name    name of event
+     * @param array|\Closure $handler handler
      * @param string     $when
      * @return static
      */
@@ -126,7 +96,7 @@ trait ComponentsTrait
     /**
      * Detach event
      *
-     * @param            $name - name of event
+     * @param string $name name of event
      * @param string $when
      * @return static
      */
@@ -151,7 +121,6 @@ trait ComponentsTrait
         $this->_attachBehaviorInternal(Helper::hash($data, Helper::SERIALIZE_JSON), $data);
         return $this;
     }
-
 
     /**
      * @param null $actionName
@@ -600,7 +569,7 @@ trait ComponentsTrait
      *
      *  - a [[Behavior]] object
      *  - a string specifying the behavior class
-     *  - an object configuration array that will be passed to [[Rock::factory()]] to create the behavior object.
+     *  - an object configuration array that will be passed to @see Rock::factory() to create the behavior object.
      *
      * @return Behavior the behavior object
      * @see detachBehavior()

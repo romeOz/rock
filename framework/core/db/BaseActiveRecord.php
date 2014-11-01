@@ -1,7 +1,6 @@
 <?php
 namespace rock\db;
 
-use rock\base\ArrayableTrait;
 use rock\base\Model;
 use rock\event\Event;
 use rock\helpers\ArrayHelper;
@@ -881,7 +880,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
 
     /**
      * This method is called at the end of inserting or updating a record.
-     * The default implementation will trigger an [[EVENT_AFTER_INSERT]] event when `$insert` is true,
+     * The default implementation will trigger an @see BaseActiveRecord::EVENT_AFTER_INSERT event when `$insert` is true,
      * or an [[EVENT_AFTER_UPDATE]] event if `$insert` is false. The event class used is [[AfterSaveEvent]].
      * When overriding this method, make sure you call the parent implementation so that
      * the event is triggered.

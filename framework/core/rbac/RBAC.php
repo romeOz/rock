@@ -136,7 +136,7 @@ abstract class RBAC implements RBACInterface
      */
     public function getAll(array $only = [], array $exclude = [])
     {
-        return ArrayHelper::prepareArray(static::$items, $only, $exclude);
+        return ArrayHelper::only(static::$items, $only, $exclude);
     }
 
     /**

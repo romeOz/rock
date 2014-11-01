@@ -15,7 +15,6 @@ use rock\rbac\Role;
 use rock\Rock;
 use rock\security\Security;
 use rock\template\Template;
-use rock\validation\Validation;
 
 return array_merge(
     [
@@ -233,12 +232,17 @@ return array_merge(
             'class' => \rock\i18n\i18n::className(),
             'pathsDicts' => [
                 i18n::RU => [
-                    '@common/lang/ru/lang.inc',
+                    '@common/lang/ru/lang.php',
+                    '@common/lang/ru/validate.php',
                 ],
                 i18n::EN => [
-                    '@common/lang/en/lang.inc',
+                    '@common/lang/en/lang.php',
+                    '@common/lang/en/validate.php',
                 ]
-            ]
+            ],
+            'locale' => function(){
+                return Rock::$app->language;
+            }
         ],
         'date' => [
             'class' => \rock\date\DateTime::className(),
@@ -360,14 +364,10 @@ return array_merge(
         'url' => [
             'class' => \rock\url\Url::className(),
         ],
-        'validation' => [
-            'class' => \rock\validation\Validation::className(),
-            'locale' => function (Validation $validation){ $validation::$locale = Rock::$app->language;}
+        'validate' => [
+            'class' => \rock\validate\Validate::className(),
+            'locale' => function (){ return Rock::$app->language;}
         ],
-//        'validate' => [
-//            'class' => \rock\validate\Validate::className(),
-//            'locale' => function (){ return Rock::$app->language;}
-//        ],
         'captcha' => [
             'class' => \rock\captcha\Captcha::className(),
             /**
@@ -409,12 +409,6 @@ return array_merge(
         ],
         \rock\filters\EventFilter::className() => [
             'class' => \rock\filters\EventFilter::className(),
-        ],
-        \rock\filters\SanitizeFilter::className() => [
-            'class' => \rock\filters\SanitizeFilter::className(),
-        ],
-        \rock\filters\ValidationFilters::className() => [
-            'class' => \rock\filters\ValidationFilters::className(),
         ],
         'rbac' =>[
             'class' => \rock\rbac\DBManager::className(),
@@ -468,6 +462,9 @@ return array_merge(
             'class' => Security::className(),
             'deriveKeyStrategy' => 'hmac', // for PHP version < 5.5.0
             //'deriveKeyStrategy' => 'pbkdf2', // for PHP version >= 5.5.0
+        ],
+        'sanitize' => [
+            'class' => \rock\sanitize\Sanitize::className(),
         ],
         Role::className() =>[
             'class' => Role::className(),

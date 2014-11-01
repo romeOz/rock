@@ -18,7 +18,7 @@ class RecoveryForm extends BaseRecoveryForm
     {
         if (!isset($this->_users)) {
             if (!$this->_users = BaseUsers::findOneByEmail($this->email, BaseUsers::STATUS_ACTIVE, false)) {
-                $this->Rock->template->addPlaceholder('e_recovery', Rock::t('invalidEmail'), true);
+                $this->addErrorAsPlaceholder(Rock::t('invalidEmail'), 'e_recovery');
             }
         }
 
