@@ -40,7 +40,7 @@ class Route implements RequestInterface, ErrorsInterface
     /** @var  array|\Closure */
     public $fail;
     public $RESTHandlers = [];
-    public static $defaultFilters = ['removeTags', 'trim', /*'urldecode', */'toType'];
+    public static $defaultFilters = ['removeTags', 'trim', ['call' => 'urldecode'],'toType'];
 
     protected $errors = 0;
 
