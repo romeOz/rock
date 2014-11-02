@@ -36,9 +36,9 @@ Features
  * i18n
  * Validation (in an independent project [Rock Validate](https://github.com/romeOz/rock-validate))
  * Cache (in an independent project [Rock Cache](https://github.com/romeOz/rock-cache))
- * Behaviors + Filters (AccessFilter, ContentNegotiatorFilter, EventFilter, RateLimiter, SanitizeFilter, ValidationFilters, VerbFilter, TimestampBehavior)
+ * Behaviors + Filters (AccessFilter, ContentNegotiatorFilter, EventFilter, RateLimiter, VerbFilter, TimestampBehavior)
  * Mail
- * Security + Tokenization
+ * Security + CSRF prevention
  * Markdown (abstraction over the [cebe/markdown](https://github.com/cebe/markdown))
  * RBAC (local or DB)
  * Exception + Logger + Tracing
