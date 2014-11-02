@@ -12,10 +12,7 @@ use rock\event\Event;
 use rock\exception\Exception;
 use rock\filters\AccessFilter;
 use rock\filters\EventFilter;
-use rock\filters\SanitizeFilter;
-use rock\filters\ValidationFilters;
 use rock\Rock;
-use rock\validation\Validation;
 
 class TestSnippet extends Snippet
 {

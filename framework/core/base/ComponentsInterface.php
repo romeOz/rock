@@ -4,7 +4,6 @@ namespace rock\base;
 
 
 use rock\db\ActiveQueryInterface;
-use rock\validation\Validation;
 
 interface ComponentsInterface extends ObjectInterface
 {
