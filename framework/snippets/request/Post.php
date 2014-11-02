@@ -2,6 +2,7 @@
 namespace rock\snippets\request;
 use rock\base\Snippet;
 use rock\request\Request;
+use rock\sanitize\Sanitize;
 
 /**
  * Snippet "Post request"
@@ -21,6 +22,9 @@ class Post extends Snippet
     public $autoEscape = false;
     public function get()
     {
+        if (is_array($this->filters)) {
+            $this->filters = Sanitize::rules($this->filters);
+        }
         if (empty($this->name)){
             return Request::postAll($this->filters);
         }
