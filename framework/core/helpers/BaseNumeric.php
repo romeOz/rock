@@ -5,9 +5,9 @@ namespace rock\helpers;
 class BaseNumeric
 {
     /**
-     * Is parity
+     * Check is parity.
      *
-     * @param int $value - numeric
+     * @param int $value numeric
      * @return boolean
      */
     public static function isParity($value)
@@ -16,9 +16,9 @@ class BaseNumeric
     }
 
     /**
-     * Number convert to positive
+     * Number convert to positive.
      *
-     * @param int $value - number
+     * @param int $value number
      * @return int
      */
     public static function toPositive($value)
@@ -27,9 +27,9 @@ class BaseNumeric
     }
 
     /**
-     * String conversion to numbers
+     * String conversion to numbers.
      *
-     * @param string $value - value
+     * @param string $value value
      * @return mixed
      */
     public static function toNumeric($value)
@@ -45,9 +45,9 @@ class BaseNumeric
     }
 
     /**
-     * Hex to bin
+     * Hex to bin.
      *
-     * @param string $value - hex string
+     * @param string $value hex string
      * @return string
      */
     public static function hexToBin($value)

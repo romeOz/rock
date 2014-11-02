@@ -7,7 +7,7 @@ use rock\helpers\String;
 use rock\Rock;
 
 /**
- * Snippet "Pagination"
+ * Snippet "Pagination".
  *
  * Examples:
  *
@@ -45,7 +45,7 @@ class Pagination extends Snippet
     public $array;
 
     /**
-     * May be a callable, snippet, and instance
+     * May be a callable, snippet, and instance.
      *
      * ```
      * [[Pagination?call=`\foo\FooController.getPagination`]]
@@ -64,7 +64,7 @@ class Pagination extends Snippet
     public $call;
     public $pageVar;
     /**
-     * tpl active
+     * Template for active page.
      *
      * @var string
      */
@@ -76,7 +76,8 @@ class Pagination extends Snippet
     public $pageLastTpl;
     public $wrapperTpl;
     /**
-     * URL-arguments
+     * URL-arguments.
+     *
      * @var array
      */
     public $pageArgs = [];

@@ -7,7 +7,7 @@ use rock\helpers\Helper;
 use rock\helpers\Json;
 
 /**
- * Snippet "ListView"
+ * Snippet "ListView".
  *
  * Examples:
  *
@@ -29,7 +29,7 @@ use rock\helpers\Json;
  * ]]
  * ```
  *
- * As PHP engine;
+ * As PHP engine:
  *
  * ```php
  * $template = new \rock\Template;
@@ -86,8 +86,9 @@ class ListView extends Snippet
      */
     public $array = [];
     /**
-     * The data as an call
-     * May be a callable, snippet, and instance
+     * The data as an call.
+     *
+     * May be a callable, snippet, and instance.
      *
      * ```
      * [[ListView?call=`\foo\FooController.getAll`]]
@@ -113,18 +114,18 @@ class ListView extends Snippet
     /**
      * Params pagination:
      *
-     * - array: data of pagination as an array
-     * - call:  data of pagination as an call
-     * - toPlaceholder: the name of global placeholder to adding the pagination
-     * - pageLimit:        count buttons of pagination
-     * - pageVar:          name url-argument of pagination ("page" by default)
-     * - pageArgs:         url-arguments of pagination
-     * - pageAnchor:       url-anchor of pagination
-     * - wrapperTpl:       wrapper template for pagination
-     * - pageNumTpl:       template for buttons
-     * - pageActiveTpl:    template for active button
-     * - pageFirstTpl:     template for button "first"
-     * - pageLastTpl:      template for button  "last"
+     * - array - data of pagination as an array
+     * - call -  data of pagination as an call
+     * - toPlaceholder - the name of global placeholder to adding the pagination
+     * - pageLimit -        count buttons of pagination
+     * - pageVar -          name url-argument of pagination ("page" by default)
+     * - pageArgs -         url-arguments of pagination
+     * - pageAnchor -       url-anchor of pagination
+     * - wrapperTpl -       wrapper template for pagination
+     * - pageNumTpl -       template for buttons
+     * - pageActiveTpl -    template for active button
+     * - pageFirstTpl -     template for button "first"
+     * - pageLastTpl -      template for button  "last"
      *
      * @var array
      */
@@ -132,14 +133,13 @@ class ListView extends Snippet
     /**
      * Prepare item.
      *
-     * @var array
-     *
      * ```php
      * ['call' => '\foo\Snippet', 'params' => [...]]
      * ['call' => function{}()]
      * ['call' => [Foo::className(), 'staticMethod']]
      * ['call' => [new Foo(), 'method']]
      * ```
+     * @var array
      */
     public $prepare;
 

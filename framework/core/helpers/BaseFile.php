@@ -16,6 +16,7 @@ class BaseFile extends Util
     const PATTERN_ENDSWITH = 4;
     const PATTERN_MUSTBEDIR = 8;
     const PATTERN_NEGATIVE = 16;
+    private static $_mimeTypes = [];
 
     /**
      * Create of file.
@@ -24,7 +25,7 @@ class BaseFile extends Util
      * @param string $value    value.
      * @param int    $const    constant for `file_put_contents`.
      * @param bool   $recursive
-     * @param int    $mode the permission to be set for the created file.
+     * @param int    $mode     the permission to be set for the created file.
      * @return bool
      */
     public static function create($pathFile, $value = "", $const = 0, $recursive = true, $mode = 0775)
@@ -34,13 +35,45 @@ class BaseFile extends Util
                 return false;
             }
         }
-
         if (!file_put_contents($pathFile, $value, $const)) {
             Rock::warning(Exception::NOT_CREATE_FILE, ['name' => $pathFile]);
+
             return false;
         }
         chmod($pathFile, $mode);
+
         return true;
+    }
+
+    /**
+     * Creates a new directory.
+     *
+     * This method is similar to the PHP `mkdir()` function except that
+     * it uses `chmod()` to set the permission of the created directory
+     * in order to avoid the impact of the `umask` setting.
+     *
+     * @param string  $path      path of the directory to be created.
+     * @param integer $mode      the permission to be set for the created directory.
+     * @param bool    $recursive whether to create parent directories if they do not exist.
+     * @return bool whether the directory is created successfully
+     */
+    public static function createDirectory($path, $mode = 0775, $recursive = true)
+    {
+        if (is_dir($path)) {
+            return true;
+        }
+        $parentDir = dirname($path);
+        if ($recursive && !is_dir($parentDir)) {
+            static::createDirectory($parentDir, $mode, true);
+        }
+        if (!$result = mkdir($path, $mode)) {
+            Rock::warning(Exception::NOT_CREATE_DIR, ['name' => $path]);
+
+            return false;
+        }
+        chmod($path, $mode);
+
+        return $result;
     }
 
     /**
@@ -55,6 +88,7 @@ class BaseFile extends Util
             return false;
         }
         @unlink($path);
+
         return true;
     }
 
@@ -69,21 +103,25 @@ class BaseFile extends Util
     {
         if (!rename($oldPath, $newPath)) {
             Rock::error("Error when renaming file: {$oldPath}");
+
             return false;
         }
+
         return true;
     }
 
     /**
      * Determines the MIME type of the specified file.
+     *
      * This method will first try to determine the MIME type based on
      * [finfo_open](http://php.net/manual/en/function.finfo-open.php). If this doesn't work, it will
-     * fall back to [[getMimeTypeByExtension()]].
-     * @param string $file the file name.
-     * @param string $magicFile name of the optional magic database file, usually something like `/path/to/magic.mime`.
-     * This will be passed as the second parameter to [finfo_open](http://php.net/manual/en/function.finfo-open.php).
-     * @param bool $checkExtension whether to use the file extension to determine the MIME type in case
-     * `finfo_open()` cannot determine it.
+     * fall back to {@see BaseFile::getMimeTypeByExtension()}
+     *
+     * @param string $file           the file name.
+     * @param string $magicFile      name of the optional magic database file, usually something like `/path/to/magic.mime`.
+     *                               This will be passed as the second parameter to [finfo_open](http://php.net/manual/en/function.finfo-open.php).
+     * @param bool   $checkExtension whether to use the file extension to determine the MIME type in case
+     *                               `finfo_open()` cannot determine it.
      * @return string the MIME type (e.g. `text/plain`). Null is returned if the MIME type cannot be determined.
      */
     public static function getMimeType($file, $magicFile = null, $checkExtension = true)
@@ -98,50 +136,38 @@ class BaseFile extends Util
                 }
             }
         }
+
         return $checkExtension ? static::getMimeTypeByExtension($file) : null;
     }
 
     /**
      * Determines the MIME type based on the extension name of the specified file.
+     *
      * This method will use a local map between extension names and MIME types.
-     * @param string $file the file name.
+     *
+     * @param string $file      the file name.
      * @param string $magicFile the path of the file that contains all available MIME type information.
-     * If this is not set, the default file aliased by `@rock/helpers/mimeTypes.php` will be used.
+     *                          If this is not set, the default file aliased by `@rock/helpers/mimeTypes.php` will be used.
      * @return string the MIME type. Null is returned if the MIME type cannot be determined.
      */
     public static function getMimeTypeByExtension($file, $magicFile = null)
     {
         $mimeTypes = static::loadMimeTypes($magicFile);
-
         if (($ext = pathinfo($file, PATHINFO_EXTENSION)) !== '') {
             $ext = strtolower($ext);
             if (isset($mimeTypes[$ext])) {
                 return $mimeTypes[$ext];
             }
         }
+
         return null;
     }
 
     /**
-     * Determines the extensions by given MIME type.
-     * This method will use a local map between extension names and MIME types.
-     * @param string $mimeType file MIME type.
-     * @param string $magicFile the path of the file that contains all available MIME type information.
-     * If this is not set, the default file aliased by `@rock/helpers/mimeTypes.php` will be used.
-     * @return array the extensions corresponding to the specified MIME type
-     */
-    public static function getExtensionsByMimeType($mimeType, $magicFile = null)
-    {
-        $mimeTypes = static::loadMimeTypes($magicFile);
-        return array_keys($mimeTypes, mb_strtolower($mimeType, 'utf-8'), true);
-    }
-
-    private static $_mimeTypes = [];
-
-    /**
      * Loads MIME types from the specified file.
+     *
      * @param string $magicFile the file that contains MIME type information.
-     * If null, the file `@rock/helpers/mimeTypes.php` will be used.
+     *                          If null, the file `@rock/helpers/mimeTypes.php` will be used.
      * @return array the mapping from file extensions to MIME types
      */
     protected static function loadMimeTypes($magicFile)
@@ -152,17 +178,37 @@ class BaseFile extends Util
         if (!isset(self::$_mimeTypes[$magicFile])) {
             self::$_mimeTypes[$magicFile] = require($magicFile);
         }
+
         return self::$_mimeTypes[$magicFile];
     }
 
     /**
-     * Copies a whole directory as another one.
-     * The files and sub-directories will also be copied over.
-     * @param string $src the source directory
-     * @param string $dst the destination directory
-     * @param array $options options for directory copy. Valid options are:
+     * Determines the extensions by given MIME type.
      *
-     * - dirMode: integer, the permission to be set for newly copied directories. Defaults to 0775.
+     * This method will use a local map between extension names and MIME types.
+     *
+     * @param string $mimeType  file MIME type.
+     * @param string $magicFile the path of the file that contains all available MIME type information.
+     *                          If this is not set, the default file aliased by `@rock/helpers/mimeTypes.php` will be used.
+     * @return array the extensions corresponding to the specified MIME type
+     */
+    public static function getExtensionsByMimeType($mimeType, $magicFile = null)
+    {
+        $mimeTypes = static::loadMimeTypes($magicFile);
+
+        return array_keys($mimeTypes, mb_strtolower($mimeType, 'utf-8'), true);
+    }
+
+    /**
+     * Copies a whole directory as another one.
+     *
+     * The files and sub-directories will also be copied over.
+     *
+     * @param string $src     the source directory
+     * @param string $dst     the destination directory
+     * @param array  $options options for directory copy. Valid options are:
+     *
+     * - dirMode: integer, the permission to be set for newly copied directories. Defaults to `0775`.
      * - fileMode:  integer, the permission to be set for newly copied files. Defaults to the current environment setting.
      * - filter: callback, a PHP callback that is called for each directory or file.
      *   The signature of the callback should be: `function ($path)`, where `$path` refers the full path to be filtered.
@@ -197,7 +243,6 @@ class BaseFile extends Util
         if (!is_dir($dst)) {
             static::createDirectory($dst, isset($options['dirMode']) ? $options['dirMode'] : 0775, true);
         }
-
         $handle = opendir($src);
         while (($file = readdir($handle)) !== false) {
             if ($file === '.' || $file === '..') {
@@ -226,6 +271,230 @@ class BaseFile extends Util
     }
 
     /**
+     * Checks if the given file path satisfies the filtering options.
+     *
+     * @param string $path    the path of the file or directory to be checked
+     * @param array  $options the filtering options.
+     * @return bool whether the file or directory satisfies the filtering options.
+     */
+    public static function filterPath($path, $options)
+    {
+        if (isset($options['filter'])) {
+            $result = call_user_func($options['filter'], $path);
+            if (is_bool($result)) {
+                return $result;
+            }
+        }
+        if (empty($options['except']) && empty($options['only'])) {
+            return true;
+        }
+        $path = str_replace('\\', '/', $path);
+        if (!empty($options['except'])) {
+            if (($except = self::lastExcludeMatchingFromList($options['basePath'], $path, $options['except'])) !== null
+            ) {
+                return $except['flags'] & self::PATTERN_NEGATIVE;
+            }
+        }
+        if (!is_dir($path) && !empty($options['only'])) {
+            if (($except = self::lastExcludeMatchingFromList($options['basePath'], $path, $options['only'])) !== null) {
+                // don't check PATTERN_NEGATIVE since those entries are not prefixed with !
+                return true;
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Scan the given exclude list in reverse to see whether pathname
+     * should be ignored.  The first match (i.e. the last on the list), if
+     * any, determines the fate.  Returns the element which
+     * matched, or null for undecided.
+     *
+     * Based on `last_exclude_matching_from_list()` from dir.c of git 1.8.5.3 sources.
+     *
+     * @param string $basePath
+     * @param string $path
+     * @param array  $excludes list of patterns to match $path against
+     * @return string null or one of $excludes item as an array with keys: 'pattern', 'flags'
+     * @throws \Exception if any of the exclude patterns is not a string or an array with keys: pattern, flags, firstWildcard.
+     */
+    private static function lastExcludeMatchingFromList($basePath, $path, $excludes)
+    {
+        foreach (array_reverse($excludes) as $exclude) {
+            if (is_string($exclude)) {
+                $exclude = self::parseExcludePattern($exclude);
+            }
+            if (!isset($exclude['pattern']) || !isset($exclude['flags']) || !isset($exclude['firstWildcard'])) {
+                throw new \Exception(
+                    'If exclude/include pattern is an array it must contain the pattern, flags and firstWildcard keys.');
+            }
+            if ($exclude['flags'] & self::PATTERN_MUSTBEDIR && !is_dir($path)) {
+                continue;
+            }
+            if ($exclude['flags'] & self::PATTERN_NODIR) {
+                if (self::matchBasename(
+                    basename($path),
+                    $exclude['pattern'],
+                    $exclude['firstWildcard'],
+                    $exclude['flags'])
+                ) {
+                    return $exclude;
+                }
+                continue;
+            }
+            if (self::matchPathname(
+                $path,
+                $basePath,
+                $exclude['pattern'],
+                $exclude['firstWildcard'],
+                $exclude['flags'])
+            ) {
+                return $exclude;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Processes the pattern, stripping special characters like / and ! from the beginning and settings flags instead.
+     *
+     * @param string $pattern
+     * @return array with keys: (string)pattern, (int)flags, (int|bool)firstWildcard
+     * @throws \Exception if the pattern is not a string.
+     */
+    private static function parseExcludePattern($pattern)
+    {
+        if (!is_string($pattern)) {
+            throw new \Exception('Exclude/include pattern must be a string.');
+        }
+        $result = array(
+            'pattern' => $pattern,
+            'flags' => 0,
+            'firstWildcard' => false,
+        );
+        if (!isset($pattern[0])) {
+            return $result;
+        }
+        if ($pattern[0] == '!') {
+            $result['flags'] |= self::PATTERN_NEGATIVE;
+            $pattern = String::byteSubstr($pattern, 1, String::byteLength($pattern));
+        }
+        $len = String::byteLength($pattern);
+        if ($len && String::byteSubstr($pattern, -1, 1) == '/') {
+            $pattern = String::byteSubstr($pattern, 0, -1);
+            $len--;
+            $result['flags'] |= self::PATTERN_MUSTBEDIR;
+        }
+        if (strpos($pattern, '/') === false) {
+            $result['flags'] |= self::PATTERN_NODIR;
+        }
+        $result['firstWildcard'] = self::firstWildcardInPattern($pattern);
+        if ($pattern[0] == '*' &&
+            self::firstWildcardInPattern(String::byteSubstr($pattern, 1, String::byteLength($pattern))) === false
+        ) {
+            $result['flags'] |= self::PATTERN_ENDSWITH;
+        }
+        $result['pattern'] = $pattern;
+
+        return $result;
+    }
+
+    /**
+     * Searches for the first wildcard character in the pattern.
+     *
+     * @param string $pattern the pattern to search in
+     * @return integer|bool position of first wildcard character or false if not found
+     */
+    private static function firstWildcardInPattern($pattern)
+    {
+        $wildcards = array('*', '?', '[', '\\');
+        $wildcardSearch = function ($r, $c) use ($pattern) {
+            $p = strpos($pattern, $c);
+
+            return $r === false ? $p : ($p === false ? $r : min($r, $p));
+        };
+
+        return array_reduce($wildcards, $wildcardSearch, false);
+    }
+
+    /**
+     * Performs a simple comparison of file or directory names.
+     *
+     * Based on `match_basename()` from dir.c of git 1.8.5.3 sources.
+     *
+     * @param string       $baseName      file or directory name to compare with the pattern
+     * @param string       $pattern       the pattern that $baseName will be compared against
+     * @param integer|bool $firstWildcard location of first wildcard character in the $pattern
+     * @param integer      $flags         pattern flags
+     * @return bool wheter the name matches against pattern
+     */
+    private static function matchBasename($baseName, $pattern, $firstWildcard, $flags)
+    {
+        if ($firstWildcard === false) {
+            if ($pattern === $baseName) {
+                return true;
+            }
+        } else if ($flags & self::PATTERN_ENDSWITH) {
+            /* "*literal" matching against "fooliteral" */
+            $n = String::byteLength($pattern);
+            if (String::byteSubstr($pattern, 1, $n) === String::byteSubstr($baseName, -$n, $n)) {
+                return true;
+            }
+        }
+
+        return fnmatch($pattern, $baseName, 0);
+    }
+
+    /**
+     * Compares a path part against a pattern with optional wildcards.
+     *
+     * Based on `match_pathname()` from dir.c of git 1.8.5.3 sources.
+     *
+     * @param string       $path          full path to compare
+     * @param string       $basePath      base of path that will not be compared
+     * @param string       $pattern       the pattern that path part will be compared against
+     * @param integer|bool $firstWildcard location of first wildcard character in the $pattern
+     * @param integer      $flags         pattern flags
+     * @return bool wheter the path part matches against pattern
+     */
+    private static function matchPathname($path, $basePath, $pattern, $firstWildcard, $flags)
+    {
+        // match with FNM_PATHNAME; the pattern has base implicitly in front of it.
+        if (isset($pattern[0]) && $pattern[0] == '/') {
+            $pattern = String::byteSubstr($pattern, 1, String::byteLength($pattern));
+            if ($firstWildcard !== false && $firstWildcard !== 0) {
+                $firstWildcard--;
+            }
+        }
+        $namelen = String::byteLength($path) - (empty($basePath) ? 0 : String::byteLength($basePath) + 1);
+        $name = String::byteSubstr($path, -$namelen, $namelen);
+        if ($firstWildcard !== 0) {
+            if ($firstWildcard === false) {
+                $firstWildcard = String::byteLength($pattern);
+            }
+            // if the non-wildcard part is longer than the remaining pathname, surely it cannot match.
+            if ($firstWildcard > $namelen) {
+                return false;
+            }
+            if (strncmp($pattern, $name, $firstWildcard)) {
+                return false;
+            }
+            $pattern = String::byteSubstr($pattern, $firstWildcard, String::byteLength($pattern));
+            $name = String::byteSubstr($name, $firstWildcard, $namelen);
+            // If the whole pattern did not have a wildcard, then our prefix match is all we need; we do not need to call fnmatch at all.
+            if (empty($pattern) && empty($name)) {
+                return true;
+            }
+        }
+
+        return fnmatch($pattern, $name, FNM_PATHNAME);
+    }
+
+    /**
      * Removes a directory (and all its content) recursively.
      *
      * @param string $dir the directory to be deleted recursively.
@@ -250,82 +519,19 @@ class BaseFile extends Util
         }
         closedir($handle);
         rmdir($dir);
+
         return true;
-    }
-
-    /**
-     * Checks if the given file path satisfies the filtering options.
-     * @param string $path the path of the file or directory to be checked
-     * @param array $options the filtering options.
-     * @return bool whether the file or directory satisfies the filtering options.
-     */
-    public static function filterPath($path, $options)
-    {
-        if (isset($options['filter'])) {
-            $result = call_user_func($options['filter'], $path);
-            if (is_bool($result)) {
-                return $result;
-            }
-        }
-
-        if (empty($options['except']) && empty($options['only'])) {
-            return true;
-        }
-
-        $path = str_replace('\\', '/', $path);
-
-        if (!empty($options['except'])) {
-            if (($except = self::lastExcludeMatchingFromList($options['basePath'], $path, $options['except'])) !== null) {
-                return $except['flags'] & self::PATTERN_NEGATIVE;
-            }
-        }
-
-        if (!is_dir($path) && !empty($options['only'])) {
-            if (($except = self::lastExcludeMatchingFromList($options['basePath'], $path, $options['only'])) !== null) {
-                // don't check PATTERN_NEGATIVE since those entries are not prefixed with !
-                return true;
-            }
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Creates a new directory.
-     *
-     * This method is similar to the PHP `mkdir()` function except that
-     * it uses `chmod()` to set the permission of the created directory
-     * in order to avoid the impact of the `umask` setting.
-     *
-     * @param string $path path of the directory to be created.
-     * @param integer $mode the permission to be set for the created directory.
-     * @param bool $recursive whether to create parent directories if they do not exist.
-     * @return bool whether the directory is created successfully
-     */
-    public static function createDirectory($path, $mode = 0775, $recursive = true)
-    {
-        if (is_dir($path)) {
-            return true;
-        }
-        $parentDir = dirname($path);
-        if ($recursive && !is_dir($parentDir)) {
-            static::createDirectory($parentDir, $mode, true);
-        }
-        if (!$result = mkdir($path, $mode)) {
-            Rock::warning(Exception::NOT_CREATE_DIR, ['name' => $path]);
-            return false;
-        }
-        chmod($path, $mode);
-        return $result;
     }
 
     /**
      * Normalizes a file/directory path.
+     *
      * After normalization, the directory separators in the path will be `DIRECTORY_SEPARATOR`,
      * and any trailing directory separators will be removed. For example, `/home\demo/` on Linux
      * will be normalized as '/home/demo'.
+     *
      * @param string $path the file/directory path to be normalized
-     * @param string $ds the directory separator to be used in the normalized result. Defaults to `DIRECTORY_SEPARATOR`.
+     * @param string $ds   the directory separator to be used in the normalized result. Defaults to `DIRECTORY_SEPARATOR`.
      * @return string the normalized file/directory path
      */
     public static function normalizePath($path, $ds = DIRECTORY_SEPARATOR)
@@ -335,6 +541,7 @@ class BaseFile extends Util
 
     /**
      * Returns the trailing name component of a path.
+     *
      * This method is similar to the php function `basename()` except that it will
      * treat both `\` and `/` as directory separators, independent of the operating system.
      * This method was mainly created to work on php namespaces. When working with real
@@ -360,34 +567,8 @@ class BaseFile extends Util
     }
 
     /**
-     * Performs a simple comparison of file or directory names.
-     *
-     * Based on `match_basename()` from dir.c of git 1.8.5.3 sources.
-     *
-     * @param string $baseName file or directory name to compare with the pattern
-     * @param string $pattern the pattern that $baseName will be compared against
-     * @param integer|bool $firstWildcard location of first wildcard character in the $pattern
-     * @param integer $flags pattern flags
-     * @return bool wheter the name matches against pattern
-     */
-    private static function matchBasename($baseName, $pattern, $firstWildcard, $flags)
-    {
-        if ($firstWildcard === false) {
-            if ($pattern === $baseName) {
-                return true;
-            }
-        } else if ($flags & self::PATTERN_ENDSWITH) {
-            /* "*literal" matching against "fooliteral" */
-            $n = String::byteLength($pattern);
-            if (String::byteSubstr($pattern, 1, $n) === String::byteSubstr($baseName, -$n, $n)) {
-                return true;
-            }
-        }
-        return fnmatch($pattern, $baseName, 0);
-    }
-
-    /**
      * Returns parent directory's path.
+     *
      * This method is similar to `dirname()` except that it will treat
      * both `\` and `/` as directory separators, independent of the operating system.
      *
@@ -419,15 +600,15 @@ class BaseFile extends Util
         switch (substr($sizeStr, -1)) {
             case 'M':
             case 'm':
-                return (int) $sizeStr * 1048576;
+                return (int)$sizeStr * 1048576;
             case 'K':
             case 'k':
-                return (int) $sizeStr * 1024;
+                return (int)$sizeStr * 1024;
             case 'G':
             case 'g':
-                return (int) $sizeStr * 1073741824;
+                return (int)$sizeStr * 1073741824;
             default:
-                return (int) $sizeStr;
+                return (int)$sizeStr;
         }
     }
 
@@ -443,149 +624,7 @@ class BaseFile extends Util
         if ($size < 0) {
             $size += 2.0 * (PHP_INT_MAX + 1);
         }
+
         return $size;
-    }
-
-    /**
-     * Compares a path part against a pattern with optional wildcards.
-     *
-     * Based on `match_pathname()` from dir.c of git 1.8.5.3 sources.
-     *
-     * @param string $path full path to compare
-     * @param string $basePath base of path that will not be compared
-     * @param string $pattern the pattern that path part will be compared against
-     * @param integer|bool $firstWildcard location of first wildcard character in the $pattern
-     * @param integer $flags pattern flags
-     * @return bool wheter the path part matches against pattern
-     */
-    private static function matchPathname($path, $basePath, $pattern, $firstWildcard, $flags)
-    {
-        // match with FNM_PATHNAME; the pattern has base implicitly in front of it.
-        if (isset($pattern[0]) && $pattern[0] == '/') {
-            $pattern = String::byteSubstr($pattern, 1, String::byteLength($pattern));
-            if ($firstWildcard !== false && $firstWildcard !== 0) {
-                $firstWildcard--;
-            }
-        }
-
-        $namelen = String::byteLength($path) - (empty($basePath) ? 0 : String::byteLength($basePath) + 1);
-        $name = String::byteSubstr($path, -$namelen, $namelen);
-
-        if ($firstWildcard !== 0) {
-            if ($firstWildcard === false) {
-                $firstWildcard = String::byteLength($pattern);
-            }
-            // if the non-wildcard part is longer than the remaining pathname, surely it cannot match.
-            if ($firstWildcard > $namelen) {
-                return false;
-            }
-
-            if (strncmp($pattern, $name, $firstWildcard)) {
-                return false;
-            }
-            $pattern = String::byteSubstr($pattern, $firstWildcard, String::byteLength($pattern));
-            $name = String::byteSubstr($name, $firstWildcard, $namelen);
-
-            // If the whole pattern did not have a wildcard, then our prefix match is all we need; we do not need to call fnmatch at all.
-            if (empty($pattern) && empty($name)) {
-                return true;
-            }
-        }
-
-        return fnmatch($pattern, $name, FNM_PATHNAME);
-    }
-
-    /**
-     * Scan the given exclude list in reverse to see whether pathname
-     * should be ignored.  The first match (i.e. the last on the list), if
-     * any, determines the fate.  Returns the element which
-     * matched, or null for undecided.
-     *
-     * Based on `last_exclude_matching_from_list()` from dir.c of git 1.8.5.3 sources.
-     *
-     * @param string $basePath
-     * @param string $path
-     * @param array $excludes list of patterns to match $path against
-     * @return string null or one of $excludes item as an array with keys: 'pattern', 'flags'
-     * @throws \Exception if any of the exclude patterns is not a string or an array with keys: pattern, flags, firstWildcard.
-     */
-    private static function lastExcludeMatchingFromList($basePath, $path, $excludes)
-    {
-        foreach(array_reverse($excludes) as $exclude) {
-            if (is_string($exclude)) {
-                $exclude = self::parseExcludePattern($exclude);
-            }
-            if (!isset($exclude['pattern']) || !isset($exclude['flags']) || !isset($exclude['firstWildcard'])) {
-                throw new \Exception('If exclude/include pattern is an array it must contain the pattern, flags and firstWildcard keys.');
-            }
-            if ($exclude['flags'] & self::PATTERN_MUSTBEDIR && !is_dir($path)) {
-                continue;
-            }
-
-            if ($exclude['flags'] & self::PATTERN_NODIR) {
-                if (self::matchBasename(basename($path), $exclude['pattern'], $exclude['firstWildcard'], $exclude['flags'])) {
-                    return $exclude;
-                }
-                continue;
-            }
-
-            if (self::matchPathname($path, $basePath, $exclude['pattern'], $exclude['firstWildcard'], $exclude['flags'])) {
-                return $exclude;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Processes the pattern, stripping special characters like / and ! from the beginning and settings flags instead.
-     * @param string $pattern
-     * @return array with keys: (string)pattern, (int)flags, (int|bool)firstWildcard
-     * @throws \Exception if the pattern is not a string.
-     */
-    private static function parseExcludePattern($pattern)
-    {
-        if (!is_string($pattern)) {
-            throw new \Exception('Exclude/include pattern must be a string.');
-        }
-        $result = array(
-            'pattern' => $pattern,
-            'flags' => 0,
-            'firstWildcard' => false,
-        );
-        if (!isset($pattern[0]))
-            return $result;
-
-        if ($pattern[0] == '!') {
-            $result['flags'] |= self::PATTERN_NEGATIVE;
-            $pattern = String::byteSubstr($pattern, 1, String::byteLength($pattern));
-        }
-        $len = String::byteLength($pattern);
-        if ($len && String::byteSubstr($pattern, -1, 1) == '/') {
-            $pattern = String::byteSubstr($pattern, 0, -1);
-            $len--;
-            $result['flags'] |= self::PATTERN_MUSTBEDIR;
-        }
-        if (strpos($pattern, '/') === false)
-            $result['flags'] |= self::PATTERN_NODIR;
-        $result['firstWildcard'] = self::firstWildcardInPattern($pattern);
-        if ($pattern[0] == '*' && self::firstWildcardInPattern(String::byteSubstr($pattern, 1, String::byteLength($pattern))) === false)
-            $result['flags'] |= self::PATTERN_ENDSWITH;
-        $result['pattern'] = $pattern;
-        return $result;
-    }
-
-    /**
-     * Searches for the first wildcard character in the pattern.
-     * @param string $pattern the pattern to search in
-     * @return integer|bool position of first wildcard character or false if not found
-     */
-    private static function firstWildcardInPattern($pattern)
-    {
-        $wildcards = array('*','?','[','\\');
-        $wildcardSearch = function($r, $c) use ($pattern) {
-            $p = strpos($pattern, $c);
-            return $r===false ? $p : ($p===false ? $r : min($r, $p));
-        };
-        return array_reduce($wildcards, $wildcardSearch, false);
     }
 }

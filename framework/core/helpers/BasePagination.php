@@ -24,8 +24,8 @@ class BasePagination
      * @param int|null $pageCurrent
      * @param int      $sort      sort pages:
      *
-     * - `SORT_ASC`: asc (by default)
-     * - `SORT_DESC`: desc
+     * - `SORT_ASC` - asc (by default)
+     * - `SORT_DESC` - desc
      *
      * @param int      $limit     limit items
      * @param int      $pageLimit limit pages

@@ -12,9 +12,9 @@ use rock\base\Arrayable;
 class BaseJson
 {
     /**
-     * Validation value is json
+     * Validation value is json.
      *
-     * @param mixed $value - value
+     * @param mixed $value value
      * @return bool
      */
     public static function is($value)
@@ -28,7 +28,8 @@ class BaseJson
 
 
     /**
-     * To normalize
+     * To normalize.
+     *
      * @param string $json
      * @return string
      */
@@ -43,10 +44,11 @@ class BaseJson
 
     /**
      * Encodes the given value into a JSON string.
+     *
      * The method enhances `json_encode()`.
      * @param mixed $value the data to be encoded
      * @param integer $options the encoding options. For more details please refer to
-     * <http://www.php.net/manual/en/function.json-encode.php>.
+     * @link http://www.php.net/manual/en/function.json-encode.php
      * @return string the encoding result
      */
     public static function encode($value, $options = 0)
@@ -59,7 +61,7 @@ class BaseJson
     }
 
     /**
-     * Converting json to array
+     * Converting json to array.
      *
      * @param string $json
      * @param bool   $asArray
@@ -101,10 +103,9 @@ class BaseJson
         return $decode;
     }
 
-
-
     /**
      * Pre-processes the data before sending it to `json_encode()`.
+     *
      * @param mixed $data the data to be processed
 
      * @return mixed the processed data
@@ -139,5 +140,4 @@ class BaseJson
 
         return $data;
     }
-
 }

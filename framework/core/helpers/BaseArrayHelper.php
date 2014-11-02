@@ -32,7 +32,7 @@ class BaseArrayHelper
         if (!$keys) {
             return $array;
         }
-        $current = & $array;
+        $current = &$array;
         foreach ($keys as $key) {
             if (!is_array($current) || !Helper::getValue($current[$key])) {
                 throw new ArrayException(
@@ -63,8 +63,8 @@ class BaseArrayHelper
      * // result: ['options' => [1, 2]]
      * ```
      *
-     * @param array        $array   the array to extract value from
-     * @param array|string $keys    chain keys of the array element
+     * @param array        $array the array to extract value from
+     * @param array|string $keys  chain keys of the array element
      * @return mixed|null the value of the element if found, default value otherwise
      */
     public static function removeValue(array &$array, $keys)
@@ -120,9 +120,9 @@ class BaseArrayHelper
     /**
      * Set value in array.
      *
-     * @param array $array
-     * @param array|string $keys chain keys of the array element
-     * @param mixed $value value of array
+     * @param array        $array
+     * @param array|string $keys  chain keys of the array element
+     * @param mixed        $value value of array
      * @return array
      */
     public static function setValue(array &$array, $keys, $value = null)
@@ -133,12 +133,12 @@ class BaseArrayHelper
         if (is_string($keys)) {
             $keys = explode('.', $keys);
         }
-        $current = & $array;
+        $current = &$array;
         foreach ($keys as $key) {
             if (!is_array($current) || empty($current[$key])) {
                 $current[$key] = [];
             }
-            $current = & $current[$key];
+            $current = &$current[$key];
         }
         $current = $value;
 
@@ -151,7 +151,7 @@ class BaseArrayHelper
      * @param mixed $value   current object
      * @param array $only    list of items whose value needs to be returned.
      * @param array $exclude list of items whose value should NOT be returned.
-     * @param bool   $unserialize
+     * @param bool  $unserialize
      * @return array
      */
     public static function toArray($value, array $only = [], array $exclude = [], $unserialize = false)
@@ -159,25 +159,25 @@ class BaseArrayHelper
         if (is_array($value)) {
             return static::map(
                 $value,
-                function($value) use ($only, $exclude, $unserialize){
+                function ($value) use ($only, $exclude, $unserialize) {
                     return static::toArray($value, $only, $exclude, $unserialize);
                 },
                 true
             );
         }
-
         if (is_object($value) && !$value instanceof \Closure) {
             if ($value instanceof Arrayable) {
-                $attributes =  $value->toArray($only, $exclude);
+                $attributes = $value->toArray($only, $exclude);
             } else {
-                $attributes = $value instanceof \stdClass && isset($value->scalar) ? $value->scalar : get_object_vars($value);
+                $attributes =
+                    $value instanceof \stdClass && isset($value->scalar) ? $value->scalar : get_object_vars($value);
             }
-
             if (is_array($attributes)) {
                 return static::toArray($attributes, $only, $exclude, $unserialize);
             }
             $value = $attributes;
         }
+
         return $unserialize === true ? Serialize::unserialize($value, false) : $value;
     }
 
@@ -268,17 +268,14 @@ class BaseArrayHelper
     {
         foreach ($data as $key => $value) {
             if (is_array($value) && $recursive === true) {
-                $value =  static::toMulti($value, $separator, $recursive);
+                $value = static::toMulti($value, $separator, $recursive);
                 //continue;
             }
             if (($keys = explode($separator, $key)) && count($keys) > 1) {
                 $data = ArrayHelper::setValue($data, $keys, $value);
                 unset($data[$key]);
-
-
                 continue;
             }
-
             $data[$key] = $value;
         }
 
@@ -289,10 +286,10 @@ class BaseArrayHelper
      * Move element of array (top, bottom).
      *
      * @param array      $array current array
-     * @param string|int $key  key to move
-     * @param int        $move constant
-     *                         - `MOVE_HEAD` move head
-     *                         - `MOVE_TAIL` move tail
+     * @param string|int $key   key to move
+     * @param int        $move  constant
+     *                          - `MOVE_HEAD` move head
+     *                          - `MOVE_TAIL` move tail
      * @return array
      */
     public static function moveElement(array $array, $key, $move = self::MOVE_HEAD)
@@ -678,7 +675,6 @@ class BaseArrayHelper
         if ($key instanceof \Closure) {
             return $key($array, $default);
         }
-
         if (is_object($array) && is_array($key)) {
             $key = implode('.', $key);
         }
@@ -727,9 +723,11 @@ class BaseArrayHelper
      * Merge key with value
      *
      * @param array  $array     current array
-     * @param string $separator  separator
+     * @param string $separator separator
      * @param int    $const     constant
-     *                          - `ESCAPE` escape value quotes
+     *
+     * - `ESCAPE` escape value quotes
+     *
      * @return array
      */
     public static function concatKeyValue(array $array, $separator = '=', $const = 0)
@@ -749,6 +747,7 @@ class BaseArrayHelper
 
     /**
      * Builds a map (key-value pairs) from a multidimensional array or an array of objects.
+     *
      * The `$from` and `$to` parameters specify the key names or property names to set up the map.
      * Optionally, one can further group the map according to a grouping field `$group`.
      *
@@ -818,7 +817,7 @@ class BaseArrayHelper
     /**
      * Depth
      *
-     * @param array $array current array
+     * @param array $array     current array
      * @param bool  $onlyFirst only first element
      * @throws ArrayException
      * @return int
@@ -848,6 +847,7 @@ class BaseArrayHelper
 
     /**
      * Encodes special characters in an array of strings into HTML entities.
+     *
      * Both the array keys and values will be encoded.
      * If a value is an array, this method will also encode it recursively.
      *
@@ -877,6 +877,7 @@ class BaseArrayHelper
 
     /**
      * Decodes HTML entities into the corresponding characters in an array of strings.
+     *
      * Both the array keys and values will be decoded.
      * If a value is an array, this method will also decode it recursively.
      *
@@ -903,31 +904,22 @@ class BaseArrayHelper
         return $d;
     }
 
-    public static function intersectByKeys(array $array, array $keys)
-    {
-        return array_intersect_key($array, array_flip($keys));
-    }
-
-    public static function diffByKeys(array $array, array $keys)
-    {
-        return array_diff_key($array, array_flip($keys));
-    }
-
     /**
      * Sorts an array of objects or arrays (with the same structure) by one or several keys.
-     * @param array $array the array to be sorted. The array will be modified after calling this method.
-     * @param string|callable|array $key the key(s) to be sorted by. This refers to a key name of the sub-array
-     * elements, a property name of the objects, or an anonymous function returning the values for comparison
-     * purpose. The anonymous function signature should be: `function($item)`.
-     * To sort by multiple keys, provide an array of keys here.
-     * @param integer|array $direction the sorting direction. It can be either `SORT_ASC` or `SORT_DESC`.
-     * When sorting by multiple keys with different sorting directions, use an array of sorting directions.
-     * @param integer|array $sortFlag the PHP sort flag. Valid values include
-     * `SORT_REGULAR`, `SORT_NUMERIC`, `SORT_STRING`, `SORT_LOCALE_STRING`, `SORT_NATURAL` and `SORT_FLAG_CASE`.
-     * Please refer to [PHP manual](http://php.net/manual/en/function.sort.php)
-     * for more details. When sorting by multiple keys with different sort flags, use an array of sort flags.
+     *
+     * @param array                 $array     the array to be sorted. The array will be modified after calling this method.
+     * @param string|callable|array $key       the key(s) to be sorted by. This refers to a key name of the sub-array
+     *                                         elements, a property name of the objects, or an anonymous function returning the values for comparison
+     *                                         purpose. The anonymous function signature should be: `function($item)`.
+     *                                         To sort by multiple keys, provide an array of keys here.
+     * @param integer|array         $direction the sorting direction. It can be either `SORT_ASC` or `SORT_DESC`.
+     *                                         When sorting by multiple keys with different sorting directions, use an array of sorting directions.
+     * @param integer|array         $sortFlag  the PHP sort flag. Valid values include
+     *                                         `SORT_REGULAR`, `SORT_NUMERIC`, `SORT_STRING`, `SORT_LOCALE_STRING`, `SORT_NATURAL` and `SORT_FLAG_CASE`.
+     *                                         Please refer to [PHP manual](http://php.net/manual/en/function.sort.php)
+     *                                         for more details. When sorting by multiple keys with different sort flags, use an array of sort flags.
      * @throws ArrayException if the $descending or $sortFlag parameters do not have
-     * correct number of elements as that of $key.
+     *                                         correct number of elements as that of $key.
      */
     public static function multisort(&$array, $key, $direction = SORT_ASC, $sortFlag = SORT_REGULAR)
     {
@@ -939,12 +931,16 @@ class BaseArrayHelper
         if (is_scalar($direction)) {
             $direction = array_fill(0, $n, $direction);
         } elseif (count($direction) !== $n) {
-            throw new ArrayException(ArrayException::ERROR, 'The length of $descending parameter must be the same as that of $keys.');
+            throw new ArrayException(
+                ArrayException::ERROR,
+                'The length of $descending parameter must be the same as that of $keys.');
         }
         if (is_scalar($sortFlag)) {
             $sortFlag = array_fill(0, $n, $sortFlag);
         } elseif (count($sortFlag) !== $n) {
-            throw new ArrayException(ArrayException::ERROR, 'The length of $sortFlag parameter must be the same as that of $keys.');
+            throw new ArrayException(
+                ArrayException::ERROR,
+                'The length of $sortFlag parameter must be the same as that of $keys.');
         }
         $args = [];
         foreach ($keys as $i => $key) {
@@ -959,6 +955,7 @@ class BaseArrayHelper
 
     /**
      * Returns the values of a specified column in an array.
+     *
      * The input array should be multidimensional or an array of objects.
      *
      * For example:
@@ -1001,10 +998,12 @@ class BaseArrayHelper
 
     /**
      * Checks if the given array contains the specified key.
+     *
      * This method enhances the `array_key_exists()` function by supporting case-insensitive
      * key comparison.
-     * @param string $key the key to check
-     * @param array $array the array with keys to check
+     *
+     * @param string  $key           the key to check
+     * @param array   $array         the array with keys to check
      * @param boolean $caseSensitive whether the key comparison should be case-sensitive
      * @return boolean whether the array contains the specified key
      */
@@ -1031,9 +1030,9 @@ class BaseArrayHelper
      *
      * Note that an empty array will NOT be considered associative.
      *
-     * @param array $array the array being checked
+     * @param array   $array      the array being checked
      * @param boolean $allStrings whether the array keys must be all strings in order for
-     * the array to be treated as associative.
+     *                            the array to be treated as associative.
      * @return boolean whether the array is associative
      */
     public static function isAssociative($array, $allStrings = true)
@@ -1041,13 +1040,13 @@ class BaseArrayHelper
         if (!is_array($array) || empty($array)) {
             return false;
         }
-
         if ($allStrings) {
             foreach ($array as $key => $value) {
                 if (!is_string($key)) {
                     return false;
                 }
             }
+
             return true;
         } else {
             foreach ($array as $key => $value) {
@@ -1055,6 +1054,7 @@ class BaseArrayHelper
                     return true;
                 }
             }
+
             return false;
         }
     }
@@ -1067,9 +1067,9 @@ class BaseArrayHelper
      *
      * Note that an empty array will be considered indexed.
      *
-     * @param array $array the array being checked
+     * @param array   $array       the array being checked
      * @param boolean $consecutive whether the array keys must be a consecutive sequence
-     * in order for the array to be treated as indexed.
+     *                             in order for the array to be treated as indexed.
      * @return boolean whether the array is associative
      */
     public static function isIndexed($array, $consecutive = false)
@@ -1077,11 +1077,9 @@ class BaseArrayHelper
         if (!is_array($array)) {
             return false;
         }
-
         if (empty($array)) {
             return true;
         }
-
         if ($consecutive) {
             return array_keys($array) === range(0, count($array) - 1);
         } else {
@@ -1090,6 +1088,7 @@ class BaseArrayHelper
                     return false;
                 }
             }
+
             return true;
         }
     }
@@ -1109,17 +1108,29 @@ class BaseArrayHelper
         return $array;
     }
 
+    public static function intersectByKeys(array $array, array $keys)
+    {
+        return array_intersect_key($array, array_flip($keys));
+    }
+
+    public static function diffByKeys(array $array, array $keys)
+    {
+        return array_diff_key($array, array_flip($keys));
+    }
+
     /**
      * Merges two or more arrays into one recursively.
+     *
      * If each array has an element with the same string key value, the latter
      * will overwrite the former (different from array_merge_recursive).
      * Recursive merging will be conducted if both arrays have an element of array
      * type and are having the same key.
      * For integer-keyed elements, the elements from the latter array will
      * be appended to the former array.
+     *
      * @param array $a array to be merged to
      * @param array $b array to be merged from. You can specify additional
-     * arrays via third argument, fourth argument etc.
+     *                 arrays via third argument, fourth argument etc.
      * @return array the merged array (the original arrays are not changed.)
      */
     public static function merge($a, $b)

@@ -24,7 +24,7 @@ class BaseHelper implements SerializeInterface
     /**
      * Conversion to type
      *
-     * @param mixed $value - value
+     * @param mixed $value value
      * @return mixed
      */
     public static function toType($value)
@@ -67,13 +67,12 @@ class BaseHelper implements SerializeInterface
         return $value;
     }
 
-
     /**
-     * Get hash var
+     * Get hash var.
      *
      * @param      $value
      * @param int  $serializator
-     * @param bool $recursive - recursive array
+     * @param bool $recursive recursive array
      * @return string
      */
     public static function hash($value, $serializator = self::SERIALIZE_PHP, $recursive = false)
@@ -109,4 +108,4 @@ class BaseHelper implements SerializeInterface
 
         return serialize($value);
     }
-} 
+}
