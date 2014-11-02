@@ -3,16 +3,14 @@
 namespace rock\helpers;
 
 
-
 use Imagine\Gd\Imagine;
 use Imagine\Image\Box;
-use Imagine\Image\Color;
 use Imagine\Image\ImageInterface;
 use Imagine\Image\ImagineInterface;
 use Imagine\Image\ManipulatorInterface;
+use Imagine\Image\Palette\CMYK;
 use Imagine\Image\Point;
 use rock\base\ClassName;
-use rock\base\ObjectTrait;
 use rock\Rock;
 
 class BaseImage
@@ -30,12 +28,12 @@ class BaseImage
      * gmagick driver definition.
      */
     const DRIVER_GMAGICK = 'gmagick';
+
     /**
      * @var array|string the driver to use. This can be either a single driver name or an array of driver names.
      * If the latter, the first available driver will be used.
      */
     public static $driver = [self::DRIVER_GMAGICK, self::DRIVER_IMAGICK, self::DRIVER_GD2];
-
     /**
      * @var ImagineInterface instance.
      */
@@ -97,12 +95,12 @@ class BaseImage
      *
      * For example,
      *
-     * ~~~
+     * ```php
      * $obj->crop('path\to\image.jpg', 200, 200, [5, 5]);
      *
      * $point = new \Imagine\Image\Point(5, 5);
      * $obj->crop('path\to\image.jpg', 200, 200, $point);
-     * ~~~
+     * ```
      *
      * @param string $filename the image file path or path alias.
      * @param integer $width the crop width
@@ -124,7 +122,9 @@ class BaseImage
     }
 
     /**
-     * Creates a thumbnail image. The function differs from [[\Imagine\Image\ImageInterface::thumbnail()]] function that
+     * Creates a thumbnail image.
+     *
+     * The function differs from `\Imagine\Image\ImageInterface::thumbnail()` function that
      * it keeps the aspect ratio of the image.
      *
      * @param string|resource $pathOrResource the image file path or path alias.
@@ -187,6 +187,7 @@ class BaseImage
 
     /**
      * Draws a text string on an existing image.
+     *
      * @param string $filename the image file path or path alias.
      * @param string $text the text to write to the image
      * @param string $fontFile the file path or path alias
@@ -234,12 +235,9 @@ class BaseImage
         $size = $img->getSize();
 
         $pasteTo = new Point($margin, $margin);
-        $padColor = new Color($color, $alpha);
-
         $box = new Box($size->getWidth() + ceil($margin * 2), $size->getHeight() + ceil($margin * 2));
 
-        $image = static::getImagine()->create($box, $padColor);
-
+        $image = static::getImagine()->create($box, (new CMYK())->color($color, $alpha));
         $image->paste($img, $pasteTo);
 
         return $image;
