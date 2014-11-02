@@ -1,6 +1,6 @@
 <?php
 
-namespace rock\helpers;
+namespace rock\imagine;
 
 
 use Imagine\Gd\Imagine;
@@ -8,9 +8,10 @@ use Imagine\Image\Box;
 use Imagine\Image\ImageInterface;
 use Imagine\Image\ImagineInterface;
 use Imagine\Image\ManipulatorInterface;
-use Imagine\Image\Palette\CMYK;
+use Imagine\Image\Palette\RGB;
 use Imagine\Image\Point;
 use rock\base\ClassName;
+use rock\helpers\ArrayHelper;
 use rock\Rock;
 
 class BaseImage
@@ -84,10 +85,10 @@ class BaseImage
                     }
                     break;
                 default:
-                    throw new \Exception("Unknown driver: $driver");
+                    throw new Exception(Exception::ERROR, "Unknown driver: $driver");
             }
         }
-        throw new \Exception("Your system does not support any of these drivers: " . implode(',', (array)static::$driver));
+        throw new Exception(Exception::ERROR, "Your system does not support any of these drivers: " . implode(',', (array)static::$driver));
     }
 
     /**
@@ -112,7 +113,7 @@ class BaseImage
     public static function crop($filename, $width, $height, array $start = [0, 0])
     {
         if (!isset($start[0], $start[1])) {
-            throw new \Exception('$start must be an array of two elements.');
+            throw new Exception(Exception::ERROR, '$start must be an array of two elements.');
         }
 
         return static::getImagine()
@@ -136,7 +137,10 @@ class BaseImage
     public static function thumbnail($pathOrResource, $width, $height, $mode = ManipulatorInterface::THUMBNAIL_OUTBOUND)
     {
         $box = new Box($width, $height);
-        $img = is_resource($pathOrResource) ? static::getImagine()->read($pathOrResource) : static::getImagine()->open(Rock::getAlias($pathOrResource));
+        /** @var ImageInterface $img */
+        $img = is_resource($pathOrResource)
+            ? static::getImagine()->read($pathOrResource)
+            : static::getImagine()->open(Rock::getAlias($pathOrResource));
 
         if (($img->getSize()->getWidth() <= $box->getWidth() && $img->getSize()->getHeight() <= $box->getHeight()) || (!$box->getWidth() && !$box->getHeight())) {
             return $img->copy();
@@ -176,11 +180,13 @@ class BaseImage
     public static function watermark($pathOrResource, $watermarkPathOrResource, array $start = [0, 0])
     {
         if (!isset($start[0], $start[1])) {
-            throw new \Exception('$start must be an array of two elements.');
+            throw new Exception(Exception::ERROR, '$start must be an array of two elements.');
         }
 
         $img = is_resource($pathOrResource) ? static::getImagine()->read($pathOrResource) : static::getImagine()->open(Rock::getAlias($pathOrResource));
-        $watermark = is_resource($watermarkPathOrResource) ? static::getImagine()->read($watermarkPathOrResource) : static::getImagine()->open(Rock::getAlias($watermarkPathOrResource));
+        $watermark = is_resource($watermarkPathOrResource)
+            ? static::getImagine()->read($watermarkPathOrResource)
+            : static::getImagine()->open(Rock::getAlias($watermarkPathOrResource));
         $img->paste($watermark, new Point($start[0], $start[1]));
         return $img;
     }
@@ -204,7 +210,7 @@ class BaseImage
     public static function text($filename, $text, $fontFile, array $start = [0, 0], array $fontOptions = [])
     {
         if (!isset($start[0], $start[1])) {
-            throw new \Exception('$start must be an array of two elements.');
+            throw new Exception(Exception::ERROR, '$start must be an array of two elements.');
         }
 
         $fontSize = ArrayHelper::getValue($fontOptions, ['size'], 12);
@@ -212,7 +218,7 @@ class BaseImage
         $fontAngle = ArrayHelper::getValue($fontOptions, ['angle'], 0);
 
         $img = static::getImagine()->open(Rock::getAlias($filename));
-        $font = static::getImagine()->font(Rock::getAlias($fontFile), $fontSize, new Color($fontColor));
+        $font = static::getImagine()->font(Rock::getAlias($fontFile), $fontSize,(new RGB())->color($fontColor));
 
         $img->draw()->text($text, $font, new Point($start[0], $start[1]), $fontAngle);
 
@@ -230,14 +236,14 @@ class BaseImage
      */
     public static function frame($pathOrResource, $margin = 20, $color = '666', $alpha = 100)
     {
-        $img = is_resource($pathOrResource) ? static::getImagine()->read($pathOrResource) : static::getImagine()->open(Rock::getAlias($pathOrResource));
-
+        /** @var ImageInterface $img */
+        $img = is_resource($pathOrResource)
+            ? static::getImagine()->read($pathOrResource)
+            : static::getImagine()->open(Rock::getAlias($pathOrResource));
         $size = $img->getSize();
-
         $pasteTo = new Point($margin, $margin);
         $box = new Box($size->getWidth() + ceil($margin * 2), $size->getHeight() + ceil($margin * 2));
-
-        $image = static::getImagine()->create($box, (new CMYK())->color($color, $alpha));
+        $image = static::getImagine()->create($box, (new RGB())->color($color, $alpha));
         $image->paste($img, $pasteTo);
 
         return $image;

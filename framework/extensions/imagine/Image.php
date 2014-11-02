@@ -1,9 +1,9 @@
 <?php
 
-namespace rock\helpers;
+namespace rock\imagine;
 
 
 class Image extends BaseImage
 {
 
-} 
+}

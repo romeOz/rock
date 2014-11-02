@@ -33,6 +33,7 @@ if (!$configs = require(dirname(__DIR__) . '/apps/common/configs/configs.php')) 
 
 Log::setPath(__DIR__ . '/runtime/logs');
 Rock::setAlias('tests', __DIR__);
+Rock::setAlias('rockunit', __DIR__);
 Rock::setAlias('runtime', '@tests/runtime');
 
 Rock::$app = new Rock();

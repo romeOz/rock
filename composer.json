@@ -46,6 +46,7 @@
         "psr-4": {
             "rock\\": "framework/core/",
             "rock\\snippets\\": "framework/snippets/",
+            "rock\\imagine\\": "framework/extensions/imagine/",
             "rock\\sphinx\\": "framework/extensions/sphinx/",
             "rock\\authclient\\" : "framework/extensions/authclient/",
             "rock\\mq\\" : "framework/extensions/mq/",

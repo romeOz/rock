@@ -6,7 +6,7 @@ namespace rock\image;
 
 use rock\base\ComponentsTrait;
 use rock\file\FileManager;
-use rock\helpers\Image;
+use rock\imagine\Image;
 use rock\Rock;
 
 class DataProvider
