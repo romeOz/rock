@@ -28,6 +28,7 @@ install:
   - tests/data/travis/redis-setup.sh
   - tests/data/travis/couchbase-setup.sh
   - tests/data/travis/mq-setup.sh
+  - tests/data/travis/image-setup.sh
   - framework/rock.sh
 
 before_script:
