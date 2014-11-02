@@ -2,7 +2,6 @@
 
 namespace rock\widgets;
 
-
 use rock\base\ComponentsTrait;
 use rock\base\Model;
 use rock\base\Widget;
@@ -30,13 +29,13 @@ class ActiveField
     public $attribute;
     /**
      * @var array the HTML attributes (name-value pairs) for the field container tag.
-     * The values will be HTML-encoded using @see Html::encode() .
+     * The values will be HTML-encoded using {@see \rock\helpers\Html::encode()}.
      * If a value is null, the corresponding attribute will not be rendered.
      * The following special options are recognized:
      *
      * - tag: the tag name of the container element. Defaults to "div".
      *
-     * @see Html::renderTagAttributes() for details on how attributes are being rendered.
+     * @see \rock\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
      */
     public $options = ['class' => 'form-group'];
     public $required = false;
@@ -50,7 +49,7 @@ class ActiveField
     /**
      * @var array the default options for the input tags. The parameter passed to individual input methods
      * (e.g. `textInput()`) will be merged with this property when rendering the input tag.
-     * @see Html::renderTagAttributes() for details on how attributes are being rendered.
+     * @see \rock\helpers\Html::Html::renderTagAttributes()} for details on how attributes are being rendered.
      */
     public $inputOptions = ['class' => 'form-control'];
     /**
@@ -60,7 +59,7 @@ class ActiveField
      *
      * - tag: the tag name of the container element. Defaults to "div".
      *
-     * @see Html::renderTagAttributes() for details on how attributes are being rendered.
+     * @see \rock\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
      */
     public $errorOptions = ['class' => 'form-error'];
     /**
@@ -70,14 +69,14 @@ class ActiveField
      *
      * - tag: the tag name of the container element. Defaults to "div".
      *
-     * @see Html::renderTagAttributes() for details on how attributes are being rendered.
+     * @see \rock\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
      */
     public $ngErrorOptions = ['class' => 'form-error hide'];
     public $ngErrorMessages = [];
     /**
      * @var array the default options for the label tags. The parameter passed to `label()` will be
      * merged with this property when rendering the label tag.
-     * @see Html::renderTagAttributes() for details on how attributes are being rendered.
+     * @see \rock\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
      */
     public $labelOptions = ['class' => 'form-label'];
     /**
@@ -88,34 +87,34 @@ class ActiveField
      *
      * - tag: the tag name of the container element. Defaults to `div`.
      *
-     * @see Html::renderTagAttributes() for details on how attributes are being rendered.
+     * @see \rock\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
      */
     public $hintOptions = ['class' => 'form-hint'];
     /**
      * @var boolean whether to enable client-side data validation.
-     * If not set, it will take the value of @see \rock\widgets\ActiveForm::enableClientValidation .
+     * If not set, it will take the value of {@see \rock\widgets\ActiveForm::enableClientValidation}.
      */
     public $enableClientValidation;
     /**
      * @var boolean whether to enable AJAX-based data validation.
-     * If not set, it will take the value of @see \rock\widgets\ActiveForm::enableAjaxValidation .
+     * If not set, it will take the value of {@see \rock\widgets\ActiveForm::enableAjaxValidation}.
      */
     public $enableAjaxValidation;
     /**
      * @var boolean whether to perform validation when the input field loses focus and its value is found changed.
-     * If not set, it will take the value of @see \rock\widgets\ActiveForm::validateOnChange .
+     * If not set, it will take the value of {@see \rock\widgets\ActiveForm::validateOnChange}.
      */
     public $validateOnChange;
     /**
      * @var boolean whether to perform validation while the user is typing in the input field.
-     * If not set, it will take the value of @see \rock\widgets\ActiveForm::validateOnType .
+     * If not set, it will take the value of {@see \rock\widgets\ActiveForm::$validateOnType}.
      * @see validationDelay
      */
     public $validateOnType;
     /**
      * @var integer number of milliseconds that the validation should be delayed when the input field
      * is changed or the user types in the field.
-     * If not set, it will take the value of @see \rock\widgets\ActiveForm::validationDelay .
+     * If not set, it will take the value of {@see \rock\widgets\ActiveForm::$validationDelay}.
      */
     public $validationDelay;
     /**
@@ -131,8 +130,8 @@ class ActiveField
     public $selectors;
     /**
      * @var array different parts of the field (e.g. input, label). This will be used together with
-     * @see template to generate the final field HTML code. The keys are the
-     * token names in @see template ,
+     * {@see \rock\widgets\ActiveField::$template} to generate the final field HTML code. The keys are the
+     * token names in {@see \rock\widgets\ActiveField::$template} ,
      * while the values are the corresponding HTML code. Valid tokens include `{input}`, `{label}` and `{error}`.
      * Note that you normally don't need to access this property directly as
      * it is maintained by various methods of this class.
@@ -172,7 +171,7 @@ class ActiveField
      * @see enableCache
      */
     public $cacheClass = 'cache';
-    /** @var string  */
+    /** @var string */
     protected $formName = 'form';
 
     public function init()
@@ -184,6 +183,7 @@ class ActiveField
 
     /**
      * PHP magic method that returns the string representation of this object.
+     *
      * @return string the string representation of this object.
      */
     public function __toString()
@@ -194,6 +194,7 @@ class ActiveField
             return $this->render();
         } catch (\Exception $e) {
             Rock::error(ErrorHandler::convertExceptionToString($e));
+
             //ErrorHandler::convertExceptionToError($e);
             return '';
         }
@@ -202,11 +203,12 @@ class ActiveField
     /**
      * Renders the whole field.
      * This method will generate the label, error tag, input tag and hint tag (if any), and
-     * assemble them into HTML according to @see template .
+     * assemble them into HTML according to {@see \rock\widgets\ActiveField::$template} .
+     *
      * @param string|callable $content the content within the field container.
-     * If null (not set), the default methods will be called to generate the label, error tag and input tag,
-     * and use them as the content.
-     * If a callable, it will be called to generate the content. The signature of the callable should be:
+     *                                 If null (not set), the default methods will be called to generate the label, error tag and input tag,
+     *                                 and use them as the content.
+     *                                 If a callable, it will be called to generate the content. The signature of the callable should be:
      *
      * ```php
      * function ($field) {
@@ -223,7 +225,7 @@ class ActiveField
         }
         if ($content === null) {
             if (!isset($this->parts['{input}'])) {
-                $this->inputOptions =$this->calculateClientInputOption($this->inputOptions);
+                $this->inputOptions = $this->calculateClientInputOption($this->inputOptions);
                 $this->parts['{input}'] = Html::activeTextInput($this->model, $this->attribute, $this->inputOptions);
             }
             if (!isset($this->parts['{label}'])) {
@@ -243,6 +245,26 @@ class ActiveField
         return $this->begin() . "\n" . $content . "\n" . $this->end();
     }
 
+    protected function checkRateLimiter()
+    {
+        if (!empty($this->rateLimiter)) {
+            if (!isset($this->rateLimiter[2])) {
+                $this->rateLimiter[2] = true;
+            }
+            list($limit, $period, $checked) = $this->rateLimiter;
+            $rateLimiter = new RateLimiter(
+                [
+                    'enableRateLimitHeaders' => false,
+                    'dependency' => isset($this->form->submitted) ? $this->form->submitted : true
+                ]);
+            if ($rateLimiter->check($limit, $period, get_class($this->model) . '::' . $this->attribute) === $checked) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     protected function calculateClientInputOption($options = [])
     {
         if (!isset($options['data-ng-model'])) {
@@ -252,13 +274,12 @@ class ActiveField
         }
         if (!isset($options['data-ng-class'])) {
             $options['data-ng-class'] = isset($this->formName)
-                ? 'showHighlightError("'.$this->formName.'['.$this->attribute.']")'
-                : 'showHighlightError("'.$this->attribute.'")';
+                ? 'showHighlightError("' . $this->formName . '[' . $this->attribute . ']")'
+                : 'showHighlightError("' . $this->attribute . '")';
         }
         if ($this->form->validateOnChanged) {
             $options['data-rock-form-focus'] = '';
         }
-
         if (isset($options['value']) && empty($options['value']) && !isset($options['data-rock-reset-field'])) {
             $options['data-rock-reset-field'] = '';
         }
@@ -275,16 +296,16 @@ class ActiveField
             }
             $this->ngErrorOptions['data-ng-repeat'] = '(error, errorMsg) in ' . $this->ngErrorMessages;
             $this->ngErrorOptions['data-ng-class'] = isset($this->formName)
-                ? 'showError("'.$this->formName.'['.$this->attribute.']", error)'
-                : 'showError("'.$this->attribute.'", error)';
+                ? 'showError("' . $this->formName . '[' . $this->attribute . ']", error)'
+                : 'showError("' . $this->attribute . '", error)';
             $this->ngErrorOptions['data-ng-bind'] = 'errorMsg';
             $tag = isset($this->ngErrorOptions['tag']) ? $this->ngErrorOptions['tag'] : 'div';
             unset($this->ngErrorOptions['tag']);
             $result .= Html::tag($tag, '', $this->ngErrorOptions) . "\n";
         }
         $this->errorOptions['data-ng-class'] = isset($this->formName)
-            ? 'hideError("'.$this->formName.'['.$this->attribute.']", error)'
-            : 'hideError("'.$this->attribute.'", error)';
+            ? 'hideError("' . $this->formName . '[' . $this->attribute . ']", error)'
+            : 'hideError("' . $this->attribute . '", error)';
         $result .= Html::error($this->model, $this->attribute, $this->errorOptions);
 
         return $result;
@@ -292,6 +313,7 @@ class ActiveField
 
     /**
      * Renders the opening tag of the field container.
+     *
      * @return string the rendering result.
      */
     public function begin()
@@ -315,6 +337,7 @@ class ActiveField
 
     /**
      * Renders the closing tag of the field container.
+     *
      * @return string the rendering result.
      */
     public function end()
@@ -323,25 +346,24 @@ class ActiveField
     }
 
     /**
-     * Generates a label tag for @see attribute.
+     * Generates a label tag for {@see \rock\widgets\ActiveField::$attribute}.
      *
-     * @param string|boolean $label the label to use. If null, the label will be generated
-     *                              via @see Model::getAttributeLabel() .
-     * If false, the generated field will not contain the label part.
-     * Note that this will NOT be @see Html::encode() .
-     * @param array $options        the tag options in terms of name-value pairs. It will be merged
-     *                              with @see labelOptions .
-     * The options will be rendered as the attributes of the resulting tag. The values will be HTML-encoded
-     * using @see Html::encode() . If a value is null, the corresponding attribute will not be rendered.
+     * @param string|boolean $label   the label to use. If null, the label will be generated
+     *                                via {@see \rock\base\Model::getAttributeLabel()}.
+     *                                If false, the generated field will not contain the label part. Note that this will NOT be {@see \rock\helpers\Html::encode()}.
+     * @param array          $options the tag options in terms of name-value pairs. It will be merged
+     *                                with {@see \rock\widgets\ActiveField::$labelOptions}.
+     *                                The options will be rendered as the attributes of the resulting tag. The values will be HTML-encoded
+     *                                using {@see \rock\helpers\Html::encode()}. If a value is null, the corresponding attribute will not be rendered.
      * @return static the field object itself
      */
     public function label($label = null, $options = [])
     {
         if ($label === false) {
             $this->parts['{label}'] = '';
+
             return $this;
         }
-
         $options = array_merge($this->labelOptions, $options);
         if ($label !== null) {
             $options['label'] = $label;
@@ -352,13 +374,14 @@ class ActiveField
     }
 
     /**
-     * Generates a tag that contains the first validation error of @see attribute .
+     * Generates a tag that contains the first validation error of {@see \rock\widgets\ActiveField::$attribute}.
+     *
      * Note that even if there is no validation error, this method will still return an empty error tag.
      *
      * @param array|boolean $options the tag options in terms of name-value pairs. It will be merged
      *                               with @see errorOptions .
-     * The options will be rendered as the attributes of the resulting tag. The values will be HTML-encoded
-     * using @see Html::encode() . If a value is null, the corresponding attribute will not be rendered.
+     *                               The options will be rendered as the attributes of the resulting tag. The values will be HTML-encoded
+     *                               using {@see \rock\helpers\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
      *
      * The following options are specially handled:
      *
@@ -372,6 +395,7 @@ class ActiveField
     {
         if ($options === false) {
             $this->parts['{error}'] = '';
+
             return $this;
         }
         $options = array_merge($this->errorOptions, $options);
@@ -382,9 +406,10 @@ class ActiveField
 
     /**
      * Renders the hint tag.
+     *
      * @param string $content the hint content. It will NOT be HTML-encoded.
-     * @param array $options the tag options in terms of name-value pairs. These will be rendered as
-     * the attributes of the hint tag. The values will be HTML-encoded using @see Html::encode().
+     * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
+     *                        the attributes of the hint tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()}.
      *
      * The following options are specially handled:
      *
@@ -403,9 +428,10 @@ class ActiveField
 
     /**
      * Renders an input tag.
-     * @param string $type the input type (e.g. 'text', 'password')
-     * @param array $options the tag options in terms of name-value pairs. These will be rendered as
-     * the attributes of the resulting tag. The values will be HTML-encoded using @see Html::encode().
+     *
+     * @param string $type    the input type (e.g. 'text', 'password')
+     * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
+     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()}.
      * @return static the field object itself
      */
     public function input($type, $options = [])
@@ -419,11 +445,25 @@ class ActiveField
     }
 
     /**
+     * Adjusts the "for" attribute for the label based on the input options.
+     *
+     * @param array $options the input options
+     */
+    protected function adjustLabelFor($options)
+    {
+        if (isset($options['id']) && !isset($this->labelOptions['for'])) {
+            $this->labelOptions['for'] = $options['id'];
+        }
+    }
+
+    /**
      * Renders a text input.
+     *
      * This method will generate the "name" and "value" tag attributes automatically for the model attribute
      * unless they are explicitly specified in `$options`.
+     *
      * @param array $options the tag options in terms of name-value pairs. These will be rendered as
-     * the attributes of the resulting tag. The values will be HTML-encoded using @see Html::encode().
+     *                       the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()}.
      * @return static the field object itself
      */
     public function textInput($options = [])
@@ -445,8 +485,9 @@ class ActiveField
      *
      * This method will generate the "name" and "value" tag attributes automatically for the model attribute
      * unless they are explicitly specified in `$options`.
+     *
      * @param array $options the tag options in terms of name-value pairs. These will be rendered as
-     * the attributes of the resulting tag. The values will be HTML-encoded using @see Html::encode() .
+     *                       the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
      * @return static the field object itself
      */
     public function hiddenInput($options = [])
@@ -466,10 +507,12 @@ class ActiveField
 
     /**
      * Renders a password input.
+     *
      * This method will generate the "name" and "value" tag attributes automatically for the model attribute
      * unless they are explicitly specified in `$options`.
+     *
      * @param array $options the tag options in terms of name-value pairs. These will be rendered as
-     * the attributes of the resulting tag. The values will be HTML-encoded using @see Html::encode() .
+     *                       the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
      * @return static the field object itself
      */
     public function passwordInput($options = [])
@@ -484,10 +527,12 @@ class ActiveField
 
     /**
      * Renders a file input.
+     *
      * This method will generate the "name" and "value" tag attributes automatically for the model attribute
      * unless they are explicitly specified in `$options`.
+     *
      * @param array $options the tag options in terms of name-value pairs. These will be rendered as
-     * the attributes of the resulting tag. The values will be HTML-encoded using @see Html::encode() .
+     *                       the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
      * @return static the field object itself
      */
     public function fileInput($options = [])
@@ -504,9 +549,11 @@ class ActiveField
 
     /**
      * Renders a text area.
+     *
      * The model attribute value will be used as the content in the textarea.
+     *
      * @param array $options the tag options in terms of name-value pairs. These will be rendered as
-     * the attributes of the resulting tag. The values will be HTML-encoded using @see Html::encode() .
+     *                       the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
      * @return static the field object itself
      */
     public function textarea($options = [])
@@ -521,23 +568,25 @@ class ActiveField
 
     /**
      * Renders a radio button.
+     *
      * This method will generate the "checked" tag attribute according to the model attribute value.
-     * @param array $options the tag options in terms of name-value pairs. The following options are specially handled:
+     *
+     * @param array   $options         the tag options in terms of name-value pairs. The following options are specially handled:
      *
      * - uncheck: string, the value associated with the uncheck state of the radio button. If not set,
      *   it will take the default value '0'. This method will render a hidden input so that if the radio button
      *   is not checked and is submitted, the value of this attribute will still be submitted to the server
      *   via the hidden input.
      * - label: string, a label displayed next to the radio button.  It will NOT be HTML-encoded. Therefore you can pass
-     *   in HTML code such as an image tag. If this is is coming from end users, you should @see Html::encode() it to prevent XSS attacks.
+     *   in HTML code such as an image tag. If this is is coming from end users, you should {@see \rock\helpers\Html::encode()} it to prevent XSS attacks.
      *   When this option is specified, the radio button will be enclosed by a label tag.
      * - labelOptions: array, the HTML attributes for the label tag. This is only used when the "label" option is specified.
      *
      * The rest of the options will be rendered as the attributes of the resulting tag. The values will
-     * be HTML-encoded using @see Html::encode() . If a value is null, the corresponding attribute will not be rendered.
+     * be HTML-encoded using {@see \rock\helpers\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
      * @param boolean $enclosedByLabel whether to enclose the radio within the label.
-     * If true, the method will still use `template` to layout the checkbox and the error message
-     * except that the radio is enclosed by the label tag.
+     *                                 If true, the method will still use `template` to layout the checkbox and the error message
+     *                                 except that the radio is enclosed by the label tag.
      * @return static the field object itself
      */
     public function radio($options = [], $enclosedByLabel = true)
@@ -560,23 +609,25 @@ class ActiveField
 
     /**
      * Renders a checkbox.
+     *
      * This method will generate the "checked" tag attribute according to the model attribute value.
-     * @param array $options the tag options in terms of name-value pairs. The following options are specially handled:
+     *
+     * @param array   $options         the tag options in terms of name-value pairs. The following options are specially handled:
      *
      * - uncheck: string, the value associated with the uncheck state of the radio button. If not set,
      *   it will take the default value '0'. This method will render a hidden input so that if the radio button
      *   is not checked and is submitted, the value of this attribute will still be submitted to the server
      *   via the hidden input.
      * - label: string, a label displayed next to the checkbox.  It will NOT be HTML-encoded. Therefore you can pass
-     *   in HTML code such as an image tag. If this is is coming from end users, you should @see Html::encode() it to prevent XSS attacks.
+     *   in HTML code such as an image tag. If this is is coming from end users, you should {@see \rock\helpers\Html::encode()} it to prevent XSS attacks.
      *   When this option is specified, the checkbox will be enclosed by a label tag.
      * - labelOptions: array, the HTML attributes for the label tag. This is only used when the "label" option is specified.
      *
      * The rest of the options will be rendered as the attributes of the resulting tag. The values will
-     * be HTML-encoded using @see Html::encode() . If a value is null, the corresponding attribute will not be rendered.
+     * be HTML-encoded using {@see \rock\helpers\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
      * @param boolean $enclosedByLabel whether to enclose the checkbox within the label.
-     * If true, the method will still use @see template to layout the checkbox and the error message
-     * except that the checkbox is enclosed by the label tag.
+     *                                 If true, the method will still use {@see \rock\widgets\ActiveField::$template} to layout the checkbox and the error message
+     *                                 except that the checkbox is enclosed by the label tag.
      * @return static the field object itself
      */
     public function checkbox($options = [], $enclosedByLabel = true)
@@ -599,15 +650,15 @@ class ActiveField
     /**
      * Renders a drop-down list.
      * The selection of the drop-down list is taken from the value of the model attribute.
-     * @param array|callable $items the option data items. The array keys are option values, and the array values
-     * are the corresponding option labels. The array can also be nested (i.e. some array values are arrays too).
-     * For each sub-array, an option group will be generated whose label is the key associated with the sub-array.
-     * If you have a list of data models, you may convert them into the format described above using
-     * @see ArrayHelper::map() .
+     *
+     * @param array|callable $items   the option data items. The array keys are option values, and the array values
+     *                                are the corresponding option labels. The array can also be nested (i.e. some array values are arrays too).
+     *                                For each sub-array, an option group will be generated whose label is the key associated with the sub-array.
+     *                                If you have a list of data models, you may convert them into the format described above using {@see \rock\helpers\ArrayHelper::map()}.
      *
      * Note, the values and labels will be automatically HTML-encoded by this method, and the blank spaces in
      * the labels will also be HTML-encoded.
-     * @param array $options the tag options in terms of name-value pairs. The following options are specially handled:
+     * @param array          $options the tag options in terms of name-value pairs. The following options are specially handled:
      *
      * - prompt: string, a prompt text to be displayed as the first option;
      * - options: array, the attributes for the select option tags. The array keys must be valid option values,
@@ -621,10 +672,10 @@ class ActiveField
      * ```
      *
      * - groups: array, the attributes for the optgroup tags. The structure of this is similar to that of 'options',
-     *   except that the array keys represent the optgroup labels specified in $items.
+     *   except that the array keys represent the optgroup labels specified in `$items`.
      *
      * The rest of the options will be rendered as the attributes of the resulting tag. The values will
-     * be HTML-encoded using @see Html::encode() . If a value is null, the corresponding attribute will not be rendered.
+     * be HTML-encoded using {@see \rock\helpers\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
      *
      * @return static the field object itself
      */
@@ -641,19 +692,61 @@ class ActiveField
         $options = $this->calculateClientInputOption($options);
         $this->adjustLabelFor($options);
         $this->parts['{input}'] = Html::activeDropDownList($this->model, $this->attribute, $items, $options);
-
         $this->setCache($cacheKey, $this->parts['{input}']);
+
         return $this;
+    }
+
+    protected function getCacheKey($method)
+    {
+        $model = $this->model;
+
+        return $model::className() . $this->attribute . $method;
+    }
+
+    /**
+     * @param string $key
+     * @return bool|mixed
+     */
+    protected function getCache($key)
+    {
+        if (!$this->cache() instanceof CacheInterface) {
+            return false;
+        }
+
+        return $this->cache()->get($key);
+    }
+
+    /**
+     * @return CacheInterface|null
+     */
+    protected function cache()
+    {
+        if (!$this->enableCache) {
+            return null;
+        }
+
+        return $this->Rock->{$this->cacheClass};
+    }
+
+    protected function setCache($key, $value)
+    {
+        if (!$this->cache() instanceof CacheInterface) {
+            return false;
+        }
+
+        return $this->cache()->set($key, $value, $this->cacheExpire, $this->cacheTags);
     }
 
     /**
      * Renders a list box.
+     * 
      * The selection of the list box is taken from the value of the model attribute.
-     * @param array $items the option data items. The array keys are option values, and the array values
-     * are the corresponding option labels. The array can also be nested (i.e. some array values are arrays too).
-     * For each sub-array, an option group will be generated whose label is the key associated with the sub-array.
-     * If you have a list of data models, you may convert them into the format described above using
-     * @see ArrayHelper::map() .
+     *
+     * @param array $items   the option data items. The array keys are option values, and the array values
+     *                       are the corresponding option labels. The array can also be nested (i.e. some array values are arrays too).
+     *                       For each sub-array, an option group will be generated whose label is the key associated with the sub-array.
+     *                       If you have a list of data models, you may convert them into the format described above using {@see \rock\helpers\ArrayHelper::map()} .
      *
      * Note, the values and labels will be automatically HTML-encoded by this method, and the blank spaces in
      * the labels will also be HTML-encoded.
@@ -677,7 +770,7 @@ class ActiveField
      *   mode, we can still obtain the posted unselect value.
      *
      * The rest of the options will be rendered as the attributes of the resulting tag. The values will
-     * be HTML-encoded using @see Html::encode() . If a value is null, the corresponding attribute will not be rendered.
+     * be HTML-encoded using {@see \rock\helpers\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
      *
      * @return static the field object itself
      */
@@ -694,18 +787,21 @@ class ActiveField
         $this->adjustLabelFor($options);
         $this->parts['{input}'] = Html::activeListBox($this->model, $this->attribute, $items, $options);
         $this->setCache($cacheKey, $this->parts['{input}']);
+
         return $this;
     }
 
     /**
      * Renders a list of checkboxes.
-     * A checkbox list allows multiple selection, like @see listBox() .
+     * 
+     * A checkbox list allows multiple selection, like {@see \rock\widgets\ActiveField::listBox()} .
      * As a result, the corresponding submitted value is an array.
      * The selection of the checkbox list is taken from the value of the model attribute.
-     * @param array|callable $items the data item used to generate the checkboxes.
-     * The array values are the labels, while the array keys are the corresponding checkbox values.
-     * Note that the labels will NOT be HTML-encoded, while the values will.
-     * @param array $options options (name => config) for the checkbox list. The following options are specially handled:
+     *
+     * @param array|callable $items   the data item used to generate the checkboxes.
+     *                                The array values are the labels, while the array keys are the corresponding checkbox values.
+     *                                Note that the labels will NOT be HTML-encoded, while the values will.
+     * @param array          $options options (name => config) for the checkbox list. The following options are specially handled:
      *
      * - unselect: string, the value that should be submitted when none of the checkboxes is selected.
      *   By setting this option, a hidden input will be generated.
@@ -734,6 +830,7 @@ class ActiveField
         $this->adjustLabelFor($options);
         $this->parts['{input}'] = Html::activeCheckboxList($this->model, $this->attribute, $items, $options);
         $this->setCache($cacheKey, $this->parts['{input}']);
+
         return $this;
     }
 
@@ -741,10 +838,11 @@ class ActiveField
      * Renders a list of radio buttons.
      * A radio button list is like a checkbox list, except that it only allows single selection.
      * The selection of the radio buttons is taken from the value of the model attribute.
-     * @param array|callable $items the data item used to generate the radio buttons.
-     * The array keys are the labels, while the array values are the corresponding radio button values.
-     * Note that the labels will NOT be HTML-encoded, while the values will.
-     * @param array $options options (name => config) for the radio button list. The following options are specially handled:
+     *
+     * @param array|callable $items   the data item used to generate the radio buttons.
+     *                                The array keys are the labels, while the array values are the corresponding radio button values.
+     *                                Note that the labels will NOT be HTML-encoded, while the values will.
+     * @param array          $options options (name => config) for the radio button list. The following options are specially handled:
      *
      * - unselect: string, the value that should be submitted when none of the radio buttons is selected.
      *   By setting this option, a hidden input will be generated.
@@ -775,7 +873,6 @@ class ActiveField
             $options['itemOptions']['data-ng-model'] = "{$this->formName}.values.{$this->attribute}";
         }
         $this->parts['{input}'] = Html::activeRadioList($this->model, $this->attribute, $items, $options);
-
         $this->setCache($cacheKey, $this->parts['{input}']);
 
         return $this;
@@ -799,8 +896,8 @@ class ActiveField
      * ]);
      * ```
      *
-     * @param string $class the widget class name
-     * @param array $config name-value pairs that will be used to initialize the widget
+     * @param string $class  the widget class name
+     * @param array  $config name-value pairs that will be used to initialize the widget
      * @return static the field object itself
      */
     public function widget($class, $config = [])
@@ -815,25 +912,14 @@ class ActiveField
     }
 
     /**
-     * Adjusts the "for" attribute for the label based on the input options.
-     * @param array $options the input options
-     */
-    protected function adjustLabelFor($options)
-    {
-        if (isset($options['id']) && !isset($this->labelOptions['for'])) {
-            $this->labelOptions['for'] = $options['id'];
-        }
-    }
-
-    /**
      * Turns on query caching.
      * This method is provided as a shortcut to setting two properties that are related
      * with query caching: `cacheExpire` and `cacheTags`.
      *
      * @param int|null $expire
      * @param string[] $tags the tags for the cached query result.
-     * See `cacheTags` for more details.
-     * If not set, it will use the value of `cacheExpire`. See `cacheExpire` for more details.
+     *                       See `cacheTags` for more details.
+     *                       If not set, it will use the value of `cacheExpire`. See `cacheExpire` for more details.
      * @return $this
      */
     public function beginCache($expire = 0, array $tags = null)
@@ -853,60 +939,7 @@ class ActiveField
     public function endCache()
     {
         $this->enableCache = false;
+
         return $this;
-    }
-
-    /**
-     * @param string $key
-     * @return bool|mixed
-     */
-    protected function getCache($key)
-    {
-        if (!$this->cache() instanceof CacheInterface) {
-            return false;
-        }
-
-        return $this->cache()->get($key);
-    }
-
-    protected function setCache($key, $value)
-    {
-        if (!$this->cache() instanceof CacheInterface) {
-            return false;
-        }
-        return $this->cache()->set($key, $value, $this->cacheExpire, $this->cacheTags);
-    }
-
-    /**
-     * @return CacheInterface|null
-     */
-    protected function cache()
-    {
-        if (!$this->enableCache) {
-            return null;
-        }
-        return $this->Rock->{$this->cacheClass};
-    }
-
-    protected function getCacheKey($method)
-    {
-        $model = $this->model;
-        return $model::className() . $this->attribute . $method;
-    }
-
-    protected function checkRateLimiter()
-    {
-        if (!empty($this->rateLimiter)) {
-            if (!isset($this->rateLimiter[2])) {
-                $this->rateLimiter[2] = true;
-            }
-            list($limit, $period, $checked) = $this->rateLimiter;
-            $rateLimiter = new RateLimiter(['enableRateLimitHeaders' => false, 'dependency' => isset($this->form->submitted) ? $this->form->submitted : true]);
-            if ($rateLimiter->check($limit, $period, get_class($this->model) . '::' . $this->attribute) === $checked) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
