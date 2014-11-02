@@ -8,7 +8,10 @@ fi
 # this is helpful to compile extension
 sudo apt-get install autoconf
 
-# install this version
+
+###
+# Install Imagick
+###
 IMAGICK=3.1.2
 
 wget http://pecl.php.net/get/imagick-${IMAGICK}.tgz
@@ -19,9 +22,12 @@ phpize && ./configure && make install && echo "Installed ext/imagick-${IMAGICK}"
 echo "extension = imagick.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 
-# install this version
+###
+# Install gmagick
+###
 GMAGICK=1.1.7RC2
 
+sudo apt-get install graphicsmagick
 wget http://pecl.php.net/get/gmagick-1.1.7RC2.tgz
 tar zxvf gmagick-${GMAGICK}.tgz
 cd "gmagick-${GMAGICK}"
