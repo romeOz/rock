@@ -17,3 +17,14 @@ cd "imagick-${IMAGICK}"
 phpize && ./configure && make install && echo "Installed ext/imagick-${IMAGICK}"
 
 echo "extension = imagick.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+
+
+# install this version
+GMAGICK=1.1.7RC2
+
+wget http://pecl.php.net/get/gmagick-1.1.7RC2.tgz
+tar zxvf gmagick-${GMAGICK}.tgz
+cd "gmagick-${GMAGICK}"
+phpize && ./configure && make install && echo "Installed ext/gmagick-${GMAGICK}"
+
+echo "extension = gmagick.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
