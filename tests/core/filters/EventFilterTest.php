@@ -4,6 +4,8 @@ namespace rockunit\core\filters\verbs\EventFilterTest;
 
 
 use rock\access\Access;
+use rock\base\ClassName;
+use rock\base\ComponentsTrait;
 use rock\base\Controller;
 use rock\event\Event;
 use rock\filters\AccessFilter;
@@ -104,15 +106,79 @@ class BarController extends Controller
     }
 }
 
+
+class Foo
+{
+    use ComponentsTrait;
+    const EVENT_BEGIN_GET = 'beginGet';
+    const EVENT_END_GET = 'endGet';
+
+    public function foo()
+    {
+        if ($this->before('foo') === false) {
+            return null;
+        }
+        $result = 'foo';
+        if ($this->after(null, $result) === false) {
+            return null;
+        };
+        return $result;
+    }
+
+    public function bar()
+    {
+        return 'bar';
+    }
+
+
+    public function filter()
+    {
+        return '<b>test</b>';
+    }
+
+    public $test = 'test';
+    //    public function beforeAction()
+    //    {
+    //
+    //        return parent::beforeAction();
+    //    }
+}
+
+class TestEvent
+{
+    use ClassName;
+
+    public static function beginGet(Event $event)
+    {
+        echo $event->owner instanceof Foo;
+    }
+
+    public static function endGet(Event $event)
+    {
+        echo $event->owner instanceof Foo,  $event->data['result'];
+    }
+
+
+    public static function foo(Event $event)
+    {
+        echo $event->data['foo'];
+    }
+}
+
 /**
  * @group base
  * @group filters
  */
 class EventFilterTest extends \PHPUnit_Framework_TestCase
 {
+    public function setUp()
+    {
+        static::tearDownAfterClass();
+    }
+
     public static function setUpBeforeClass()
     {
-        Event::offAll();
+        static::tearDownAfterClass();
     }
 
     public static function tearDownAfterClass()
@@ -133,12 +199,48 @@ class EventFilterTest extends \PHPUnit_Framework_TestCase
         $this->expectOutputString('event_2');
     }
 
-    public function testTrigger()
+    public function testTriggerA()
     {
         $controller = new BarController();
         $this->assertSame($controller->method('actionIndex'), 'index');
         Event::trigger(BarController::className(), 'event_1');
         $this->expectOutputString('event_1');
     }
+
+    public function testTriggerB()
+    {
+        $this->assertEquals(
+            (new Foo())
+                ->on('foo', [[TestEvent::className(), 'foo'], ['foo' => 'foo']])
+                ->trigger('foo')
+                ->foo(),
+            'foo'
+        );
+        $this->assertFalse(Event::has(Foo::className(), 'foo'));
+        $this->expectOutputString('foo');
+    }
+
+    public function testEventByMethodWithoutEvents()
+    {
+        $this->assertEquals('bar', (new Foo())->method('bar'));
+        $this->assertEquals(0, Event::count());
+        $this->expectOutputString('');
+    }
+
+
+    public function testOff()
+    {
+        Event::on(Foo::className(), 'foo', [[TestEvent::className(), 'foo'], ['foo' => 'foo']]);
+        $this->assertEquals(
+            (new Foo())
+                ->off('foo')
+                ->trigger('foo')
+                ->foo(),
+            'foo'
+        );
+        $this->assertFalse(Event::has(Foo::className(),'foo'));
+        $this->expectOutputString('');
+    }
+
 }
  
