@@ -5,6 +5,7 @@ namespace rockunit\core\behaviors;
 use rockunit\core\db\DatabaseTestCase;
 use rockunit\core\db\models\ActiveRecord;
 use rockunit\core\db\models\Order;
+use rockunit\core\db\models\OrderTimestamp;
 
 /**
  * @group base
@@ -28,6 +29,14 @@ class TimestampBehaviorTest extends DatabaseTestCase
         $this->assertNotEmpty($query->created_at);
         $this->assertSame($query->created_at, $query::findOne($query->getPrimaryKey())->created_at);
         //$this->assertTrue((bool)Articles::deleteAll(['id' => $query->getPrimaryKey()]));
+
+        $query= new OrderTimestamp();
+        $query->customer_id = 2;
+        $query->total = 77;
+        $this->assertNull($query->created_at);
+        $this->assertTrue($query->save());
+        $this->assertNotEmpty($query->created_at);
+        $this->assertSame($query->created_at, $query::findOne($query->getPrimaryKey())->created_at);
     }
 
     public function testUpdate()

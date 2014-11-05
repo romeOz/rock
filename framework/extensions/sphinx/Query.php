@@ -2,11 +2,12 @@
 namespace rock\sphinx;
 
 use rock\base\ComponentsTrait;
+use rock\base\ModelEvent;
+use rock\db\AfterFindEvent;
 use rock\db\CacheTrait;
 use rock\db\Expression;
 use rock\db\QueryInterface;
 use rock\db\QueryTrait;
-use rock\event\Event;
 
 /**
  * Query represents a SELECT SQL statement.
@@ -218,9 +219,7 @@ class Query implements QueryInterface
         if ($row !== false) {
             list ($row) = $this->fillUpSnippets([$row]);
         }
-        if (!$this->afterFind($row)) {
-            return false;
-        }
+        $this->afterFind($row);
         return $row;
     }
 
@@ -239,9 +238,7 @@ class Query implements QueryInterface
             return false;
         }
         $result = $this->typeCast($this->createCommand($connection)->queryScalar(), $connection);
-        if (!$this->afterFind($result)) {
-            return false;
-        }
+        $this->afterFind($result);
         return $result;
     }
 
@@ -258,9 +255,7 @@ class Query implements QueryInterface
             return [];
         }
         $columns = $this->createCommand($connection)->queryColumn();
-        if (!$this->afterFind($columns)) {
-            return false;
-        }
+        $this->afterFind($columns);
         return $columns;
     }
 
@@ -817,20 +812,34 @@ class Query implements QueryInterface
         return $connection->createCommand($sql, $params)->getRawSql();
     }
 
-    protected function beforeFind()
+    /**
+     * This method is called when the AR object is created and populated with the query result.
+     *
+     * The default implementation will trigger an {@see BaseActiveRecord::EVENT_BEFORE_FIND} event.
+     * When overriding this method, make sure you call the parent implementation to ensure the
+     * event is triggered.
+     */
+    public function beforeFind()
     {
-        if ($this->trigger(self::EVENT_BEFORE_FIND)->before() === false) {
-            return false;
-        }
-
-        return true;
+        $event = new ModelEvent;
+        $this->trigger(self::EVENT_BEFORE_FIND, $event);
+        return $event->isValid;
     }
 
-    protected function afterFind(&$result)
+    /**
+     * This method is called when the AR object is created and populated with the query result.
+     *
+     * The default implementation will trigger an {@see BaseActiveRecord::EVENT_AFTER_FIND} event.
+     * When overriding this method, make sure you call the parent implementation to ensure the
+     * event is triggered.
+     *
+     * @param mixed $result the query result.
+     */
+    public function afterFind(&$result = null)
     {
-        if ($this->trigger(self::EVENT_AFTER_FIND, Event::AFTER)->after(null, $result) === false) {
-            return false;
-        }
-        return true;
+        $event = new AfterFindEvent();
+        $event->result = $result;
+        $this->trigger(self::EVENT_AFTER_FIND, $event);
+        $result = $event->result;
     }
 }

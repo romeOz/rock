@@ -22,6 +22,7 @@ class Route implements RequestInterface, ErrorsInterface
 
     const EVENT_BEGIN_ROUTER = 'beginRoute';
     const EVENT_END_ROUTER = 'endRoute';
+    const EVENT_RULE_ROUTE = 'ruleRoute';
 
     const ANY = '*';
     const REST = 1;
@@ -81,12 +82,12 @@ class Route implements RequestInterface, ErrorsInterface
      * @param array|string $verbs
      * @param string|array          $pattern
      * @param callable              $handler
-     * @param \Closure                 $filter
+     * @param callable|array|null     $filters
      * @return boolean
      */
-    public function addRoute($verbs, $pattern, \Closure $handler, \Closure $filter = null)
+    public function addRoute($verbs, $pattern, \Closure $handler, $filters = null)
     {
-        if (!$this->isRoute($verbs, $pattern, $handler, $filter)) {
+        if (!$this->isRoute($verbs, $pattern, $handler, $filters)) {
             $this->initFail();
             return false;
         }
@@ -94,13 +95,13 @@ class Route implements RequestInterface, ErrorsInterface
         return true;
     }
 
-    protected function isRoute($verbs, $pattern, \Closure $handler, \Closure $filter = null)
+    protected function isRoute($verbs, $pattern, \Closure $handler, $filters = null)
     {
         /**
          * default rule or equals rule
          */
         if ($this->isPattern($pattern) === true) {
-            return $this->isRequests(is_string($verbs) ? [$verbs] : $verbs, $handler, $filter);
+            return $this->isRequests(is_string($verbs) ? [$verbs] : $verbs, $handler, $filters);
         }
 
         $this->errors |= self::E_NOT_FOUND;
@@ -108,16 +109,15 @@ class Route implements RequestInterface, ErrorsInterface
         return false;
     }
 
-
     /**
      * Add route by any request methods
      *
      * @param string|array $pattern
      * @param callable     $handler
-     * @param callable        $filters
+     * @param callable|array|null     $filters
      * @return boolean
      */
-    public function any($pattern, \Closure $handler, \Closure $filters = null)
+    public function any($pattern, \Closure $handler, $filters = null)
     {
         return $this->addRoute(self::ANY, $pattern, $handler, $filters);
     }
@@ -127,10 +127,10 @@ class Route implements RequestInterface, ErrorsInterface
      *
      * @param string|array $pattern
      * @param callable     $handler
-     * @param callable     $filters
+     * @param callable|array|null     $filters
      * @return boolean
      */
-    public function get($pattern, \Closure $handler, \Closure $filters = null)
+    public function get($pattern, \Closure $handler, $filters = null)
     {
         return $this->addRoute(self::GET, $pattern, $handler, $filters);
     }
@@ -140,10 +140,10 @@ class Route implements RequestInterface, ErrorsInterface
      *
      * @param string|array $pattern
      * @param callable     $handler
-     * @param callable     $filters
+     * @param callable|array|null     $filters
      * @return boolean
      */
-    public function post($pattern, \Closure $handler, \Closure $filters = null)
+    public function post($pattern, \Closure $handler, $filters = null)
     {
         return $this->addRoute(self::POST, $pattern, $handler, $filters);
     }
@@ -153,10 +153,10 @@ class Route implements RequestInterface, ErrorsInterface
      *
      * @param string|array $pattern
      * @param callable     $handler
-     * @param callable     $filters
+     * @param callable|array|null     $filters
      * @return boolean
      */
-    public function put($pattern, \Closure $handler, \Closure $filters = null)
+    public function put($pattern, \Closure $handler, $filters = null)
     {
         return $this->addRoute(self::PUT, $pattern, $handler, $filters);
     }
@@ -166,10 +166,10 @@ class Route implements RequestInterface, ErrorsInterface
      *
      * @param string|array $pattern
      * @param callable     $handler
-     * @param callable     $filters
+     * @param callable|array|null     $filters
      * @return boolean
      */
-    public function delete($pattern, \Closure $handler, \Closure $filters = null)
+    public function delete($pattern, \Closure $handler, $filters = null)
     {
         return $this->addRoute(self::DELETE, $pattern, $handler, $filters);
     }
@@ -257,7 +257,6 @@ class Route implements RequestInterface, ErrorsInterface
         return $this;
     }
 
-
     /**
      * @param array|\Closure $fail
      * @return $this
@@ -267,7 +266,6 @@ class Route implements RequestInterface, ErrorsInterface
         $this->fail = $fail;
         return $this;
     }
-
 
     /**
      * Manager URL by Application.
@@ -284,8 +282,6 @@ class Route implements RequestInterface, ErrorsInterface
         }
         throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_PROPERTY, ['name' => 'rules']);
     }
-
-
 
     protected function isPattern($pattern)
     {
@@ -393,7 +389,6 @@ class Route implements RequestInterface, ErrorsInterface
         call_user_func($function, $route);
     }
 
-
     protected function initFail()
     {
         if (!isset($this->fail)) {
@@ -473,29 +468,31 @@ class Route implements RequestInterface, ErrorsInterface
         }
         return false;
     }
-    
-
-
 
     /**
      * @param array    $verbs
      * @param callable $handler
-     * @param callable $filter
+     * @param callable $filters
      * @return bool
      */
-    protected function isRequests(array $verbs, \Closure $handler, \Closure $filter = null)
+    protected function isRequests(array $verbs, \Closure $handler, $filters = null)
     {
         if (!static::hasVerbs($verbs)) {
             $this->errors |= self::E_VERBS;
             return false;
         }
-        if ($filter instanceof \Closure) {
-            $filter = call_user_func($filter, $this);
-            $is = $filter instanceof self ? $this->isBehavior($filter) : $this->isBool($filter);
-            if (!$is) {
-                return false;
+        if (isset($filters)) {
+            if ($filters instanceof \Closure) {
+                if (!$this->isBool($filters)) {
+                    return false;
+                }
+            } elseif (is_array($filters)) {
+                if (!$this->isBehavior($filters)) {
+                    return false;
+                }
             }
         }
+
         $this->errors = 0;
         $this->initSuccess();
         $this->defaultScope();
@@ -504,8 +501,9 @@ class Route implements RequestInterface, ErrorsInterface
         return true;
     }
 
-    protected function isBool($is)
+    protected function isBool(callable $callback)
     {
+        $is = (bool)call_user_func($callback, $this);
         if (!$is) {
             $this->errors |= self::E_NOT_FOUND;
             return false;
@@ -515,22 +513,31 @@ class Route implements RequestInterface, ErrorsInterface
     }
 
     /**
-     * @param self|AccessFilter $behavior
+     * @param array $behaviors
      * @return bool
      */
-    protected function isBehavior(self $behavior)
+    protected function isBehavior(array $behaviors)
     {
         $result = null;
-        if (!$behavior->before()) {
+        $this->attachBehaviors($behaviors);
+        $event = new RouteEvent();
+        $this->trigger(self::EVENT_RULE_ROUTE, $event);
 
-            $this->errors |= $behavior->getAccessErrors();
-
+        if (!$event->isValid) {
+            $this->errors |= $event->errors;
             return false;
         }
-
-        $behavior->after(null/*, $result*/);
-
         return true;
+//        if (!$behaviors->before()) {
+//
+//            $this->errors |= $behaviors->getAccessErrors();
+//
+//            return false;
+//        }
+//
+//        $behaviors->after(null/*, $result*/);
+//
+//        return true;
     }
 
     protected function callAction(\Closure $handler)

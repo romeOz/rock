@@ -6,24 +6,24 @@ namespace rock\db;
  *
  * An ActiveQuery can be a normal query or be used in a relational context.
  *
- * ActiveQuery instances are usually created by [[\rock\db\ActiveRecord::find()]] and [[\rock\db\ActiveRecord::findBySql()]].
- * Relational queries are created by [[\rock\db\ActiveRecord::hasOne()]] and [[\rock\db\ActiveRecord::hasMany()]].
+ * ActiveQuery instances are usually created by {@see \rock\db\ActiveRecord::find()} and {@see \rock\db\ActiveRecord::findBySql()}.
+ * Relational queries are created by {@see \rock\db\ActiveRecord::hasOne()} and {@see \rock\db\ActiveRecord::hasMany()}.
  *
  * Normal Query
  * ------------
  *
  * ActiveQuery mainly provides the following methods to retrieve the query results:
  *
- * - [[one()]]: returns a single record populated with the first row of data.
- * - [[all()]]: returns all records based on the query results.
- * - [[count()]]: returns the number of records.
- * - [[sum()]]: returns the sum over the specified column.
- * - [[average()]]: returns the average over the specified column.
- * - [[min()]]: returns the min over the specified column.
- * - [[max()]]: returns the max over the specified column.
- * - [[scalar()]]: returns the value of the first column in the first row of the query result.
- * - [[column()]]: returns the value of the first column in the query result.
- * - [[exists()]]: returns a value indicating whether the query result has data or not.
+ * - {@see \rock\db\ActiveQuery::one()}: returns a single record populated with the first row of data.
+ * - {@see \rock\db\ActiveQuery::all()}: returns all records based on the query results.
+ * - {@see \rock\db\ActiveQuery::count()}: returns the number of records.
+ * - {@see \rock\db\ActiveQuery::sum()}: returns the sum over the specified column.
+ * - {@see \rock\db\ActiveQuery::sum()}: returns the average over the specified column.
+ * - {@see \rock\db\ActiveQuery::min()}: returns the min over the specified column.
+ * - {@see \rock\db\ActiveQuery::max()}: returns the max over the specified column.
+ * - {@see \rock\db\ActiveQuery::scalar()}: returns the value of the first column in the first row of the query result.
+ * - {@see \rock\db\ActiveQuery::column()}: returns the value of the first column in the query result.
+ * - {@see \rock\db\ActiveQuery::exists()}: returns a value indicating whether the query result has data or not.
  *
  * Because ActiveQuery extends from [[Query]], one can use query methods, such as [[where()]],
  * [[orderBy()]] to customize the query options.
@@ -165,9 +165,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
             $this->findWith($this->with, $models);
         }
         if (!$this->asArray) {
-            if (!$this->afterFind($models)) {
-                return [];
-            }
+            $this->afterFind($models);
             foreach ($models as $model) {
                 $model->afterFind();
             }
@@ -270,12 +268,8 @@ class ActiveQuery extends Query implements ActiveQueryInterface
                 $model = $models[0];
             }
 
-            if (!$this->afterFind($model)) {
-                return null;
-            }
-            if (!$activeRecord->afterFind($model)) {
-                return null;
-            }
+            $this->afterFind($model);
+            $activeRecord->afterFind($model);
             return $model;
         } else {
             return null;

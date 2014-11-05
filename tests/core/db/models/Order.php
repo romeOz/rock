@@ -108,7 +108,6 @@ class Order extends ActiveRecord
     {
         if (parent::beforeSave($insert)) {
             $this->created_at = time();
-
             return true;
         } else {
             return false;

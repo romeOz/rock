@@ -4,7 +4,6 @@ namespace rockunit\core\db;
 use rock\access\Access;
 use rock\db\ActiveQuery;
 use rock\db\ActiveQueryInterface;
-use rock\db\ActiveRecord;
 use rock\db\ActiveRecordInterface;
 use rock\db\BaseActiveRecord;
 use rock\db\Connection;
@@ -1232,14 +1231,49 @@ trait ActiveRecordTestTrait
         unset($_POST['_method']);
     }
 
-    public function testSmartAccessAndEvent()
+    public function testFindCheckAccessSuccess()
     {
         /* @var $this \PHPUnit_Framework_TestCase|ActiveRecordTestTrait */
-
         /* @var $customerClass ActiveRecordInterface */
         $customerClass = $this->getCustomerClass();
 
-        // fail
+        $query = $customerClass::find()
+            ->checkAccess(
+                [
+                    'allow' => true,
+                    'verbs' => ['GET'],
+                ],
+                [
+                    function (Access $access) {
+                        /* @var $this \PHPUnit_Framework_TestCase|ActiveRecordTestTrait */
+                        $this->assertTrue($access->owner instanceof ActiveQuery);
+                        echo 'success';
+                    }
+                ],
+                [
+                    function (Access $access) {
+                        /* @var $this \PHPUnit_Framework_TestCase|ActiveRecordTestTrait */
+
+                        $this->assertTrue($access->owner instanceof ActiveQuery);
+                        echo 'fail';
+                    }
+                ]
+            )
+            ->where(['id' => 1]);
+
+        $this->assertNotEmpty($query->one());
+        $this->assertEmpty(Event::getAll());
+        $this->assertNotEmpty($query->all());
+        $this->assertEmpty(Event::getAll());
+        $this->expectOutputString('successsuccess');
+
+    }
+
+    public function testFindCheckAccessFail()
+    {
+        /* @var $this \PHPUnit_Framework_TestCase|ActiveRecordTestTrait */
+        /* @var $customerClass ActiveRecordInterface */
+        $customerClass = $this->getCustomerClass();
         $query = $customerClass::find()
             ->checkAccess(
                 [
@@ -1263,25 +1297,20 @@ trait ActiveRecordTestTrait
                     }
                 ]
             )
-            ->on(
-                ActiveQuery::EVENT_BEFORE_FIND,
-                function () {
-                    echo 'before';
-                }
-            )
-            ->on(
-                ActiveQuery::EVENT_AFTER_FIND,
-                function () {
-                    echo 'after';
-                },
-                Event::AFTER
-            )
             ->where(['id' => 1]);
         $this->assertEmpty($query->one());
         $this->assertEmpty(Event::getAll());
         $this->assertEmpty($query->all());
 
-        // Insert
+        $this->expectOutputString('failfail');
+    }
+
+    public function testInsertCheckAccessFail()
+    {
+        /* @var $this \PHPUnit_Framework_TestCase|ActiveRecordTestTrait */
+        /* @var $customerClass ActiveRecordInterface */
+        $customerClass = $this->getCustomerClass();
+
         /** @var Customer $customer */
         $customer = new $customerClass;
         $customer            ->checkAccess(
@@ -1305,70 +1334,21 @@ trait ActiveRecordTestTrait
                     echo 'fail';
                 }
             ]
-        )
-            ->on(
-                ActiveRecord::EVENT_BEFORE_INSERT,
-                function () {
-                    echo 'before';
-                }
-            )
-            ->on(
-                ActiveRecord::EVENT_AFTER_INSERT,
-                function () {
-                    echo 'after';
-                },
-                Event::AFTER
-            );
+        );
         $customer->email = 'user4@example.com';
         $customer->name = 'user4';
         $customer->address = 'address4';
         $this->assertFalse($customer->save());
 
-        // success
-        $query = $customerClass::find()
-            ->checkAccess(
-                [
-                    'allow' => true,
-                    'verbs' => ['GET'],
-                ],
-                [
-                    function (Access $access) {
-                        /* @var $this \PHPUnit_Framework_TestCase|ActiveRecordTestTrait */
+        $this->expectOutputString('fail');
+    }
 
-                        $this->assertTrue($access->owner instanceof ActiveQuery);
-                        echo 'success';
-                    }
-                ],
-                [
-                    function (Access $access) {
-                        /* @var $this \PHPUnit_Framework_TestCase|ActiveRecordTestTrait */
+    public function testInsertCheckAccessSuccess()
+    {
+        /* @var $this \PHPUnit_Framework_TestCase|ActiveRecordTestTrait */
+        /* @var $customerClass ActiveRecordInterface */
+        $customerClass = $this->getCustomerClass();
 
-                        $this->assertTrue($access->owner instanceof ActiveQuery);
-                        echo 'fail';
-                    }
-                ]
-            )
-            ->on(
-                ActiveQuery::EVENT_BEFORE_FIND,
-                function () {
-                    echo 'before';
-                }
-            )
-            ->on(
-                ActiveQuery::EVENT_AFTER_FIND,
-                function () {
-                    echo 'after';
-                },
-                Event::AFTER
-            )
-            ->where(['id' => 1]);
-
-        $this->assertNotEmpty($query->one());
-        $this->assertEmpty(Event::getAll());
-        $this->assertNotEmpty($query->all());
-        $this->assertEmpty(Event::getAll());
-
-        // insert
         /** @var Customer $customer */
         $customer = new $customerClass;
         $customer            ->checkAccess(
@@ -1392,26 +1372,13 @@ trait ActiveRecordTestTrait
                     echo 'fail';
                 }
             ]
-        )
-            ->on(
-                ActiveRecord::EVENT_BEFORE_INSERT,
-                function () {
-                    echo 'before';
-                }
-            )
-            ->on(
-                ActiveRecord::EVENT_AFTER_INSERT,
-                function () {
-                    echo 'after';
-                },
-                Event::AFTER
-            );
+        );
         $customer->email = 'user4@example.com';
         $customer->name = 'user4';
         $customer->address = 'address4';
         $this->assertTrue($customer->save());
         $this->assertEmpty(Event::getAll());
-        $this->expectOutputString('failfailfailsuccessbeforeaftersuccesssuccessbeforeafter');
+        $this->expectOutputString('success');
     }
 
     public function testInsertWithRule()
@@ -1458,7 +1425,7 @@ trait ActiveRecordTestTrait
         $customer->name = 'user4';
         $customer->address = 'address4';
         $this->assertFalse($customer->save());
-        $this->assertEmpty($customer->getErrors());
+        $this->assertNotEmpty($customer->getErrors());
 
         // success
         /** @var Customer $customer */
@@ -1467,6 +1434,5 @@ trait ActiveRecordTestTrait
         $customer->name = 4;
         $customer->address = 'address4';
         $this->assertTrue($customer->save());
-        $this->expectOutputString('fail');
     }
 }

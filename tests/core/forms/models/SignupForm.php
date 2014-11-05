@@ -4,6 +4,7 @@ namespace rockunit\core\forms\models;
 
 
 use apps\common\models\forms\BaseSignupForm;
+use rock\base\ModelEvent;
 use rock\event\Event;
 use rock\Rock;
 use rockunit\core\db\models\BaseUsers;
@@ -32,10 +33,10 @@ class SignupForm extends BaseSignupForm
         $this->users = $users;
         $this->isSignup = true;
         $result = $users->toArray();
-        if ($this->trigger(self::EVENT_AFTER_SIGNUP, Event::AFTER)->after(null, $result) === false) {
-            return false;
-        }
 
+        $event = new ModelEvent();
+        $event->result = $result;
+        $this->trigger(self::EVENT_AFTER_SIGNUP, $event);
 
         return true;
     }

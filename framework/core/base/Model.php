@@ -516,7 +516,8 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
 
     /**
      * This method is invoked before validation starts.
-     * The default implementation raises a @see beforeValidate() event.
+     *
+     * The default implementation raises a {@see \rock\base\Model::beforeValidate()} event.
      * You may override this method to do preliminary checks before validation.
      * Make sure the parent implementation is invoked so that the event can be raised.
      * @return boolean whether the validation should be executed. Defaults to true.
@@ -524,24 +525,21 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
      */
     public function beforeValidate()
     {
-        if ($this->trigger(self::EVENT_BEFORE_VALIDATE)->before() === false) {
-            //Event::offMulti([self::EVENT_AFTER_, self::EVENT_BEFORE_VALIDATE]);
-            return false;
-        }
-
-        return true;
+        $event = new ModelEvent;
+        $this->trigger(self::EVENT_BEFORE_VALIDATE, $event);
+        return $event->isValid;
     }
 
     /**
      * This method is invoked after validation ends.
-     * The default implementation raises an @see afterValidate() event.
+     *
+     * The default implementation raises an {@see \rock\base\Model::afterValidate()} event.
      * You may override this method to do postprocessing after validation.
      * Make sure the parent implementation is invoked so that the event can be raised.
      */
     public function afterValidate()
     {
-        $this->trigger(self::EVENT_AFTER_VALIDATE, Event::AFTER)->after();
-        //Event::offMulti([self::EVENT_AFTER_VALIDATE, self::EVENT_BEFORE_VALIDATE]);
+        $this->trigger(self::EVENT_AFTER_VALIDATE);
     }
 
 

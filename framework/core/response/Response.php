@@ -292,7 +292,7 @@ class Response
         }
         $this->_statusCode = (int)$value;
         if ($this->getIsInvalid()) {
-            throw new \Exception("The HTTP status code is invalid: $value");
+            throw new Exception(Exception::ERROR, "The HTTP status code is invalid: $value");
         }
         if ($text === null) {
             $this->statusText = isset($this->httpStatuses[$this->_statusCode]) ? $this->httpStatuses[$this->_statusCode] : '';

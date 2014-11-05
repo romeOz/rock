@@ -159,25 +159,38 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
                 },
                 '/',
                 Route::GET,
-                function (Route $route) {
-
-                    return $route
-                        ->checkAccess(
-                            [
-                                'allow' => true,
-                                'verbs' => ['GET'],
-                                'ips' => ['10.2.3']
-                            ],
-                            function (Access $access) {
-                                echo 'success_behavior';
-                            },
-                            function (Access $access) {
-                                echo $access->getErrors();
-                            }
-                        )
-                        ->before();
-                },
+                [
+                    'access' => [
+                        'class' => AccessFilter::className(),
+                        'rules' =>            [
+                            'allow' => true,
+                            'verbs' => ['GET'],
+                            'ips' => ['10.2.3']
+                        ],
+                        'success' => function (Access $access) {
+                            echo 'success_behavior';
+                        },
+                        'fail' => function (Access $access) {
+                            echo $access->getErrors();
+                        }
+                    ]
+                ],
                 'success_behaviortotal_success0action'
+            ],
+
+            [
+                function(){
+                    $_SERVER['HTTP_HOST'] = $_SERVER['SERVER_NAME'] = 'site.com';
+                    $_SERVER['REQUEST_URI'] = '/';
+                    $_SERVER['REMOTE_ADDR'] = '10.2.3';
+                    $_POST['_method'] = null;
+                },
+                '/',
+                Route::GET,
+                function(){
+                    return true;
+                },
+                'total_success0action'
             ],
         ];
     }
@@ -220,7 +233,6 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
 
         $this->expectOutputString($output);
     }
-
 
     public function providerFail()
     {
@@ -291,35 +303,44 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
                 },
                 '/',
                 Route::GET,
-                function (Route $route) {
-
-                    $route->attachBehavior(
-                        'access',
-                        [
-                            'class' => AccessFilter::className(),
-                            'rules' =>
-                                [
-                                    'allow' => false,
-                                    'verbs' => ['GET'],
-                                    'ips' => ['10.2.3']
-                                ],
-                            'success' => [
-                                function (Access $access) {
-                                    echo 'success_behavior' . $access->getErrors();
-                                }
+                [
+                    'access' => [
+                        'class' => AccessFilter::className(),
+                        'rules' =>
+                            [
+                                'allow' => false,
+                                'verbs' => ['GET'],
+                                'ips' => ['10.2.3']
                             ],
-                            'fail' => [
-                                function (Access $access) {
-                                    echo 'fail_behavior' . $access->getErrors();
-                                }
-                            ],
-                        ]
-                    );
-
-                    return $route;
-                },
+                        'success' => [
+                            function (Access $access) {
+                                echo 'success_behavior' . $access->getErrors();
+                            }
+                        ],
+                        'fail' => [
+                            function (Access $access) {
+                                echo 'fail_behavior' . $access->getErrors();
+                            }
+                        ],
+                    ]
+                ],
                 'fail_behavior' . (Route::E_IPS | Route::E_VERBS) . 'total_fail' .
                 (Route::E_IPS | Route::E_VERBS)
+            ],
+
+            [
+                function(){
+                    $_SERVER['HTTP_HOST'] = $_SERVER['SERVER_NAME'] = 'site.com';
+                    $_SERVER['REQUEST_URI'] = '/';
+                    $_SERVER['REMOTE_ADDR'] = '10.2.3';
+                    $_POST['_method'] = null;
+                },
+                '/',
+                Route::GET,
+                function(){
+                    return false;
+                },
+                'total_fail' . Route::E_NOT_FOUND
             ],
         ];
     }

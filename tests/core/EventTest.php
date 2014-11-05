@@ -1,8 +1,8 @@
 <?php
-
-namespace rockunit\core\event;
+namespace rockunit\core;
 
 use rock\base\ClassName;
+
 use rock\event\Event;
 
 
@@ -199,7 +199,6 @@ class EventTest extends \PHPUnit_Framework_TestCase
                 }, ['foo' => 'test']
             ]
         );
-
         $this->assertTrue(Event::has(Foo::className(), 'foo'));
         $this->assertTrue(Event::off(Foo::className(), 'foo'));
         $this->assertFalse(Event::has(Foo::className(), 'foo'));
@@ -207,7 +206,7 @@ class EventTest extends \PHPUnit_Framework_TestCase
 
     public function testOffWithHandler()
     {
-        $handler =             [
+        $handler = [
             function (Event $event) {
                 echo $event->data['foo'];
             }, ['foo' => 'test']
@@ -220,9 +219,7 @@ class EventTest extends \PHPUnit_Framework_TestCase
         Event::on(Foo::className(), 'foo', [[Foo::className(), 'display'], ['foo' => 'static']]);
         Event::on(Foo::className(), 'foo', [[new Foo(), 'get'], ['foo' => 'instance']]);
         $this->assertSame(Event::countHandlers(Foo::className(), 'foo'), 3);
-        Event::off(Foo::className(),'foo', $handler);
+        Event::off(Foo::className(), 'foo', $handler);
         $this->assertSame(Event::countHandlers(Foo::className(), 'foo'), 2);
-
     }
 }
- 

@@ -1,6 +1,7 @@
 <?php
 namespace rock\template;
 
+use rock\base\ActionEvent;
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
 use rock\base\Config;
@@ -27,25 +28,25 @@ class Template implements ComponentsInterface
     const TO_TYPE = 4;
     const ENGINE_ROCK = 1;
     const ENGINE_PHP = 2;
+
+    const EVENT_BEFORE_TEMPLATE = 'beforeTemplate';
+    const EVENT_AFTER_TEMPLATE = 'afterTemplate';
+
     /**
-     * @event Event an event that is triggered
-     * by @see beginPage() .
+     * @event Event an event that is triggered by {@see \rock\template\Template::beginPage()}.
      */
     const EVENT_BEGIN_PAGE = 'beginPage';
     /**
-     * @event Event an event that is triggered
-     * by @see endPage() .
+     * @event Event an event that is triggered by {@see \rock\template\Template::endPage()}.
      */
     const EVENT_END_PAGE = 'endPage';
 
     /**
-     * @event Event an event that is triggered
-     * by @see beginBody() .
+     * @event Event an event that is triggered by {@see \rock\template\Template::beginBody()}.
      */
     const EVENT_BEGIN_BODY = 'beginBody';
     /**
-     * @event Event an event that is triggered
-     * by @see endBody() .
+     * @event Event an event that is triggered by {@see \rock\template\Template::endBody()}.
      */
     const EVENT_END_BODY = 'endBody';
     /**
@@ -182,13 +183,13 @@ class Template implements ComponentsInterface
         if (isset($context)) {
             $this->context = $context;
         }
-        if (!$this->before()) {
+        if (!$this->beforeChunk($path)) {
             return null;
         }
         list($cacheKey, $cacheExpire, $cacheTags) = $this->calculateCacheParams($placeholders);
         // Get cache
         if (($resultCache = $this->getCache($cacheKey)) !== false) {
-            if ($this->after(null, $resultCache) === false) {
+            if ($this->afterChunk($path, $resultCache) === false) {
                 return null;
             }
 
@@ -204,7 +205,7 @@ class Template implements ComponentsInterface
         $result = implode("\n", [$this->beginPage(), $this->beginBody(), $result, $this->endBody(), $this->endPage()]);
         // Set cache
         $this->setCache($cacheKey, $result, $cacheExpire, $cacheTags);
-        if ($this->after(null, $result) === false) {
+        if ($this->afterChunk($path, $result) === false) {
             return null;
         }
 
@@ -1062,6 +1063,65 @@ class Template implements ComponentsInterface
     }
 
     /**
+     * This method is invoked right before an action is executed.
+     *
+     * The method will trigger the {@see \rock\base\Controller::EVENT_BEFORE_ACTION} event. The return value of the method
+     * will determine whether the action should continue to run.
+     *
+     * If you override this method, your code should look like the following:
+     *
+     * ```php
+     * public function beforeAction($action)
+     * {
+     *     if (parent::beforeAction($action)) {
+     *         // your custom code here
+     *         return true;  // or false if needed
+     *     } else {
+     *         return false;
+     *     }
+     * }
+     * ```
+     *
+     * @param string $action the action to be executed.
+     * @return boolean whether the action should continue to run.
+     */
+    protected function beforeChunk($action)
+    {
+        $event = new ActionEvent($action);
+        $this->trigger(self::EVENT_BEFORE_TEMPLATE, $event);
+        return $event->isValid;
+    }
+
+    /**
+     * This method is invoked right after an action is executed.
+     *
+     * The method will trigger the {@see \rock\base\Controller::EVENT_AFTER_ACTION} event. The return value of the method
+     * will be used as the action return value.
+     *
+     * If you override this method, your code should look like the following:
+     *
+     * ```php
+     * public function afterAction($action, $result)
+     * {
+     *     $result = parent::afterAction($action, $result);
+     *     // your custom code here
+     *     return $result;
+     * }
+     * ```
+     *
+     * @param string $action the action just executed.
+     * @param mixed $result the action return result.
+     * @return mixed the processed action result.
+     */
+    protected function afterChunk($action, $result)
+    {
+        $event = new ActionEvent($action);
+        $event->result = $result;
+        $this->trigger(self::EVENT_AFTER_TEMPLATE, $event);
+        return $event->result;
+    }
+
+    /**
      * Callback to replace variables template.
      *
      * @param array $matches array of variables template.
@@ -1451,16 +1511,16 @@ class Template implements ComponentsInterface
      */
     public function getSnippet($snippet, array $params = [], $autoEscape = true)
     {
-        if (!$this->before(__METHOD__)) {
-            return null;
-        }
+//        if (!$this->before(__METHOD__)) {
+//            return null;
+//        }
         $template = clone $this;
         $template->removeAllPlaceholders();
         $result = $template->getSnippetInternal($snippet, $params, $autoEscape);
         $this->cachePlaceholders = $template->cachePlaceholders;
-        if (!$this->after(__METHOD__, $result)) {
-            return null;
-        }
+//        if (!$this->after(__METHOD__, $result)) {
+//            return null;
+//        }
 
         return $result;
     }
@@ -1485,12 +1545,12 @@ class Template implements ComponentsInterface
             $snippet->autoEscape = false;
         }
         $snippet->template = $this;
-        if (!$snippet->before('get')) {
+        if (!$snippet->beforeSnippet($snippet::className())) {
             return null;
         }
         // Get cache
         if (($resultCache = $this->getCache($cacheKey)) !== false) {
-            if (!$snippet->after('get', $resultCache) || !$this->after(__METHOD__, $resultCache)) {
+            if (!$snippet->afterSnippet($snippet::className(), $resultCache)) {
                 return null;
             }
 
@@ -1509,7 +1569,7 @@ class Template implements ComponentsInterface
             : $result;
         //  Set cache
         $this->setCache($cacheKey, $result, $cacheExpire, $cacheTags);
-        if (!$snippet->after('get', $result)) {
+        if (!$snippet->afterSnippet($snippet::className(), $result)) {
             return null;
         }
 

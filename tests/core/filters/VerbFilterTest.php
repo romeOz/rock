@@ -52,6 +52,14 @@ class BarController extends Controller
         return 'test';
     }
 
+    public function actionFoo()
+    {
+        if (!$this->beforeAction('actionFoo')) {
+            return null;
+        }
+        return 'foo';
+    }
+
     public function actionView()
     {
         return 'view';
@@ -82,12 +90,15 @@ class VerbFilterTest extends \PHPUnit_Framework_TestCase
         $_POST['_method'] = 'GET';
         $this->assertNull($controller->method('actionIndex'));
         $this->assertNull($controller->method('actionView'));
+        $this->assertNull($controller->actionFoo());
         $_POST['_method'] = 'POST';
         $this->assertSame($controller->method('actionIndex'), 'test');
         $this->assertSame($controller->method('actionView'), 'view');
+        $this->assertSame($controller->actionFoo(), 'foo');
         $_POST['_method'] = 'PUT';
         $this->assertSame($controller->method('actionIndex'), 'test');
         $this->assertSame($controller->method('actionView'), 'view');
+        $this->assertSame($controller->actionFoo(), 'foo');
     }
 }
  

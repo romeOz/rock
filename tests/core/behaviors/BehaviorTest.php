@@ -3,57 +3,17 @@ namespace rockunit\core\behavior\Behavior;
 
 
 
+use rock\access\Access;
+use rock\base\ActionEvent;
 use rock\base\Behavior;
-use rock\base\ComponentsInterface;
-use rock\base\ComponentsTrait;
 use rock\base\Controller;
 use rock\event\Event;
-use rock\exception\Exception;
-use rock\filters\EventFilter;
-use rock\Rock;
-
-class Foo
-{
-    use ComponentsTrait;
-
-    const EVENT_BEGIN_GET = 'beginGet';
-    const EVENT_END_GET = 'endGet';
-
-    public function foo()
-    {
-        if ($this->before('foo') === false) {
-            return null;
-        }
-        $result = 'foo';
-        if ($this->after(null, $result) === false) {
-            return null;
-        };
-        return $result;
-    }
-
-    public function bar()
-    {
-        return 'bar';
-    }
-
-
-    public function filter()
-    {
-        return '<b>test</b>';
-    }
-
-    public $test = 'test';
-//    public function beforeAction()
-//    {
-//
-//        return parent::beforeAction();
-//    }
-}
+use rock\filters\AccessFilter;
 
 class FooBehavior extends Behavior
 {
 
-    public $test = 'test';
+    public $test = 'fooBehavior';
 
     public function bar()
     {
@@ -62,10 +22,23 @@ class FooBehavior extends Behavior
 }
 
 
-
 class FooController extends Controller
 {
+    public function actionIndex()
+    {
+        return 'index';
+    }
 
+    public function actionView()
+    {
+        if (!$this->beforeAction('actionView')) {
+            return null;
+        }
+        $event = new ActionEvent('actionView');
+        $event->result = 'view';
+        $this->trigger('test', $event);
+        return 'view';
+    }
 }
 
 /**
@@ -86,123 +59,95 @@ class BehaviorTest extends \PHPUnit_Framework_TestCase
 
     public function testAttachBehavior()
     {
-        Rock::$app->di[Foo::className()] = [
-            'class' => Foo::className(),
-        ];
-        Rock::$app->di[FooController::className()] = [
-            'class' => FooController::className(),
-        ];
-        /** @var ComponentsInterface $controller */
-        $controller = Rock::$app->{FooController::className()};
+        $controller = new FooController();
         $controller->attachBehaviors(
             [
-                'test' => [
+                'testBehavior' => [
                     'class' => FooBehavior::className()
                 ]
             ]
         );
-        $controller->{'as Event'} = [
-            'class' => EventFilter::className(),
-            'on' => [
-                'event_5' => [
-                    [
-                        function () {
-                            echo 'event_5';
-                        }
-                    ]
-                ],
-            ],
-            'trigger' => ['event_5']
-        ];
-        $this->assertEquals($controller->bar(), 'bar');
-        $controller->before();
-        $this->expectOutputString('event_5');
-        $this->assertTrue(isset($controller->test));
-        $this->assertEquals($controller->test, 'test');
+
+        $this->assertTrue($controller->existsBehavior('testBehavior'));
+        $this->assertSame('fooBehavior', $controller->test);
+        $this->assertSame('bar', $controller->bar());
         unset($controller->test);
-        $this->assertFalse(isset($controller->test));
         $this->assertNull($controller->test);
         $controller->test = 'foo';
-        $this->assertEquals($controller->test, 'foo');
+        $this->assertEquals('foo', $controller->test);
     }
 
-
     /**
-     * @expectedException Exception
+     * @expectedException \rock\exception\Exception
      */
     public function testAttachBehaviorDetachThrowException()
     {
-        Rock::$app->di[Foo::className()] = [
-            'class' => Foo::className(),
-        ];
-        Rock::$app->di[FooController::className()] = [
-            'class' => FooController::className(),
-        ];
-        /** @var ComponentsInterface $controllerBehavior */
-        $controllerBehavior = Rock::$app->{FooController::className()};
-        $controllerBehavior->attachBehaviors(
+        $controller = new FooController();
+        $controller->attachBehaviors(
             [
-                'test' => [
-                    'class' => Foo::className()
-                ]
-            ]
-        );
-        $this->assertEquals($controllerBehavior->bar(), 'bar');
-        $controllerBehavior->detachBehavior('test');
-        $this->assertEquals($controllerBehavior->bar(), 'bar');
-    }
-
-    public function testAttachBehaviorDetach()
-    {
-        Rock::$app->di[Foo::className()] = [
-            'class' => Foo::className(),
-        ];
-        Rock::$app->di[FooController::className()] = [
-            'class' => FooController::className(),
-        ];
-        /** @var ComponentsInterface $controllerBehavior */
-        $controllerBehavior = Rock::$app->{FooController::className()};
-        $controllerBehavior->attachBehaviors(
-            [
-                'test' => [
+                'testBehavior' => [
                     'class' => FooBehavior::className()
                 ]
             ]
         );
-        $this->assertTrue($controllerBehavior->hasBehavior('test'));
-        $this->assertEquals($controllerBehavior->bar(), 'bar');
-        $controllerBehavior->detachBehavior('test');
-        $this->assertFalse($controllerBehavior->hasBehavior('test'));
+
+        $this->assertTrue($controller->existsBehavior('testBehavior'));
+        $controller->detachBehavior('testBehavior');
+        $this->assertFalse($controller->existsBehavior('testBehavior'));
+        $controller->bar();
+
     }
 
-
-    public function testAttachBehaviorAttach()
+    public function testDetachBehaviors()
     {
-        Rock::$app->di[Foo::className()] = [
-            'class' => Foo::className(),
-        ];
-        Rock::$app->di[FooController::className()] = [
-            'class' => FooController::className(),
-        ];
-        /** @var ComponentsInterface $controllerBehavior */
-        $controllerBehavior = Rock::$app->{FooController::className()};
-        $controllerBehavior->attachBehaviors(
+        $controller = new FooController();
+        $controller->on('test', function(Event $event){
+            echo 'test ' . $event->result;
+        });
+        $controller->checkAccess(
             [
-                'test' => [
-                    'class' => FooBehavior::className()
-                ]
-            ]
+                 'allow' => true,
+                 'verbs' => ['POST'],
+             ],
+            function (Access $access) {
+                $this->assertTrue($access->owner instanceof FooController);
+                echo 'success';
+            },
+            function (Access $access) {
+                $this->assertTrue($access->owner instanceof FooController);
+                echo 'fail';
+            }
         );
-        $this->assertEquals($controllerBehavior->bar(), 'bar');
-        $controllerBehavior->detachBehaviors();
-        $this->assertFalse($controllerBehavior->hasBehavior('test'));
-        $controllerBehavior->attachBehavior(
-            'test',
-            [
-                'class' => FooBehavior::className()
-            ]
-        );
-        $this->assertTrue($controllerBehavior->hasBehavior('test'));
-        $this->assertEquals($controllerBehavior->bar(), 'bar');
+        $controller->detachBehaviors();
+        $this->assertSame('view', $controller->actionView());
+        $this->expectOutputString('test view');
+    }
+
+    public function testDetachBehavior()
+    {
+        $controller = new FooController();
+        $controller->on('test', function(Event $event){
+            echo 'test ' . $event->result;
+        });
+        $controller->{'as access'} = [
+            'class' => AccessFilter::className(),
+            'rules' => [
+                'allow' => true,
+                'verbs' => ['POST'],
+            ],
+            'success' => function (Access $access) {
+                $this->assertTrue($access->owner instanceof FooController);
+                echo 'success';
+            },
+            'fail' => function (Access $access) {
+                $this->assertTrue($access->owner instanceof FooController);
+                echo 'fail';
+            }
+        ];
+        $this->assertTrue($controller->existsBehavior('access'));
+        $this->assertInstanceOf(Behavior::className(), $controller->detachBehavior('access'));
+        $this->assertFalse($controller->existsBehavior('access'));
+        $this->assertSame('view', $controller->actionView());
+        $this->expectOutputString('test view');
     }
 }

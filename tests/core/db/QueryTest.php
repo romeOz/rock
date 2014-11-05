@@ -369,11 +369,10 @@ class QueryTest extends DatabaseTestCase
     }
 
 
-    public function testSmartAccessAndEvent()
+    public function testCheckAccessFail()
     {
         $connection = $this->getConnection();
 
-        // fail
         $query = new Query();
         $query->from('customer');
         $query->checkAccess(
@@ -393,25 +392,18 @@ class QueryTest extends DatabaseTestCase
                     echo 'fail';
                 }
             ]
-        )
-        ->on(
-            Query::EVENT_BEFORE_FIND,
-            function () {
-                echo 'before';
-            }
-        )
-        ->on(
-            Query::EVENT_AFTER_FIND,
-            function () {
-                echo 'after';
-            },
-            Event::AFTER
         );
         $this->assertEmpty($query->one($connection));
         $this->assertEmpty(Event::getAll());
         $this->assertEmpty($query->all($connection));
+        $this->expectOutputString('failfail');
 
-        // success
+    }
+
+    public function testCheckAccessSuccess()
+    {
+        $connection = $this->getConnection();
+
         $query = new Query();
         $query->from('customer');
         $query->checkAccess(
@@ -431,19 +423,6 @@ class QueryTest extends DatabaseTestCase
                     echo 'fail';
                 }
             ]
-        )
-        ->on(
-            Query::EVENT_BEFORE_FIND,
-            function () {
-                echo 'before';
-            }
-        )
-        ->on(
-            Query::EVENT_AFTER_FIND,
-            function () {
-                echo 'after';
-            },
-            Event::AFTER
         );
 
         $this->assertNotEmpty($query->one($connection));
@@ -451,6 +430,6 @@ class QueryTest extends DatabaseTestCase
 
         $this->assertNotEmpty($query->all($connection));
         $this->assertEmpty(Event::getAll());
-        $this->expectOutputString('failfailsuccessbeforeaftersuccess');
+        $this->expectOutputString('successsuccess');
     }
 }

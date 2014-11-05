@@ -34,11 +34,11 @@ class FooController extends Controller
 
     public function actionView()
     {
-        if ($this->before('actionView') === false) {
+        if ($this->beforeAction('actionView') === false) {
             return null;
         }
         $result = 'view';
-        if ($this->after('actionView', $result) === false) {
+        if ($this->afterAction('actionView', $result) === false) {
             return null;
         }
 
@@ -79,11 +79,11 @@ class BarController extends Controller
 
     public function actionView()
     {
-        if ($this->before('actionView') === false) {
+        if ($this->beforeAction('actionView') === false) {
             return null;
         }
         $result = 'view';
-        if ($this->after('actionView', $result) === false) {
+        if ($this->afterAction('actionView', $result) === false) {
             return null;
         }
 
@@ -99,7 +99,6 @@ class BazController extends Controller
         return [
             'access' => [
                 'class' => AccessFilter::className(),
-                'only' => '*',
                 'rules' =>
                     [
                         'allow' => false,
@@ -123,11 +122,11 @@ class BazController extends Controller
 
     public function actionView()
     {
-        if ($this->before('actionView') === false) {
+        if ($this->beforeAction('actionView') === false) {
             return null;
         }
         $result = 'view';
-        if ($this->after('actionView', $result) === false) {
+        if ($this->afterAction('actionView', $result) === false) {
             return null;
         }
 
@@ -141,7 +140,7 @@ class MultiAccessController extends Controller
     public function behaviors()
     {
         return [
-            'access_1' => [
+            [
                 'class' => AccessFilter::className(),
                 'only' => ['actionIndex', 'actionUpdate'],
                 'rules' =>
@@ -150,7 +149,7 @@ class MultiAccessController extends Controller
                         'verbs' => ['GET'],
                     ],
             ],
-            'access_2' => [
+            [
                 'class' => AccessFilter::className(),
                 'only' => ['actionCreate'],
                 'rules' =>
@@ -159,7 +158,7 @@ class MultiAccessController extends Controller
                         'verbs' => ['GET'],
                     ],
             ],
-            'access_3' => [
+            [
                 'class' => AccessFilter::className(),
                 'only' => ['actionCreate'],
                 'rules' =>
@@ -168,18 +167,18 @@ class MultiAccessController extends Controller
                         'verbs' => ['POST'],
                     ],
             ],
-            'access_4' => [
+            [
                 'class' => AccessFilter::className(),
-                'only' => ['actionView'],
+                'except' =>  ['actionIndex', 'actionUpdate', 'actionCreate'],
                 'rules' =>
                     [
                         'allow' => true,
                         'verbs' => ['POST'],
                     ],
             ],
-            'access_5' => [
+            [
                 'class' => AccessFilter::className(),
-                'only' => ['actionView'],
+                'except' =>  ['actionIndex', 'actionUpdate', 'actionCreate'],
                 'rules' =>
                     [
                         'allow' => true,
@@ -202,11 +201,11 @@ class MultiAccessController extends Controller
 
     public function actionView()
     {
-        if ($this->before('actionView') === false) {
+        if ($this->beforeAction('actionView') === false) {
             return null;
         }
         $result = 'view';
-        if ($this->after('actionView', $result) === false) {
+        if ($this->afterAction('actionView', $result) === false) {
             return null;
         }
 

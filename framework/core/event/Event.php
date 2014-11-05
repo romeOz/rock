@@ -2,24 +2,34 @@
 namespace rock\event;
 
 use rock\base\ObjectTrait;
-use rock\base\WhenInterface;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\ObjectHelper;
 use rock\Rock;
 
-class Event implements WhenInterface
+class Event
 {
     use ObjectTrait;
 
     /** @var  string */
     public $name;
-    /** @var  object */
+    /**
+     * @var object the sender of this event. If not set, this property will be
+     * set as the object whose "trigger()" method is called.
+     * This property may also be a `null` when this event is a
+     * class-level event which is triggered in a static context.
+     */
     public $owner;
     /** @var  mixed */
     public $result;
     /** @var  mixed */
     public $data;
+    /**
+     * @var boolean whether the event is handled. Defaults to `false`.
+     * When a handler sets this to be true, the event processing will stop and
+     * ignore the rest of the uninvoked event handlers.
+     */
+    public $handled = false;
 
     /**
      * Array of events
@@ -30,7 +40,7 @@ class Event implements WhenInterface
 
 
     /**
-     * Subscribing in event
+     * Subscribing in event.
      *
      * @param string|object $class the object or the fully qualified class name specifying the class-level event.
      * @param string $name the event name.
@@ -38,9 +48,13 @@ class Event implements WhenInterface
      */
     public static function trigger($class, $name, $event = null)
     {
+        if (empty(static::$events)) {
+            return;
+        }
         if ($event === null) {
             $event = new static;
         }
+        $event->handled = false;
         $event->name = $name;
 
         if (is_object($class)) {
@@ -58,6 +72,9 @@ class Event implements WhenInterface
                     list($function, $data) = $handler;
                     $event->data = $data;
                     call_user_func($function, $event);
+                    if ($event->handled) {
+                        return;
+                    }
                 }
                 //static::off($class, $name);
             }
@@ -66,14 +83,16 @@ class Event implements WhenInterface
 
 
     /**
-     * Publishing event
+     * Publishing event.
      *
      * @param string|object $class the fully qualified class name to which the event handler needs to attach.
-     * @param string         $name          - name of event
-     * @param array|\Closure $handler       - handler
-     *                                      => array(function ($args) { ... }, $data)
-     *                                      => array($instance, 'method', $data)
-     *                                      => array('Class', 'static_method', $data)
+     * @param string         $name          name of event
+     * @param array|\Closure $handler       handler
+     *
+     * - `[function ($args) { ... }, $data]`
+     * - `[$instance, 'method', $data]`
+     * - `['Class', 'static_method', $data]`
+     *
      */
     public static function on($class, $name, $handler)
     {
@@ -93,10 +112,10 @@ class Event implements WhenInterface
 
 
     /**
-     * Detach event
+     * Detach event.
      *
      * @param string|object   $class   the fully qualified class name from which the event handler needs to be detached.
-     * @param string   $name    - name of event
+     * @param string   $name    name of event
      * @param callable $handler the event handler to be removed.
      *                          If it is null, all handlers attached to the named event will be removed.
      * @return bool
@@ -220,7 +239,8 @@ class Event implements WhenInterface
     }
 
     /**
-     * Count handlers of events
+     * Count handlers of events.
+     *
      * @param string|object $class
      * @param string $name name of event
      * @return int
@@ -240,7 +260,8 @@ class Event implements WhenInterface
     }
 
     /**
-     * Count events of class (with parents)
+     * Count events of class (with parents).
+     *
      * @param string|object $class
      * @return int
      */

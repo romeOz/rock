@@ -3,24 +3,25 @@
 namespace rockunit\core\filters;
 
 use rock\access\Access;
-use rock\base\ComponentsTrait;
+use rock\base\Controller;
 use rock\event\Event;
 
-class BazController
+class BazController extends Controller
 {
-    use ComponentsTrait;
     const EVENT_BEGIN_GET = 'beginGet';
     const EVENT_END_GET = 'endGet';
+    public $test = 'test';
 
-    public function foo()
+    public function actionIndex()
     {
-        if ($this->before('foo') === false) {
+        if ($this->beforeAction('foo') === false) {
             return null;
         }
         $result = 'foo';
-        if ($this->after(null, $result) === false) {
+        if ($this->afterAction('foo', $result) === false) {
             return null;
         };
+
         return $result;
     }
 
@@ -29,13 +30,10 @@ class BazController
         return 'bar';
     }
 
-
     public function filter()
     {
         return '<b>test</b>';
     }
-
-    public $test = 'test';
     //    public function beforeAction()
     //    {
     //
@@ -47,7 +45,7 @@ class BazController
  * @group base
  * @group filters
  */
-class CheckAccessTest  extends \PHPUnit_Framework_TestCase
+class CheckAccessTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
@@ -61,99 +59,73 @@ class CheckAccessTest  extends \PHPUnit_Framework_TestCase
 
     public function testCheckAccessTrue()
     {
-        $this->assertEquals(
-            (new BazController())
-                ->checkAccess(
-                    [
-                        'allow' => true,
-                        'verbs' => ['GET'],
-                    ],
-                    [
-                        function (Access $access) {
-                            $this->assertTrue($access->owner instanceof BazController);
-                            echo 'success';
-                        }
-                    ],
-                    [
-                        function (Access $access) {
-                            $this->assertTrue($access->owner instanceof BazController);
-                            echo 'fail';
-                        }
-                    ]
-                )
-                ->on(
-                    'event_before',
-                    [
-                        function () {
-                            echo 'event_before';
-                        }
-                    ]
-                )
-                ->on(
-                    'event_after',
-                    [
-                        function (Event $event) {
-
-                            echo 'event_after' . $event->result;
-                        }
-                    ],
-                    Event::AFTER
-                )
-                ->trigger('event_before')
-                ->trigger('event_after', Event::AFTER)
-                ->foo(),
-            'foo'
-        );
-        $this->expectOutputString('successevent_beforeevent_afterfoo');
+        $controller = (new BazController())
+            ->checkAccess(
+                [
+                    'allow' => true,
+                    'verbs' => ['GET'],
+                ],
+                [
+                    function (Access $access) {
+                        $this->assertTrue($access->owner instanceof BazController);
+                        echo 'success';
+                    }
+                ],
+                [
+                    function (Access $access) {
+                        $this->assertTrue($access->owner instanceof BazController);
+                        echo 'fail';
+                    }
+                ]
+            )
+            ->on(
+                Controller::EVENT_BEFORE_ACTION,
+                function (Event $event) {
+                    $this->assertNull($event->result);
+                    $this->assertSame('bar', $event->data);
+                },
+                'bar')
+            ->on(
+                Controller::EVENT_AFTER_ACTION,
+                function (Event $event) {
+                    $this->assertSame('foo', $event->result);
+                });
+        $this->assertEquals('foo', $controller->actionIndex());
+        $this->expectOutputString('success');
     }
 
 
     public function testCheckAccessFalse()
     {
-        $this->assertNull(
-            (new BazController())
-
-                ->on(
-                    'event_before',
-                    [
-                        function () {
-                            echo 'event_before';
-                        }
-                    ]
-                )
-                ->on(
-                    'event_after',
-                    [
-                        function (Event $event) {
-                            echo 'event_after' . $event->result;
-                        }
-                    ],
-                    Event::AFTER
-                )
-                ->trigger('event_before')
-                ->checkAccess(
-                    [
-                        'allow' => true,
-                        'verbs' => ['POST'],
-                    ],
-                    [
-                        function (Access $access) {
-                            $this->assertTrue($access->owner instanceof BazController);
-                            echo 'success';
-                        }
-                    ],
-                    [
-                        function (Access $access) {
-                            $this->assertTrue($access->owner instanceof BazController);
-                            echo 'fail';
-                        }
-                    ]
-                )
-                ->trigger('event_after', Event::AFTER)
-                ->foo()
-        );
-        $this->assertFalse(Event::has(BazController::className(),'event_after'));
-        $this->expectOutputString('event_beforefail');
+        $controller = (new BazController())
+            ->checkAccess(
+                [
+                    'allow' => true,
+                    'verbs' => ['POST'],
+                ],
+                [
+                    function (Access $access) {
+                        $this->assertTrue($access->owner instanceof BazController);
+                        echo 'success';
+                    }
+                ],
+                [
+                    function (Access $access) {
+                        $this->assertTrue($access->owner instanceof BazController);
+                        echo 'fail';
+                    }
+                ]
+            )
+            ->on(
+                Controller::EVENT_BEFORE_ACTION,
+                function () {
+                    echo Controller::EVENT_BEFORE_ACTION;
+                })
+            ->on(Controller::EVENT_AFTER_ACTION, function(){
+                echo Controller::EVENT_AFTER_ACTION;
+            });
+        $this->assertNull($controller->actionIndex());
+        $this->expectOutputString('fail');
     }
 
 
@@ -184,33 +156,30 @@ class CheckAccessTest  extends \PHPUnit_Framework_TestCase
         $this->expectOutputString('fail');
     }
 
-
     public function testCheckAccessIpsTrue()
     {
         $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
-        $this->assertEquals(
-            (new BazController())
-                ->checkAccess(
-                    [
-                        'allow' => true,
-                        'ips' => ['127.0.0.1'],
-                    ],
-                    [
-                        function (Access $access) {
-                            $this->assertTrue($access->owner instanceof BazController);
-                            echo 'success';
-                        }
-                    ],
-                    [
-                        function (Access $access) {
-                            $this->assertTrue($access->owner instanceof BazController);
-                            echo 'fail';
-                        }
-                    ]
-                )
-                ->foo(),
-            'foo'
-        );
+        $result = (new BazController())
+            ->checkAccess(
+                [
+                    'allow' => true,
+                    'ips' => ['127.0.0.1'],
+                ],
+                [
+                    function (Access $access) {
+                        $this->assertTrue($access->owner instanceof BazController);
+                        echo 'success';
+                    }
+                ],
+                [
+                    function (Access $access) {
+                        $this->assertTrue($access->owner instanceof BazController);
+                        echo 'fail';
+                    }
+                ]
+            )
+            ->actionIndex();
+        $this->assertEquals('foo', $result);
         $this->expectOutputString('success');
     }
 
@@ -231,13 +200,13 @@ class CheckAccessTest  extends \PHPUnit_Framework_TestCase
                         }
                     ],
                     [
-                        function (Access $access)  {
+                        function (Access $access) {
                             $this->assertTrue($access->owner instanceof BazController);
                             echo 'fail';
                         }
                     ]
                 )
-                ->foo()
+                ->actionIndex()
         );
         $this->expectOutputString('fail');
     }

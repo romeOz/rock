@@ -2,9 +2,12 @@
 
 namespace rock\filters;
 
+use rock\base\ActionFilter;
+use rock\base\Controller;
 use rock\request\Request;
 use rock\response\Response;
 use rock\Rock;
+use rock\template\Template;
 use rock\user\User;
 
 /**
@@ -62,6 +65,17 @@ class RateLimiter extends ActionFilter
      */
     public $dependency = true;
 
+    public function events()
+    {
+        return [
+            Controller::EVENT_BEFORE_ACTION => 'beforeFilter',
+            Controller::EVENT_AFTER_ACTION => 'afterFilter',
+            Template::EVENT_BEFORE_TEMPLATE => 'beforeFilter',
+            Template::EVENT_AFTER_TEMPLATE => 'afterFilter',
+        ];
+    }
+
+
     public function init()
     {
         if ($this->dependency instanceof \Closure) {
@@ -73,8 +87,11 @@ class RateLimiter extends ActionFilter
     /**
      * {@inheritdoc}
      */
-    public function before($action = null)
+    public function beforeAction($action)
     {
+//        if (!$this->isActive($action)) {
+//            return parent::beforeAction($action);
+//        }
         if (empty($this->actions) || empty($action)) {
             return true;
         }

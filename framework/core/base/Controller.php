@@ -15,6 +15,15 @@ abstract class Controller implements ComponentsInterface
         ComponentsTrait::init as parentInit;
     }
 
+    /**
+     * @event ActionEvent an event raised right before executing a controller action.
+     * You may set {@see \rock\base\ActionEvent::$isValid} to be false to cancel the action execution.
+     */
+    const EVENT_BEFORE_ACTION = 'beforeAction';
+    /**
+     * @event ActionEvent an event raised right after executing a controller action.
+     */
+    const EVENT_AFTER_ACTION = 'afterAction';
 
     /** @var  Template */
     protected $template;
@@ -84,6 +93,93 @@ abstract class Controller implements ComponentsInterface
             $layout = '@common.views/layouts/notPage';
         }
         return $this->render($layout);
+    }
+
+    /**
+     * This method is invoked right before an action is executed.
+     *
+     * The method will trigger the {@see \rock\base\Controller::EVENT_BEFORE_ACTION} event. The return value of the method
+     * will determine whether the action should continue to run.
+     *
+     * If you override this method, your code should look like the following:
+     *
+     * ```php
+     * public function beforeAction($action)
+     * {
+     *     if (parent::beforeAction($action)) {
+     *         // your custom code here
+     *         return true;  // or false if needed
+     *     } else {
+     *         return false;
+     *     }
+     * }
+     * ```
+     *
+     * @param string $action the action to be executed.
+     * @return boolean whether the action should continue to run.
+     */
+    public function beforeAction($action)
+    {
+        $event = new ActionEvent($action);
+        $this->trigger(self::EVENT_BEFORE_ACTION, $event);
+        return $event->isValid;
+    }
+
+    /**
+     * This method is invoked right after an action is executed.
+     *
+     * The method will trigger the {@see \rock\base\Controller::EVENT_AFTER_ACTION} event. The return value of the method
+     * will be used as the action return value.
+     *
+     * If you override this method, your code should look like the following:
+     *
+     * ```php
+     * public function afterAction($action, $result)
+     * {
+     *     $result = parent::afterAction($action, $result);
+     *     // your custom code here
+     *     return $result;
+     * }
+     * ```
+     *
+     * @param string $action the action just executed.
+     * @param mixed $result the action return result.
+     * @return mixed the processed action result.
+     */
+    public function afterAction($action, $result)
+    {
+        $event = new ActionEvent($action);
+        $event->result = $result;
+        $this->trigger(self::EVENT_AFTER_ACTION, $event);
+        return $event->result;
+    }
+
+    /**
+     * Get method
+     *
+     * @param string $actionName name of method
+     * @param array  $args args action method
+     * @return mixed
+     * @throws ControllerException
+     */
+    public function method($actionName, array $args = null)
+    {
+        if (!method_exists($this, $actionName)) {
+            $this->detachBehaviors();
+            throw new ControllerException(ControllerException::CRITICAL, ControllerException::UNKNOWN_METHOD, [
+                'method' => get_class($this) . '::' . $actionName
+            ]);
+        }
+        if ($this->beforeAction($actionName) === false) {
+            return null;
+        }
+        $result = call_user_func_array([$this, $actionName], [$args]);
+
+        if ($this->afterAction($actionName, $result) === false) {
+            return null;
+        }
+
+        return $result;
     }
 
     public static function findUrlById($resource)

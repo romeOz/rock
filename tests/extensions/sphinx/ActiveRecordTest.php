@@ -476,9 +476,9 @@ class ActiveRecordTest extends SphinxTestCase
     }
 
 
-    public function testSmartAccessAndEvent()
+    public function testFindCheckAccessFail()
     {
-        // fail
+
         $query = ArticleIndex::find()
             ->checkAccess(
                 [
@@ -498,68 +498,16 @@ class ActiveRecordTest extends SphinxTestCase
                     }
                 ]
             )
-            ->on(
-                ActiveQuery::EVENT_BEFORE_FIND,
-                function () {
-                    echo 'before';
-                }
-            )
-            ->on(
-                ActiveQuery::EVENT_AFTER_FIND,
-                function () {
-                    echo 'after';
-                },
-                Event::AFTER
-            )
             ->where(['id' => 1]);
         $this->assertEmpty($query->one());
         $this->assertEmpty(Event::getAll());
         $this->assertEmpty($query->all());
         $this->assertEmpty(Event::getAll());
+        $this->expectOutputString('failfail');
+    }
 
-        // insert
-        $runtime = new RuntimeIndex();
-        $runtime  ->checkAccess(
-            [
-                'allow' => true,
-                'verbs' => ['POST'],
-            ],
-            [
-                function (Access $access) {
-                    $this->assertTrue($access->owner instanceof RuntimeIndex);
-                    echo 'success';
-                }
-            ],
-            [
-                function (Access $access) {
-                    $this->assertTrue($access->owner instanceof RuntimeIndex);
-                    echo 'fail';
-                }
-            ]
-        )
-            ->on(
-                ActiveRecord::EVENT_BEFORE_INSERT,
-                function () {
-                    echo 'before';
-                }
-            )
-            ->on(
-                ActiveRecord::EVENT_AFTER_INSERT,
-                function () {
-                    echo 'after';
-                },
-                Event::AFTER
-            );
-        $runtime->id = 15;
-        $runtime->title = 'test title';
-        $runtime->content = 'test content';
-        $runtime->type_id = 7;
-        $runtime->category = [1, 2];
-        $this->assertFalse($runtime->save());
-        $this->assertEmpty(Event::getAll());
-
-
-        // Success
+    public function testFindCheckAccessSuccess()
+    {
         $query = ArticleIndex::find()
             ->checkAccess(
                 [
@@ -579,27 +527,51 @@ class ActiveRecordTest extends SphinxTestCase
                     }
                 ]
             )
-            ->on(
-                ActiveQuery::EVENT_BEFORE_FIND,
-                function () {
-                    echo 'before';
-                }
-            )
-            ->on(
-                ActiveQuery::EVENT_AFTER_FIND,
-                function () {
-                    echo 'after';
-                },
-                Event::AFTER
-            )
             ->where(['id' => 1])
             ->with('category');
         $this->assertNotEmpty($query->one());
         $this->assertEmpty(Event::getAll());
         $this->assertNotEmpty($query->all());
         $this->assertEmpty(Event::getAll());
+        $this->expectOutputString('successsuccess');
+    }
 
+
+    public function testInsertCheckAccessFail()
+    {
         // insert
+        $runtime = new RuntimeIndex();
+        $runtime  ->checkAccess(
+            [
+                'allow' => true,
+                'verbs' => ['POST'],
+            ],
+            [
+                function (Access $access) {
+                    $this->assertTrue($access->owner instanceof RuntimeIndex);
+                    echo 'success';
+                }
+            ],
+            [
+                function (Access $access) {
+                    $this->assertTrue($access->owner instanceof RuntimeIndex);
+                    echo 'fail';
+                }
+            ]
+        );
+        $runtime->id = 15;
+        $runtime->title = 'test title';
+        $runtime->content = 'test content';
+        $runtime->type_id = 7;
+        $runtime->category = [1, 2];
+        $this->assertFalse($runtime->save());
+        $this->assertEmpty(Event::getAll());
+
+       $this->expectOutputString('fail');
+    }
+
+    public function testInsertCheckAccessSuccess()
+    {
         $runtime = new RuntimeIndex();
         $runtime  ->checkAccess(
             [
@@ -618,20 +590,7 @@ class ActiveRecordTest extends SphinxTestCase
                     echo 'fail';
                 }
             ]
-        )
-            ->on(
-                ActiveRecord::EVENT_BEFORE_INSERT,
-                function () {
-                    echo 'before';
-                }
-            )
-            ->on(
-                ActiveRecord::EVENT_AFTER_INSERT,
-                function () {
-                    echo 'after';
-                },
-                Event::AFTER
-            );
+        );
         $runtime->id = 15;
         $runtime->title = 'test title';
         $runtime->content = 'test content';
@@ -639,9 +598,8 @@ class ActiveRecordTest extends SphinxTestCase
         $runtime->category = [1, 2];
         $this->assertTrue($runtime->save());
         $this->assertEmpty(Event::getAll());
-        $this->expectOutputString('failfailfailsuccessbeforeaftersuccesssuccessbeforeafter');
+        $this->expectOutputString('success');
     }
-
 
     public function testInsertWithRule()
     {
@@ -680,7 +638,7 @@ class ActiveRecordTest extends SphinxTestCase
         $runtime->type_id = 'test';
         $runtime->category = [1, 2];
         $this->assertFalse($runtime->save());
-        $this->assertEmpty($runtime->getErrors());
+        $this->assertNotEmpty($runtime->getErrors());
 
         // success
         $runtime = new RuntimeRulesIndex();
@@ -690,7 +648,6 @@ class ActiveRecordTest extends SphinxTestCase
         $runtime->type_id = 7;
         $runtime->category = [1, 2];
         $this->assertTrue($runtime->save());
-        $this->expectOutputString('fail');
     }
 
     /**

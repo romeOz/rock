@@ -7,15 +7,15 @@ use rock\db\ActiveQueryInterface;
 
 interface ComponentsInterface extends ObjectInterface
 {
-    /**
-     * Get method
-     *
-     * @param string $name - name of method
-     * @param array  $args - args action method
-     * @return mixed
-     * @throws \rock\exception\Exception
-     */
-    public function method($name, array $args = null);
+//    /**
+//     * Get method
+//     *
+//     * @param string $name name of method
+//     * @param array  $args args action method
+//     * @return mixed
+//     * @throws \rock\exception\Exception
+//     */
+//    public function method($name, array $args = null);
 
     /**
      * Get data behaviors
@@ -27,7 +27,7 @@ interface ComponentsInterface extends ObjectInterface
     /**
      * Subscribing in event
      *
-     * @param string $name - name of event
+     * @param string $name name of event
      * @return static|ActiveQueryInterface
      */
     public function trigger($name);
@@ -35,16 +35,18 @@ interface ComponentsInterface extends ObjectInterface
     /**
      * Publishing event
      *
-     * @param string $name    - name of event
-     * @param array|\Closure  $handler - handler
+     * @param string         $name    name of event
+     * @param array|\Closure $handler handler
+     * @param null           $args
+     * @param bool           $append
      * @return static|ActiveQueryInterface
      */
-    public function on($name, $handler);
+    public function on($name, $handler, $args = null, $append = true);
 
     /**
      * Detach event
      *
-     * @param $name - name of event
+     * @param string $name name of event
      * @return static|ActiveQueryInterface
      */
     public function off($name);
@@ -61,14 +63,16 @@ interface ComponentsInterface extends ObjectInterface
 
     /**
      * Returns the named behavior object.
+     *
      * @param string $name the behavior name
      * @return Behavior the behavior object, or null if the behavior does not exist
      */
     public function getBehavior($name);
 
-    public function hasBehavior($name);
+    public function existsBehavior($name);
     /**
      * Returns all behaviors attached to this component.
+     *
      * @return Behavior[] list of behaviors attached to this component
      */
     public function getBehaviors();
@@ -76,6 +80,7 @@ interface ComponentsInterface extends ObjectInterface
 
     /**
      * Attaches a behavior to this component.
+     *
      * This method will create the behavior object based on the given
      * configuration. After that, the behavior object will be attached to
      * this component by calling the [[Behavior::attach()]] method.
@@ -93,6 +98,7 @@ interface ComponentsInterface extends ObjectInterface
 
     /**
      * Attaches a list of behaviors to the component.
+     *
      * Each behavior is indexed by its name and should be a [[Behavior]] object,
      * a string specifying the behavior class, or an configuration array for creating the behavior.
      * @param array $behaviors list of behaviors to be attached to the component
@@ -108,6 +114,7 @@ interface ComponentsInterface extends ObjectInterface
 
     /**
      * Detaches a behavior from the component.
+     *
      * The behavior's [[Behavior::detach()]] method will be invoked.
      * @param string $name the behavior's name.
      * @return Behavior the detached behavior. Null if the behavior does not exist.

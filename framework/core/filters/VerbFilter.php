@@ -2,7 +2,11 @@
 
 namespace rock\filters;
 
+use rock\base\ActionFilter;
+use rock\base\Controller;
+use rock\db\BaseActiveRecord;
 use rock\Rock;
+use rock\template\Template;
 
 /**
  * VerbFilter is an action filter that filters by HTTP request methods.
@@ -48,25 +52,39 @@ class VerbFilter extends ActionFilter
      *
      * For example,
      *
-     * ~~~
+     * ```php
      * [
      *   'actionCreate' => [Request::GET, Request::POST],
      *   'actionUpdate' => [Request::GET, Request::PUT, Request::POST],
      *   'actionDelete' => [Request::POST, Request::DELETE],
      *   '*' => [Request::GET],
      * ]
-     * ~~~
+     * ```
      */
     public $actions = [];
     public $throwException = false;
 
+    public function events()
+    {
+        return [
+            Controller::EVENT_BEFORE_ACTION => 'beforeFilter',
+            Controller::EVENT_AFTER_ACTION => 'afterFilter',
+            Template::EVENT_BEFORE_TEMPLATE => 'beforeFilter',
+            Template::EVENT_AFTER_TEMPLATE => 'afterFilter',
+            BaseActiveRecord::EVENT_BEFORE_INSERT => 'beforeFilter',
+            BaseActiveRecord::EVENT_AFTER_INSERT => 'afterFilter',
+            BaseActiveRecord::EVENT_BEFORE_UPDATE => 'beforeFilter',
+            BaseActiveRecord::EVENT_AFTER_UPDATE => 'afterFilter',
+            BaseActiveRecord::EVENT_BEFORE_FIND => 'beforeFilter',
+            BaseActiveRecord::EVENT_AFTER_FIND => 'afterFilter',
+        ];
+    }
 
     /**
      * {@inheritdoc}
      */
-    public function before($action = null)
+    public function beforeAction($action)
     {
-
         if (empty($this->actions) || empty($action)) {
             return true;
         }

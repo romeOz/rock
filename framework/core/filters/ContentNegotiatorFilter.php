@@ -1,6 +1,7 @@
 <?php
 namespace rock\filters;
 
+use rock\base\ActionFilter;
 use rock\request\Request;
 use rock\response\Response;
 use rock\Rock;
@@ -108,14 +109,13 @@ class ContentNegotiatorFilter extends ActionFilter
     /**
      * {@inheritdoc}
      */
-    public function before($action = null)
+    public function beforeAction($action)
     {
-        if (!$this->validateActions($action)) {
-
-            return parent::before();
-        }
+//        if (!$this->isActive($action)) {
+//            return parent::beforeAction($action);
+//        }
         $this->negotiate();
-        return parent::before();
+        return true;
     }
 
     /**

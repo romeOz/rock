@@ -4,9 +4,6 @@ namespace rock\base;
 use rock\event\Event;
 use rock\exception\Exception;
 use rock\filters\AccessFilter;
-use rock\filters\ActionFilter;
-use rock\filters\EventFilter;
-use rock\helpers\Helper;
 use rock\Rock;
 
 trait ComponentsTrait
@@ -16,36 +13,8 @@ trait ComponentsTrait
     /** @var Behavior[]  */
     protected $_behaviors;
 
-    protected static $_events = [];
+    private $_events = [];
 
-
-    /**
-     * Get method
-     *
-     * @param string $actionName name of method
-     * @param array  $args args action method
-     * @return mixed
-     * @throws Exception
-     */
-    public function method($actionName, array $args = null)
-    {
-        if (!method_exists($this, $actionName)) {
-            $this->detachBehaviors();
-            throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, [
-                'method' => get_class($this) . '::' . $actionName
-            ]);
-        }
-        if ($this->before($actionName) === false) {
-            return null;
-        }
-        $result = call_user_func_array([$this, $actionName], [$args]);
-
-        if ($this->after($actionName, $result) === false) {
-            return null;
-        }
-
-        return $result;
-    }
 
     /**
      * Get data behaviors
@@ -57,54 +26,73 @@ trait ComponentsTrait
         return [];
     }
 
-    /**
-     * Subscribing in event
-     *
-     * @param string            $name name of event
-     * @param string            $when
-     * @param Event $event
-     * @return static
-     */
-    public function trigger($name, $when = Event::BEFORE, Event $event = null)
+    public function on($name, $handler, $args = null, $append = true)
     {
-        $data = ['class' => EventFilter::className(), 'when' => $when, 'trigger' => $name];
-        $hash = Helper::hash($data, Helper::SERIALIZE_JSON);
-        $data['event'] = $event;
-        if (!isset($event)) {
-            $data['event'] = new Event();
+        $this->ensureBehaviors();
+        if ($append || empty($this->_events[$name])) {
+            $this->_events[$name][] = [$handler, $args];
+        } else {
+            array_unshift($this->_events[$name], [$handler, $args]);
         }
-        $this->_attachBehaviorInternal($hash, $data);
         return $this;
     }
 
     /**
-     * Publishing event
-     *
-     * @param string         $name    name of event
-     * @param array|\Closure $handler handler
-     * @param string     $when
-     * @return static
+     * Detaches an existing event handler from this component.
+     * This method is the opposite of [[on()]].
+     * @param string $name event name
+     * @param callable $handler the event handler to be removed.
+     * If it is null, all handlers attached to the named event will be removed.
+     * @return boolean if a handler is found and detached
+     * @see on()
      */
-    public function on($name, $handler, $when = Event::BEFORE)
+    public function off($name, $handler = null)
     {
-        $data = ['class' => EventFilter::className(), 'when' => $when, 'on' => [$name => [$handler instanceof \Closure ? [$handler] : $handler]]];
-        $this->_attachBehaviorInternal(Helper::hash($data, Helper::SERIALIZE_JSON), $data);
-        self::$_events[] = [$this::className(), $name];
-        return $this;
+        $this->ensureBehaviors();
+        if (empty($this->_events[$name])) {
+            return false;
+        }
+        if ($handler === null) {
+            unset($this->_events[$name]);
+            return true;
+        } else {
+            $removed = false;
+            foreach ($this->_events[$name] as $i => $event) {
+                if ($event[0] === $handler) {
+                    unset($this->_events[$name][$i]);
+                    $removed = true;
+                }
+            }
+            if ($removed) {
+                $this->_events[$name] = array_values($this->_events[$name]);
+            }
+            return $removed;
+        }
     }
 
-    /**
-     * Detach event
-     *
-     * @param string $name name of event
-     * @param string $when
-     * @return static
-     */
-    public function off($name, $when = Event::BEFORE)
+    public function trigger($name, Event $event = null)
     {
-        $data = ['class' => EventFilter::className(), 'when' => $when, 'off' => $name];
-        $this->_attachBehaviorInternal(Helper::hash($data, Helper::SERIALIZE_JSON), $data);
-        return $this;
+        $this->ensureBehaviors();
+        if (!empty($this->_events[$name])) {
+            if ($event === null) {
+                $event = new Event;
+            }
+            if ($event->owner === null) {
+                $event->owner = $this;
+            }
+            $event->handled = false;
+            $event->name = $name;
+            foreach ($this->_events[$name] as $handler) {
+                $event->data = $handler[1];
+                call_user_func($handler[0], $event);
+                // stop further handling if the event is handled
+                if ($event->handled) {
+                    return;
+                }
+            }
+        }
+        // invoke class-level attached handlers
+        Event::trigger($this, $name, $event);
     }
 
     /**
@@ -117,66 +105,49 @@ trait ComponentsTrait
      */
     public function checkAccess(array $rules, $success = null, $fail = null)
     {
-        $data = ['class' => AccessFilter::className(), 'rules' => $rules, 'success' => $success, 'fail' => $fail];
-        $this->_attachBehaviorInternal(Helper::hash($data, Helper::SERIALIZE_JSON), $data);
+        $behavior = ['class' => AccessFilter::className(), 'rules' => $rules, 'success' => $success, 'fail' => $fail];
+        $this->_attachBehaviorInternal(1, $behavior);
         return $this;
     }
 
     /**
-     * @param null $actionName
-     * @return bool
+     * Makes sure that the behaviors declared in [[behaviors()]] are attached to this component.
      */
-    public function before($actionName = null)
+    public function ensureBehaviors()
     {
-        $actionName = $this->_prepareActionName($actionName);
-        $this->ensureBehaviors();
-        /** @var  ActionFilter $behavior */
-        foreach ($this->_behaviors as $name => $behavior) {
-            if ($behavior instanceof ActionFilter) {
-                if (!$behavior->before($actionName)) {
-                    Event::offClass($this);
-                    self::$_events = [];
-                    return false;
-                }
-            } elseif ($behavior instanceof Behavior) {
-                $behavior->before();
-            }
-            if ($behavior instanceof EventFilter && $behavior->when === EventFilter::BEFORE) {
-                unset($this->_behaviors[$name]);
+        if (!isset($this->_behaviors)) {
+            $this->_behaviors = [];
+            foreach ($this->behaviors() as $name => $behavior) {
+                $this->_attachBehaviorInternal($name, $behavior);
             }
         }
-
-        return true;
     }
 
     /**
-     * @param null $actionName
-     * @param mixed $result
-     * @return bool
+     * Attaches a behavior to this component.
+     * @param string|integer $name the name of the behavior. If this is an integer, it means the behavior
+     * is an anonymous one. Otherwise, the behavior is a named one and any existing behavior with the same name
+     * will be detached first.
+     * @param string|array|Behavior $behavior the behavior to be attached
+     * @return Behavior the attached behavior.
      */
-    public function after($actionName = null, &$result = null)
+    private function _attachBehaviorInternal($name, $behavior)
     {
-        $actionName = $this->_prepareActionName($actionName);
-
-        $this->ensureBehaviors();
-        /** @var  ActionFilter $behavior */
-        foreach ($this->_behaviors as $name => $behavior) {
-            if ($behavior instanceof ActionFilter) {
-                if (!$behavior->after($result, $actionName)) {
-                    Event::offClass($this);
-                    self::$_events = [];
-                    return false;
-                }
-            } elseif ($behavior instanceof Behavior) {
-                $behavior->after($result);
-            }
-            if ($behavior instanceof EventFilter && $behavior->when === EventFilter::AFTER) {
-                unset($this->_behaviors[$name]);
-            }
+        if (!($behavior instanceof Behavior)) {
+            /** @var Behavior $behavior */
+            $behavior = Rock::factory($behavior);
         }
-        Event::offMulti(self::$_events);
-        //self::$_events = [];
-        return true;
+        if (is_int($name)) {
+            $behavior->attach($this);
+            $this->_behaviors[] = $behavior;
+        } else {
+            if (isset($this->_behaviors[$name])) {
+                $this->_behaviors[$name]->detach();
+            }
+            $behavior->attach($this);
+            $this->_behaviors[$name] = $behavior;
+        }
+        return $behavior;
     }
 
     private function _prepareActionName($method)
@@ -219,10 +190,6 @@ trait ComponentsTrait
         } elseif (strncmp($name, 'on ', 3) === 0) {
             // on event: attach event handler
             $this->on(trim(substr($name, 3)), $value);
-
-            return;
-        } elseif (strncmp($name, 'trigger ', 8) === 0) {
-            $this->trigger(trim(substr($name, 8)));
 
             return;
         } elseif (strncmp($name, 'as ', 3) === 0) {
@@ -527,7 +494,7 @@ trait ComponentsTrait
         return isset($this->_behaviors[$name]) ? $this->_behaviors[$name] : null;
     }
 
-    public function hasBehavior($name)
+    public function existsBehavior($name)
     {
         $this->ensureBehaviors();
         return !empty($this->_behaviors[$name]);
@@ -577,49 +544,8 @@ trait ComponentsTrait
     public function attachBehavior($name, $behavior)
     {
         $this->ensureBehaviors();
-
         return $this->_attachBehaviorInternal($name, $behavior);
     }
-
-    /**
-     * Makes sure that the behaviors declared in [[behaviors()]] are attached to this component.
-     */
-    public function ensureBehaviors()
-    {
-        if (!isset($this->_behaviors)) {
-            $this->_behaviors = [];
-            foreach ($this->behaviors() as $name => $behavior) {
-                $this->_attachBehaviorInternal($name, $behavior);
-            }
-        }
-    }
-
-    /**
-     * Attaches a behavior to this component.
-     *
-     * @param string                $name     the name of the behavior.
-     * @param string|array|Behavior $behavior the behavior to be attached
-     * @return Behavior the attached behavior.
-     */
-    private function _attachBehaviorInternal($name, $behavior)
-    {
-        $this->ensureBehaviors();
-        if (!($behavior instanceof Behavior)) {
-
-            /** @var Behavior $behavior */
-            $behavior = Rock::factory($behavior);
-
-        }
-        $behavior->owner = $this;
-//        if (isset(self::$_behaviors[$name])) {
-//            self::$_behaviors[$name]->detach();
-//        }
-//        $behavior->attach($this);
-        return $this->_behaviors[$name] = $behavior;
-    }
-
-
-
 
     /**
      * Detaches a behavior from the component.
@@ -633,7 +559,7 @@ trait ComponentsTrait
         if (isset($this->_behaviors[$name])) {
             $behavior = $this->_behaviors[$name];
             unset($this->_behaviors[$name]);
-            //$behavior->detach();
+            $behavior->detach();
 
             return $behavior;
         } else {

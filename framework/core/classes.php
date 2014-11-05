@@ -406,9 +406,6 @@ return array_merge(
         \rock\filters\AccessFilter::className() => [
             'class' => \rock\filters\AccessFilter::className(),
         ],
-        \rock\filters\EventFilter::className() => [
-            'class' => \rock\filters\EventFilter::className(),
-        ],
         'rbac' =>[
             'class' => \rock\rbac\DBManager::className(),
         ],

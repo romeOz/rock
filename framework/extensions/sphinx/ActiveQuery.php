@@ -215,12 +215,8 @@ class ActiveQuery extends Query implements ActiveQueryInterface
                 $model = $models[0];
             }
             list ($model) = $this->fillUpSnippets([$model]);
-            if (!$this->afterFind($model)) {
-                return null;
-            }
-            if (!$activeRecord->afterFind($model)) {
-                return null;
-            }
+            $this->afterFind($model);
+            $activeRecord->afterFind($model);
             return $model;
         } else {
             return null;

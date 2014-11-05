@@ -2,7 +2,7 @@
 namespace rock\db;
 
 use rock\base\Model;
-use rock\event\Event;
+use rock\base\ModelEvent;
 use rock\helpers\ArrayHelper;
 
 /**
@@ -190,7 +190,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * (because another user has modified the data), a {@see \rock\db\Exception} exception will be thrown,
      * and the update or deletion is skipped.
      *
-     * Optimistic locking is only supported by {@see BaseActiveRecord::update()} and {@see BaseActiveRecord::delete()}.
+     * Optimistic locking is only supported by {@see \rock\db\BaseActiveRecord::update()} and {@see BaseActiveRecord::delete()}.
      *
      * To use Optimistic locking:
      *
@@ -499,7 +499,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
 
     /**
      * Marks an attribute dirty.
-     * This method may be called to force updating a record when calling {@see BaseActiveRecord::update()},
+     * This method may be called to force updating a record when calling {@see \rock\db\BaseActiveRecord::update()},
      * even if there is no change being made to the record.
      * @param string $name the attribute name
      */
@@ -554,7 +554,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
     /**
      * Saves the current record.
      *
-     * This method will call {@see \rock\db\ActiveRecordInterface::insert()} when {@see BaseActiveRecord::$isNewRecord} is true, or {@see BaseActiveRecord::update()}
+     * This method will call {@see \rock\db\ActiveRecordInterface::insert()} when {@see BaseActiveRecord::$isNewRecord} is true, or {@see \rock\db\BaseActiveRecord::update()}
      * when {@see BaseActiveRecord::$isNewRecord} is false.
      *
      * For example, to save a customer record:
@@ -643,7 +643,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
     /**
      * Updates the specified attributes.
      *
-     * This method is a shortcut to {@see BaseActiveRecord::update()} when data validation is not needed
+     * This method is a shortcut to {@see \rock\db\BaseActiveRecord::update()} when data validation is not needed
      * and only a small set attributes need to be updated.
      *
      * You may specify the attributes to be updated as name list or name-value pairs.
@@ -723,7 +723,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
 
     /**
      * Updates one or several counter columns for the current AR object.
-     * Note that this method differs from {@see BaseActiveRecord::updateAllCounters()} in that it only
+     * Note that this method differs from {@see \rock\db\BaseActiveRecord::updateAllCounters()} in that it only
      * saves counters for the current AR object.
      *
      * An example usage is as follows:
@@ -835,27 +835,26 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      */
     public function beforeFind()
     {
-        if ($this->trigger(self::EVENT_BEFORE_FIND)->before() === false) {
-            return false;
-        }
-
-        return true;
-
+        $event = new ModelEvent;
+        $this->trigger(self::EVENT_BEFORE_FIND, $event);
+        return $event->isValid;
     }
 
     /**
      * This method is called when the AR object is created and populated with the query result.
-     * 
+     *
      * The default implementation will trigger an {@see BaseActiveRecord::EVENT_AFTER_FIND} event.
      * When overriding this method, make sure you call the parent implementation to ensure the
      * event is triggered.
+     *
+     * @param mixed $result the query result.
      */
     public function afterFind(&$result = null)
     {
-        if ($this->trigger(self::EVENT_AFTER_FIND, Event::AFTER)->after(null, $result) === false) {
-            return false;
-        }
-        return true;
+        $event = new AfterFindEvent();
+        $event->result = $result;
+        $this->trigger(self::EVENT_AFTER_FIND, $event);
+        $result = $event->result;
     }
 
     /**
@@ -884,14 +883,9 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      */
     public function beforeSave($insert)
     {
-        if ($insert) {
-            $eventBefore = self::EVENT_BEFORE_INSERT;
-            //$eventAfter =  self::EVENT_AFTER_INSERT;
-        } else {
-            $eventBefore = self::EVENT_BEFORE_UPDATE;
-            //$eventAfter =  self::EVENT_AFTER_UPDATE;
-        }
-        return $this->trigger($eventBefore)->before();
+        $event = new ModelEvent;
+        $this->trigger($insert ? self::EVENT_BEFORE_INSERT : self::EVENT_BEFORE_UPDATE, $event);
+        return $event->isValid;
     }
 
     /**
@@ -911,18 +905,10 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      */
     public function afterSave($insert, $changedAttributes)
     {
-        if ($insert) {
-            //$eventBefore = self::EVENT_BEFORE_INSERT;
-            $eventAfter =  self::EVENT_AFTER_INSERT;
-        } else {
-            //$eventBefore = self::EVENT_BEFORE_UPDATE;
-            $eventAfter =  self::EVENT_AFTER_UPDATE;
-        }
         $event = new AfterSaveEvent([
             'changedAttributes' => $changedAttributes
         ]);
-        $this->trigger($eventAfter, Event::AFTER, $event)->after();
-        //Event::offMulti([$eventAfter, $eventBefore]);
+        $this->trigger($insert ? self::EVENT_AFTER_INSERT : self::EVENT_AFTER_UPDATE, $event);
     }
 
     /**
@@ -947,12 +933,9 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      */
     public function beforeDelete()
     {
-        if ($this->trigger(self::EVENT_BEFORE_DELETE)->before() === false) {
-            //Event::offMulti([self::EVENT_AFTER_DELETE, self::EVENT_BEFORE_DELETE]);
-            return false;
-        }
-
-        return true;
+        $event = new ModelEvent;
+        $this->trigger(self::EVENT_BEFORE_DELETE, $event);
+        return $event->isValid;
     }
 
     /**
@@ -964,8 +947,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      */
     public function afterDelete()
     {
-        $this->trigger(self::EVENT_AFTER_DELETE, Event::AFTER)->after();
-        //Event::offMulti([self::EVENT_AFTER_DELETE, self::EVENT_BEFORE_DELETE]);
+        $this->trigger(self::EVENT_AFTER_DELETE);
     }
 
     /**
