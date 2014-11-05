@@ -5,6 +5,7 @@ namespace rock\mq;
 
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
+use rock\base\ModelEvent;
 use rock\event\Event;
 
 class Queue implements ComponentsInterface
@@ -46,7 +47,9 @@ class Queue implements ComponentsInterface
      */
     public function beforeSend()
     {
-        return $this->trigger(self::EVENT_BEFORE_SEND)->before();
+        $event = new ModelEvent();
+        $this->trigger(self::EVENT_BEFORE_SEND, $event);
+        return $event->isValid;
     }
 
     /**
@@ -54,7 +57,10 @@ class Queue implements ComponentsInterface
      */
     public function afterSend(&$result = null)
     {
-        $this->trigger(self::EVENT_AFTER_SEND, Event::AFTER)->after(null, $result);
+        $event = new ModelEvent();
+        $event->result = $result;
+        $this->trigger(self::EVENT_AFTER_SEND, $event);
+        $result = $event->result;
     }
 
     /**
