@@ -5,7 +5,6 @@ namespace rock\sphinx;
 use rock\db\ActiveQueryInterface;
 use rock\db\ActiveQueryTrait;
 use rock\db\ActiveRelationTrait;
-use rock\event\Event;
 
 /**
  * ActiveQuery represents a Sphinx query associated with an Active Record class.
@@ -161,7 +160,6 @@ class ActiveQuery extends Query implements ActiveQueryInterface
                 foreach ($models as $model) {
                     $model->afterFind();
                 }
-                Event::offMulti(static::$_events);
             } else {
                 $this->afterFind($models);
                 $activeRecord->afterFind($models);

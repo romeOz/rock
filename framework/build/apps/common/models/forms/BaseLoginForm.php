@@ -5,7 +5,7 @@ namespace apps\common\models\forms;
 
 use apps\common\models\users\BaseUsers;
 use rock\base\Model;
-use rock\event\Event;
+use rock\base\ModelEvent;
 use rock\helpers\ArrayHelper;
 use rock\Rock;
 use rock\validate\Validate;
@@ -196,19 +196,16 @@ class BaseLoginForm extends Model
 
     public function beforeLogin()
     {
-        if ($this->trigger(self::EVENT_BEFORE_LOGIN)->before() === false) {
-            return false;
-        }
-
-        return true;
+        $event = new ModelEvent();
+        $this->trigger(self::EVENT_BEFORE_LOGIN, $event);
+        return $event->isValid;
     }
 
     public function afterLogin($result)
     {
-        if ($this->trigger(self::EVENT_AFTER_LOGIN, Event::AFTER)->after(null, $result) === false) {
-            return false;
-        }
-        return true;
+        $event = new ModelEvent();
+        $event->result = $result;
+        $this->trigger(self::EVENT_AFTER_LOGIN, $event);
     }
 
 

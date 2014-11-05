@@ -4,6 +4,7 @@ namespace apps\common\models\forms;
 
 use apps\common\models\users\BaseUsers;
 use rock\base\Model;
+use rock\base\ModelEvent;
 use rock\db\Connection;
 use rock\event\Event;
 use rock\exception\ErrorHandler;
@@ -77,27 +78,6 @@ class BaseSignupForm extends Model
         ];
     }
 
-    protected function validateExistsUser()
-    {
-        if ($this->hasErrors()) {
-            return true;
-        }
-        if (BaseUsers::existsByUsernameOrEmail($this->email, $this->username, null)) {
-            $this->addErrorAsPlaceholder(Rock::t('existsUsernameOrEmail'), 'e_signup');
-            return false;
-        }
-        return true;
-    }
-
-    protected function validateCSRF($input)
-    {
-        $v = Validate::required()->csrf()->placeholders(['name' => 'CSRF-token']);
-        if (!$v->validate($input)) {
-            $this->addErrorAsPlaceholder($v->getFirstError(), 'e_signup');
-            return false;
-        }
-        return true;
-    }
 
     public function safeAttributes()
     {
@@ -228,12 +208,9 @@ class BaseSignupForm extends Model
 
     public function beforeSignup()
     {
-        if ($this->trigger(self::EVENT_BEFORE_SIGNUP)->before() === false) {
-            //Event::offMulti([self::EVENT_AFTER_SIGNUP, self::EVENT_BEFORE_SIGNUP]);
-            return false;
-        }
-
-        return true;
+        $event = new ModelEvent();
+        $this->trigger(self::EVENT_BEFORE_SIGNUP, $event);
+        return $event->isValid;
     }
 
     public function afterSignup()
@@ -246,10 +223,33 @@ class BaseSignupForm extends Model
         $this->users->id = $this->users->primaryKey;
         $this->isSignup = true;
         $result = $users->toArray();
-        if ($this->trigger(self::EVENT_AFTER_SIGNUP, Event::AFTER)->after(null, $result) === false) {
+
+        $event = new ModelEvent();
+        $event->result = $result;
+        $this->trigger(self::EVENT_AFTER_SIGNUP, $event);
+
+        return true;
+    }
+
+    protected function validateExistsUser()
+    {
+        if ($this->hasErrors()) {
+            return true;
+        }
+        if (BaseUsers::existsByUsernameOrEmail($this->email, $this->username, null)) {
+            $this->addErrorAsPlaceholder(Rock::t('existsUsernameOrEmail'), 'e_signup');
             return false;
         }
+        return true;
+    }
 
+    protected function validateCSRF($input)
+    {
+        $v = Validate::required()->csrf()->placeholders(['name' => 'CSRF-token']);
+        if (!$v->validate($input)) {
+            $this->addErrorAsPlaceholder($v->getFirstError(), 'e_signup');
+            return false;
+        }
         return true;
     }
 } 
