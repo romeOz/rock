@@ -161,6 +161,22 @@ class BaseException extends \Exception implements ExceptionInterface
         ];
     }
 
+    public static function getTracesByException(\Exception $exception)
+    {
+        $trace           = $exception->getTrace();
+        $traceAsString = $exception->getTraceAsString();
+        $file            = $exception->getFile();
+        $line            = $exception->getLine();
+        $trace = current($trace);
+        return [
+            'class' => $trace['class'],
+            'method' => $trace['function'],
+            'file' => $file,
+            'line' => $line,
+            'stack' => str_replace("\n", ' ; ', $traceAsString)
+        ];
+    }
+
     public static function replace($message, array $traces, $asStack = DEBUG)
     {
         if ($asStack === true) {
@@ -174,22 +190,18 @@ class BaseException extends \Exception implements ExceptionInterface
     /**
      * Get traces by Exception handler.
      *
-     * @param \Exception $handler
+     * @param \Exception $exception
      * @return array
      */
-    protected function getTracesInternal($handler)
+    protected function getTracesInternal($exception)
     {
+        if ($exception instanceof \Exception) {
+            return static::getTracesByException($exception);
+        }
         $trace           = $this->getTrace();
         $traceAsString  = $this->getTraceAsString();
         $file            = $this->getFile();
         $line            = $this->getLine();
-        if ($handler instanceof \Exception) {
-            $trace           = $handler->getTrace();
-            $traceAsString = $handler->getTraceAsString();
-            $file            = $handler->getFile();
-            $line            = $handler->getLine();
-
-        }
         $trace = current($trace);
         return [
             'class' => $trace['class'],
@@ -228,5 +240,29 @@ class BaseException extends \Exception implements ExceptionInterface
             return;
         }
         static::displayFatal();
+    }
+
+    /**
+     * Converts an exception into a PHP error.
+     *
+     * This method can be used to convert exceptions inside of methods like `__toString()`
+     * to PHP errors because exceptions cannot be thrown inside of them.
+     *
+     * @param \Exception $exception the exception to convert to a PHP error.
+     */
+    public static function convertExceptionToError($exception)
+    {
+        trigger_error(static::convertExceptionToString($exception), E_USER_ERROR);
+    }
+
+    /**
+     * Converts an exception into a simple string.
+     *
+     * @param \Exception $exception the exception being converted
+     * @return string the string representation of the exception.
+    */
+    public static function convertExceptionToString(\Exception $exception)
+    {
+        return static::replace($exception->getMessage(), static::getTracesByException($exception), static::$asStack);
     }
 }

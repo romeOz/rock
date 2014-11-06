@@ -10,7 +10,7 @@ use rock\authclient\services\Vkontakte;
 use rock\authclient\storages\Session;
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
-use rock\exception\ErrorHandler;
+use rock\exception\BaseException;
 use rock\helpers\Json;
 use rock\helpers\JsonException;
 use rock\request\Request;
@@ -93,7 +93,7 @@ class VK implements ComponentsInterface, ClientInterface
         try {
             return array_merge(Json::decode($this->service->request($this->apiUrl)), ['extra' => $extraAttributes]);
         } catch (JsonException $e) {
-            Rock::error(ErrorHandler::convertExceptionToString($e));
+            Rock::error($e->getMessage(), [], BaseException::getTracesByException($e));
         }
 
         return [];

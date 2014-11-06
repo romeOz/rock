@@ -4,6 +4,7 @@ namespace rock\session;
 
 use rock\db\Connection;
 use rock\db\Query;
+use rock\exception\BaseException;
 use rock\exception\ErrorHandler;
 use rock\Rock;
 
@@ -178,7 +179,7 @@ class DbSession extends Session
                     ->execute();
             }
         } catch (\Exception $e) {
-            Rock::info(ErrorHandler::convertExceptionToString($e));
+            Rock::info($e->getMessage(), [], BaseException::getTracesByException($e));
             return false;
         }
 

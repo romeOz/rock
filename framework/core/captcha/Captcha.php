@@ -156,6 +156,9 @@ class Captcha implements ComponentsInterface, CaptchaInterface
 
     /**
      * Generate captcha.
+     *
+     * @param bool $session
+     * @return array
      */
     protected function generate($session = true)
     {

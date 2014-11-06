@@ -6,6 +6,7 @@ use rock\base\ComponentsTrait;
 use rock\base\Model;
 use rock\base\Widget;
 use rock\cache\CacheInterface;
+use rock\exception\BaseException;
 use rock\exception\ErrorHandler;
 use rock\filters\RateLimiter;
 use rock\helpers\Html;
@@ -193,7 +194,7 @@ class ActiveField
         try {
             return $this->render();
         } catch (\Exception $e) {
-            Rock::error(ErrorHandler::convertExceptionToString($e));
+            Rock::error($e->getMessage(), [], BaseException::getTracesByException($e));
 
             //ErrorHandler::convertExceptionToError($e);
             return '';

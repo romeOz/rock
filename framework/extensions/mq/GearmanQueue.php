@@ -90,7 +90,7 @@ class GearmanQueue extends Queue implements QueueInterface
             }
         }
 
-        Rock::error(__METHOD__ .': The receive timed out.');
+        Rock::error('The receive timed out.');
         return null;
     }
 

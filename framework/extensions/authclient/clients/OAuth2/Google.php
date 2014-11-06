@@ -9,7 +9,7 @@ use rock\authclient\ClientInterface;
 use rock\authclient\storages\Session;
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
-use rock\exception\ErrorHandler;
+use rock\exception\BaseException;
 use rock\helpers\Json;
 use rock\helpers\JsonException;
 use rock\request\Request;
@@ -90,7 +90,7 @@ class Google implements ComponentsInterface, ClientInterface
         try {
             return Json::decode($this->service->request($this->apiUrl));
         } catch (JsonException $e) {
-            Rock::error(ErrorHandler::convertExceptionToString($e));
+            Rock::error($e->getMessage(), [], BaseException::getTracesByException($e));
         }
 
         return [];

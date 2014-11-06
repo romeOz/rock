@@ -67,7 +67,7 @@ class ZeroQueue extends Queue implements QueueInterface
             sleep($this->timeout);
         }
 
-        Rock::error(__METHOD__ .': The receive timed out.');
+        Rock::error('The receive timed out.');
         return null;
     }
 
@@ -141,7 +141,7 @@ class ZeroQueue extends Queue implements QueueInterface
             sleep($this->timeout);
         }
 
-        Rock::error(__METHOD__ .': The receive timed out.');
+        Rock::error('The receive timed out.');
         return null;
     }
 
