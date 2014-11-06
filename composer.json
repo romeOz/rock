@@ -30,7 +30,7 @@
         "cebe/markdown": "*@dev"
     },
     "require-dev": {
-        "phpunit/phpunit": "4.2.*",
+        "phpunit/phpunit": "4.3.*",
         "videlalvaro/php-amqplib": "2.2.*",
         "lusitanian/oauth": "*",
         "mibe/feedwriter": "*",
