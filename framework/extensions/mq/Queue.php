@@ -5,8 +5,6 @@ namespace rock\mq;
 
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
-use rock\base\ModelEvent;
-use rock\event\Event;
 
 class Queue implements ComponentsInterface
 {
