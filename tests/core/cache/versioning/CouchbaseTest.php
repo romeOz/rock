@@ -4,7 +4,6 @@ namespace rockunit\core\cache\versioning;
 use rock\cache\versioning\Couchbase;
 use rockunit\core\cache\CommonTraitTest;
 use rock\cache\CacheInterface;
-use rock\cache\CacheException;
 
 /**
  * @group couchbase
@@ -38,7 +37,7 @@ class CouchbaseTest extends CommonTraitTest
 
     /**
      * @dataProvider providerCache
-     * @expectedException CacheException
+     * @expectedException \rock\cache\CacheException
      */
     public function testGetAll(CacheInterface $cache)
     {
@@ -92,7 +91,7 @@ class CouchbaseTest extends CommonTraitTest
 
     /**
      * @dataProvider providerCache
-     * @expectedException CacheException
+     * @expectedException \rock\cache\CacheException
      */
     public function testGetAllKeys(CacheInterface $cache)
     {

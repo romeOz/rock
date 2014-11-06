@@ -2,10 +2,7 @@
 
 namespace rockunit\core\cache;
 
-
-
 use rock\cache\CacheInterface;
-use rock\cache\CacheException;
 use rock\cache\Redis;
 
 /**
@@ -39,7 +36,7 @@ class RedisTest extends CommonTraitTest
 
     /**
      * @dataProvider providerCache
-     * @expectedException CacheException
+     * @expectedException \rock\cache\CacheException
      */
     public function testGetAll(CacheInterface $cache)
     {

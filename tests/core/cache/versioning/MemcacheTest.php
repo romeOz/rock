@@ -2,7 +2,6 @@
 namespace rockunit\core\cache\versioning;
 
 use rock\cache\CacheInterface;
-use rock\cache\CacheException;
 use rock\cache\versioning\Memcache;
 use rockunit\core\cache\CommonTraitTest;
 
@@ -37,7 +36,7 @@ class MemcacheTest extends CommonTraitTest
 
     /**
      * @dataProvider providerCache
-     * @expectedException CacheException
+     * @expectedException \rock\cache\CacheException
      */
     public function testGetAll(CacheInterface $cache)
     {
@@ -76,7 +75,6 @@ class MemcacheTest extends CommonTraitTest
         $this->assertInternalType('string', $cache->getTag('foo'), 'var should be type string');
     }
 
-
     /**
      * @dataProvider providerCache
      */
@@ -92,7 +90,7 @@ class MemcacheTest extends CommonTraitTest
 
     /**
      * @dataProvider providerCache
-     * @expectedException CacheException
+     * @expectedException \rock\cache\CacheException
      */
     public function testGetAllKeys(CacheInterface $cache)
     {
