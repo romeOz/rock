@@ -394,7 +394,7 @@ class QueryTest extends SphinxTestCase
         );
         $this->assertEmpty($query->one($connection));
         $this->assertEmpty(Event::getAll());
-        $this->expectOutputString('failfail');
+        $this->expectOutputString('fail');
     }
 
     public function testCheckAccessSuccess()

@@ -1,7 +1,6 @@
 <?php
 namespace rock\template;
 
-use rock\base\ActionEvent;
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
 use rock\base\Config;
@@ -183,13 +182,13 @@ class Template implements ComponentsInterface
         if (isset($context)) {
             $this->context = $context;
         }
-        if (!$this->beforeChunk($path)) {
+        if (!$this->before($path)) {
             return null;
         }
         list($cacheKey, $cacheExpire, $cacheTags) = $this->calculateCacheParams($placeholders);
         // Get cache
         if (($resultCache = $this->getCache($cacheKey)) !== false) {
-            if ($this->afterChunk($path, $resultCache) === false) {
+            if ($this->after($path, $resultCache) === false) {
                 return null;
             }
 
@@ -205,7 +204,7 @@ class Template implements ComponentsInterface
         $result = implode("\n", [$this->beginPage(), $this->beginBody(), $result, $this->endBody(), $this->endPage()]);
         // Set cache
         $this->setCache($cacheKey, $result, $cacheExpire, $cacheTags);
-        if ($this->afterChunk($path, $result) === false) {
+        if ($this->after($path, $result) === false) {
             return null;
         }
 
@@ -1063,17 +1062,17 @@ class Template implements ComponentsInterface
     }
 
     /**
-     * This method is invoked right before an action is executed.
+     * This method is invoked right before an chunk/snippet is executed.
      *
-     * The method will trigger the {@see \rock\base\Controller::EVENT_BEFORE_ACTION} event. The return value of the method
+     * The method will trigger the {@see \rock\base\Controller::EVENT_BEFORE_TEMPLATE} event. The return value of the method
      * will determine whether the action should continue to run.
      *
      * If you override this method, your code should look like the following:
      *
      * ```php
-     * public function beforeAction($action)
+     * public function before($namen)
      * {
-     *     if (parent::beforeAction($action)) {
+     *     if (parent::before($name)) {
      *         // your custom code here
      *         return true;  // or false if needed
      *     } else {
@@ -1082,12 +1081,13 @@ class Template implements ComponentsInterface
      * }
      * ```
      *
-     * @param string $action the action to be executed.
+     * @param string $name the path to chunk/snippet to be executed.
      * @return boolean whether the action should continue to run.
      */
-    protected function beforeChunk($action)
+    protected function before($name)
     {
-        $event = new ActionEvent($action);
+        $event = new TemplateEvent();
+        $event->name = $name;
         $this->trigger(self::EVENT_BEFORE_TEMPLATE, $event);
         return $event->isValid;
     }
@@ -1101,21 +1101,22 @@ class Template implements ComponentsInterface
      * If you override this method, your code should look like the following:
      *
      * ```php
-     * public function afterAction($action, $result)
+     * public function after($name, $result)
      * {
-     *     $result = parent::afterAction($action, $result);
+     *     $result = parent::after($name, $result);
      *     // your custom code here
      *     return $result;
      * }
      * ```
      *
-     * @param string $action the action just executed.
+     * @param string $name the path to chunk/snippet just executed.
      * @param mixed $result the action return result.
      * @return mixed the processed action result.
      */
-    protected function afterChunk($action, $result)
+    protected function after($name, $result)
     {
-        $event = new ActionEvent($action);
+        $event = new TemplateEvent();
+        $event->name = $name;
         $event->result = $result;
         $this->trigger(self::EVENT_AFTER_TEMPLATE, $event);
         return $event->result;
@@ -1511,17 +1512,15 @@ class Template implements ComponentsInterface
      */
     public function getSnippet($snippet, array $params = [], $autoEscape = true)
     {
-//        if (!$this->before(__METHOD__)) {
-//            return null;
-//        }
+        if (!$this->before($snippet)) {
+            return null;
+        }
         $template = clone $this;
         $template->removeAllPlaceholders();
         $result = $template->getSnippetInternal($snippet, $params, $autoEscape);
         $this->cachePlaceholders = $template->cachePlaceholders;
-//        if (!$this->after(__METHOD__, $result)) {
-//            return null;
-//        }
 
+        $this->after($snippet, $result);
         return $result;
     }
 
