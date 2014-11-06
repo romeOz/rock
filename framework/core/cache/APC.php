@@ -2,6 +2,8 @@
 
 namespace rock\cache;
 
+use rock\Rock;
+
 class APC implements CacheInterface
 {
     use CacheTrait;
@@ -11,7 +13,7 @@ class APC implements CacheInterface
      */
     public function getStorage()
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new CacheException(CacheException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -210,8 +212,9 @@ class APC implements CacheInterface
     }
 
     /**
-     * Set lock
-     * Note: Dog-pile" ("cache miss storm") and "race condition" effects
+     * Set lock.
+     *
+     * > Dog-pile" ("cache miss storm") and "race condition" effects.
      *
      * @param string $key
      * @param mixed  $value
@@ -224,8 +227,7 @@ class APC implements CacheInterface
         while (!apc_add(self::LOCK_PREFIX . $key, $value, 5)) {
             $iteration++;
             if ($iteration > $max) {
-                new Exception(Exception::ERROR, Exception::INVALID_SAVE, ['key' => $key]);
-
+                Rock::error(CacheException::INVALID_SAVE, ['key' => $key]);
                 return false;
             }
             usleep(1000);

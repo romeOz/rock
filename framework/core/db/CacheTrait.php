@@ -24,16 +24,6 @@ trait CacheTrait
         $this->enableCache = true;
         $this->cacheExpire = $expire;
         $this->cacheTags = $tags;
-//        $connection = clone $this->getConnection();
-//        //$connection = $this->getConnection();
-//        $connection->enableQueryCache = true;
-//
-//        if ($expire !== null) {
-//            $connection->queryCacheExpire = $expire;
-//        }
-//        $connection->queryCacheTags = $tags;
-//        $this->setConnection($connection);
-
         return $this;
     }
 
@@ -44,11 +34,6 @@ trait CacheTrait
     {
         $this->enableCache = false;
         $this->cacheExpire = $this->cacheTags = null;
-//        $connection = clone $this->getConnection();
-//        //$connection = $this->getConnection();
-//        $connection->enableQueryCache = false;
-//        $this->setConnection($connection);
-
         return $this;
     }
 

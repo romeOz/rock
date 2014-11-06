@@ -8,7 +8,8 @@ use rock\helpers\String;
 use rock\Rock;
 
 /**
- * Class Url
+ * Class Url.
+ *
  * @property string $scheme
  * @property string $host
  * @property int $port

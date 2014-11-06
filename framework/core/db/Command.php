@@ -155,7 +155,7 @@ class Command
             } catch (\Exception $e) {
                 $message = $e->getMessage() . "\nFailed to prepare SQL: $sql";
                 //$errorInfo = $e instanceof \PDOException ? $e->errorInfo : null;
-                throw new Exception(Exception::CRITICAL, $message, [], $e);
+                throw new Exception($message, [], $e);
             }
         }
     }
@@ -294,7 +294,7 @@ class Command
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e: $message;
             Rock::trace('db.query', $token);
-            throw new Exception(Exception::ERROR, $message, [], $e);
+            throw new Exception($message, [], $e);
         }
     }
 
@@ -444,7 +444,7 @@ class Command
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('db.query', $token);
 
-            throw new Exception(Exception::ERROR, $message, [], $e);
+            throw new Exception($message, [], $e);
         }
     }
 

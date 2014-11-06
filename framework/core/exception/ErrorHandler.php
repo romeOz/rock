@@ -90,13 +90,13 @@ class ErrorHandler implements LoggerInterface
 
     protected static function log($level, $msg, $file, $line)
     {
-        Exception::log($level, $msg, $file . ' on line ' . $line);
+        BaseException::log($level, $msg, ['file' => $file, 'line' => $line, 'stack' => $file . ' on line ' . $line]);
         if (DEBUG === true) {
 
-            Exception::debuger()->handleException(new \ErrorException($msg, $level, 0, $file, $line));
+            BaseException::debuger()->handleException(new \ErrorException($msg, $level, 0, $file, $line));
         }
         if ($level > self::ERROR) {
-            Exception::displayFatal();
+            BaseException::displayFatal();
         }
     }
 

@@ -340,7 +340,7 @@ class Markdown extends MarkdownExtra
                 $url = $this->enabledDummy === true ? "http://rd3.videos.sapo.pt/{$url}" : "http://videos.sapo.pt/playhtml?file=http://rd3.videos.sapo.pt/{$url}/mov/1";
                 break;
             default:
-                throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_HOSTING, ['name' => $hosting]);
+                throw new MarkdownException(MarkdownException::UNKNOWN_HOSTING, ['name' => $hosting]);
         }
         return $url;
     }

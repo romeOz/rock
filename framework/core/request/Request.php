@@ -374,9 +374,10 @@ class Request implements RequestInterface, ComponentsInterface
      * Returns the path info of the currently requested URL.
      * A path info refers to the part that is after the entry script and before the question mark (query string).
      * The starting and ending slashes are both removed.
-     * @return string part of the request URL that is after the entry script and before the question mark.
+     *
+*@return string part of the request URL that is after the entry script and before the question mark.
      * Note, the returned path info is already URL-decoded.
-     * @throws Exception if the path info cannot be determined due to unexpected server configuration
+     * @throws RequestException if the path info cannot be determined due to unexpected server configuration
      */
     public function getPathInfo()
     {
@@ -401,9 +402,10 @@ class Request implements RequestInterface, ComponentsInterface
      * Resolves the path info part of the currently requested URL.
      * A path info refers to the part that is after the entry script and before the question mark (query string).
      * The starting slashes are both removed (ending slashes will be kept).
-     * @return string part of the request URL that is after the entry script and before the question mark.
+     *
+*@return string part of the request URL that is after the entry script and before the question mark.
      * Note, the returned path info is decoded.
-     * @throws Exception if the path info cannot be determined due to unexpected server configuration
+     * @throws RequestException if the path info cannot be determined due to unexpected server configuration
      */
     protected function resolvePathInfo()
     {
@@ -440,7 +442,7 @@ class Request implements RequestInterface, ComponentsInterface
         } elseif (isset($_SERVER['PHP_SELF']) && strpos($_SERVER['PHP_SELF'], $scriptUrl) === 0) {
             $pathInfo = substr($_SERVER['PHP_SELF'], strlen($scriptUrl));
         } else {
-            throw new Exception(Exception::ERROR, 'Unable to determine the path info of the current request.');
+            throw new RequestException('Unable to determine the path info of the current request.');
         }
 
         if ($pathInfo[0] === '/') {
@@ -454,7 +456,7 @@ class Request implements RequestInterface, ComponentsInterface
      * Is self domain
      *
      * @param bool $throw - throw an exception (default: false)
-     * @throws Exception
+     * @throws RequestException
      * @return bool
      */
     public function isSelfDomain($throw = false)
@@ -467,7 +469,7 @@ class Request implements RequestInterface, ComponentsInterface
             !in_array(strtolower($_SERVER['HTTP_HOST']), $domains, true)
         ) {
             if ($throw === true) {
-                throw new Exception(Exception::CRITICAL, "Invalid domain: {$_SERVER['HTTP_HOST']}");
+                throw new RequestException("Invalid domain: {$_SERVER['HTTP_HOST']}");
             } else {
                 Rock::error("Invalid domain: {$_SERVER['HTTP_HOST']}");
             }
@@ -499,8 +501,9 @@ class Request implements RequestInterface, ComponentsInterface
      * Returns the currently requested relative URL.
      * This refers to the portion of the URL that is after the @see getHostInfo() part.
      * It includes the @see getQueryString() part if any.
-     * @return string the currently requested relative URL. Note that the URI returned is URL-encoded.
-     * @throws Exception if the URL cannot be determined due to unusual server configuration
+     *
+*@return string the currently requested relative URL. Note that the URI returned is URL-encoded.
+     * @throws RequestException if the URL cannot be determined due to unusual server configuration
      */
     public function getUrl()
     {
@@ -529,7 +532,7 @@ class Request implements RequestInterface, ComponentsInterface
      *
      * @return string|boolean the request URI portion for the currently requested URL.
      * Note that the URI returned is URL-encoded.
-     * @throws Exception if the request URI cannot be determined due to unusual server configuration
+     * @throws RequestException if the request URI cannot be determined due to unusual server configuration
      */
     protected function resolveRequestUri()
     {
@@ -546,7 +549,7 @@ class Request implements RequestInterface, ComponentsInterface
                 $requestUri .= '?' . $_SERVER['QUERY_STRING'];
             }
         } else {
-            throw new Exception(Exception::CRITICAL, 'Unable to determine the request URI.');
+            throw new RequestException('Unable to determine the request URI.');
         }
         return $requestUri;
     }

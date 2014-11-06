@@ -29,7 +29,7 @@ class Attributes
         $result = [];
         foreach ($this->attributes as $attribute => $sanitize) {
             if (!$sanitize instanceof Sanitize) {
-                throw new Exception(Exception::ERROR, "`{$attribute}` is not `".Sanitize::className()."`");
+                throw new SanitizeException("`{$attribute}` is not `".Sanitize::className()."`");
             }
             if ($attribute === Sanitize::REMAINDER) {
                 $result = array_merge($result, $this->remainder($sanitize, $input));

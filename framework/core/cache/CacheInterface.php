@@ -14,7 +14,8 @@ interface CacheInterface extends SerializeInterface
 
     /**
      * Get current storage
-     * @throws Exception
+     *
+*@throws CacheException
      * @return \Memcached|\Memcache|\Redis|\Couchbase
      */
     public function getStorage();
@@ -202,7 +203,8 @@ interface CacheInterface extends SerializeInterface
 
     /**
      * Get status cache server
-     * @throws Exception
+     *
+*@throws CacheException
      * @return mixed
      */
     public function status();

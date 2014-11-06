@@ -1,6 +1,9 @@
 <?php
 namespace rock\db\sqlite;
 
+use rock\db\Exception;
+use rock\helpers\ObjectHelper;
+
 /**
  * QueryBuilder is the query builder for SQLite databases.
  */
@@ -33,15 +36,15 @@ class QueryBuilder extends \rock\db\QueryBuilder
      * Generates a batch INSERT SQL statement.
      * For example,
      *
-     * ~~~
+     * ```php
      * $connection->createCommand()->batchInsert('user', ['name', 'age'], [
      *     ['Tom', 30],
      *     ['Jane', 20],
      *     ['Linda', 25],
      * ])->execute();
-     * ~~~
+     * ```
      *
-     * Note that the values in each row must match the corresponding column names.
+     * > That the values in each row must match the corresponding column names.
      *
      * @param string $table the table that new rows will be inserted into.
      * @param array $columns the column names
@@ -117,9 +120,9 @@ class QueryBuilder extends \rock\db\QueryBuilder
                 // it's possible that sqlite_sequence does not exist
             }
         } elseif ($table === null) {
-            throw new Exception(Exception::CRITICAL, "Table not found: $tableName");
+            throw new Exception("Table not found: $tableName");
         } else {
-            throw new Exception(Exception::CRITICAL, "There is not sequence associated with table '$tableName'.'");
+            throw new Exception("There is not sequence associated with table '$tableName'.'");
         }
     }
 
@@ -165,7 +168,7 @@ class QueryBuilder extends \rock\db\QueryBuilder
      */
     public function dropColumn($table, $column)
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => ObjectHelper::methodName($this, 'dropColumn')]);
+        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -178,7 +181,7 @@ class QueryBuilder extends \rock\db\QueryBuilder
      */
     public function renameColumn($table, $oldName, $newName)
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => ObjectHelper::methodName($this, 'renameColumn')]);
+        throw new Exception( Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -198,7 +201,7 @@ class QueryBuilder extends \rock\db\QueryBuilder
      */
     public function addForeignKey($name, $table, $columns, $refTable, $refColumns, $delete = null, $update = null)
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => ObjectHelper::methodName($this, 'addForeignKey')]);
+        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -210,7 +213,7 @@ class QueryBuilder extends \rock\db\QueryBuilder
      */
     public function dropForeignKey($name, $table)
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => ObjectHelper::methodName($this, 'dropForeignKey')]);
+        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -226,7 +229,7 @@ class QueryBuilder extends \rock\db\QueryBuilder
      */
     public function alterColumn($table, $column, $type)
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => ObjectHelper::methodName($this, 'alterColumn')]);
+        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -239,7 +242,7 @@ class QueryBuilder extends \rock\db\QueryBuilder
      */
     public function addPrimaryKey($name, $table, $columns)
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => ObjectHelper::methodName($this, 'addPrimaryKey')]);
+        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -251,7 +254,7 @@ class QueryBuilder extends \rock\db\QueryBuilder
      */
     public function dropPrimaryKey($name, $table)
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => ObjectHelper::methodName($this, 'dropPrimaryKey')]);
+        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**

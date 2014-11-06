@@ -151,7 +151,7 @@ class ContentNegotiatorFilter extends ActionFilter
                 $response->acceptParams = [];
                 return;
             } else {
-                throw new ContentNegotiatorFilterException(ContentNegotiatorFilterException::CRITICAL, 'The requested response format is not supported: ' . $format);
+                throw new ContentNegotiatorFilterException('The requested response format is not supported: ' . $format);
             }
         }
 
@@ -178,7 +178,7 @@ class ContentNegotiatorFilter extends ActionFilter
             }
         }
 
-        throw new ContentNegotiatorFilterException(ContentNegotiatorFilterException::CRITICAL, 'None of your requested content types is supported.');
+        throw new ContentNegotiatorFilterException('None of your requested content types is supported.');
     }
 
     /**

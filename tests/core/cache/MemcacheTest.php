@@ -2,7 +2,7 @@
 namespace rockunit\core\cache;
 
 use rock\cache\CacheInterface;
-use rock\cache\Exception;
+use rock\cache\CacheException;
 use rock\cache\Memcache;
 
 /**
@@ -36,7 +36,7 @@ class MemcacheTest extends CommonTraitTest
 
     /**
      * @dataProvider providerCache
-     * @expectedException Exception
+     * @expectedException CacheException
      */
     public function testGetAll(CacheInterface $cache)
     {
@@ -45,7 +45,7 @@ class MemcacheTest extends CommonTraitTest
 
     /**
      * @dataProvider providerCache
-     * @expectedException Exception
+     * @expectedException CacheException
      */
     public function testGetAllKeys(CacheInterface $cache)
     {

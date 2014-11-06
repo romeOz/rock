@@ -7,7 +7,6 @@ use League\Flysystem\Config;
 use League\Flysystem\Filesystem;
 use League\Flysystem\PluginInterface;
 use rock\base\ComponentsTrait;
-use rock\base\ObjectTrait;
 use rock\helpers\ArrayHelper;
 use rock\helpers\String;
 
@@ -113,7 +112,7 @@ class FileManager
         try {
             return $this->getFilesystem()->read($path);
         } catch (\Exception $e) {
-            $this->errors[] = String::replace(Exception::UNKNOWN_FILE, ['path' => $path]);
+            $this->errors[] = String::replace(FileException::UNKNOWN_FILE, ['path' => $path]);
         }
         return false;
     }
@@ -133,7 +132,7 @@ class FileManager
         try {
             return $this->getFilesystem()->readAndDelete($path);
         } catch (\Exception $e) {
-            $this->errors[] = String::replace(Exception::UNKNOWN_FILE, ['path' => $path]);
+            $this->errors[] = String::replace(FileException::UNKNOWN_FILE, ['path' => $path]);
         }
         return false;
     }
@@ -151,7 +150,7 @@ class FileManager
         try {
             return $this->getFilesystem()->write($path, $contents, $config);
         } catch (\Exception $e) {
-            $this->errors[] = String::replace(Exception::FILE_EXISTS, ['path' => $path]);
+            $this->errors[] = String::replace(FileException::FILE_EXISTS, ['path' => $path]);
         }
         return false;
     }
@@ -179,7 +178,7 @@ class FileManager
         try {
             return $this->getFilesystem()->update($path, $contents, $config);
         } catch (\Exception $e) {
-            $this->errors[] = String::replace(Exception::FILE_EXISTS, ['path' => $path]);
+            $this->errors[] = String::replace(FileException::FILE_EXISTS, ['path' => $path]);
         }
         return false;
     }
@@ -421,7 +420,7 @@ class FileManager
         try {
             return $this->getFilesystem()->delete($path);
         } catch (\Exception $e) {
-            $this->errors[] = String::replace(Exception::UNKNOWN_FILE, ['path' => $path]);
+            $this->errors[] = String::replace(FileException::UNKNOWN_FILE, ['path' => $path]);
         }
         return false;
     }
@@ -565,7 +564,7 @@ class FileManager
             }
         }
         if ($error === true) {
-            $this->errors[] = String::replace(Exception::UNKNOWN_FILE, ['path' => $pattern]);
+            $this->errors[] = String::replace(FileException::UNKNOWN_FILE, ['path' => $pattern]);
         }
         return null;
     }

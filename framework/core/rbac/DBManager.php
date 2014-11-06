@@ -6,7 +6,6 @@ use apps\common\models\users\access\Items;
 use apps\common\models\users\access\Roles;
 use apps\common\models\users\access\RolesItems;
 use apps\common\models\users\access\UsersItems;
-use rock\base\ObjectTrait;
 use rock\db\Connection;
 use rock\db\SelectBuilder;
 use rock\helpers\ArrayHelper;
@@ -53,7 +52,7 @@ class DBManager extends RBAC
             ->asArray()
             ->all(static::$connection)) {
 
-            throw new Exception(Exception::ERROR, 'Items is empty.');
+            throw new RBACException('Items is empty.');
         }
         static::$items = $dataItems;
         if (!$dataRolesItems = RolesItems::find()
@@ -94,7 +93,7 @@ class DBManager extends RBAC
     public function add(Item $item)
     {
         if ($this->has($item->name)) {
-            throw new Exception(Exception::CRITICAL, "Cannot add '{$item->name}'. A has been exists.");
+            throw new RBACException("Cannot add '{$item->name}'. A has been exists.");
         }
         /** @var Role|Permission  $item */
         $items = new Items();
@@ -120,7 +119,7 @@ class DBManager extends RBAC
     public function attachItem(Role $role, Item $item)
     {
         if ($this->detect($role, $item)) {
-            throw new Exception(Exception::CRITICAL, "Cannot attach '{$role->name}' as a item of '{$item->name}'. A has been detected.");
+            throw new RBACException("Cannot attach '{$role->name}' as a item of '{$item->name}'. A has been detected.");
         }
 
         $result = static::$connection->createCommand()
@@ -144,7 +143,7 @@ class DBManager extends RBAC
         $itemNames = [];
         foreach ($items as $item) {
             if ($this->detect($role, $item)) {
-                throw new Exception(Exception::CRITICAL, "Cannot attach '{$role->name}' as a item of '{$item->name}'. A has been detected.");
+                throw new RBACException("Cannot attach '{$role->name}' as a item of '{$item->name}'. A has been detected.");
             }
             $rows[] = [$role->name, $item->name];
             $itemNames[] = $item->name;
@@ -245,10 +244,10 @@ class DBManager extends RBAC
         $rows = [];
         foreach ($roles as $role) {
             if (!$role instanceof Role) {
-                throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_TYPE, ['name' => serialize($role)]);
+                throw new RBACException(RBACException::UNKNOWN_TYPE, ['name' => serialize($role)]);
             }
             if ($this->hasAssigned($userId, $role->name)) {
-                throw new Exception(Exception::ERROR, "Duplicate role: {$role->name}");
+                throw new RBACException("Duplicate role: {$role->name}");
             }
             $rows[] =[$userId, $role->name];
             static::$assignments[$userId][] = $role->name;
@@ -268,7 +267,7 @@ class DBManager extends RBAC
         $names = [];
         foreach ($roles as $role) {
             if (!$role instanceof Role) {
-                throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_TYPE, ['name' => serialize($role)]);
+                throw new RBACException(RBACException::UNKNOWN_TYPE, ['name' => serialize($role)]);
             }
             $names[] = $role->name;
         }

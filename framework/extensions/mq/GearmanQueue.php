@@ -36,7 +36,7 @@ class GearmanQueue extends Queue implements QueueInterface
         }
         // Check the return code - what other codes are there and what do they mean?
         if($client->returnCode() != GEARMAN_SUCCESS){
-            throw new Exception(Exception::ERROR, 'Bad return code: ' . $client->returnCode());
+            throw new MQException('Bad return code: ' . $client->returnCode());
         }
 
         $this->afterSend();
@@ -115,32 +115,32 @@ class GearmanQueue extends Queue implements QueueInterface
 
     /**
      * @inheritdoc
-     * @throws Exception
+     * @throws MQException
      */
     public function publish(array $topics, $limit = -1)
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new MQException(MQException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
      * @inheritdoc
-     * @throws Exception
+     * @throws MQException
      */
     public function subscribe($topic = '', $limit = -1, $message = '')
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new MQException(MQException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
      * @return \GearmanClient
-     * @throws Exception
+     * @throws MQException
      */
     protected function client()
     {
         $client = new \GearmanClient();
         $client->addServers($this->dns);
         if (($haveGoodServer = $client->ping($this->id)) === false) {
-            throw new Exception(Exception::ERROR, "Server does not access: {$this->dns}");
+            throw new MQException("Server does not access: {$this->dns}");
         }
         return $client;
     }

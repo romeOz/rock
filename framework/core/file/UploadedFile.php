@@ -88,7 +88,7 @@ class UploadedFile implements ComponentsInterface
 
     /**
      * @return FileManager
-     * @throws Exception
+     * @throws FileException
      */
     protected function getAdapter()
     {
@@ -321,6 +321,4 @@ class UploadedFile implements ComponentsInterface
             self::$_files[$key] = $self;
         }
     }
-
-
 }

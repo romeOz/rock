@@ -7,7 +7,7 @@ namespace rockunit\snippets;
 use rock\i18n\i18nInterface;
 use rock\Rock;
 use rock\snippets\Pagination;
-use rock\template\Exception;
+use rock\template\TemplateException;
 use rock\template\Template;
 use rockunit\core\template\TemplateCommon;
 
@@ -71,7 +71,7 @@ class PaginationTest extends TemplateCommon
         $params = [
             'call' => 'Foo.method'
         ];
-        $this->setExpectedException(Exception::className());
+        $this->setExpectedException(TemplateException::className());
         $this->template->getSnippet(Pagination::className(), $params);
     }
 }

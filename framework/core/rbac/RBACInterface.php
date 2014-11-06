@@ -30,16 +30,18 @@ interface RBACInterface extends \IteratorAggregate, \Countable, ItemInterface
 
     /**
      * Get Role
-     * @param string $name - name of role
+     *
+*@param string $name - name of role
      * @return Role|null
-     * @throws Exception
+     * @throws RBACException
      */
     public function getRole($name);
     /**
      * Get permission
-     * @param string    $name - name of permission
+     *
+*@param string    $name - name of permission
      * @return Permission|null
-     * @throws Exception
+     * @throws RBACException
      */
     public function getPermission($name);
 
@@ -72,7 +74,7 @@ interface RBACInterface extends \IteratorAggregate, \Countable, ItemInterface
      *
      * @param Role|Permission|Item $item
      * @return boolean whether the role, permission or rule is successfully added to the system
-     * @throws Exception if data validation or saving fails (such as the name of the role or permission is not unique)
+     * @throws RBACException if data validation or saving fails (such as the name of the role or permission is not unique)
      */
     public function add(Item $item);
 
@@ -170,7 +172,7 @@ interface RBACInterface extends \IteratorAggregate, \Countable, ItemInterface
      * @param Role[] $roles the rule to be associated with this assignment. If not null, the rule
      * will be executed when [[allow()]] is called to check the user permission.     
      * @return bool
-     * @throws Exception if the role has already been assigned to the user
+     * @throws RBACException if the role has already been assigned to the user
      */
     public function assign($userId, array $roles);
 

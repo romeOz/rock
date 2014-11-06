@@ -3,7 +3,7 @@ namespace rockunit\core\cache\versioning;
 
 
 use rock\cache\CacheInterface;
-use rock\cache\Exception;
+use rock\cache\CacheException;
 use rock\cache\versioning\APC;
 use rockunit\core\cache\CommonTraitTest;
 
@@ -30,7 +30,7 @@ class APCTest extends CommonTraitTest
 
     /**
      * @dataProvider providerCache
-     * @expectedException Exception
+     * @expectedException CacheException
      */
     public function testGetStorage(CacheInterface $cache)
     {

@@ -34,7 +34,7 @@ class LengthTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider providerForComponentException
-     * @expectedException \rock\validate\Exception
+     * @expectedException \rock\validate\ValidateException
      */
     public function testThrowException($string, $min, $max)
     {

@@ -3,6 +3,8 @@
 namespace rock\cache;
 
 
+use rock\Rock;
+
 class Redis implements CacheInterface
 {
     use CacheTrait {
@@ -23,7 +25,7 @@ class Redis implements CacheInterface
     }
 
     /**
-     * Get current storage
+     * {@inheritdoc}
      *
      * @return \Redis
      */
@@ -183,7 +185,7 @@ class Redis implements CacheInterface
      */
     public function getAll()
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new CacheException(CacheException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -221,8 +223,9 @@ class Redis implements CacheInterface
     }
 
     /**
-     * Set lock
-     * Note: Dog-pile" ("cache miss storm") and "race condition" effects
+     * Set lock.
+     *
+     * > Dog-pile" ("cache miss storm") and "race condition" effects.
      *
      * @param string $key
      * @param mixed  $value
@@ -236,7 +239,7 @@ class Redis implements CacheInterface
         while (!static::$storage->setnx(self::LOCK_PREFIX . $key, $value)) {
             $iteration++;
             if ($iteration > $max) {
-                new Exception(Exception::ERROR, Exception::INVALID_SAVE, ['key' => $key]);
+                Rock::error(CacheException::INVALID_SAVE, ['key' => $key]);
                 return false;
             }
             usleep(1000);

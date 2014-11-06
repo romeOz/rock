@@ -110,7 +110,7 @@ class Sanitize
      *
      * @param mixed $input
      * @return mixed
-     * @throws Exception
+     * @throws SanitizeException
      */
     public function sanitize($input)
     {
@@ -148,10 +148,10 @@ class Sanitize
         }
 
         if (!isset($this->rules[$name])) {
-            throw new Exception(Exception::ERROR, "Unknown rule: {$name}");
+            throw new SanitizeException("Unknown rule: {$name}");
         }
         if (!class_exists($this->rules[$name])) {
-            throw new Exception(Exception::ERROR, Exception::UNKNOWN_CLASS, ['class' => $this->rules[$name]]);
+            throw new SanitizeException(SanitizeException::UNKNOWN_CLASS, ['class' => $this->rules[$name]]);
         }
         /** @var Rule $rule */
         $reflect = new \ReflectionClass($this->rules[$name]);

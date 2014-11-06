@@ -66,7 +66,7 @@ return array_merge(
                     if (!class_exists($class)) {
                         /** @var \rock\base\Controller $class */
                         if (!$class = ArrayHelper::getValue((array)\rock\di\Container::get($class), ['class'])) {
-                            throw new \rock\template\Exception(\rock\template\Exception::CRITICAL, \rock\template\Exception::UNKNOWN_CLASS, ['class' => $link[0]]);
+                            throw new \rock\template\TemplateException(\rock\template\TemplateException::UNKNOWN_CLASS, ['class' => $link[0]]);
                         }
                     }
 
@@ -202,9 +202,7 @@ return array_merge(
                         } else {
                             $object = Rock::factory(Rock::getAlias($class));
                             if (!method_exists($object, $method)) {
-                                throw new \rock\exception\Exception(
-                                    \rock\exception\Exception::CRITICAL, \rock\exception\Exception::UNKNOWN_METHOD, ['method' => "{$class}::{$method}"]
-                                );
+                                throw new \rock\exception\BaseException(\rock\exception\BaseException::UNKNOWN_METHOD, ['method' => "{$class}::{$method}"]);
                             }
                             $function = [$object, $method];
                         }

@@ -74,7 +74,7 @@ class i18nTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \rock\i18n\Exception
+     * @expectedException \rock\i18n\i18nException
      */
     public function testUnknown()
     {

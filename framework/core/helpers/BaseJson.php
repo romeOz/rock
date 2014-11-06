@@ -82,17 +82,17 @@ class BaseJson
                 case JSON_ERROR_NONE:
                     break;
                 case JSON_ERROR_DEPTH:
-                    throw new JsonException(JsonException::ERROR, 'The maximum stack depth has been exceeded.');
+                    throw new JsonException('The maximum stack depth has been exceeded.');
                 case JSON_ERROR_CTRL_CHAR:
-                    throw new JsonException(JsonException::ERROR, 'Control character error, possibly incorrectly encoded.');
+                    throw new JsonException('Control character error, possibly incorrectly encoded.');
                 case JSON_ERROR_SYNTAX:
-                    throw new JsonException(JsonException::ERROR, 'Syntax error.');
+                    throw new JsonException('Syntax error.');
                 case JSON_ERROR_STATE_MISMATCH:
-                    throw new JsonException(JsonException::ERROR, 'Invalid or malformed JSON.');
+                    throw new JsonException('Invalid or malformed JSON.');
                 case JSON_ERROR_UTF8:
-                    throw new JsonException(JsonException::ERROR, 'Malformed UTF-8 characters, possibly incorrectly encoded.');
+                    throw new JsonException('Malformed UTF-8 characters, possibly incorrectly encoded.');
                 default:
-                    throw new JsonException(JsonException::ERROR, 'Unknown JSON decoding error.');
+                    throw new JsonException('Unknown JSON decoding error.');
             }
         } else {
             if (json_last_error() !== JSON_ERROR_NONE) {

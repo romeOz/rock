@@ -103,9 +103,9 @@ class QueryBuilder extends \rock\db\QueryBuilder
 
             return "SELECT SETVAL('$sequence',$value,false)";
         } elseif ($table === null) {
-            throw new Exception(Exception::CRITICAL, "Table not found: $tableName");
+            throw new Exception("Table not found: $tableName");
         } else {
-            throw new Exception(Exception::CRITICAL, "There is not sequence associated with table '$tableName'.");
+            throw new Exception("There is not sequence associated with table '$tableName'.");
         }
     }
 

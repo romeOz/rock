@@ -2,7 +2,7 @@
 namespace rock\base;
 
 use rock\event\Event;
-use rock\exception\Exception;
+use rock\exception\BaseException;
 use rock\filters\AccessFilter;
 use rock\Rock;
 
@@ -11,8 +11,7 @@ trait ComponentsTrait
     use ObjectTrait;
 
     /** @var Behavior[]  */
-    protected $_behaviors;
-
+    private $_behaviors;
     private $_events = [];
 
 
@@ -39,6 +38,7 @@ trait ComponentsTrait
 
     /**
      * Detaches an existing event handler from this component.
+     *
      * This method is the opposite of [[on()]].
      * @param string $name event name
      * @param callable $handler the event handler to be removed.
@@ -96,7 +96,7 @@ trait ComponentsTrait
     }
 
     /**
-     * Check Access
+     * Check Access.
      *
      * @param array      $rules
      * @param array|\Closure|null $success
@@ -125,6 +125,7 @@ trait ComponentsTrait
 
     /**
      * Attaches a behavior to this component.
+     *
      * @param string|integer $name the name of the behavior. If this is an integer, it means the behavior
      * is an anonymous one. Otherwise, the behavior is a named one and any existing behavior with the same name
      * will be detached first.
@@ -150,18 +151,6 @@ trait ComponentsTrait
         return $behavior;
     }
 
-    private function _prepareActionName($method)
-    {
-        if (!isset($method)) {
-            return null;
-        }
-
-        if ($buff = strstr($method, '::')) {
-            return ltrim($buff, ':');
-        }
-        return $method;
-    }
-
     /**
      * Sets the value of a component property.
      * This method will check in the following order and act accordingly:
@@ -173,10 +162,11 @@ trait ComponentsTrait
      *
      * Do not call this method directly as it is a PHP magic method that
      * will be implicitly called when executing `$component->property = $value;`.
+     *
      * @param string $name the property name or the event name
      * @param mixed $value the property value
-     * @throws Exception if the property is not defined
-     * @throws Exception if the property is read-only.
+     * @throws BaseException if the property is not defined
+     * @throws BaseException if the property is read-only.
      * @see __get()
      */
     public function __set($name, $value)
@@ -211,13 +201,13 @@ trait ComponentsTrait
             }
         }
         if (method_exists($this, 'get' . $name)) {
-            throw new Exception(Exception::CRITICAL, Exception::SETTING_READ_ONLY_PROPERTY, [
+            throw new BaseException(BaseException::SETTING_READ_ONLY_PROPERTY, [
                 'class' => get_class(
                     $this
                 ), 'property' => $name
             ]);
         } else {
-            throw new Exception(Exception::CRITICAL, Exception::SETTING_UNKNOWN_PROPERTY, [
+            throw new BaseException(BaseException::SETTING_UNKNOWN_PROPERTY, [
                 'class' => get_class($this), 'property' => $name
             ]);
         }
@@ -232,10 +222,11 @@ trait ComponentsTrait
      *
      * Do not call this method directly as it is a PHP magic method that
      * will be implicitly called when executing `$value = $component->property;`.
+     *
      * @param string $name the property name
      * @return mixed the property value or the value of a behavior's property
-     * @throws Exception if the property is not defined
-     * @throws Exception if the property is write-only.
+     * @throws BaseException if the property is not defined
+     * @throws BaseException if the property is write-only.
      * @see __set()
      */
     public function __get($name)
@@ -255,13 +246,13 @@ trait ComponentsTrait
             }
         }
         if (method_exists($this, 'set' . $name)) {
-            throw new Exception(Exception::CRITICAL, Exception::GETTING_WRITE_ONLY_PROPERTY, [
+            throw new BaseException(BaseException::GETTING_WRITE_ONLY_PROPERTY, [
                 'class' => get_class(
                     $this
                 ), 'property' => $name
             ]);
         } else {
-            throw new Exception(Exception::CRITICAL, Exception::GETTING_UNKNOWN_PROPERTY, [
+            throw new BaseException(BaseException::GETTING_UNKNOWN_PROPERTY, [
                 'class' => get_class($this), 'property' => $name
             ]);
         }
@@ -308,8 +299,9 @@ trait ComponentsTrait
      *
      * Do not call this method directly as it is a PHP magic method that
      * will be implicitly called when executing `unset($component->property)`.
+     *
      * @param string $name the property name
-     * @throws Exception if the property is read only.
+     * @throws BaseException if the property is read only.
      */
     public function __unset($name)
     {
@@ -330,7 +322,7 @@ trait ComponentsTrait
                 }
             }
         }
-        throw new Exception(Exception::CRITICAL, 'Unsetting read-only property: ' . get_class($this) . '::' . $name);
+        throw new BaseException('Unsetting read-only property: ' . get_class($this) . '::' . $name);
     }
 
     /**
@@ -341,10 +333,11 @@ trait ComponentsTrait
      *
      * Do not call this method directly as it is a PHP magic method that
      * will be implicitly called when an unknown method is being invoked.
+     *
      * @param string $name the method name
      * @param array $params method parameters
      * @return mixed the method return value
-     * @throws Exception when calling unknown method
+     * @throws BaseException when calling unknown method
      */
     public function __call($name, $params)
     {
@@ -356,7 +349,7 @@ trait ComponentsTrait
             }
         }
 
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, [
+        throw new BaseException(BaseException::UNKNOWN_METHOD, [
             'method' => get_class($this) . "::{$name}()"
         ]);
     }
@@ -567,7 +560,6 @@ trait ComponentsTrait
         }
     }
 
-
     /**
      * Detaches all behaviors from the component.
      */
@@ -578,14 +570,4 @@ trait ComponentsTrait
             $this->detachBehavior($name);
         }
     }
-
-    public function removeBehaviors()
-    {
-        unset($this->_behaviors);
-    }
-
-//    public function detachEvents()
-//    {
-//        Event::offMulti(array_keys(self::$_events));
-//    }
 }

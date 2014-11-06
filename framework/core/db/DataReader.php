@@ -219,7 +219,7 @@ class DataReader implements \Iterator, \Countable
             $this->_row = $this->_statement->fetch();
             $this->_index = 0;
         } else {
-            throw new Exception(Exception::ERROR, 'DataReader cannot rewind. It is a forward-only reader.');
+            throw new Exception('DataReader cannot rewind. It is a forward-only reader.');
         }
     }
 

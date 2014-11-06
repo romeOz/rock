@@ -145,11 +145,11 @@ class ActiveDataProvider
         } elseif ($this->query instanceof ActiveRecordInterface) {
             return $this->prepareDataWithCallback($this->query->toArray($this->only, $this->exclude, $this->expand));
         } else {
-            throw new Exception(Exception::CRITICAL, 'var must be of type array or instances ActiveRecord');
+            throw new Exception('Var must be of type array or instances ActiveRecord.');
         }
 
         if (!is_array($data)) {
-            throw new Exception(Exception::CRITICAL, 'var must be of type array or instances ActiveRecord');
+            throw new Exception('Var must be of type array or instances ActiveRecord.');
         }
 
         reset($data);

@@ -3,8 +3,7 @@
 namespace rock\base;
 
 
-use rock\base\ObjectTrait;
-use rock\execute\Exception;
+use rock\execute\ExecuteException;
 use rock\Rock;
 
 class Widget
@@ -50,8 +49,9 @@ class Widget
     /**
      * Ends a widget.
      * Note that the rendering result of the widget is directly echoed out.
+     *
      * @return static the widget instance that is ended.
-     * @throws Exception if [[begin()]] and [[end()]] calls are not properly nested
+     * @throws ExecuteException if [[begin()]] and [[end()]] calls are not properly nested
      */
     public static function end()
     {
@@ -62,12 +62,10 @@ class Widget
 
                 return $widget;
             } else {
-                throw new Exception(Exception::CRITICAL,
-                                    "Expecting end() of " . get_class($widget) . ", found " . get_called_class());
+                throw new ExecuteException("Expecting end() of " . get_class($widget) . ", found " . get_called_class());
             }
         } else {
-            throw new Exception(Exception::CRITICAL,
-                                "Unexpected " . get_called_class() . '::end() call. A matching begin() is not found.');
+            throw new ExecuteException("Unexpected " . get_called_class() . '::end() call. A matching begin() is not found.');
         }
     }
 

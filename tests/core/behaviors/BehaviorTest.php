@@ -78,7 +78,7 @@ class BehaviorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \rock\exception\Exception
+     * @expectedException \rock\exception\BaseException
      */
     public function testAttachBehaviorDetachThrowException()
     {

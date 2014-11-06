@@ -19,7 +19,7 @@ abstract class RBAC implements RBACInterface
 
     /**
      * @param string $itemName
-     * @throws Exception
+     * @throws RBACException
      * @return Item|null
      */
     public function get($itemName)
@@ -46,7 +46,7 @@ abstract class RBAC implements RBACInterface
         if ($data instanceof Role) {
             return $data;
         }
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_ROLE, ['name' => serialize($data)]);
+        throw new RBACException(RBACException::UNKNOWN_ROLE, ['name' => serialize($data)]);
     }
 
     /**
@@ -63,7 +63,7 @@ abstract class RBAC implements RBACInterface
         if ($data instanceof Permission) {
             return $data;
         }
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_PERMISSION, ['name' => serialize($data)]);
+        throw new RBACException(RBACException::UNKNOWN_PERMISSION, ['name' => serialize($data)]);
     }
 
 
@@ -196,7 +196,12 @@ abstract class RBAC implements RBACInterface
 
 
     protected static $roles;
-    
+
+    /**
+     * @param $roleName
+     * @return array|null
+     * @throws RBACException
+     */
     public function getRecursiveRoles($roleName)
     {
         if (!$this->has($roleName)) {
@@ -221,7 +226,7 @@ abstract class RBAC implements RBACInterface
             return [$roleName];
         }
 
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_TYPE, [
+        throw new RBACException(RBACException::UNKNOWN_TYPE, [
             'name' => Helper::getValueIsset(
                     static::$items[$roleName]['type']
                 )
@@ -230,6 +235,12 @@ abstract class RBAC implements RBACInterface
 
 
     protected static $permissions;
+
+    /**
+     * @param $roleName
+     * @return array|null
+     * @throws RBACException
+     */
     public function getRecursivePermissions($roleName)
     {
         if (!$this->has($roleName)) {
@@ -254,7 +265,7 @@ abstract class RBAC implements RBACInterface
             return null;
         }
 
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_TYPE, [
+        throw new RBACException(RBACException::UNKNOWN_TYPE, [
             'name' => Helper::getValueIsset(
                     static::$items[$roleName]['type']
                 )
@@ -262,7 +273,10 @@ abstract class RBAC implements RBACInterface
     }
 
     /**
-     * @inheritdoc
+     * @param       $itemName
+     * @param array $params
+     * @return bool
+     * @throws RBACException
      */
     protected function checkRecursive($itemName, array $params = null)
     {
@@ -287,11 +301,10 @@ abstract class RBAC implements RBACInterface
                     }
                 }
             }
-
             return true;
         }
 
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_TYPE, [
+        throw new RBACException(RBACException::UNKNOWN_TYPE, [
             'name' => Helper::getValueIsset(
                     static::$items[$itemName]['type']
                 )
@@ -305,7 +318,7 @@ abstract class RBAC implements RBACInterface
         }
         $role = $this->processData($roleName);
         if (!$role instanceof Role) {
-            throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_TYPE, ['name' => serialize($role)]);
+            throw new RBACException(RBACException::UNKNOWN_TYPE, ['name' => serialize($role)]);
         }
 
         return $role->execute($params);
@@ -318,7 +331,7 @@ abstract class RBAC implements RBACInterface
         }
         $permission = $this->processData($permissionName);
         if (!$permission instanceof Permission) {
-            throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_TYPE, ['name' => serialize($permission)]);
+            throw new RBACException(RBACException::UNKNOWN_TYPE, ['name' => serialize($permission)]);
         }
 
         return $permission->execute($params);
@@ -378,12 +391,12 @@ abstract class RBAC implements RBACInterface
     /**
      * @param string $itemName
      * @return Item
-     * @throws Exception
+     * @throws RBACException
      */
     protected function processData($itemName)
     {
         if (empty(static::$items[$itemName]['data'])) {
-            throw new Exception(Exception::CRITICAL, Exception::NOT_DATA_PARAMS);
+            throw new RBACException(RBACException::NOT_DATA_PARAMS);
         }
         $data = static::$items[$itemName]['data'];
         if (is_string($data)) {
@@ -395,7 +408,7 @@ abstract class RBAC implements RBACInterface
             return $data;
         }
 
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_TYPE, ['name' => serialize($data)]);
+        throw new RBACException(RBACException::UNKNOWN_TYPE, ['name' => serialize($data)]);
     }
 
     public function refresh()

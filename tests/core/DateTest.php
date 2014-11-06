@@ -4,7 +4,7 @@ namespace rockunit\core;
 
 
 use rock\date\DateTime;
-use rock\date\Exception;
+use rock\date\DateException;
 use rock\date\locale\Ru;
 
 /**
@@ -47,7 +47,7 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($dateTime->format(), date('j  n  Y'));
 
         // unknown format
-        $this->setExpectedException(Exception::className());
+        $this->setExpectedException(DateException::className());
         (new DateTime)->unknown();
     }
 

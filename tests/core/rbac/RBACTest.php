@@ -2,7 +2,7 @@
 
 namespace rockunit\core\rbac;
 
-use rock\rbac\Exception;
+use rock\rbac\RBACException;
 use rock\rbac\Permission;
 use rock\rbac\PhpManager;
 use rock\rbac\RBAC;
@@ -77,7 +77,7 @@ class RBACTest extends DatabaseTestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException RBACException
      */
     public function testGetPermissionThrowException()
     {
@@ -85,7 +85,7 @@ class RBACTest extends DatabaseTestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException RBACException
      */
     public function testGetRoleThrowException()
     {

@@ -85,10 +85,10 @@ class BaseImage
                     }
                     break;
                 default:
-                    throw new Exception(Exception::ERROR, "Unknown driver: $driver");
+                    throw new ImagineException("Unknown driver: $driver");
             }
         }
-        throw new Exception(Exception::ERROR, "Your system does not support any of these drivers: " . implode(',', (array)static::$driver));
+        throw new ImagineException("Your system does not support any of these drivers: " . implode(',', (array)static::$driver));
     }
 
     /**
@@ -113,7 +113,7 @@ class BaseImage
     public static function crop($filename, $width, $height, array $start = [0, 0])
     {
         if (!isset($start[0], $start[1])) {
-            throw new Exception(Exception::ERROR, '$start must be an array of two elements.');
+            throw new ImagineException('$start must be an array of two elements.');
         }
 
         return static::getImagine()
@@ -180,7 +180,7 @@ class BaseImage
     public static function watermark($pathOrResource, $watermarkPathOrResource, array $start = [0, 0])
     {
         if (!isset($start[0], $start[1])) {
-            throw new Exception(Exception::ERROR, '$start must be an array of two elements.');
+            throw new ImagineException('$start must be an array of two elements.');
         }
 
         $img = is_resource($pathOrResource) ? static::getImagine()->read($pathOrResource) : static::getImagine()->open(Rock::getAlias($pathOrResource));
@@ -210,7 +210,7 @@ class BaseImage
     public static function text($filename, $text, $fontFile, array $start = [0, 0], array $fontOptions = [])
     {
         if (!isset($start[0], $start[1])) {
-            throw new Exception(Exception::ERROR, '$start must be an array of two elements.');
+            throw new ImagineException('$start must be an array of two elements.');
         }
 
         $fontSize = ArrayHelper::getValue($fontOptions, ['size'], 12);

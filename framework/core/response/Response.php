@@ -4,7 +4,7 @@ namespace rock\response;
 use rock\base\ComponentsTrait;
 use rock\csrf\CSRF;
 use rock\event\Event;
-use rock\exception\Exception;
+use rock\exception\BaseException;
 use rock\helpers\File;
 use rock\helpers\String;
 use rock\Rock;
@@ -292,7 +292,7 @@ class Response
         }
         $this->_statusCode = (int)$value;
         if ($this->getIsInvalid()) {
-            throw new Exception(Exception::ERROR, "The HTTP status code is invalid: $value");
+            throw new ResponseException("The HTTP status code is invalid: $value");
         }
         if ($text === null) {
             $this->statusText = isset($this->httpStatuses[$this->_statusCode]) ? $this->httpStatuses[$this->_statusCode] : '';
@@ -318,7 +318,7 @@ class Response
      * Sends the response to the client.
      *
      * @param bool $die
-     * @throws Exception
+     * @throws BaseException
      */
     public function send($die = false)
     {
@@ -471,7 +471,7 @@ class Response
      * @param string $attachmentName the file name shown to the user.
      * @param string $mimeType the MIME type of the content.
      * @return static the response object itself
-     * @throws Exception if the requested range is not satisfiable
+     * @throws BaseException if the requested range is not satisfiable
      */
     public function sendContentAsFile($content, $attachmentName, $mimeType = 'application/octet-stream')
     {
@@ -480,7 +480,7 @@ class Response
         $range = $this->getHttpRange($contentLength);
         if ($range === false) {
             $headers->set('Content-Range', "bytes */$contentLength");
-            throw new Exception(Exception::CRITICAL, 'Requested range not satisfiable');
+            throw new ResponseException('Requested range not satisfiable');
         }
 
         $headers->setDefault('Pragma', 'public')
@@ -517,7 +517,7 @@ class Response
      * @param string $attachmentName the file name shown to the user.
      * @param string $mimeType the MIME type of the stream content.
      * @return static the response object itself
-     * @throws Exception if the requested range cannot be satisfied.
+     * @throws BaseException if the requested range cannot be satisfied.
      */
     public function sendStreamAsFile($handle, $attachmentName, $mimeType = 'application/octet-stream')
     {
@@ -528,7 +528,7 @@ class Response
         $range = $this->getHttpRange($fileSize);
         if ($range === false) {
             $headers->set('Content-Range', "bytes */$fileSize");
-            throw new Exception(Exception::CRITICAL, 'Requested range not satisfiable');
+            throw new ResponseException('Requested range not satisfiable');
         }
 
         list($begin, $end) = $range;
@@ -947,7 +947,7 @@ class Response
      * The default implementation will convert @see Response::data
      * into @see Response::content and set headers accordingly.
      *
-     * @throws Exception if the formatter for the specified format is invalid or @see Response::format is not supported
+     * @throws BaseException if the formatter for the specified format is invalid or @see Response::format is not supported
      */
     protected function prepare()
     {
@@ -962,21 +962,20 @@ class Response
             if ($formatter instanceof ResponseFormatterInterface) {
                 $formatter->format($this);
             } else {
-                throw new Exception(Exception::CRITICAL, 'The ' . $this->format .
-                                                         ' response formatter is invalid. It must implement the ResponseFormatterInterface.');
+                throw new ResponseException("The {$this->format} response formatter is invalid. It must implement the ResponseFormatterInterface.");
             }
         } elseif ($this->format === self::FORMAT_RAW) {
             $this->content = $this->data;
         } else {
-            throw new Exception(Exception::CRITICAL, 'Unsupported response format: ' . $this->format);
+            throw new ResponseException("Unsupported response format: {$this->format}");
         }
         if (is_array($this->content)) {
-            throw new Exception(Exception::CRITICAL, "Response content must not be an array.");
+            throw new ResponseException("Response content must not be an array.");
         } elseif (is_object($this->content)) {
             if (method_exists($this->content, '__toString')) {
                 $this->content = $this->content->__toString();
             } else {
-                throw new Exception(Exception::CRITICAL, "Response content must be a string or an object implementing __toString().");
+                throw new ResponseException("Response content must be a string or an object implementing __toString().");
             }
         }
     }

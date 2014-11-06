@@ -112,7 +112,7 @@ EOD;
     {
         $tableSchema = $this->db->getTableSchema($table);
         if ($tableSchema === null) {
-            throw new Exception(Exception::CRITICAL, "Unknown table: $table");
+            throw new Exception("Unknown table: $table");
         }
         if ($tableSchema->sequenceName === null) {
             return '';

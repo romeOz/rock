@@ -162,7 +162,7 @@ abstract class ActiveRecord extends BaseActiveRecord
         if ($schema !== null) {
             return $schema;
         } else {
-            throw new Exception(Exception::CRITICAL, "The index does not exist: " . static::indexName());
+            throw new Exception("The index does not exist: " . static::indexName());
         }
     }
 
@@ -266,7 +266,7 @@ abstract class ActiveRecord extends BaseActiveRecord
      */
     public function getSnippetSource()
     {
-        throw new Exception(Exception::CRITICAL, $this->className() . ' does not provide snippet source.');
+        throw new Exception($this->className() . ' does not provide snippet source.');
     }
 
     /**
@@ -525,7 +525,7 @@ abstract class ActiveRecord extends BaseActiveRecord
             $rows = $this->updateAll($values, $condition);
 
             if ($lock !== null && !$rows) {
-                throw new Exception(Exception::ERROR, 'The object being updated is outdated.');
+                throw new Exception('The object being updated is outdated.');
             }
         }
 
@@ -574,7 +574,7 @@ abstract class ActiveRecord extends BaseActiveRecord
                 }
                 $result = $this->deleteAll($condition);
                 if ($lock !== null && !$result) {
-                    throw new Exception(Exception::ERROR, 'The object being deleted is outdated.');
+                    throw new Exception('The object being deleted is outdated.');
                 }
                 $this->setOldAttributes(null);
                 $this->afterDelete();

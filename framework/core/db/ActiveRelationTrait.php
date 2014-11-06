@@ -143,8 +143,8 @@ trait ActiveRelationTrait
             $method = new \ReflectionMethod($model, 'get' . $name);
             $realName = lcfirst(substr($method->getName(), 3));
             if ($realName !== $name) {
-                throw new Exception(Exception::CRITICAL, 'Relation names are case sensitive. ' . get_class($model) .
-                                                         " has a relation named \"$realName\" instead of \"$name\".");
+                throw new Exception('Relation names are case sensitive. ' . get_class($model) .
+                                                         " has a relation named '{$realName}' instead of '{$name}'.");
             }
         }
 
@@ -185,7 +185,7 @@ trait ActiveRelationTrait
     public function populateRelation($name, &$primaryModels)
     {
         if (!is_array($this->link)) {
-            throw new Exception(Exception::CRITICAL, 'Invalid link: it must be an array of key-value pairs.');
+            throw new Exception('Invalid link: it must be an array of key-value pairs.');
         }
 
         if ($this->via instanceof self) {
@@ -418,7 +418,7 @@ trait ActiveRelationTrait
             $attribute = reset($this->link);
             foreach ($models as $model) {
                 if (empty($this->link) && !isset($model[$attribute])) {
-                    throw new Exception(Exception::CRITICAL, "field '$attribute' not found");
+                    throw new Exception("Field '{$attribute}' not found.");
                 }
                 if (($value = $model[$attribute]) !== null) {
                     $values[] = $value;

@@ -37,7 +37,7 @@ class CacheFile implements CacheInterface
 
     /**
      * @return FileManager
-     * @throws Exception
+     * @throws CacheException
      */
     public function getAdapter()
     {
@@ -50,7 +50,7 @@ class CacheFile implements CacheInterface
             $this->adapter = Rock::factory($this->adapter);
         }
         if (!$this->adapter instanceof FileManager) {
-            throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_CLASS, ['class' => $this->adapter]);
+            throw new CacheException(CacheException::UNKNOWN_CLASS, ['class' => $this->adapter]);
         }
 
         return $this->adapter;
@@ -61,7 +61,7 @@ class CacheFile implements CacheInterface
      */
     public function getStorage()
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new CacheException(CacheException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -301,7 +301,7 @@ class CacheFile implements CacheInterface
      */
     public function status()
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new CacheException(CacheException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -358,7 +358,7 @@ class CacheFile implements CacheInterface
      * Get data file cache
      *
      * @param string|int $key - key
-     * @throws Exception
+     * @throws CacheException
      * @return bool|mixed
      */
     protected function getDataFile($key)

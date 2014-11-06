@@ -2,9 +2,11 @@
 namespace rock\cache;
 
 use rock\helpers\Json;
+use rock\Rock;
 
 /**
- * Memcached storage
+ * Memcached storage.
+ *
  * if use expire "0", then time to live infinitely
  *
  * ```php
@@ -222,8 +224,8 @@ class Memcached implements CacheInterface
     /**
      * Set tags
      *
-     * @param string $key
-     * @param array  $tags
+     * @param string $key key of cache
+     * @param array  $tags list of tags
      */
     protected function setTags($key, array $tags = null)
     {
@@ -251,12 +253,6 @@ class Memcached implements CacheInterface
         return static::$storage->get(self::LOCK_PREFIX . $key);
     }
 
-    /**
-     * @param string $key
-     * @param mixed $value
-     * @param int $expire
-     * @return bool
-     */
     protected function provideLock($key, $value, $expire)
     {
         if ($this->lock($key, $value)) {
@@ -270,12 +266,13 @@ class Memcached implements CacheInterface
     }
 
     /**
-     * Set lock
-     * Note: Dog-pile" ("cache miss storm") and "race condition" effects
+     * Set lock.
      *
-     * @param string $key - key of cache
-     * @param mixed  $value
-     * @param int    $max
+     * > Dog-pile" ("cache miss storm") and "race condition" effects
+     *
+     * @param string $key key of cache
+     * @param mixed $value content of cache
+     * @param int    $max max iteration
      * @return bool
      */
     protected function lock($key, $value, $max = 15)
@@ -285,7 +282,7 @@ class Memcached implements CacheInterface
         while (!static::$storage->add(self::LOCK_PREFIX . $key, $value, 5)) {
             $iteration++;
             if ($iteration > $max) {
-                new Exception(Exception::ERROR, Exception::INVALID_SAVE, ['key' => $key]);
+                Rock::error(CacheException::INVALID_SAVE, ['key' => $key]);
                 return false;
             }
             usleep(1000);

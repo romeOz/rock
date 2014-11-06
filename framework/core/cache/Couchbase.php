@@ -3,6 +3,7 @@
 namespace rock\cache;
 
 use rock\helpers\Json;
+use rock\Rock;
 
 class Couchbase implements CacheInterface
 {
@@ -186,7 +187,7 @@ class Couchbase implements CacheInterface
      */
     public function getAllKeys()
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new CacheException(CacheException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -194,7 +195,7 @@ class Couchbase implements CacheInterface
      */
     public function getAll()
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new CacheException(CacheException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -214,7 +215,7 @@ class Couchbase implements CacheInterface
     }
 
     /**
-     * Set tags
+     * Set tags.
      *
      * @param string $key
      * @param array  $tags
@@ -261,8 +262,9 @@ class Couchbase implements CacheInterface
     }
 
     /**
-     * Set lock
-     * Note: Dog-pile" ("cache miss storm") and "race condition" effects
+     * Set lock.
+     *
+     * > Dog-pile" ("cache miss storm") and "race condition" effects.
      *
      * @param string $key
      * @param mixed  $value
@@ -276,7 +278,7 @@ class Couchbase implements CacheInterface
         while (!(bool)static::$storage->add(self::LOCK_PREFIX . $key, $value, 5)) {
             $iteration++;
             if ($iteration > $max) {
-                new Exception(Exception::ERROR, Exception::INVALID_SAVE, ['key' => $key]);
+                Rock::error(CacheException::INVALID_SAVE, ['key' => $key]);
                 return false;
             }
             usleep(1000);

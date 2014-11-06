@@ -2,6 +2,7 @@
 namespace rock\db\oci;
 
 use rock\db\ColumnSchema;
+use rock\db\Exception;
 use rock\db\TableSchema;
 
 /**
@@ -194,7 +195,7 @@ EOD;
         if ($this->db->isActive) {
             return $this->db->createCommand("SELECT {$sequenceName}.CURRVAL FROM DUAL")->queryScalar();
         } else {
-            throw new InvalidCallException('DB Connection is not active.');
+            throw new Exception('DB Connection is not active.');
         }
     }
 

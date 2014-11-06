@@ -28,7 +28,7 @@ class BaseObjectHelper
             $property = array_shift($keys);
             if (!isset($object->$property) && $throwException === true) {
                 throw new ObjectHelperException(
-                    ObjectHelperException::CRITICAL, ObjectHelperException::SETTING_UNKNOWN_PROPERTY, [
+                    ObjectHelperException::SETTING_UNKNOWN_PROPERTY, [
                         'class' => get_class(
                             $object
                         ), 'property' => $property
@@ -42,7 +42,7 @@ class BaseObjectHelper
             $property = array_shift($keys);
             if (!isset($object->$property) && $throwException === true) {
                 throw new ObjectHelperException(
-                    ObjectHelperException::CRITICAL, ObjectHelperException::SETTING_UNKNOWN_PROPERTY, [
+                    ObjectHelperException::SETTING_UNKNOWN_PROPERTY, [
                         'class' => get_class(
                             $object
                         ), 'property' => $property
@@ -55,27 +55,6 @@ class BaseObjectHelper
         }
 
         return $object;
-    }
-
-    /**
-     * Get method name.
-     *
-     * ```php
-     * ObjectHelper::methodName('namespace\Foo', 'method');
-     * // output: namespace\Foo::method
-     * ```
-     *
-     * @param object|string $object
-     * @param string        $method
-     * @return string
-     */
-    public static function methodName($object, $method)
-    {
-        if (is_object($object)) {
-            $object = get_class($object);
-        }
-
-        return "{$object}::{$method}";
     }
 
     /**

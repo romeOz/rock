@@ -45,7 +45,7 @@ class CallTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \rock\validate\Exception
+     * @expectedException \rock\validate\ValidateException
      */
     public function testInvalidCallbacksShouldRaiseComponentExceptionUponInstantiation()
     {

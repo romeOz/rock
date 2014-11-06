@@ -226,28 +226,23 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
     /**
      * Performs the data validation.
      *
-     * This method executes the validation rules applicable to the current @see scenario.
+     * This method executes the validation rules applicable to the current {@see \rock\base\Model::$scenario}.
      * The following criteria are used to determine whether a rule is currently applicable:
      *
      * - the rule must be associated with the attributes relevant to the current scenario;
      * - the rules must be effective for the current scenario.
      *
-     * This method will call @see beforeValidate()
-     * and @see afterValidate() before and
+     * This method will call {@see \rock\base\Model::beforeValidate()} and {@see \rock\base\Model::afterValidate()} before and
      * after the actual validation, respectively. If @see beforeValidate() returns false,
      * the validation will be cancelled and @see afterValidate() will not be called.
      *
-     * Errors found during the validation
-     * can be retrieved via @see getErrors() ,
-     *
-     * @see getFirstErrors()
-     * and @see getFirstError() .
+     * Errors found during the validation can be retrieved via {@see \rock\base\Model::getErrors()}, {@see \rock\base\Model::getFirstErrors()}
+     * and {@see \rock\base\Model::getFirstError()}.
      *
      * @param array $attributes list of attributes that should be validated.
      *                          If this parameter is empty, it means any attribute listed in the applicable
      *                          validation rules should be validated.
-     * @param boolean $clearErrors whether to
-     * call @see clearErrors() before performing validation
+     * @param boolean $clearErrors whether to call {@see \rock\base\Model::clearErrors()} before performing validation
      * @return boolean whether the validation is successful without any error.
      */
     public function validate(array $attributes = null, $clearErrors = true)
@@ -291,7 +286,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
 
             $type = array_shift($rule);
             if ($type !== self::RULE_SANITIZE && $type !== self::RULE_VALIDATE) {
-                throw new ModelException(ModelException::ERROR, "Unknown type of rule: {$type}");
+                throw new ModelException("Unknown type of rule: {$type}");
             }
             $attributeNames = array_shift($rule);
             if (is_string($attributeNames)) {
@@ -331,7 +326,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
                 $args = [];
                 if (is_string($key)) {
                     if (!is_array($rule)) {
-                        throw new ModelException(ModelException::ERROR, 'Arguments must be `array`');
+                        throw new ModelException('Arguments must be `array`');
                     }
                     $args = $rule;
                     $rule = $key;
@@ -396,7 +391,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
                 $args = [];
                 if (is_string($key)) {
                     if (!is_array($ruleName)) {
-                        throw new ModelException(ModelException::ERROR, 'Arguments must be `array`');
+                        throw new ModelException('Arguments must be `array`');
                     }
                     $args = $ruleName;
                     $ruleName = $key;

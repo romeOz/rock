@@ -44,7 +44,7 @@ class JsonResponseFormatter implements ResponseFormatterInterface
      * Formats response data in JSONP format.
      *
      * @param Response $response
-     * @throws Exception
+     * @throws ResponseException
      */
     protected function formatJsonp($response)
     {
@@ -53,7 +53,7 @@ class JsonResponseFormatter implements ResponseFormatterInterface
             $response->content = sprintf('%s(%s);', $response->data['callback'], Json::encode($response->data['data']));
         } else {
             $response->content = '';
-            throw new Exception(Exception::WARNING, "The 'jsonp' response requires that the data be an array consisting of both 'data' and 'callback' elements.");
+            throw new ResponseException("The 'jsonp' response requires that the data be an array consisting of both 'data' and 'callback' elements.");
         }
     }
 } 

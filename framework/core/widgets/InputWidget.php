@@ -38,7 +38,7 @@ class InputWidget extends Widget
     public function init()
     {
         if (!$this->hasModel() && $this->name === null) {
-            throw new Exception(Exception::CRITICAL, "Either 'name', or 'model' and 'attribute' properties must be specified.");
+            throw new WidgetException("Either 'name', or 'model' and 'attribute' properties must be specified.");
         }
         if (!isset($this->options['id'])) {
             $this->options['id'] = $this->hasModel() ? Html::getInputId($this->model, $this->attribute) : $this->getId();

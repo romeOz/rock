@@ -5,18 +5,17 @@ use rock\helpers\ArrayHelper;
 use rock\helpers\ObjectHelper;
 
 /**
- * ArrayableTrait provides a common implementation of the @see Arrayable interface.
+ * ArrayableTrait provides a common implementation of the {@see \rock\base\Arrayable} interface.
  *
- * ArrayableTrait implements @see Model::toArray() by respecting the field definitions as declared
- * in @see Model::fields()
- * and @see Model::extraFields() .
+ * ArrayableTrait implements {@see \rock\base\ArrayableTrait::toArray()} by respecting the field definitions as declared
+ * in {@see \rock\base\ArrayableTrait::fields()} and {@see \rock\base\ArrayableTrait::extraFields()}.
  */
 trait ArrayableTrait
 {
     /**
-     * Returns the list of fields that should be returned by default by @see toArray() when no specific fields are specified.
+     * Returns the list of fields that should be returned by default by {@see \rock\base\ArrayableTrait::toArray()} when no specific fields are specified.
      *
-     * A field is a named element in the returned array by @see toArray() .
+     * A field is a named element in the returned array by {@see \rock\base\ArrayableTrait::toArray()}.
      *
      * This method should return an array of field names or field definitions.
      * If the former, the field name will be treated as an object property name whose value will be used
@@ -66,11 +65,11 @@ trait ArrayableTrait
     }
 
     /**
-     * Returns the list of fields that can be expanded further and returned by  @see toArray() .
+     * Returns the list of fields that can be expanded further and returned by {@see \rock\base\ArrayableTrait::toArray()}.
      *
-     * This method is similar to @see fields() except that the list of fields returned
-     * by this method are not returned by default by @see toArray() . Only when field names
-     * to be expanded are explicitly specified when calling @see toArray() , will their values
+     * This method is similar to {@see \rock\base\ArrayableTrait::fields()} except that the list of fields returned
+     * by this method are not returned by default by {@see \rock\base\ArrayableTrait::toArray()}. Only when field names
+     * to be expanded are explicitly specified when calling {@see \rock\base\ArrayableTrait::toArray()}, will their values
      * be exported.
      *
      * The default implementation returns an empty array.
@@ -79,7 +78,7 @@ trait ArrayableTrait
      * (e.g. the current application user).
      *
      * @return array the list of expandable field names or field definitions. Please refer
-     * to @see fields() on the format of the return value.
+     * to {@see \rock\base\ArrayableTrait::fields()} on the format of the return value.
      * @see toArray()
      * @see fields()
      */
@@ -91,7 +90,7 @@ trait ArrayableTrait
     /**
      * Converts the model into an array.
      *
-     * This method will first identify which fields to be included in the resulting array by calling @see resolveFields() .
+     * This method will first identify which fields to be included in the resulting array by calling {@see \rock\base\ArrayableTrait::resolveFields()}.
      * It will then turn the model into an array with these fields. If `$recursive` is true,
      * any embedded objects will also be converted into arrays.
      *
@@ -99,10 +98,10 @@ trait ArrayableTrait
      * which refers to a list of links as specified by the interface.
      *
      * @param array $only        the fields being requested. If empty, all fields as specified
-     *                           by @see fields() will be returned.
+     *                           by {@see \rock\base\ArrayableTrait::fields()} will be returned.
      * @param array   $exclude
      * @param array   $expand    the additional fields being requested for exporting. Only fields declared
-     *                           in @see extraFields() will be considered.
+     *                           in {@see \rock\base\ArrayableTrait::extraFields()} will be considered.
      * @param boolean $recursive whether to recursively return array representation of embedded objects.
      * @return array the array representation of the object
      */
@@ -121,9 +120,10 @@ trait ArrayableTrait
     }
 
     /**
-     * Determines which fields can be returned by @see toArray() .
-     * This method will check the requested fields against those declared in @see fields()
-     * and @see extraFields() to determine which fields can be returned.
+     * Determines which fields can be returned by {@see \rock\base\ArrayableTrait::toArray()}.
+     *
+     * This method will check the requested fields against those declared in {@see \rock\base\ArrayableTrait::fields()}
+     * and {@see \rock\base\ArrayableTrait::extraFields()} to determine which fields can be returned.
      *
      * @param array $only   the fields being requested for exporting
      * @param array $expand the additional fields being requested for exporting
@@ -166,6 +166,7 @@ trait ArrayableTrait
 
     /**
      * Converts an object or an array of objects into an array.
+     *
      * @param object|array $object the object to be converted into an array
      * @param array $properties a mapping from object class names to the properties that need to put into the resulting arrays.
      * The properties specified for each class is an array of the following format:

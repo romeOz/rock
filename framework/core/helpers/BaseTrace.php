@@ -3,8 +3,6 @@
 namespace rock\helpers;
 
 use rock\base\ClassName;
-use rock\base\ComponentsTrait;
-
 
 class BaseTrace
 {

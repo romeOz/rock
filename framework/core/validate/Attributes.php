@@ -28,7 +28,7 @@ class Attributes
         }
         foreach ($this->attributes as $attribute => $validate) {
             if (!$validate instanceof Validate) {
-                throw new Exception(Exception::ERROR, "`{$attribute}` is not `".Validate::className()."`");
+                throw new ValidateException("`{$attribute}` is not `".Validate::className()."`");
             }
             if (!isset($value[$attribute])) {
                 $value[$attribute] = null;

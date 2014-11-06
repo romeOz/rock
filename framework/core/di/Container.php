@@ -17,7 +17,7 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
      * @param string|array $configs the configuration. It can be either a string representing the class name
      *                             or an array representing the object configuration.
      * @param mixed ...,$configs arguments for object.
-     * @throws Exception
+     * @throws ContainerException
      * @return null|ObjectInterface
      */
     public static function load(/*$args...*/$configs)
@@ -29,7 +29,7 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
 
         if (!static::has($class)) {
             if (!class_exists($class)) {
-                throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_CLASS, ['class' => $class]);
+                throw new ContainerException(ContainerException::UNKNOWN_CLASS, ['class' => $class]);
             }
             return static::newInstance($class, [$configs], $args);
         }
@@ -196,13 +196,13 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
      *
      * @param string $alias alias of class.
      * @param array|\Closure  $config
-     * @throws Exception
+     * @throws ContainerException
      */
     public static function add($alias, $config)
     {
         if (is_array($config)) {
             if (!class_exists($config['class'])) {
-                throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_CLASS, ['class' => $config['class']]);
+                throw new ContainerException(ContainerException::UNKNOWN_CLASS, ['class' => $config['class']]);
             }
             $name = $config['class'];
             $singleton = !empty($config['singleton']);
@@ -216,7 +216,7 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
         } elseif ($config instanceof \Closure) {
             static::$classAliases[$alias] = ['class' => $config, 'alias' => $alias, 'properties' => []];
         } else {
-            throw new Exception(Exception::CRITICAL, Exception::INVALID_CONFIG);
+            throw new ContainerException(ContainerException::INVALID_CONFIG);
         }
 
         unset(static::$instances[$alias]);
@@ -335,10 +335,6 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
      */
     protected static function setProperty($object, array $data, array $configs = [], array $args = [])
     {
-//        if (!ObjectHelper::instanceOfTrait($object, ObjectTrait::className())) {
-//            return;
-//        }
-        //$object->reset();
         ObjectHelper::setProperties($object, !empty($configs) ? $configs : $data['properties']);
         call_user_func_array([$object, 'init'], $args);
     }
@@ -349,7 +345,7 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
      * @param array $data array data of dependency.
      * @param array $configs
      * @param array $args array args of class.
-     * @throws Exception
+     * @throws ContainerException
      * @return object
      */
     protected static function getInstance(array $data, array $configs = [], array $args = [])
@@ -369,7 +365,7 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
                 $args
             );
         } catch (\Exception $e) {
-            throw new Exception(Exception::CRITICAL, $e->getMessage(), [], $e);
+            throw new ContainerException($e->getMessage(), [], $e);
         }
     }
 
@@ -443,7 +439,7 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
             $class = Rock::getAlias($config['class']);
             unset($config['class'], $config['singleton']);
         } else {
-            throw new Exception(Exception::CRITICAL, Exception::ARGS_NOT_ARRAY);
+            throw new ContainerException(ContainerException::ARGS_NOT_ARRAY);
         }
         $class = ltrim(str_replace(['\\', '_', '/'], '\\', $class), '\\');
 

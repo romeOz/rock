@@ -2,7 +2,7 @@
 
 namespace rockunit\core\validate;
 
-use rock\validate\Exception;
+use rock\validate\ValidateException;
 use rock\validate\locale\en\Date;
 use rock\validate\locale\en\Numeric;
 use rock\validate\Validate;
@@ -509,7 +509,7 @@ class ValidateTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException ValidateException
      */
     public function testAttributesThrowException()
     {
@@ -585,7 +585,7 @@ class ValidateTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException ValidateException
      */
     public function testAttributesOneThrowException()
     {
@@ -690,7 +690,7 @@ class ValidateTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException ValidateException
      */
     public function testUnknownRule()
     {
@@ -699,7 +699,7 @@ class ValidateTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException ValidateException
      */
     public function testClassNotExists()
     {
@@ -720,7 +720,7 @@ class ValidateTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException ValidateException
      */
     public function testClassI18NNotExists()
     {

@@ -169,7 +169,7 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
      *
      * @param $formatAlias
      * @param $params
-     * @throws Exception
+     * @throws DateException
      * @return string
      *
      * ```php
@@ -182,7 +182,7 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
     {
         $formatAlias = $this->getCustomFormat($formatAlias);
         if(!$formatAlias) {
-            throw new Exception(Exception::ERROR, "There is no method or format with name: {$formatAlias}");
+            throw new DateException("There is no method or format with name: {$formatAlias}");
         }
         return $this->format($formatAlias);
     }
@@ -279,7 +279,7 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
      * @param string         $optionName
      * @param callable $callback
      * ```function (DataTime $dataTime) {}```
-     * @throws Exception
+     * @throws DateException
      */
     public function addFormatOption($optionName, \Closure $callback)
     {

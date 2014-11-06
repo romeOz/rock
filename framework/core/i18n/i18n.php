@@ -46,7 +46,7 @@ class i18n implements ObjectInterface, i18nInterface
             foreach ($paths as $path) {
                 $path = Rock::getAlias($path);
                 if (!file_exists($path) || (!$data = require($path)) || !is_array($data)) {
-                    throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_FILE, ['path' => $path]);
+                    throw new i18nException(i18nException::UNKNOWN_FILE, ['path' => $path]);
                     break 2;
                 }
                 $context         = basename($path, '.php');
@@ -178,7 +178,7 @@ class i18n implements ObjectInterface, i18nInterface
      *
      * @param string|array $keys chain keys
      * @param array        $placeholders
-     * @throws Exception
+     * @throws i18nException
      * @return mixed|null
      */
     protected function translateInternal($keys, array $placeholders = [])
@@ -189,9 +189,7 @@ class i18n implements ObjectInterface, i18nInterface
         $result = ArrayHelper::getValue(static::$data[$this->locale][$this->category], $keys);
         if (!isset($result)) {
             $keys = is_array($keys) ? implode('][', $keys) : $keys;
-            throw new Exception(
-                Exception::ERROR, Exception::UNKNOWN_I18N, ['name' => "{$this->category}[{$keys}]"]
-            );
+            throw new i18nException(i18nException::UNKNOWN_I18N, ['name' => "{$this->category}[{$keys}]"]);
         }
 
         return String::replace($result, $placeholders, $this->removeBraces);

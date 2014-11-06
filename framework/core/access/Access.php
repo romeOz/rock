@@ -87,12 +87,12 @@ class Access implements ErrorsInterface
      * Check Access
      *
      * @return bool
-     * @throws Exception
+     * @throws AccessException
      */
     protected function provide()
     {
         if (!is_object($this->owner)) {
-            throw new Exception(Exception::CRITICAL, Exception::NOT_OBJECT, ['name' => 'owner']);
+            throw new AccessException(AccessException::NOT_OBJECT, ['name' => 'owner']);
         }
         if (!isset($this->rules['allow'])) {
             return true;

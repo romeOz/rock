@@ -46,7 +46,7 @@ interface QueueInterface
      *
      * @param string $message - send message
      * @param int $limit - the number of iterations, defaults to -1 which means no limit
-     * @throws Exception
+     * @throws MQException
      * @return null|string
      */
     public function send($message = '', $limit = -1);

@@ -71,12 +71,12 @@ class Collection implements ComponentsInterface
     /**
      * @param string $client service id.
      * @return ClientInterface auth client instance.
-     * @throws Exception on non existing client request.
+     * @throws AuthclientException on non existing client request.
      */
     public function getClient($client)
     {
         if (!array_key_exists($client, $this->_clients)) {
-            throw new Exception(Exception::CRITICAL, "Unknown auth client '{$client}'.");
+            throw new AuthclientException("Unknown auth client '{$client}'.");
         }
         if (!is_object($this->_clients[$client])) {
             $this->_clients[$client] = $this->createClient($this->_clients[$client]);

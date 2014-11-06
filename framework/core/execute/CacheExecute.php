@@ -38,7 +38,7 @@ class CacheExecute extends Execute
      * @param string $value - key
      * @param array  $data
      * @param array  $params
-     * @throws Exception
+     * @throws ExecuteException
      * @return mixed
      */
     public function get($value, array $params = null, array $data = null)
@@ -46,7 +46,7 @@ class CacheExecute extends Execute
         $path = static::preparePath($value);
 
         if (!file_exists($path) && !$this->createFile($path, $value)) {
-            throw new Exception(Exception::CRITICAL, Exception::NOT_CREATE_FILE, ['path' => $path]);
+            throw new ExecuteException(ExecuteException::NOT_CREATE_FILE, ['path' => $path]);
         }
         unset($value);
 

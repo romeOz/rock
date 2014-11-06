@@ -3,8 +3,7 @@ namespace rock\search;
 
 
 use rock\base\ComponentsTrait;
-use rock\base\ObjectTrait;
-use rock\exception\Exception;
+use rock\exception\BaseException;
 use rock\Rock;
 
 class PHPMorphy
@@ -33,9 +32,7 @@ class PHPMorphy
                     ]
                 );
             } catch (\Exception $e) {
-                throw new Exception(
-                    Exception::CRITICAL, $e->getMessage(), null, $e
-                );
+                throw new BaseException($e->getMessage(), [], $e);
             }
         }
     }

@@ -1302,7 +1302,7 @@ class BaseHtml
     {
         $formName = $model->formName();
         if (!preg_match('/(^|.*\])([\w\.]+)(\[.*|$)/', $attribute, $matches)) {
-            throw new HtmlException(HtmlException::CRITICAL, 'Attribute name must contain word characters only.');
+            throw new HtmlException('Attribute name must contain word characters only.');
         }
         $prefix = $matches[1];
         $attribute = $matches[2];
@@ -1312,9 +1312,7 @@ class BaseHtml
         } elseif ($formName !== '') {
             return $formName . $prefix . "[$attribute]" . $suffix;
         } else {
-            throw new HtmlException(
-                HtmlException::CRITICAL,
-                get_class($model) . '::formName() cannot be empty for tabular inputs.');
+            throw new HtmlException(get_class($model) . '::formName() cannot be empty for tabular inputs.');
         }
     }
 
@@ -1341,7 +1339,7 @@ class BaseHtml
         if (preg_match('/(^|.*\])([\w\.]+)(\[.*|$)/', $attribute, $matches)) {
             return $matches[2];
         } else {
-            throw new HtmlException(HtmlException::CRITICAL, 'Attribute name must contain word characters only.');
+            throw new HtmlException('Attribute name must contain word characters only.');
         }
     }
 
@@ -1438,7 +1436,7 @@ class BaseHtml
     public static function getAttributeValue($model, $attribute)
     {
         if (!preg_match('/(^|.*\])([\w\.]+)(\[.*|$)/', $attribute, $matches)) {
-            throw new HtmlException(HtmlException::CRITICAL, 'Attribute name must contain word characters only.');
+            throw new HtmlException('Attribute name must contain word characters only.');
         }
         $attribute = $matches[2];
         $value = $model->$attribute;

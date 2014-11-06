@@ -33,7 +33,7 @@ class DataProvider
 
     /**
      * @return FileManager
-     * @throws Exception
+     * @throws ImageException
      */
     public function getAdapterImage()
     {
@@ -46,14 +46,14 @@ class DataProvider
             static::$adapterImage = Rock::factory(static::$adapterImage);
         }
         if (!static::$adapterImage instanceof FileManager) {
-            throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_CLASS, ['class' => static::$adapterImage]);
+            throw new ImageException(ImageException::UNKNOWN_CLASS, ['class' => static::$adapterImage]);
         }
         return static::$adapterImage;
     }
 
     /**
      * @return FileManager
-     * @throws Exception
+     * @throws ImageException
      */
     public function getAdapterCache()
     {
@@ -66,7 +66,7 @@ class DataProvider
             static::$adapterCache = Rock::factory(static::$adapterCache);
         }
         if (!static::$adapterCache instanceof FileManager) {
-            throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_CLASS, ['class' => static::$adapterCache]);
+            throw new ImageException(ImageException::UNKNOWN_CLASS, ['class' => static::$adapterCache]);
         }
 
         return static::$adapterCache;
@@ -133,7 +133,7 @@ class DataProvider
         }
 
         if (!$this->getAdapterCache()->write($path, Image::thumbnail($this->resource, $this->width, $this->height)->get('jpg'))) {
-            new Exception(Exception::ERROR, Exception::NOT_CREATE_FILE, ['path' => $path]);
+            new ImageException(ImageException::NOT_CREATE_FILE, ['path' => $path]);
         }
     }
 }

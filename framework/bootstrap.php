@@ -21,11 +21,7 @@ Rock::$app->language = Request::getPreferredLanguage(Rock::$app->allowLanguages)
  * Catch error
  */
 \rock\exception\ErrorHandler::run();
-//
-///**
-// * Set level error
-// */
-//\models\exception\Exception::setLevelLog();
+
 /**
  * bootstrap
  */

@@ -4,6 +4,7 @@ namespace rock\captcha;
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
 use rock\helpers\Helper;
+use rock\Rock;
 
 /**
  * @author   Kruglov Sergei (fork by Romeo)
@@ -429,10 +430,7 @@ class Captcha implements ComponentsInterface, CaptchaInterface
         }
         $return['image'] = ob_get_clean();
         if (empty($return['image'])) {
-            new Exception(
-                Exception::ERROR, Exception::UNKNOWN_VAR, ['name' => '$return[\'image\']']
-            );
-
+            Rock::warning(CaptchaException::UNKNOWN_VAR, ['name' => '$return[\'image\']']);
             return [];
         }
         if ($session) {
@@ -466,6 +464,8 @@ class Captcha implements ComponentsInterface, CaptchaInterface
 
     /**
      * Sets the HTTP headers needed by image response.
+     *
+     * @param string $mimeType
      */
     protected function setHttpHeaders($mimeType)
     {

@@ -1,7 +1,6 @@
 <?php
 namespace rock\base;
 
-use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 
 /**

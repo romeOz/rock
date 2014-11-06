@@ -4,7 +4,7 @@ namespace rock\request;
 
 use rock\base\CollectionInterface;
 use rock\base\ObjectTrait;
-use rock\exception\Exception;
+use rock\exception\BaseException;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 
@@ -129,11 +129,11 @@ class RequestCollection implements \ArrayAccess, CollectionInterface
      *
      * @param string $name the resource name
      * @param mixed  $value
-     * @throws Exception
+     * @throws BaseException
      */
     public function offsetSet($name, $value)
     {
-        throw new Exception (Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new RequestException(RequestException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -177,7 +177,7 @@ class RequestCollection implements \ArrayAccess, CollectionInterface
 
     public function __set($name, $value)
     {
-        throw new Exception (Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new RequestException(RequestException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -197,20 +197,20 @@ class RequestCollection implements \ArrayAccess, CollectionInterface
     /**
      * @param string $name
      * @param mixed  $value
-     * @throws Exception
+     * @throws RequestException
      */
     public function add($name, $value)
     {
-        throw new Exception (Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new RequestException(RequestException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
      * @param array $data
-     * @throws Exception
+     * @throws RequestException
      */
     public function addMulti(array $data)
     {
-        throw new Exception (Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new RequestException(RequestException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**

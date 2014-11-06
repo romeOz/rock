@@ -4,7 +4,6 @@ namespace rock\db;
 use PDO;
 use rock\base\ComponentsTrait;
 use rock\base\ObjectInterface;
-use rock\base\ObjectTrait;
 use rock\Rock;
 
 /**
@@ -318,7 +317,7 @@ class Connection implements ObjectInterface
     {
         if ($this->pdo === null) {
             if (empty($this->dsn)) {
-                throw new Exception(Exception::CRITICAL, Exception::GETTING_UNKNOWN_PROPERTY, [
+                throw new Exception(Exception::GETTING_UNKNOWN_PROPERTY, [
                     'class' => __CLASS__, 'property' => 'dns'
                 ]);
             }
@@ -331,7 +330,7 @@ class Connection implements ObjectInterface
                 Rock::endProfile('db', $token);
             } catch (\PDOException $e) {
                 Rock::endProfile('db', $token);
-                throw new Exception(Exception::CRITICAL, $e->getMessage(), [], $e);
+                throw new Exception($e->getMessage(), [], $e);
             }
         }
     }
@@ -480,7 +479,7 @@ class Connection implements ObjectInterface
                 $this->_schema = is_array($this->schemaMap[$driver]) ? $this->schemaMap[$driver]['class'] : $this->schemaMap[$driver];
                 return $this->_schema = new $this->_schema(['db'=>$this]);
             } else {
-                throw new Exception(Exception::CRITICAL, Exception::NOT_SUPPORT_SCHEMA, ['driver' => $driver]);
+                throw new Exception(Exception::NOT_SUPPORT_SCHEMA, ['driver' => $driver]);
             }
         }
     }

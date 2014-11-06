@@ -618,7 +618,7 @@ class QueryBuilder
 
                 return $this->$method($indexes, $operator, $condition, $params);
             } else {
-                throw new Exception(Exception::CRITICAL, 'Found unknown operator in query: ' . $operator);
+                throw new Exception('Found unknown operator in query: ' . $operator);
             }
         } else { // hash format: 'column1' => 'value1', 'column2' => 'value2', ...
 
@@ -837,7 +837,7 @@ class QueryBuilder
     public function buildLikeCondition($indexes, $operator, $operands, &$params)
     {
         if (!isset($operands[0], $operands[1])) {
-            throw new Exception(Exception::CRITICAL, "Operator '$operator' requires two operands.");
+            throw new Exception("Operator '$operator' requires two operands.");
         }
 
         $escape = isset($operands[2]) ? $operands[2] : ['%'=>'\%', '_'=>'\_', '\\'=>'\\\\'];

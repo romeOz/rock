@@ -252,7 +252,7 @@ class Validate implements i18nInterface
      *
      * @param mixed $input
      * @return bool
-     * @throws Exception
+     * @throws ValidateException
      */
     public function validate($input)
     {
@@ -370,10 +370,10 @@ class Validate implements i18nInterface
         }
 
         if (!isset($this->rules[$name])) {
-            throw new Exception(Exception::ERROR, "Unknown rule: {$name}");
+            throw new ValidateException("Unknown rule: {$name}");
         }
         if (!class_exists($this->rules[$name]['class'])) {
-            throw new Exception(Exception::ERROR, Exception::UNKNOWN_CLASS, ['class' => $this->rules[$name]['class']]);
+            throw new ValidateException(ValidateException::UNKNOWN_CLASS, ['class' => $this->rules[$name]['class']]);
         }
         /** @var Rule $rule */
         $reflect = new \ReflectionClass($this->rules[$name]['class']);
@@ -431,7 +431,7 @@ class Validate implements i18nInterface
         /** @var Locale $locale */
         $locale = isset($this->rules[$ruleName]['locales'][$this->locale]) ? $this->rules[$ruleName]['locales'][$this->locale] : current($this->rules[$ruleName]['locales']);
         if (!class_exists($locale)) {
-            throw new Exception(Exception::ERROR, Exception::UNKNOWN_CLASS, ['class' => $locale]);
+            throw new ValidateException(ValidateException::UNKNOWN_CLASS, ['class' => $locale]);
         }
         $locale = new $locale;
         $locale->i18n = Rock::$app->i18n;
@@ -440,12 +440,12 @@ class Validate implements i18nInterface
             ->locale($this->locale)
             ->removeBraces(false);
         if (!$messages = $locale->defaultTemplates()) {
-            throw new Exception(Exception::ERROR, "Messages `{$locale}` is empty.");
+            throw new ValidateException("Messages `{$locale}` is empty.");
         }
         $this->placeholders = array_merge(call_user_func_array([$locale, 'defaultPlaceholders'], $rule->params), $this->placeholders);
         if (isset($this->templates[$ruleName])) {
             if (!isset($messages[(int)$this->valid][$this->templates[$ruleName]])) {
-                throw new Exception(Exception::ERROR, "Message `{$this->templates[$ruleName]}` is not found.");
+                throw new ValidateException("Message `{$this->templates[$ruleName]}` is not found.");
             }
             return $this->replace($messages[(int)$this->valid][$this->templates[$ruleName]]);
         }

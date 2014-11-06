@@ -7,7 +7,6 @@ use rock\base\ComponentsTrait;
 use rock\base\Config;
 use rock\di\Container;
 use rock\event\Event;
-use rock\filters\AccessFilter;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\String;
@@ -64,13 +63,13 @@ class Route implements RequestInterface, ErrorsInterface
      * SetConfigScope
      *
      * @param string $path - path config
-     * @throws Exception
+     * @throws RouteException
      */
     public static function setConfigScope($path)
     {
         $path = Rock::getAlias($path);
         if (!file_exists($path) || (!$configs = require($path))) {
-            throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_FILE, ['path' => $path]);
+            throw new RouteException(RouteException::UNKNOWN_FILE, ['path' => $path]);
         }
         Config::set($configs);
         Container::addMulti($configs['_components']);
@@ -270,7 +269,7 @@ class Route implements RequestInterface, ErrorsInterface
     /**
      * Manager URL by Application.
      *
-     * @throws Exception
+     * @throws RouteException
      */
     protected function provide()
     {
@@ -280,7 +279,7 @@ class Route implements RequestInterface, ErrorsInterface
             }
             return;
         }
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_PROPERTY, ['name' => 'rules']);
+        throw new RouteException(RouteException::UNKNOWN_PROPERTY, ['name' => 'rules']);
     }
 
     protected function isPattern($pattern)
@@ -303,9 +302,10 @@ class Route implements RequestInterface, ErrorsInterface
 
     /**
      * Get format.
-     * @param $key
+     *
+*@param $key
      * @return string
-     * @throws Exception
+     * @throws RouteException
      */
     protected function getFormat($key)
     {
@@ -319,7 +319,7 @@ class Route implements RequestInterface, ErrorsInterface
             case self::FORMAT_QUERY:
                 return Helper::getValueIsset($this->data['query']);
             default:
-                throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_FORMAT, ['format' => $key]);
+                throw new RouteException(RouteException::UNKNOWN_FORMAT, ['format' => $key]);
         }
     }
 

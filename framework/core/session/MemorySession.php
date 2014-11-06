@@ -19,12 +19,12 @@ use rock\Rock;
  * The following example shows how you can configure the application to use CacheSession:
  * Add the following to your application config under `components`:
  *
- * ~~~
+ * ```php
  * 'session' => [
  *     'class' => CacheSession::className(),
  *     'cache' => 'mycache',
  * ]
- * ~~~
+ * ```
  */
 class MemorySession extends Session
 {

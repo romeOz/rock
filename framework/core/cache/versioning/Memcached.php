@@ -2,7 +2,6 @@
 namespace rock\cache\versioning;
 
 use rock\cache\CacheInterface;
-use rock\cache\CacheTrait;
 use rock\date\DateTime;
 
 class Memcached extends \rock\cache\Memcached implements CacheInterface

@@ -110,13 +110,14 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
         } else {
             $error = error_get_last();
             $message = isset($error['message']) ? $error['message'] : 'Failed to start session.';
-            throw new Exception (Exception::ERROR, $message);
+            throw new SessionException($message);
         }
     }
 
     /**
      * Registers session handler.
-     * @throws Exception
+     *
+     * @throws SessionException
      */
     protected function registerSessionHandler()
     {
@@ -125,8 +126,7 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
                 $this->handler = Rock::factory($this->handler);
             }
             if (!$this->handler instanceof \SessionHandlerInterface) {
-                throw new Exception(Exception::CRITICAL,
-                                    '"' . get_class($this) . '::handler" must implement the SessionHandlerInterface.');
+                throw new SessionException('"' . get_class($this) . '::handler" must implement the SessionHandlerInterface.');
             }
             /** @noinspection PhpParamsInspection */
             @session_set_save_handler($this->handler, false);
@@ -260,7 +260,7 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
 
     /**
      * @param string $value the current session save path. This can be either a directory name or a path alias.
-     * @throws Exception if the path is not a valid directory
+     * @throws SessionException if the path is not a valid directory
      */
     public function setSavePath($value)
     {
@@ -268,7 +268,7 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
         if (is_dir($path)) {
             session_save_path($path);
         } else {
-            throw new Exception(Exception::CRITICAL, "Session save path is not a valid directory: $value");
+            throw new SessionException("Session save path is not a valid directory: $value");
         }
     }
 
@@ -296,7 +296,8 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
     /**
      * Sets the session cookie parameters.
      * This method is called by [[open()]] when it is about to open the session.
-     * @throws Exception if the parameters are incomplete.
+     *
+*@throws SessionException if the parameters are incomplete.
      * @see http://us2.php.net/manual/en/function.session-set-cookie-params.php
      */
     private function setCookieParamsInternal()
@@ -305,7 +306,7 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
         if (isset($data['lifetime'], $data['path'], $data['domain'], $data['secure'], $data['httponly'])) {
             session_set_cookie_params($data['lifetime'], $data['path'], $data['domain'], $data['secure'], $data['httponly']);
         } else {
-            throw new Exception(Exception::CRITICAL, 'Please make sure cookieParams contains these elements: lifetime, path, domain, secure and httponly.');
+            throw new SessionException('Please make sure cookieParams contains these elements: lifetime, path, domain, secure and httponly.');
         }
 
         if (isset($data['setUseCookies'])) {
@@ -363,7 +364,7 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
 
     /**
      * @param float $value the probability (percentage) that the GC (garbage collection) process is started on every session initialization.
-     * @throws Exception if the value is not between 0 and 100.
+     * @throws SessionException if the value is not between 0 and 100.
      */
     public function setGCProbability($value)
     {
@@ -372,7 +373,7 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
             ini_set('session.gc_probability', floor($value * 21474836.47));
             ini_set('session.gc_divisor', 2147483647);
         } else {
-            throw new Exception(Exception::CRITICAL, 'GCProbability must be a value between 0 and 100.');
+            throw new SessionException('GCProbability must be a value between 0 and 100.');
         }
     }
 

@@ -46,7 +46,7 @@ class ZeroQueue extends Queue implements QueueInterface
                    break;
                 }
             } catch (\ZMQSocketException $e) {
-                throw new Exception(Exception::CRITICAL, $e->getMessage(), [], $e);
+                throw new MQException($e->getMessage(), [], $e);
             }
             ++$count;
             sleep($this->timeout);
@@ -61,7 +61,7 @@ class ZeroQueue extends Queue implements QueueInterface
                 }
 
             } catch (\ZMQSocketException $e) {
-                throw new Exception(Exception::CRITICAL, $e->getMessage(), [], $e);
+                throw new MQException($e->getMessage(), [], $e);
             }
             ++$count;
             sleep($this->timeout);
@@ -108,7 +108,7 @@ class ZeroQueue extends Queue implements QueueInterface
 
     /**
      * @inheritdoc
-     * @throws Exception
+     * @throws MQException
      */
     public function subscribe($topic = '', $limit = -1, $message = '')
     {
@@ -135,7 +135,7 @@ class ZeroQueue extends Queue implements QueueInterface
                     return $result;
                 }
             } catch (\ZMQSocketException $e) {
-                throw new Exception(Exception::CRITICAL, $e->getMessage(),[], $e);
+                throw new MQException($e->getMessage(),[], $e);
             }
             ++$count;
             sleep($this->timeout);
@@ -147,7 +147,7 @@ class ZeroQueue extends Queue implements QueueInterface
 
     /**
      * @param $type
-     * @throws Exception
+     * @throws MQException
      * @return \ZMQSocket
      */
     protected function connection($type)
@@ -161,7 +161,7 @@ class ZeroQueue extends Queue implements QueueInterface
             $socket->connect($this->dns);
             //$socket->bind($this->dns);
         } else {
-            throw new Exception(Exception::ERROR, "Already connected to {$this->dns}");
+            throw new MQException("Already connected to {$this->dns}");
         }
 
         return $socket;

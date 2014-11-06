@@ -542,9 +542,7 @@ class QueryBuilder
      */
     public function resetSequence($table, $value = null)
     {
-        throw new Exception(Exception::CRITICAL, Exception::NOT_SUPPORT_RESETTING, [
-            'driver' => $this->db->getDriverName()
-        ]);
+        throw new Exception(Exception::NOT_SUPPORT_RESETTING, ['driver' => $this->db->getDriverName()]);
     }
 
     /**
@@ -557,9 +555,7 @@ class QueryBuilder
      */
     public function checkIntegrity($check = true, $schema = '', $table = '')
     {
-        throw new Exception(Exception::CRITICAL, Exception::NOT_SUPPORT_INTEGRITY_CHECK, [
-            'driver' => $this->db->getDriverName()
-        ]);
+        throw new Exception(Exception::NOT_SUPPORT_INTEGRITY_CHECK, ['driver' => $this->db->getDriverName()]);
     }
 
     /**
@@ -693,7 +689,7 @@ class QueryBuilder
 
         foreach ($joins as $i => $join) {
             if (!is_array($join) || !isset($join[0], $join[1])) {
-                throw new Exception(Exception::CRITICAL, Exception::JOIN_IS_NOT_ARRAY);
+                throw new Exception(Exception::JOIN_IS_NOT_ARRAY);
             }
             // 0:join type, 1:join table, 2:on-condition (optional)
             list ($joinType, $table) = $join;
@@ -900,7 +896,7 @@ class QueryBuilder
                 array_shift($condition);
                 return $this->$method($operator, $condition, $params);
             } else {
-                throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_OPERATOR, ['operator' => $operator]);
+                throw new Exception(Exception::UNKNOWN_OPERATOR, ['operator' => $operator]);
             }
         } else { // hash format: 'column1' => 'value1', 'column2' => 'value2', ...
             return $this->buildHashCondition($condition, $params);
@@ -977,7 +973,7 @@ class QueryBuilder
     public function buildNotCondition($operator, $operands, &$params)
     {
         if (count($operands) != 1) {
-            throw new Exception(Exception::CRITICAL, "Operator '$operator' requires exactly one operand.");
+            throw new Exception("Operator '$operator' requires exactly one operand.");
         }
 
         $operand = reset($operands);
@@ -1003,7 +999,7 @@ class QueryBuilder
     public function buildBetweenCondition($operator, $operands, &$params)
     {
         if (!isset($operands[0], $operands[1], $operands[2])) {
-            throw new Exception(Exception::CRITICAL, "Operator '$operator' requires three operands.");
+            throw new Exception("Operator '$operator' requires three operands.");
         }
 
         list($column, $value1, $value2) = $operands;
@@ -1034,7 +1030,7 @@ class QueryBuilder
     public function buildInCondition($operator, $operands, &$params)
     {
         if (!isset($operands[0], $operands[1])) {
-            throw new Exception(Exception::CRITICAL, "Operator '$operator' requires two operands.");
+            throw new Exception("Operator '$operator' requires two operands.");
         }
 
         list($column, $values) = $operands;
@@ -1148,14 +1144,14 @@ class QueryBuilder
     public function buildLikeCondition($operator, $operands, &$params)
     {
         if (!isset($operands[0], $operands[1])) {
-            throw new Exception(Exception::CRITICAL, "Operator '$operator' requires two operands.");
+            throw new Exception("Operator '$operator' requires two operands.");
         }
 
         $escape = isset($operands[2]) ? $operands[2] : ['%'=>'\%', '_'=>'\_', '\\'=>'\\\\'];
         unset($operands[2]);
 
         if (!preg_match('/^(AND |OR |)(((NOT |))I?LIKE)/', $operator, $matches)) {
-            throw new Exception(Exception::CRITICAL, "Invalid operator '$operator'.");
+            throw new Exception("Invalid operator '$operator'.");
         }
         $andor = ' ' . (!empty($matches[1]) ? $matches[1] : 'AND ');
         $not = !empty($matches[3]);
@@ -1197,7 +1193,7 @@ class QueryBuilder
             list($sql, $params) = $this->build($operands[0], $params);
             return "$operator ($sql)";
         } else {
-            throw new Exception(Exception::CRITICAL, 'Subquery for EXISTS operator must be a Query object.');
+            throw new Exception('Subquery for EXISTS operator must be a Query object.');
         }
     }
 }

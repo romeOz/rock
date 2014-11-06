@@ -5,7 +5,7 @@ use rock\base\ClassName;
 use rock\helpers\Helper;
 use rock\helpers\String;
 use rock\Rock;
-use rock\template\Exception;
+use rock\template\TemplateException;
 use rock\template\Template;
 
 /**
@@ -63,13 +63,13 @@ class StringFilter
      * - else
      *
      * @param Template $template
-     * @throws \rock\template\Exception
+     * @throws \rock\template\TemplateException
      * @return string
      */
     public static function contains($value, array $params, Template $template)
     {
         if (empty($params) || count($params) < 2 || !isset($params['then'])) {
-            throw new Exception(Exception::ERROR, Exception::UNKNOWN_PARAM_FILTER, ['name' => __METHOD__]);
+            throw new TemplateException(TemplateException::ERROR, TemplateException::UNKNOWN_PARAM_FILTER, ['name' => __METHOD__]);
         }
         $params['else'] = isset($params['else']) ? $params['else'] : null;
         $template = clone $template;

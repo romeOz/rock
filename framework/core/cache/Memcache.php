@@ -2,6 +2,8 @@
 
 namespace rock\cache;
 
+use rock\Rock;
+
 class Memcache extends Memcached
 {
     /** @var  \Memcache */
@@ -59,7 +61,7 @@ class Memcache extends Memcached
      */
     public function getAllKeys()
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new CacheException(CacheException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -67,25 +69,17 @@ class Memcache extends Memcached
      */
     public function getAll()
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new CacheException(CacheException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
-     * Set lock of cache
-     * "Dog-pile" ("cache miss storm") and "race condition" effects
-     *
-     * @param string $key - key of cache
-     * @param mixed $value - content of cache
-     * @param int   $expire - expire of cache
-     * @param int   $count - iteration
-     * @return bool
+     * @inheritdoc
      */
     protected function provideLock($key, $value, $expire, &$count = 0)
     {
         if ($this->lock($key, $value)) {
             static::$storage->set($key, $value, MEMCACHE_COMPRESSED, $expire);
             $this->unlock($key);
-
             return true;
         }
 
@@ -94,13 +88,7 @@ class Memcache extends Memcached
 
 
     /**
-     * Set lock
-     * Note: Dog-pile" ("cache miss storm") and "race condition" effects
-     *
-     * @param string $key - key of cache
-     * @param mixed $value - content of cache
-     * @param int    $max - max iteration
-     * @return bool
+     * @inheritdoc
      */
     protected function lock($key, $value, $max = 15)
     {
@@ -109,7 +97,7 @@ class Memcache extends Memcached
         while (!static::$storage->add(self::LOCK_PREFIX . $key, $value, MEMCACHE_COMPRESSED, 5)) {
             $iteration++;
             if ($iteration > $max) {
-                new Exception(Exception::ERROR, Exception::INVALID_SAVE, ['key' => $key]);
+                Rock::error(CacheException::INVALID_SAVE, ['key' => $key]);
                 return false;
             }
             usleep(1000);
@@ -119,10 +107,7 @@ class Memcache extends Memcached
     }
 
     /**
-     * Set dependency
-     *
-     * @param string $key - key of cache
-     * @param array  $tags - list of tags
+     * @inheritdoc
      */
     protected function setTags($key, array $tags = null)
     {

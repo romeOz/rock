@@ -5,7 +5,6 @@ namespace rock\behaviors;
 
 use rock\db\BaseActiveRecord;
 use rock\db\Expression;
-use rock\event\Event;
 
 
 /**

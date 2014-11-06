@@ -102,7 +102,7 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \rock\sanitize\Exception
+     * @expectedException \rock\sanitize\SanitizeException
      */
     public function testAttributesThrowException()
     {
@@ -250,7 +250,7 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \rock\sanitize\Exception
+     * @expectedException \rock\sanitize\SanitizeException
      */
     public function testUnknownRule()
     {

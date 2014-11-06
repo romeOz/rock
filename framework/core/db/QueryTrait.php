@@ -292,7 +292,7 @@ trait QueryTrait
                 }
                 break;
             default:
-                throw new Exception(Exception::CRITICAL, "Operator not supported: $operator");
+                throw new Exception("Operator not supported: $operator");
         }
 
         array_unshift($condition, $operator);

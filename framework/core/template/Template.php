@@ -297,7 +297,7 @@ class Template implements ComponentsInterface
     /**
      * @param string $path path to layout/chunk.
      * @param array  $placeholders
-     * @throws Exception
+     * @throws TemplateException
      * @return string
      */
     protected function renderInternal($path, array $placeholders = [])
@@ -313,7 +313,7 @@ class Template implements ComponentsInterface
         }
         $this->path = $path;
         if (!file_exists($path)) {
-            throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_FILE, ['path' => $path]);
+            throw new TemplateException(TemplateException::UNKNOWN_FILE, ['path' => $path]);
         }
         if (current(array_keys($this->engines, pathinfo($path, PATHINFO_EXTENSION))) === self::ENGINE_PHP) {
             $this->addMultiPlaceholders($placeholders ?: []);
@@ -1126,7 +1126,7 @@ class Template implements ComponentsInterface
      * Callback to replace variables template.
      *
      * @param array $matches array of variables template.
-     * @throws Exception
+     * @throws TemplateException
      * @return string
      */
     protected function replaceCallback($matches)
@@ -1237,7 +1237,7 @@ class Template implements ComponentsInterface
             }
         }
         if (!is_scalar($result) && !empty($result)) {
-            throw new Exception(Exception::ERROR, 'Wrong type is var: ' . Json::encode($result));
+            throw new TemplateException('Wrong type is var: ' . Json::encode($result));
         }
         // Set cache
         $this->setCache(
@@ -1439,7 +1439,7 @@ class Template implements ComponentsInterface
     /**
      * @param string $name   name of extension
      * @param array  $params params
-     * @throws Exception
+     * @throws TemplateException
      * @return mixed
      */
     private function _getExtensionInternal($name = null, array $params = [])
@@ -1537,7 +1537,7 @@ class Template implements ComponentsInterface
             /** @var \rock\base\Snippet $snippet */
             $snippet = Rock::factory($params);
             if (!$snippet instanceof Snippet) {
-                throw new Exception(Exception::ERROR, Exception::UNKNOWN_SNIPPET, ['name' => $snippet::className()]);
+                throw new TemplateException(TemplateException::UNKNOWN_SNIPPET, ['name' => $snippet::className()]);
             }
         }
         if ($autoEscape === false) {
@@ -1580,7 +1580,7 @@ class Template implements ComponentsInterface
      *
      * @param string $value   value
      * @param array  $filters array of filters with params
-     * @throws Exception
+     * @throws TemplateException
      * @return string
      */
     public function makeFilter($value, $filters)
@@ -1599,7 +1599,7 @@ class Template implements ComponentsInterface
                 } elseif (function_exists($method)) {
                     $value = call_user_func_array($method, array_merge([$value], $_params));
                 } else {
-                    throw new Exception(Exception::ERROR, Exception::UNKNOWN_FILTER, ['name' => $method]);
+                    throw new TemplateException(TemplateException::UNKNOWN_FILTER, ['name' => $method]);
                 }
             }
         };

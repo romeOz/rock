@@ -3,11 +3,9 @@ namespace rock\mail;
 
 
 use rock\base\ComponentsTrait;
-use rock\base\ObjectTrait;
 
 class Mail extends \PHPMailer
 {
-
     use ComponentsTrait {
         ComponentsTrait::__construct as parentConstruct;
     }
@@ -24,9 +22,8 @@ class Mail extends \PHPMailer
         $this->isHTML();
     }
 
-
     /**
-     * Set address recipient
+     * Set address recipient.
      *
      * @param string $address
      * @param string $name
@@ -35,10 +32,8 @@ class Mail extends \PHPMailer
     public function address($address, $name = "")
     {
         $this->addAddress($address, $name);
-
         return $this;
     }
-
 
     /**
      * Subject
@@ -52,7 +47,6 @@ class Mail extends \PHPMailer
         return $this;
     }
 
-
     /**
      * Body
      *
@@ -62,7 +56,6 @@ class Mail extends \PHPMailer
     public function body($body)
     {
         $this->Body = $body;
-
         return $this;
     }
 }

@@ -7,15 +7,6 @@ use rock\db\ActiveQueryInterface;
 
 interface ComponentsInterface extends ObjectInterface
 {
-//    /**
-//     * Get method
-//     *
-//     * @param string $name name of method
-//     * @param array  $args args action method
-//     * @return mixed
-//     * @throws \rock\exception\Exception
-//     */
-//    public function method($name, array $args = null);
 
     /**
      * Get data behaviors

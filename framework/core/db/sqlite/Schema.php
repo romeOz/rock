@@ -269,7 +269,7 @@ class Schema extends \rock\db\Schema
                 $this->db->createCommand("PRAGMA read_uncommitted = True;")->execute();
             break;
             default:
-                throw new Exception(Exception::CRITICAL, get_class($this) . ' only supports transaction isolation levels READ UNCOMMITTED and SERIALIZABLE.');
+                throw new Exception(get_class($this) . ' only supports transaction isolation levels READ UNCOMMITTED and SERIALIZABLE.');
         }
     }
 }

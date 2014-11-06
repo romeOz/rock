@@ -793,7 +793,7 @@ class Query implements QueryInterface
         $connection = $this->getConnection();
         $match = $this->match;
         if ($match === null) {
-            throw new Exception(Exception::CRITICAL, 'Unable to call snippets: "' . $this->className() . '::match" should be specified.');
+            throw new Exception('Unable to call snippets: "' . $this->className() . '::match" should be specified.');
         }
 
         return $connection->createCommand()

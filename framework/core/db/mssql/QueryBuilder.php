@@ -115,7 +115,7 @@ class QueryBuilder extends \rock\db\QueryBuilder
         }
         $table = $this->db->quoteTableName($table);
         if ($this->db->getTableSchema($table) === null) {
-            throw new Exception(Exception:: CRITICAL, "Table not found: $table");
+            throw new Exception("Table not found: {$table}.");
         }
         $enable = $check ? 'CHECK' : 'NOCHECK';
 

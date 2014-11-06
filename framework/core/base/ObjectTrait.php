@@ -3,7 +3,7 @@
 namespace rock\base;
 
 
-use rock\exception\Exception;
+use rock\exception\BaseException;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\ObjectHelper;
@@ -101,13 +101,13 @@ trait ObjectTrait
         if (method_exists($this, $getter)) {
             return $this->$getter();
         } elseif (method_exists($this, 'set' . $name)) {
-            throw new Exception(Exception::CRITICAL, Exception::GETTING_WRITE_ONLY_PROPERTY, [
+            throw new BaseException(BaseException::GETTING_WRITE_ONLY_PROPERTY, [
                 'class' => get_class(
                     $this
                 ), 'property' => $name
             ]);
         } else {
-            throw new Exception(Exception::CRITICAL, Exception::GETTING_UNKNOWN_PROPERTY, [
+            throw new BaseException(BaseException::GETTING_UNKNOWN_PROPERTY, [
                 'class' => get_class($this), 'property' => $name
             ]);
         }
@@ -122,8 +122,8 @@ trait ObjectTrait
      *
      * @param string $name  the property name or the event name
      * @param mixed  $value the property value
-     * @throws Exception if the property is not defined
-     * @throws Exception if the property is read-only.
+     * @throws BaseException if the property is not defined
+     * @throws BaseException if the property is read-only.
      * @see __get
      */
     public function __set($name, $value)
@@ -132,13 +132,13 @@ trait ObjectTrait
         if (method_exists($this, $setter)) {
             $this->$setter($value);
         } elseif (method_exists($this, 'get' . $name)) {
-            throw new Exception(Exception::CRITICAL, Exception::SETTING_READ_ONLY_PROPERTY, [
+            throw new BaseException(BaseException::SETTING_READ_ONLY_PROPERTY, [
                 'class' => get_class(
                     $this
                 ), 'property' => $name
             ]);
         } else {
-            throw new Exception(Exception::CRITICAL, Exception::SETTING_UNKNOWN_PROPERTY, [
+            throw new BaseException(BaseException::SETTING_UNKNOWN_PROPERTY, [
                 'class' => get_class($this), 'property' => $name
             ]);
         }
@@ -175,7 +175,7 @@ trait ObjectTrait
      * If the property is read-only, it will throw an exception.
      *
      * @param string $name the property name
-     * @throws Exception if the property is read only.
+     * @throws BaseException if the property is read only.
      */
     public function __unset($name)
     {
@@ -183,7 +183,7 @@ trait ObjectTrait
         if (method_exists($this, $setter)) {
             $this->$setter(null);
         } elseif (method_exists($this, 'get' . $name)) {
-            throw new Exception(Exception::CRITICAL, 'Unsetting read-only property: ' . get_class($this) . '::' . $name);
+            throw new BaseException('Unsetting read-only property: ' . get_class($this) . '::' . $name);
         }
     }
 
@@ -200,7 +200,7 @@ trait ObjectTrait
      */
     public function __call($name, $params = null)
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, [
+        throw new BaseException(BaseException::UNKNOWN_METHOD, [
             'method' => get_class($this) . "::{$name}()"
         ]);
     }

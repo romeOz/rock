@@ -42,7 +42,7 @@ class IpTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \rock\validate\Exception
+     * @expectedException \rock\validate\ValidateException
      */
     public function testThrowExceptionMinNetworkRange()
     {
@@ -51,7 +51,7 @@ class IpTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \rock\validate\Exception
+     * @expectedException \rock\validate\ValidateException
      */
     public function testThrowExceptionMaxNetworkRange()
     {

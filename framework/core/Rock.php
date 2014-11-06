@@ -2,19 +2,18 @@
 namespace rock;
 
 
-use apps\common\models\users\Users;
 use League\Flysystem\Util;
 use rock\base\ClassName;
 use rock\base\Config;
 use rock\base\Controller;
 use rock\di\Container;
 use rock\event\Event;
-use rock\exception\Exception;
+use rock\exception\BaseException;
 use rock\helpers\ObjectHelper;
 use rock\helpers\String;
 use rock\helpers\Trace;
-use rock\i18n\i18n;
 use rock\i18n\i18nInterface;
+use rock\log\Log;
 
 class Rock
 {
@@ -56,6 +55,7 @@ class Rock
      * Bootstrap
      *
      * @param array $configs
+     * @throws BaseException
      */
     public static function bootstrap(array $configs)
     {
@@ -76,9 +76,8 @@ class Rock
             // Routing
             Rock::$app->route->run();
 
-
         } catch (\Exception $e) {
-            new Exception(Exception::ERROR, null, [], $e);
+            throw new BaseException($e->getMessage(), [], $e);
         }
         //var_dump(Trace::getTime(Trace::APP_TIME));
         \rock\helpers\Trace::endProfile(\rock\helpers\Trace::APP, \rock\helpers\Trace::TOKEN_APP_RUNTIME);
@@ -362,43 +361,68 @@ class Rock
      * Logging as `INFO`
      *
      * @param string $message
-     * @param array $placeholders
+     * @param array  $placeholders placeholders for replacement
+     * @param array  $traces
      */
-    public static function info($message, array $placeholders = [])
+    public static function info($message, array $placeholders = [], array $traces = [])
     {
-        static::$app->log->info($message, $placeholders);
+        static::log(Log::INFO, $message, $placeholders, $traces);
     }
 
     /**
      * Logging as `DEBUG`
      *
      * @param string $message
-     * @param array $placeholders
+     * @param array  $placeholders placeholders for replacement
+     * @param array  $traces
      */
-    public static function debug($message, array $placeholders = [])
+    public static function debug($message, array $placeholders = [], array $traces = [])
     {
-        static::$app->log->debug($message, $placeholders);
+        static::log(Log::DEBUG, $message, $placeholders, $traces);
     }
 
     /**
      * Logging as `WARNING`
      *
      * @param string $message
-     * @param array $placeholders
+     * @param array  $placeholders placeholders for replacement
+     * @param array  $traces
      */
-    public static function warning($message, array $placeholders = [])
+    public static function warning($message, array $placeholders = [], array $traces = [])
     {
-        static::$app->log->warning($message, $placeholders);
+        static::log(Log::WARNING, $message, $placeholders, $traces);
     }
 
     /**
      * Logging as `ERROR`
      *
      * @param string $message
-     * @param array $placeholders
+     * @param array  $placeholders placeholders for replacement
+     * @param array  $traces
      */
-    public static function error($message, array $placeholders = [])
+    public static function error($message, array $placeholders = [], array $traces = [])
     {
-        static::$app->log->error($message, $placeholders);
+        static::log(Log::ERROR, $message, $placeholders, $traces);
+    }
+
+    /**
+     * Logging as `CRITICAL`
+     *
+     * @param string $message
+     * @param array  $placeholders placeholders for replacement
+     * @param array  $traces
+     */
+    public static function crit($message, array $placeholders = [], array $traces = [])
+    {
+        static::log(Log::CRITICAL, $message, $placeholders, $traces);
+    }
+
+    public static function log($level, $message, array $placeholders = [], array $traces = [])
+    {
+        if (empty($traces)) {
+            $traces = BaseException::getTraces(3);
+        }
+        $message = BaseException::replace($message, $traces, BaseException::$asStack);
+        static::$app->log->log($level, $message, $placeholders);
     }
 }

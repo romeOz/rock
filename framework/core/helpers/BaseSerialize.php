@@ -37,7 +37,7 @@ class BaseSerialize implements SerializeInterface
             return Json::decode($value);
         }
         if ($throwException == true) {
-            throw new SerializeException(SerializeException::ERROR, SerializeException::NOT_SERIALIZE);
+            throw new SerializeException(SerializeException::NOT_SERIALIZE);
         }
 
         return $value;

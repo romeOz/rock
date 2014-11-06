@@ -3,7 +3,7 @@
 namespace rock\validate\rules;
 
 
-use rock\validate\Exception;
+use rock\validate\ValidateException;
 
 class FileSizeBetween extends Rule
 {
@@ -11,7 +11,7 @@ class FileSizeBetween extends Rule
     {
         $this->parentConstruct($config);
         if (!is_null($min) && !is_null($max) && $min > $max) {
-            throw new Exception(Exception::ERROR, sprintf('%s cannot be less than  %s for validation', $min, $max));
+            throw new ValidateException(sprintf('%s cannot be less than  %s for validation', $min, $max));
         }
         $this->params['minValue'] = \rock\helpers\File::sizeToBytes($min);;
         $this->params['maxValue'] = \rock\helpers\File::sizeToBytes($max);

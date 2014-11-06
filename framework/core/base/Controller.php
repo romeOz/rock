@@ -166,7 +166,7 @@ abstract class Controller implements ComponentsInterface
     {
         if (!method_exists($this, $actionName)) {
             $this->detachBehaviors();
-            throw new ControllerException(ControllerException::CRITICAL, ControllerException::UNKNOWN_METHOD, [
+            throw new ControllerException(ControllerException::UNKNOWN_METHOD, [
                 'method' => get_class($this) . '::' . $actionName
             ]);
         }

@@ -36,7 +36,6 @@ class BaseArrayHelper
         foreach ($keys as $key) {
             if (!is_array($current) || !Helper::getValue($current[$key])) {
                 throw new ArrayException(
-                    ArrayException::ERROR,
                     sprintf(
                         'Did not find path %s in structure %s',
                         json_encode($keys),
@@ -366,7 +365,7 @@ class BaseArrayHelper
                 $keys[$iterator->key()] = $_keys;
             }
         } catch (\Exception $e) {
-            throw new ArrayException(ArrayException::ERROR, $e->getMessage(), [], $e);
+            throw new ArrayException($e->getMessage(), [], $e);
         }
         $iterator = null;
 
@@ -432,7 +431,7 @@ class BaseArrayHelper
                 $keys[][$iterator->key()] = $_keys;
             }
         } catch (\Exception $e) {
-            throw new ArrayException(ArrayException::ERROR, $e->getMessage(), [], $e);
+            throw new ArrayException($e->getMessage(), [], $e);
         }
 
         return $result;
@@ -836,9 +835,7 @@ class BaseArrayHelper
                 }
             }
         } catch (\Exception $e) {
-            throw new ArrayException(
-                ArrayException::ERROR, $e->getMessage(), ['name' => 'RecursiveIteratorIterator'], $e
-            );
+            throw new ArrayException($e->getMessage(), ['name' => 'RecursiveIteratorIterator'], $e);
         }
         $iterator = null;
 
@@ -931,16 +928,12 @@ class BaseArrayHelper
         if (is_scalar($direction)) {
             $direction = array_fill(0, $n, $direction);
         } elseif (count($direction) !== $n) {
-            throw new ArrayException(
-                ArrayException::ERROR,
-                'The length of $descending parameter must be the same as that of $keys.');
+            throw new ArrayException('The length of $descending parameter must be the same as that of $keys.');
         }
         if (is_scalar($sortFlag)) {
             $sortFlag = array_fill(0, $n, $sortFlag);
         } elseif (count($sortFlag) !== $n) {
-            throw new ArrayException(
-                ArrayException::ERROR,
-                'The length of $sortFlag parameter must be the same as that of $keys.');
+            throw new ArrayException('The length of $sortFlag parameter must be the same as that of $keys.');
         }
         $args = [];
         foreach ($keys as $i => $key) {

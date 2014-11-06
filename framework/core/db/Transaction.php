@@ -96,7 +96,7 @@ class Transaction
     public function begin($isolationLevel = null)
     {
         if ($this->connection === null) {
-            throw new Exception(Exception::ERROR, 'Transaction::db must be set.');
+            throw new Exception('Transaction::db must be set.');
         }
         $this->connection->open();
 
@@ -129,7 +129,7 @@ class Transaction
             );
             $schema->createSavepoint('LEVEL' . $this->_level);
         } else {
-            new Exception(Exception::INFO, 'Transaction not started: nested transaction not supported', __METHOD__);
+            Rock::info('Transaction not started: nested transaction not supported');
         }
         $this->_level++;
     }
@@ -141,7 +141,7 @@ class Transaction
     public function commit()
     {
         if (!$this->getIsActive()) {
-            throw new Exception(Exception::ERROR, 'Failed to commit transaction: transaction was inactive.');
+            throw new Exception('Failed to commit transaction: transaction was inactive.');
         }
 
         $this->_level--;
@@ -169,7 +169,7 @@ class Transaction
             );
             $schema->releaseSavepoint('LEVEL' . $this->_level);
         } else {
-            new Exception(Exception::INFO, 'Transaction not committed: nested transaction not supported');
+            Rock::info('Transaction not committed: nested transaction not supported');
         }
     }
 
@@ -210,9 +210,8 @@ class Transaction
             );
             $schema->rollBackSavepoint('LEVEL' . $this->_level);
         } else {
-            new Exception(Exception::INFO, 'Transaction not rolled back: nested transaction not supported');
             // throw an exception to fail the outer transaction
-            throw new Exception(Exception::ERROR, 'Roll back failed: nested transaction not supported.');
+            throw new Exception('Roll back failed: nested transaction not supported.');
         }
     }
 

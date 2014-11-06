@@ -1,9 +1,6 @@
 <?php
 namespace rock\db;
 
-use rock\base\ComponentsTrait;
-use rock\base\ObjectTrait;
-
 /**
  * ColumnSchema class describes the metadata of a column in a database table.
  */

@@ -7,7 +7,6 @@ use rock\access\Access;
 use rock\base\ActionFilter;
 use rock\base\Controller;
 use rock\db\BaseActiveRecord;
-use rock\event\Event;
 use rock\Rock;
 use rock\route\Route;
 use rock\route\RouteEvent;
@@ -15,8 +14,6 @@ use rock\template\Template;
 
 class AccessFilter extends ActionFilter
 {
-    protected $accessErrors = 0;
-  //  public $only = [];
     public $rules = [];
 
     /**
@@ -82,9 +79,4 @@ class AccessFilter extends ActionFilter
 
         return parent::beforeAction($action);
     }
-
-//    public function getAccessErrors()
-//    {
-//        return $this->accessErrors;
-//    }
 }

@@ -143,7 +143,7 @@ class Cookie extends SessionFlash implements \ArrayAccess, CollectionInterface, 
             $value = Serialize::serialize($value, $this->serializator);
         }
         if (!setcookie($name, $value, $this->expire, $this->path, $this->domain, $this->secure, $this->httpOnly)) {
-            throw new Exception(Exception::CRITICAL, Exception::INVALID_SET);
+            throw new CookieException(CookieException::INVALID_SET);
         }
         $_COOKIE[$name] = $value;
     }
@@ -212,7 +212,7 @@ class Cookie extends SessionFlash implements \ArrayAccess, CollectionInterface, 
             return;
         }
         if (!setcookie($name, '', time() - 3600, $this->path, $this->domain, $this->secure, $this->httpOnly)) {
-            throw new Exception(Exception::CRITICAL, Exception::INVALID_SET);
+            throw new CookieException(CookieException::INVALID_SET);
         }
         unset($_COOKIE[$name]);
     }

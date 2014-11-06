@@ -168,7 +168,7 @@ class ActiveRecord extends BaseActiveRecord
                 }
                 $condition = [$pk => $condition];
             } else {
-                throw new Exception(Exception::CRITICAL,get_called_class() . ' must have a primary key.');
+                throw new Exception(get_called_class() . ' must have a primary key.');
             }
         }
 
@@ -312,7 +312,7 @@ class ActiveRecord extends BaseActiveRecord
         if ($schema !== null) {
             return $schema;
         } else {
-            throw new Exception(Exception::CRITICAL, "The table does not exist: " . static::tableName());
+            throw new Exception('The table does not exist: ' . static::tableName());
         }
     }
 
@@ -642,7 +642,7 @@ class ActiveRecord extends BaseActiveRecord
             }
             $result = $this->deleteAll($condition);
             if ($lock !== null && !$result) {
-                throw new Exception(Exception::CRITICAL, 'The object being deleted is outdated.');
+                throw new Exception('The object being deleted is outdated.');
             }
             $this->setOldAttributes(null);
             $this->afterDelete();

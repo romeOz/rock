@@ -2,47 +2,34 @@
 namespace rock\exception;
 
 use rock\base\ClassName;
-use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\String;
 use rock\log\Log;
-use rock\log\LoggerInterface;
 use rock\response\Response;
 use rock\Rock;
 use Whoops\Handler\JsonResponseHandler;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Handler\XmlResponseHandler;
 
-abstract class BaseException extends \Exception implements LoggerInterface, ExceptionInterface
+class BaseException extends \Exception implements ExceptionInterface
 {
     use ClassName;
 
-    /**
-     * Error Level
-     *
-     * @var int
-     */
-    protected static $level = self::INFO;
-    /**
-     * Array of exceptions
-     *
-     * @var array
-     */
-    protected static $_exceptions = [];
-
+    public static $logged = true;
+    public static $format = '{{message}} {{class}}::{{method}} {{file}} on line {{line}}';
+    public static $asStack = false;
     protected static $pathFatal = '@common.views/layouts/fatal.html';
 
     /**
      * Constructor
      *
-     * @param int|string      $level       type of exception
-     * @param string|null     $msg         message or code
-     * @param array|null      $placeholders array replace
+     * @param string     $msg         message
+     * @param array      $placeholders placeholders for replacement
      * @param \Exception|null $handler     handler
      */
-    public function __construct($level = self::ERROR, $msg = null, array $placeholders = [], \Exception $handler = null) {
+    public function __construct($msg, array $placeholders = [], \Exception $handler = null) {
         if (isset($handler)) {
-            if (method_exists($handler, 'setLevelLog')) {
+            if ($handler instanceof BaseException) {
                 return;
             }
             $msg = $msg ? : $handler->getMessage();
@@ -50,27 +37,35 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
         $this->message = $this->prepareMsg($msg, $placeholders);
         //parent::__construct($this->message);
         /** Add log */
-        static::log($level, $this->message, $this->_inlineTrace($handler));
+        static::log(Log::CRITICAL, $this->message, $this->getTracesInternal($handler));
         /**  Display */
-        $this->display($level, $this->message, $handler);
+        $this->display($handler);
     }
 
     /**
-     * log
+     * Added to log
      *
-     * @param string $msg         error message
      * @param int    $level
-     * @param array  $trace       data of trace
-     *                            - class:  name of class
-     *                            - method: name of method
-     *                            - file:   path to file
-     *                            - line:   line fo file
+     * @param string $msg   error message
+     * @param array  $traces data of trace
+     *
+     * - class:  name of class
+     * - method: name of method
+     * - file:   path to file
+     * - line:   line fo file
+     *
      * @return bool
      */
-    public static function log($level = self::ERROR, $msg, $trace = null)
+    public static function log($level = Log::CRITICAL, $msg, array $traces = [])
     {
-        $msg .= ' ' . (!isset($trace) ? static::inlineBacktrace() : $trace);
-        return (new Log())->log($level, $msg);
+        if (!static::$logged) {
+            return true;
+        }
+        if (empty($traces)) {
+            $traces = static::getTraces(2, static::$asStack);
+        }
+
+        return (new Log())->log($level, static::replace($msg, $traces, static::$asStack));
     }
 
     /**
@@ -88,65 +83,30 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
             return;
         }
         if (!isset(static::$pathFatal) ||
-            !file_exists(Rock::getAlias(static::$pathFatal))
-        ) {
+            !file_exists(Rock::getAlias(static::$pathFatal))) {
             die('This site is temporarily unavailable. Please, visit the page later.');
         }
 
         die(file_get_contents(Rock::getAlias(static::$pathFatal)));
     }
 
-
-    /**
-     * Get exception
-     *
-     * @param string $key key of exception
-     * @return array|string
-     */
-    public static function get($key)
-    {
-        return Helper::getValue(self::$_exceptions[$key]);
-    }
-
-    /**
-     * Get all exceptions
-     *
-     * @param array $only
-     * @param array $exclude
-     * @return array
-     */
-    public static function getAll(array $only = [], array $exclude = [])
-    {
-        return ArrayHelper::only(self::$_exceptions, $only, $exclude);
-    }
-
-    /**
-     * Set level log
-     *
-     * @param int $level
-     */
-    public static function setLevelLog($level)
-    {
-        static::$level = (int)$level;
-    }
-
     /**
      * Set path to fatal template
+     *
      * @param string $path path to fatal template
-     * @throws Exception
+     * @throws \Exception
      */
     public static function setPathFatal($path)
     {
         $path = Rock::getAlias($path);
         if (!file_exists($path)) {
-            throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_FILE, ['path' => $path]);
+            throw new \Exception("Unknown file: {$path}");
         }
-
         static::$pathFatal = $path;
     }
 
     /**
-     * Run mode debug
+     * Run mode debug.
      *
      * @return \rock\exception\Run
      */
@@ -173,41 +133,51 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
     }
 
     /**
-     * Get trace
+     * Get traces by `debug_backtrace`.
      *
-     * @return string
+     * @param int  $index
+     * @param bool $asStack
+     * @return array
      */
-    protected static function inlineBacktrace()
+    public static function getTraces($index = 2, $asStack = DEBUG)
     {
-        /**
-         * Trace methods
-         */
-        $dataTrace      = debug_backtrace(-2);
-        $data           = [];
-        $data['class']  = Helper::getValue($dataTrace[2]['class']);
-        $data['method'] = Helper::getValue($dataTrace[2]['function']);
-        $data['file']   = $dataTrace[1]['file'];
-        $data['line']   = $dataTrace[1]['line'];
-        if (DEBUG === true) {
+        $trace  = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        $class  = Helper::getValue($trace[$index]['class']);
+        $method = Helper::getValue($trace[$index]['function']);
+        $file   = $trace[$index - 1]['file'];
+        $line   = $trace[$index - 1]['line'];
+        $stack = null;
+        if ($asStack === true) {
             ob_start();
-            debug_print_backtrace(-2);
-            $data['trace'] = str_replace("\n", ' ; ', ob_get_clean());
-            return $data;
+            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+            $stack = str_replace("\n", ' ; ', ob_get_clean());
         }
-        return $data['class'] . '	' .
-               $data['method'] . '	' .
-               $data['file'] . ' on line ' .
-               $data['line'];
+        return [
+            'class' => $class,
+            'method' => $method,
+            'file' => $file,
+            'line' => $line,
+            'stack' => $stack
+        ];
     }
 
+    public static function replace($message, array $traces, $asStack = DEBUG)
+    {
+        if ($asStack === true) {
+            return "{$message} {$traces['stack']}";
+        }
+
+        $traces['message'] = $message;
+        return String::replace(static::$format, $traces, false);
+    }
 
     /**
-     * Get trace as string
+     * Get traces by Exception handler.
      *
-     * @param object $handler
-     * @return string
+     * @param \Exception $handler
+     * @return array
      */
-    protected function _inlineTrace($handler)
+    protected function getTracesInternal($handler)
     {
         $trace           = $this->getTrace();
         $traceAsString  = $this->getTraceAsString();
@@ -218,56 +188,45 @@ abstract class BaseException extends \Exception implements LoggerInterface, Exce
             $traceAsString = $handler->getTraceAsString();
             $file            = $handler->getFile();
             $line            = $handler->getLine();
+
         }
-        $array = current($trace);
-        if (DEBUG === true) {
-            return str_replace("\n", ' ; ', $traceAsString);
-        }
-        return implode(' ', [$array['class'].'::'.$array['function'], $file . ' on line', $line]);
+        $trace = current($trace);
+        return [
+            'class' => $trace['class'],
+            'method' => $trace['function'],
+            'file' => $file,
+            'line' => $line,
+            'stack' => str_replace("\n", ' ; ', $traceAsString)
+        ];
     }
 
     /**
-     * Get log message
+     * Returns the prepared message.
      *
      * @param string|null $msg         error message
-     * @param array|null  $dataReplace array replace
+     * @param array      $placeholders placeholders for replacement
      * @return null|string
      */
-    protected function prepareMsg($msg = null, array $dataReplace = [])
+    protected function prepareMsg($msg = null, array $placeholders = [])
     {
         if (isset($msg)) {
-            return String::replace($msg, $dataReplace);
+            return String::replace($msg, $placeholders);
         }
 
         return $msg;
     }
 
     /**
-     * Display error
+     * Display error.
      *
-     * @param string     $msg       error message
-     * @param int        $level     type of exception
-     *                              - `FATAL`
-     *                              - `WARNING`
-     *                              - `ERROR`
-     *                              - `INFO`
      * @param \Exception $handler
      */
-    protected function display($level = self::ERROR, $msg, \Exception $handler = null)
+    protected function display(\Exception $handler = null)
     {
-        if ($level > static::$level) {
-            if (DEBUG === true) {
-                static::debuger()->handleException(isset($handler) ? $handler : $this);
-                return;
-            }
-            static::displayFatal();
-        }
-        $className = explode('\\', get_class($this));
-        $className = end($className);
-        if (isset($code)) {
-            self::$_exceptions[$className][$code] = $msg;
+        if (DEBUG === true) {
+            static::debuger()->handleException(isset($handler) ? $handler : $this);
             return;
         }
-        self::$_exceptions[$className][] = $msg;
+        static::displayFatal();
     }
 }

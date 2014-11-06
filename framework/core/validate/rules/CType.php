@@ -3,7 +3,7 @@
 namespace rock\validate\rules;
 
 
-use rock\validate\Exception;
+use rock\validate\ValidateException;
 
 abstract class CType extends Rule
 {
@@ -11,7 +11,7 @@ abstract class CType extends Rule
     {
         $this->parentConstruct($config);
         if (!is_string($additionalChars)) {
-            throw new Exception(Exception::ERROR, 'Invalid list of additional characters to be loaded');
+            throw new ValidateException('Invalid list of additional characters to be loaded');
         }
         $this->params['additionalChars'] = $additionalChars;
     }

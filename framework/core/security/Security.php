@@ -89,10 +89,11 @@ class Security implements ComponentsInterface
 
     /**
      * Encrypts data.
-     * @param string $data data to be encrypted.
+     *
+*@param string $data data to be encrypted.
      * @param string $password the encryption password
      * @return string the encrypted data
-     * @throws Exception if PHP Mcrypt extension is not loaded or failed to be initialized
+     * @throws SecurityException if PHP Mcrypt extension is not loaded or failed to be initialized
      * @see decrypt()
      */
     public function encrypt($data, $password)
@@ -119,10 +120,11 @@ class Security implements ComponentsInterface
 
     /**
      * Decrypts data
-     * @param string $data data to be decrypted.
+     *
+*@param string $data data to be decrypted.
      * @param string $password the decryption password
      * @return string the decrypted data
-     * @throws Exception if PHP Mcrypt extension is not loaded or failed to be initialized
+     * @throws SecurityException if PHP Mcrypt extension is not loaded or failed to be initialized
      * @see encrypt()
      */
     public function decrypt($data, $password)
@@ -179,9 +181,10 @@ class Security implements ComponentsInterface
 
     /**
      * Derives a key from the given password (PBKDF2).
-     * @param string $password the source password
+     *
+*@param string $password the source password
      * @param string $salt the random salt
-     * @throws Exception if unsupported derive key strategy is configured.
+     * @throws SecurityException if unsupported derive key strategy is configured.
      * @return string the derived key
      */
     protected function deriveKey($password, $salt)
@@ -192,15 +195,16 @@ class Security implements ComponentsInterface
             case 'hmac':
                 return $this->deriveKeyHmac($password, $salt);
             default:
-                throw new Exception(Exception::ERROR, "Unknown derive key strategy '{$this->deriveKeyStrategy}'");
+                throw new SecurityException("Unknown derive key strategy '{$this->deriveKeyStrategy}'");
         }
     }
 
     /**
      * Derives a key from the given password using PBKDF2.
-     * @param string $password the source password
+     *
+*@param string $password the source password
      * @param string $salt the random salt
-     * @throws Exception if environment does not allows PBKDF2.
+     * @throws SecurityException if environment does not allows PBKDF2.
      * @return string the derived key
      */
     protected function deriveKeyPbkdf2($password, $salt)
@@ -208,7 +212,7 @@ class Security implements ComponentsInterface
         if (function_exists('hash_pbkdf2')) {
             return hash_pbkdf2($this->derivationHash, $password, $salt, $this->derivationIterations, $this->cryptKeySize, true);
         } else {
-            throw new Exception(Exception::ERROR, 'Security::$deriveKeyStrategy is set to "pbkdf2", which requires PHP >= 5.5.0. Either upgrade your run-time environment or use another strategy.');
+            throw new SecurityException('Security::$deriveKeyStrategy is set to "pbkdf2", which requires PHP >= 5.5.0. Either upgrade your run-time environment or use another strategy.');
         }
     }
 
@@ -304,20 +308,21 @@ class Security implements ComponentsInterface
     /**
      * Generates specified number of random bytes.
      * Note that output may not be ASCII.
-     * @see generateRandomKey() if you need a string.
+     *
+*@see generateRandomKey() if you need a string.
      *
      * @param integer $length the number of bytes to generate
-     * @throws Exception on failure.
+     * @throws SecurityException on failure.
      * @return string the generated random bytes
      */
     public function generateRandomBytes($length = 32)
     {
         if (!extension_loaded('mcrypt')) {
-            throw new Exception(Exception::ERROR, 'The mcrypt PHP extension is not installed.');
+            throw new SecurityException('The mcrypt PHP extension is not installed.');
         }
         $bytes = mcrypt_create_iv($length, MCRYPT_DEV_URANDOM);
         if ($bytes === false) {
-            throw new Exception(Exception::CRITICAL, 'Unable to generate random bytes.');
+            throw new SecurityException('Unable to generate random bytes.');
         }
         return $bytes;
     }
@@ -327,7 +332,7 @@ class Security implements ComponentsInterface
      * The string generated matches [A-Za-z0-9_.-]+
      *
      * @param integer $length the length of the key in characters
-     * @throws Exception Exception on failure.
+     * @throws SecurityException Exception on failure.
      * @return string the generated random key
      */
     public function generateRandomKey($length = 32)
@@ -338,20 +343,21 @@ class Security implements ComponentsInterface
 
     /**
      * Opens the mcrypt module.
+     *
      * @return resource the mcrypt module handle.
-     * @throws Exception if mcrypt extension is not installed
-     * @throws Exception if mcrypt initialization fails
+     * @throws SecurityException if mcrypt extension is not installed
+     * @throws SecurityException if mcrypt initialization fails
      */
     protected function openCryptModule()
     {
         if (!extension_loaded('mcrypt')) {
-            throw new Exception(Exception::ERROR, 'The mcrypt PHP extension is not installed.');
+            throw new SecurityException('The mcrypt PHP extension is not installed.');
         }
         // AES version depending on crypt block size
         $algorithmName = 'rijndael-' . ($this->cryptBlockSize * 8);
         $module = @mcrypt_module_open($algorithmName, '', 'cbc', '');
         if ($module === false) {
-            throw new Exception(Exception::CRITICAL, 'Failed to initialize the mcrypt module.');
+            throw new SecurityException('Failed to initialize the mcrypt module.');
         }
 
         return $module;
@@ -386,7 +392,7 @@ class Security implements ComponentsInterface
      * compute the hash doubles for every increment by one of $cost. So, for example, if the
      * hash takes 1 second to compute when $cost is 14 then then the compute time varies as
      * 2^($cost - 14) seconds.
-     * @throws Exception on bad password parameter or cost parameter
+     * @throws SecurityException on bad password parameter or cost parameter
      * @return string The password hash string, ASCII and not longer than 64 characters.
      * @see validatePassword()
      */
@@ -395,7 +401,7 @@ class Security implements ComponentsInterface
         switch ($this->passwordHashStrategy) {
             case 'password_hash':
                 if (!function_exists('password_hash')) {
-                    throw new Exception(Exception::CRITICAL, 'Password hash key strategy "password_hash" requires PHP >= 5.5.0, either upgrade your environment or use another strategy.');
+                    throw new SecurityException('Password hash key strategy "password_hash" requires PHP >= 5.5.0, either upgrade your environment or use another strategy.');
                 }
                 return password_hash($password, PASSWORD_DEFAULT, ['cost' => $cost]);
             case 'crypt':
@@ -403,37 +409,38 @@ class Security implements ComponentsInterface
                 $hash = crypt($password, $salt);
 
                 if (!is_string($hash) || strlen($hash) < 32) {
-                    throw new Exception(Exception::CRITICAL, 'Unknown error occurred while generating hash.');
+                    throw new SecurityException('Unknown error occurred while generating hash.');
                 }
                 return $hash;
             default:
-                throw new Exception(Exception::CRITICAL, "Unknown password hash strategy '{$this->passwordHashStrategy}'");
+                throw new SecurityException("Unknown password hash strategy '{$this->passwordHashStrategy}'");
         }
     }
 
     /**
      * Verifies a password against a hash.
-     * @param string $password The password to verify.
+     *
+*@param string $password The password to verify.
      * @param string $hash The hash to verify the password against.
      * @return boolean whether the password is correct.
-     * @throws Exception on bad password or hash parameters or if crypt() with Blowfish hash is not available.
-     * @throws Exception on unsupported password hash strategy is configured.
+     * @throws SecurityException on bad password or hash parameters or if crypt() with Blowfish hash is not available.
+     * @throws SecurityException on unsupported password hash strategy is configured.
      * @see generatePasswordHash()
      */
     public function validatePassword($password, $hash)
     {
         if (!is_string($password) || $password === '') {
-            throw new Exception(Exception::ERROR, 'Password must be a string and cannot be empty.');
+            throw new SecurityException('Password must be a string and cannot be empty.');
         }
 
         if (!preg_match('/^\$2[axy]\$(\d\d)\$[\.\/0-9A-Za-z]{22}/', $hash, $matches) || $matches[1] < 4 || $matches[1] > 30) {
-            throw new Exception(Exception::ERROR, 'Hash is invalid.');
+            throw new SecurityException('Hash is invalid.');
         }
 
         switch ($this->passwordHashStrategy) {
             case 'password_hash':
                 if (!function_exists('password_verify')) {
-                    throw new Exception(Exception::CRITICAL, 'Password hash key strategy "password_hash" requires PHP >= 5.5.0, either upgrade your environment or use another strategy.');
+                    throw new SecurityException('Password hash key strategy "password_hash" requires PHP >= 5.5.0, either upgrade your environment or use another strategy.');
                 }
                 return password_verify($password, $hash);
             case 'crypt':
@@ -444,7 +451,7 @@ class Security implements ComponentsInterface
                 }
                 return $this->compareString($test, $hash);
             default:
-                throw new Exception(Exception::CRITICAL, "Unknown password hash strategy '{$this->passwordHashStrategy}'");
+                throw new SecurityException("Unknown password hash strategy '{$this->passwordHashStrategy}'");
         }
     }
 
@@ -458,13 +465,13 @@ class Security implements ComponentsInterface
      *
      * @param integer $cost the cost parameter
      * @return string the random salt value.
-     * @throws Exception if the cost parameter is not between 4 and 31
+     * @throws SecurityException if the cost parameter is not between 4 and 31
      */
     protected function generateSalt($cost = 13)
     {
         $cost = (int)$cost;
         if ($cost < 4 || $cost > 31) {
-            throw new Exception(Exception::CRITICAL, 'Cost must be between 4 and 31.');
+            throw new SecurityException('Cost must be between 4 and 31.');
         }
 
         // Get 20 * 8bits of random entropy

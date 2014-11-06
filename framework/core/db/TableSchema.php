@@ -88,7 +88,7 @@ class TableSchema
             if (isset($this->columns[$key])) {
                 $this->columns[$key]->isPrimaryKey = true;
             } else {
-                throw new Exception(Exception::CRITICAL, "Primary key '$key' cannot be found in table '{$this->name}'.");
+                throw new Exception("Primary key '$key' cannot be found in table '{$this->name}'.");
             }
         }
     }

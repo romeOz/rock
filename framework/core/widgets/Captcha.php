@@ -106,8 +106,9 @@ class Captcha extends InputWidget implements CaptchaInterface
     /**
      * Checks if there is graphic extension available to generate CAPTCHA images.
      * This method will check the existence of ImageMagick and GD extensions.
-     * @return string the name of the graphic extension, either "imagick" or "gd".
-     * @throws Exception if neither ImageMagick nor GD is installed.
+     *
+*@return string the name of the graphic extension, either "imagick" or "gd".
+     * @throws WidgetException if neither ImageMagick nor GD is installed.
      */
     public static function checkRequirements()
     {
@@ -124,6 +125,6 @@ class Captcha extends InputWidget implements CaptchaInterface
                 return 'gd';
             }
         }
-        throw new Exception(Exception::CRITICAL, 'GD with FreeType or ImageMagick PHP extensions are required.');
+        throw new WidgetException('GD with FreeType or ImageMagick PHP extensions are required.');
     }
 } 

@@ -4,7 +4,7 @@ namespace rock\validate\rules;
 
 
 use rock\file\UploadedFile;
-use rock\validate\Exception;
+use rock\validate\ValidateException;
 
 class FileExtensions extends Rule
 {
@@ -34,7 +34,7 @@ class FileExtensions extends Rule
             }
             //$extension = $extension['extension'];
         } else {
-            throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_VAR, ['name'=> 'input']);
+            throw new ValidateException(ValidateException::UNKNOWN_VAR, ['name'=> 'input']);
         }
 
         if ($this->params['checkExtensionByMimeType']) {

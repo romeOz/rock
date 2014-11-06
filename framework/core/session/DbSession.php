@@ -16,13 +16,13 @@ use rock\Rock;
  * The following example shows how you can configure the application to use DbSession:
  * Add the following to your application config under `components`:
  *
- * ~~~
+ * ```php
  * 'session' => [
  *     'class' => DbSession::className(),
  *     'db' => 'mydb',
  *     'sessionTable' => 'session_table',
  * ]
- * ~~~
+ * ```
  */
 class DbSession extends Session
 {
@@ -60,7 +60,7 @@ class DbSession extends Session
     /**
      * Initializes the DbSession component.
      * This method will initialize the [[db]] property to make sure it refers to a valid DB connection.
-     * @throws Exception if [[db]] is invalid.
+     * @throws SessionException if [[db]] is invalid.
      */
     public function init()
     {

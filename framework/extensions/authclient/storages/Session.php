@@ -4,7 +4,7 @@ namespace rock\authclient\storages;
 
 use OAuth\Common\Storage\TokenStorageInterface;
 use OAuth\Common\Token\TokenInterface;
-use rock\authclient\Exception;
+use rock\authclient\AuthclientException;
 use rock\Rock;
 
 /**
@@ -49,7 +49,7 @@ class Session implements TokenStorageInterface
             return unserialize($this->session->get([$this->sessionVariableName, $service]));
         }
 
-        throw new Exception(Exception::ERROR, 'Token not found in session, are you sure you stored it?');
+        throw new AuthclientException('Token not found in session, are you sure you stored it?');
     }
 
     /**
@@ -137,7 +137,7 @@ class Session implements TokenStorageInterface
             return $this->session->get([$this->stateVariableName, $service]);
         }
 
-        throw new Exception(Exception::ERROR, 'State not found in session, are you sure you stored it?');
+        throw new AuthclientException('State not found in session, are you sure you stored it?');
     }
 
     /**

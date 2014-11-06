@@ -21,7 +21,7 @@ class AllOf
     public function sanitize($collection)
     {
         if (!$this->sanitize instanceof Sanitize) {
-            throw new Exception(Exception::ERROR, "`{$this->sanitize}` is not `".Sanitize::className()."`");
+            throw new SanitizeException("`{$this->sanitize}` is not `".Sanitize::className()."`");
         }
         $object = null;
         if (is_object($collection)) {

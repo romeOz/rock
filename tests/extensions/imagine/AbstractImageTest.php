@@ -83,7 +83,7 @@ abstract class AbstractImageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \rock\imagine\Exception
+     * @expectedException \rock\imagine\ImagineException
      */
     public function testShouldThrowExceptionOnDriverInvalidArgument()
     {

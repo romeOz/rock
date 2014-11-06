@@ -110,7 +110,7 @@ class VerbFilter extends ActionFilter
             $response->getHeaders()->set('Allow', $verbs);
             $response->setStatusCode(405);
             if ($this->throwException === true) {
-                throw new VerbsFilterException(VerbsFilterException::ALERT, 'Method Not Allowed. This url can only handle the following request methods: ' . $verbs . '.');
+                throw new VerbsFilterException('Method Not Allowed. This url can only handle the following request methods: ' . $verbs . '.');
             }
         }
 

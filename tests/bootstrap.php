@@ -46,7 +46,7 @@ require(dirname(__DIR__) . '/framework/mixins.php');
 \rock\di\Container::addMulti($configs['_components']);
 
 
-\rock\exception\Exception::setLevelLog(1);
+\rock\exception\BaseException::$logged = false;
 
 Rock::$app->di['cache'] = [
     'class' => CacheFile::className(),

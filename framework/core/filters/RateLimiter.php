@@ -138,7 +138,7 @@ class RateLimiter extends ActionFilter
             $user->saveAllowance($action, 0, $current);
             $this->addHeaders($response, $limit, 0, $period);
             if ($this->throwException === true) {
-                throw new RateLimiterException(RateLimiterException::ALERT, $this->errorMessage);
+                throw new RateLimiterException($this->errorMessage);
             }
             return false;
         }

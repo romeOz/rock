@@ -7,22 +7,21 @@ use rock\base\ClassName;
 use rock\helpers\Helper;
 
 /**
- * Class SelectBuilder
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * new SelectBuilder([Articles::find()->fields()])
- * sql: SELECT `articles`.`id`, `articles`.`name`
+ * Builder SELECT
  *
- * new SelectBuilder(['articles'=>['id', 'name']])
- * sql: SELECT `articles`.`id`, `articles`.`name`
+ * ```php
+ * new SelectBuilder([Articles::find()->fields()]);
+ * //sql: SELECT `articles`.`id`, `articles`.`name`
  *
- * new SelectBuilder([[Articles::find()->fields(), true, '__']])
- * sql: SELECT `articles`.`id` AS `articles__id`, `articles`.`name` AS `articles__id`
+ * new SelectBuilder(['articles'=>['id', 'name']];
+ * //sql: SELECT `articles`.`id`, `articles`.`name`
  *
- * new SelectBuilder([['articles'=>['id', 'name'], true, '__']])
- * sql: SELECT `articles`.`id` AS `articles__id`, `articles`.`name` AS `articles__id`
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * new SelectBuilder([[Articles::find()->fields(), true, '__']]);
+ * //sql: SELECT `articles`.`id` AS `articles__id`, `articles`.`name` AS `articles__id`
  *
- * @package rock\db
+ * new SelectBuilder([['articles'=>['id', 'name'], true, '__']]);
+ * //sql: SELECT `articles`.`id` AS `articles__id`, `articles`.`name` AS `articles__id`
+ * ```
  */
 class SelectBuilder
 {
@@ -95,10 +94,8 @@ class SelectBuilder
                     $tableAlias = $alias;
                     $alias = true;
                 }
-
-
             } else {
-                throw new Exception(Exception::CRITICAL, Exception::WRONG_TYPE, ['name' => json_encode($select)]);
+                throw new Exception(Exception::WRONG_TYPE, ['name' => json_encode($select)]);
             }
             $aliasSeparator = Helper::getValue($aliasSeparator, $db->aliasSeparator);
 

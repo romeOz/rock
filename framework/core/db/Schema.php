@@ -263,12 +263,7 @@ abstract class Schema
      */
     protected function findTableNames($schema = '')
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, [
-            'method' => ObjectHelper::methodName(
-                    $this,
-                    'findTableNames'
-                )
-        ]);
+        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -290,12 +285,7 @@ abstract class Schema
      */
     public function findUniqueIndexes($table)
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, [
-            'method' => ObjectHelper::methodName(
-                    $this,
-                    'findUniqueIndexes'
-                )
-        ]);
+        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -310,7 +300,7 @@ abstract class Schema
         if ($this->db->isActive) {
             return $this->db->pdo->lastInsertId($sequenceName);
         } else {
-            throw new Exception(Exception::CRITICAL, 'DB Connection is not active.');
+            throw new Exception('DB Connection is not active.');
         }
     }
 

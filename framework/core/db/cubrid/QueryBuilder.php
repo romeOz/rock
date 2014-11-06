@@ -1,6 +1,8 @@
 <?php
 namespace rock\db\cubrid;
 
+use rock\db\Exception;
+
 /**
  * QueryBuilder is the query builder for CUBRID databases (version 9.1.x and higher).
  */
@@ -52,9 +54,9 @@ class QueryBuilder extends \rock\db\QueryBuilder
 
             return "ALTER TABLE " . $this->db->schema->quoteTableName($tableName) . " AUTO_INCREMENT=$value;";
         } elseif ($table === null) {
-            throw new Exception(Exception::CRITICAL, "Table not found: $tableName");
+            throw new Exception("Table not found: $tableName");
         } else {
-            throw new Exception(Exception::CRITICAL, "There is not sequence associated with table '$tableName'.");
+            throw new Exception("There is not sequence associated with table '$tableName'.");
         }
     }
 

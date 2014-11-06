@@ -117,7 +117,7 @@ class Connection extends \rock\db\Connection
      */
     public function getLastInsertID($sequenceName = '')
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**

@@ -2,7 +2,6 @@
 
 namespace rock\rbac;
 
-use rock\base\ObjectTrait;
 use rock\helpers\Helper;
 use rock\Rock;
 
@@ -34,7 +33,7 @@ class PhpManager extends RBAC
     protected function load($path)
     {
         if (!file_exists($path) || (!$data = require($path)) || !is_array($data)) {
-            throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_FILE, ['path' => $path]);
+            throw new RBACException(RBACException::UNKNOWN_FILE, ['path' => $path]);
         }
 
         return $data;
@@ -56,7 +55,7 @@ class PhpManager extends RBAC
     protected function processData($itemName)
     {
         if (empty(static::$items[$itemName]['data'])) {
-            throw new Exception(Exception::CRITICAL, Exception::NOT_DATA_PARAMS);
+            throw new RBACException(RBACException::NOT_DATA_PARAMS);
         }
         $data = static::$items[$itemName]['data'];
         if (is_string($data)) {
@@ -68,7 +67,7 @@ class PhpManager extends RBAC
             return $data;
         }
 
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_TYPE, ['name' => serialize($data)]);
+        throw new RBACException(RBACException::UNKNOWN_TYPE, ['name' => serialize($data)]);
     }
 
 
@@ -78,7 +77,7 @@ class PhpManager extends RBAC
     public function add(Item $item)
     {
         if ($this->has($item->name)) {
-            throw new Exception(Exception::CRITICAL, "Cannot add '{$item->name}'. A has been exists.");
+            throw new RBACException("Cannot add '{$item->name}'. A has been exists.");
         }
         /** @var Role|Permission  $item */
         static::$items[$item->name] = [
@@ -97,7 +96,7 @@ class PhpManager extends RBAC
     public function attachItem(Role $role, Item $item)
     {
         if ($this->detect($role, $item)) {
-            throw new Exception(Exception::CRITICAL, "Cannot attach '{$role->name}' as a item of '{$item->name}'. A has been detected.");
+            throw new RBACException("Cannot attach '{$role->name}' as a item of '{$item->name}'. A has been detected.");
         }
 
         static::$items[$role->name]['items'] = Helper::getValueIsset(static::$items[$role->name]['items'], []);
@@ -116,7 +115,7 @@ class PhpManager extends RBAC
         $names = [];
         foreach ($items as $item) {
             if ($this->detect($role, $item)) {
-                throw new Exception(Exception::CRITICAL, "Cannot attach '{$role->name}' as a item of '{$item->name}'. A has been detected.");
+                throw new RBACException("Cannot attach '{$role->name}' as a item of '{$item->name}'. A has been detected.");
             }
             $names[] = $item->name;
         }
@@ -205,7 +204,7 @@ class PhpManager extends RBAC
      * @param Role[]         $roles  the rule to be associated with this assignment. If not null, the rule
      *                               will be executed when [[allow()]] is called to check the user permission.
      * @return bool
-     * @throws Exception if the role has already been assigned to the user
+     * @throws RBACException if the role has already been assigned to the user
      */
     public function assign($userId, array $roles)
     {
@@ -213,10 +212,10 @@ class PhpManager extends RBAC
 
         foreach ($roles as $role) {
             if (!$role instanceof Role) {
-                throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_TYPE, ['name' => serialize($role)]);
+                throw new RBACException(RBACException::UNKNOWN_TYPE, ['name' => serialize($role)]);
             }
             if ($this->hasAssigned($userId, $role->name)) {
-                throw new Exception(Exception::ERROR, "Duplicate role: {$role->name}");
+                throw new RBACException("Duplicate role: {$role->name}");
             }
             $rows[] =[$userId, $role->name];
             static::$assignments[$userId][] = $role->name;
@@ -232,6 +231,7 @@ class PhpManager extends RBAC
      *
      * @param string|integer $userId the user ID (see [[User::id]]).
      * @param Role[]         $roles  the rule to be associated with this assignment. If not null, the rule
+     * @throws RBACException
      * @return boolean whether the revoking is successful
      */
     public function revoke($userId, array $roles)
@@ -239,7 +239,7 @@ class PhpManager extends RBAC
         $names = [];
         foreach ($roles as $role) {
             if (!$role instanceof Role) {
-                throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_TYPE, ['name' => serialize($role)]);
+                throw new RBACException(RBACException::UNKNOWN_TYPE, ['name' => serialize($role)]);
             }
             $names[] = $role->name;
         }
@@ -291,7 +291,6 @@ class PhpManager extends RBAC
                     $this->revoke($userId, [$item]);
                 }
             }
-
         }
     }
 }

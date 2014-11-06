@@ -45,7 +45,7 @@ class QueryBuilder extends \rock\db\QueryBuilder
         $quotedTable = $this->db->quoteTableName($table);
         $row = $this->db->createCommand('SHOW CREATE TABLE ' . $quotedTable)->queryOne();
         if ($row === false) {
-            throw new Exception(Exception::CRITICAL, "Unable to find column '$oldName' in table '$table'.");
+            throw new Exception("Unable to find column '$oldName' in table '$table'.");
         }
         if (isset($row['Create Table'])) {
             $sql = $row['Create Table'];
@@ -116,9 +116,9 @@ class QueryBuilder extends \rock\db\QueryBuilder
 
             return "ALTER TABLE $tableName AUTO_INCREMENT=$value";
         } elseif ($table === null) {
-            throw new Exception(Exception::CRITICAL, "Table not found: $tableName");
+            throw new Exception("Table not found: $tableName");
         } else {
-            throw new Exception(Exception::CRITICAL, "There is no sequence associated with table '$tableName'.");
+            throw new Exception("There is no sequence associated with table '$tableName'.");
         }
     }
 

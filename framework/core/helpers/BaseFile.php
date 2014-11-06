@@ -2,7 +2,7 @@
 namespace rock\helpers;
 
 use League\Flysystem\Util;
-use rock\file\Exception;
+use rock\file\FileException;
 use rock\Rock;
 
 /**
@@ -36,7 +36,7 @@ class BaseFile extends Util
             }
         }
         if (!file_put_contents($pathFile, $value, $const)) {
-            Rock::warning(Exception::NOT_CREATE_FILE, ['name' => $pathFile]);
+            Rock::warning(FileException::NOT_CREATE_FILE, ['name' => $pathFile]);
 
             return false;
         }
@@ -67,7 +67,7 @@ class BaseFile extends Util
             static::createDirectory($parentDir, $mode, true);
         }
         if (!$result = mkdir($path, $mode)) {
-            Rock::warning(Exception::NOT_CREATE_DIR, ['name' => $path]);
+            Rock::warning(FileException::NOT_CREATE_DIR, ['name' => $path]);
 
             return false;
         }

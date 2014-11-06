@@ -3,12 +3,14 @@
 namespace rock\base;
 
 
+use rock\db\BaseActiveRecord;
+
 class Behavior
 {
     use ObjectTrait;
 
     /**
-     * @var ComponentsInterface the owner of this behavior
+     * @var ComponentsInterface|BaseActiveRecord the owner of this behavior
      */
     public $owner;
 
@@ -48,8 +50,9 @@ class Behavior
 
     /**
      * Attaches the behavior object to the component.
-     * The default implementation will set the {@see  \rock\base\Behavior::$owner} property
-     * and attach event handlers as declared in [[events]].
+     *
+     * The default implementation will set the {@see \rock\base\Behavior::$owner} property
+     * and attach event handlers as declared in {@see \rock\base\Behavior::events()}.
      * Make sure you call the parent implementation if you override this method.
      * @param ComponentsInterface $owner the component that this behavior is to be attached to.
      */
@@ -63,8 +66,9 @@ class Behavior
 
     /**
      * Detaches the behavior object from the component.
-     * The default implementation will unset the {@see  \rock\base\Behavior::$owner} property
-     * and detach event handlers declared in [[events]].
+     *
+     * The default implementation will unset the {@see \rock\base\Behavior::$owner} property
+     * and detach event handlers declared in {@see \rock\base\Behavior::events()}.
      * Make sure you call the parent implementation if you override this method.
      */
     public function detach()
@@ -76,5 +80,4 @@ class Behavior
             $this->owner = null;
         }
     }
-
 } 

@@ -197,7 +197,7 @@ class Command extends \rock\db\Command
      */
     public function createTable($table, $columns, $options = null, $exists = false)
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -205,7 +205,7 @@ class Command extends \rock\db\Command
      */
     public function renameTable($table, $newName)
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -213,7 +213,7 @@ class Command extends \rock\db\Command
      */
     public function dropTable($table, $exists = false)
     {
-        throw new Exception(Exception::CRITICAL, Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
