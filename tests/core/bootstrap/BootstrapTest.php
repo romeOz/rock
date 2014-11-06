@@ -3,7 +3,6 @@
 namespace rockunit\core\bootstrap;
 
 use rock\base\ObjectTrait;
-use rock\exception\BaseException;
 
 class Foo
 {
@@ -147,7 +146,7 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException BaseException
+     * @expectedException \rock\exception\BaseException
      */
     public function testGetterThrowException()
     {
@@ -156,7 +155,7 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException BaseException
+     * @expectedException \rock\exception\BaseException
      */
     public function testBarGetterThrowException()
     {
@@ -175,7 +174,7 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException BaseException
+     * @expectedException \rock\exception\BaseException
      */
     public function testSetterThrowException()
     {
@@ -184,7 +183,7 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException BaseException
+     * @expectedException \rock\exception\BaseException
      */
     public function testBarSetterThrowException()
     {

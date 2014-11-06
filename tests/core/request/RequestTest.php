@@ -3,7 +3,6 @@ namespace rockunit\core\request;
 
 
 use rock\request\Request;
-use rock\Rock;
 use rock\sanitize\Sanitize;
 
 /**

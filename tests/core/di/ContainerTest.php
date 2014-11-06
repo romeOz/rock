@@ -205,7 +205,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         try {
             Rock::factory(Test::className());
         } catch (\Exception $e) {
-            $this->assertSame($e->getMessage(), 'Unknown class: rockunit\core\di\BarInterface');
+            $this->assertSame($e->getMessage(), 'Unknown class: rockunit\core\di\BarInterface.');
         }
 
         $test = Rock::factory(new Bar, Test::className());

@@ -6,7 +6,6 @@ use League\Flysystem\Adapter\Local;
 use League\Flysystem\Cache\Adapter;
 use rock\cache\CacheFile;
 use rock\cache\CacheInterface;
-use rock\cache\CacheException;
 use rock\file\FileManager;
 use rock\Rock;
 use rockunit\common\CommonTrait;
@@ -81,7 +80,7 @@ class CacheFileTest extends CommonTraitTest
 
     /**
      * @dataProvider providerCache
-     * @expectedException CacheException
+     * @expectedException \rock\cache\CacheException
      */
     public function testGetStorage(CacheInterface $cache)
     {
@@ -141,7 +140,7 @@ class CacheFileTest extends CommonTraitTest
 
     /**
      * @dataProvider providerCache
-     * @expectedException CacheException
+     * @expectedException \rock\cache\CacheException
      */
     public function testStatus(CacheInterface $cache)
     {

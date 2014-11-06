@@ -3,7 +3,6 @@
 namespace rockunit\core\rbac;
 
 
-use rock\rbac\RBACException;
 use rock\rbac\Permission;
 use rock\rbac\PhpManager;
 use rock\rbac\RBAC;
@@ -86,7 +85,7 @@ class AssignmentTest extends DatabaseTestCase
     }
 
     /**
-     * @expectedException RBACException
+     * @expectedException \rock\rbac\RBACException
      */
     public function testAssignThrowException()
     {
@@ -97,7 +96,7 @@ class AssignmentTest extends DatabaseTestCase
     }
 
     /**
-     * @expectedException RBACException
+     * @expectedException \rock\rbac\RBACException
      */
     public function testAssignDuplicateThrowException()
     {

@@ -152,8 +152,8 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(
             $this->fileManager->getErrors(),
             array(
-                'Unknown file: /foo$/',
-                'Unknown file: foo',
+                'Unknown file: /foo$/.',
+                'Unknown file: foo.',
             )
         );
         $this->assertTrue($this->fileManager->delete('foo.tmp'));
@@ -165,10 +165,10 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->fileManager->readAndDelete('~/^foo/'), 'foo');
         $this->assertFalse($this->fileManager->read('foo.tmp'));
         $this->assertSame(
-            $this->fileManager->getErrors(),
-            array(
-                'Unknown file: foo.tmp',
-            )
+            [
+                'Unknown file: foo.tmp.',
+            ],
+            $this->fileManager->getErrors()
         );
         $this->assertFalse($this->fileManager->delete('foo.tmp'));
     }
@@ -179,11 +179,11 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->fileManager->readAndDelete('~/foo$/'));
         $this->assertFalse($this->fileManager->readAndDelete('foo'));
         $this->assertSame(
-            $this->fileManager->getErrors(),
-            array(
-                'Unknown file: /foo$/',
-                'Unknown file: foo',
-            )
+            [
+                'Unknown file: /foo$/.',
+                'Unknown file: foo.',
+            ],
+            $this->fileManager->getErrors()
         );
         $this->assertTrue($this->fileManager->delete('foo.tmp'));
     }
