@@ -47,7 +47,7 @@ class Queue implements ComponentsInterface
      */
     public function beforeSend()
     {
-        $event = new ModelEvent();
+        $event = new QueueEvent;
         $this->trigger(self::EVENT_BEFORE_SEND, $event);
         return $event->isValid;
     }
@@ -57,7 +57,7 @@ class Queue implements ComponentsInterface
      */
     public function afterSend(&$result = null)
     {
-        $event = new ModelEvent();
+        $event = new QueueEvent;
         $event->result = $result;
         $this->trigger(self::EVENT_AFTER_SEND, $event);
         $result = $event->result;
@@ -69,7 +69,8 @@ class Queue implements ComponentsInterface
     public function beforeSubscription($topic, $message = null)
     {
         $event = new QueueEvent(['id' => $this->id, 'message' => $message, 'topic' => $topic]);
-        return $this->trigger(self::EVENT_BEFORE_SUBSCRIPTION, Event::BEFORE, $event)->before();
+        $this->trigger(self::EVENT_BEFORE_SUBSCRIPTION, $event);
+        return $event->isValid;
     }
 
     /**
@@ -78,6 +79,6 @@ class Queue implements ComponentsInterface
     public function afterSubscription($topic, $message = null)
     {
         $event = new QueueEvent(['id' => $this->id, 'message' => $message, 'topic' => $topic]);
-        $this->trigger(self::EVENT_AFTER_SUBSCRIPTION, Event::AFTER, $event)->after();
+        $this->trigger(self::EVENT_AFTER_SUBSCRIPTION, $event);
     }
 }
