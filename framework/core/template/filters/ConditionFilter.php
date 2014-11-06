@@ -94,7 +94,7 @@ class ConditionFilter
     {
         // is two operators (e.g. if ... then)
         if (empty($params) || count($params) < 2 || !isset($params['then'])) {
-            throw new TemplateException(TemplateException::ERROR, TemplateException::UNKNOWN_PARAM_FILTER, ['name' => __METHOD__]);
+            throw new TemplateException(TemplateException::UNKNOWN_PARAM_FILTER, ['name' => __METHOD__]);
         }
         $params['else'] = isset($params['else']) ? $params['else'] : null;
         $template = clone $template;
@@ -140,7 +140,7 @@ class ConditionFilter
                     $params['else'],
                     $placeholders);
         } else {
-            throw new TemplateException(TemplateException::ERROR, TemplateException::UNKNOWN_PARAM_FILTER, ['name' => json_encode($params)]);
+            throw new TemplateException(TemplateException::UNKNOWN_PARAM_FILTER, ['name' => json_encode($params)]);
         }
 
         return $result;

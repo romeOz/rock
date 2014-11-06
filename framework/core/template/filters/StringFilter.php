@@ -69,7 +69,7 @@ class StringFilter
     public static function contains($value, array $params, Template $template)
     {
         if (empty($params) || count($params) < 2 || !isset($params['then'])) {
-            throw new TemplateException(TemplateException::ERROR, TemplateException::UNKNOWN_PARAM_FILTER, ['name' => __METHOD__]);
+            throw new TemplateException(TemplateException::UNKNOWN_PARAM_FILTER, ['name' => __METHOD__]);
         }
         $params['else'] = isset($params['else']) ? $params['else'] : null;
         $template = clone $template;

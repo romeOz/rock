@@ -28,7 +28,7 @@ class NumericFilter
     public static function isParity($value, array $params, Template $template)
     {
         if (empty($params) || count($params) < 1 || !isset($params['then'])) {
-            throw new TemplateException(TemplateException::ERROR, TemplateException::UNKNOWN_PARAM_FILTER, ['name' => __METHOD__]);
+            throw new TemplateException(TemplateException::UNKNOWN_PARAM_FILTER, ['name' => __METHOD__]);
         }
         $params['else'] = isset($params['else']) ? $params['else'] : null;
         $template = clone $template;
@@ -101,6 +101,6 @@ class NumericFilter
             case '>>':
                 return $value >> $params['operand'];
         }
-        throw new TemplateException(TemplateException::ERROR, "Unknown operator: {$params['operator']}");
+        throw new TemplateException("Unknown operator: {$params['operator']}");
     }
 }
