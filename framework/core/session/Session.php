@@ -8,10 +8,10 @@ use rock\Rock;
 /**
  * Session provides session data management and the related configurations.
  *
- * Session is a Web application component that can be accessed via `Rock::$app->session`.
+ * Session is a Web application component that can be accessed via {@see \rock\RockInterface::$session}.
  *
- * To start the session, call [[open()]]; To complete and send out session data, call [[close()]];
- * To destroy the session, call [[destroy()]].
+ * To start the session, call {@see \rock\session\DbSession::open()}; To complete and send out session data, call {@see \rock\session\Session::close()};
+ * To destroy the session, call {@see \rock\session\DbSession::destroy()}.
  *
  * Session can be used like an array to set and get session data. For example,
  *
@@ -25,16 +25,16 @@ use rock\Rock;
  * ```
  *
  * Session can be extended to support customized session storage.
- * To do so, override [[useCustomStorage]] so that it returns true, and
+ * To do so, override {@see \rock\session\Session::getUseCustomStorage()} so that it returns true, and
  * override these methods with the actual logic about using custom storage:
- * [[openSession()]], [[closeSession()]], [[readSession()]], [[writeSession()]],
- * [[destroySession()]] and [[gcSession()]].
+ * {@see \rock\session\Session::openSession()}, {@see \rock\session\Session::closeSession()}, {@see \rock\session\Session::readSession()}, {@see \rock\session\Session::writeSession()},
+ * {@see \rock\session\Session::destroySession()} and {@see \rock\session\Session::gcSession()}.
  *
  * Session also supports a special type of session data, called *flash messages*.
  * A flash message is available only in the current request and the next request.
  * After that, it will be deleted automatically. Flash messages are particularly
  * useful for displaying confirmation messages. To use flash messages, simply
- * call methods such as [[setFlash()]], [[getFlash()]].
+ * call methods such as {@see \rock\session\SessionFlash::setFlash()}, {@see \rock\session\SessionFlash::getFlash()}.
  *
  * @property array $allFlashes Flash messages (key => message). This property is read-only.
  * @property array $cookieParams The session cookie parameters. This property is read-only.
@@ -83,9 +83,10 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
 
     /**
      * Returns a value indicating whether to use custom session storage.
+     * 
      * This method should be overridden to return true by child classes that implement custom session storage.
-     * To implement custom session storage, override these methods: [[openSession()]], [[closeSession()]],
-     * [[readSession()]], [[writeSession()]], [[destroySession()]] and [[gcSession()]].
+     * To implement custom session storage, override these methods: {@see \rock\session\Session::openSession()}, {@see \rock\session\Session::closeSession()},
+     * {@see \rock\session\Session::readSession()}, {@see \rock\session\Session::writeSession()}, {@see \rock\session\Session::destroySession()} and {@see \rock\session\Session::gcSession()}.
      * @return boolean whether to use custom storage.
      */
     public function getUseCustomStorage()
@@ -175,9 +176,10 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
 
     /**
      * Returns a value indicating whether the current request has sent the session ID.
+     * 
      * The default implementation will check cookie and $_GET using the session name.
      * If you send session ID via other ways, you may need to override this method
-     * or call [[setHasSessionId()]] to explicitly set whether the session ID is sent.
+     * or call {@see \rock\session\Session::setHasSessionId()} to explicitly set whether the session ID is sent.
      * @return boolean whether the current request has sent the session ID.
      */
     public function getHasSessionId()
@@ -198,6 +200,7 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
 
     /**
      * Sets the value indicating whether the current request has sent the session ID.
+     * 
      * This method is provided so that you can override the default way of determining
      * whether the session ID is sent.
      * @param boolean $value whether the current request has sent the session ID.
@@ -225,6 +228,7 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
 
     /**
      * Updates the current session ID with a newly generated one .
+     * 
      * Please refer to <http://php.net/session_regenerate_id> for more details.
      * @param boolean $deleteOldSession Whether to delete the old associated session file or not.
      */
@@ -283,6 +287,7 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
 
     /**
      * Sets the session cookie parameters.
+     * 
      * The cookie parameters passed to this method will be merged with the result
      * of `session_get_cookie_params()`.
      * @param array $value cookie parameters, valid keys include: `lifetime`, `path`, `domain`, `secure` and `httponly`.
@@ -295,9 +300,10 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
 
     /**
      * Sets the session cookie parameters.
-     * This method is called by [[open()]] when it is about to open the session.
+     * 
+     * This method is called by {@see \rock\session\DbSession::open()} when it is about to open the session.
      *
-*@throws SessionException if the parameters are incomplete.
+     * @throws SessionException if the parameters are incomplete.
      * @see http://us2.php.net/manual/en/function.session-set-cookie-params.php
      */
     private function setCookieParamsInternal()
@@ -316,6 +322,7 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
 
     /**
      * Returns the value indicating whether cookies should be used to store session IDs.
+     * 
      * @return boolean|null the value indicating whether cookies should be used to store session IDs.
      * @see setUseCookies()
      */
@@ -332,11 +339,12 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
 
     /**
      * Sets the value indicating whether cookies should be used to store session IDs.
+     * 
      * Three states are possible:
      *
-     * - Session::USE_ONLY_COOKIES: cookies and only cookies will be used to store session IDs.
-     * - Session::NOT_USE_COOKIES: cookies will not be used to store session IDs.
-     * - Session::USE_COOKIES: if possible, cookies will be used to store session IDs; if not, other mechanisms will be used (e.g. GET parameter)
+     * - {@see \rock\session\Session::USE_ONLY_COOKIES}: cookies and only cookies will be used to store session IDs.
+     * - {@see \rock\session\Session::NOT_USE_COOKIES}: cookies will not be used to store session IDs.
+     * - {@see \rock\session\Session::USE_COOKIES}: if possible, cookies will be used to store session IDs; if not, other mechanisms will be used (e.g. GET parameter)
      *
      * @param int $value the value indicating whether cookies should be used to store session IDs.
      */
@@ -412,7 +420,8 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
 
     /**
      * Session open handler.
-     * This method should be overridden if [[useCustomStorage]] returns true.
+     * 
+     * This method should be overridden if {@see \rock\session\Session::getUseCustomStorage()} returns true.
      * Do not call this method directly.
      * @param string $savePath session save path
      * @param string $sessionName session name
@@ -425,7 +434,8 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
 
     /**
      * Session close handler.
-     * This method should be overridden if [[useCustomStorage]] returns true.
+     * 
+     * This method should be overridden if {@see \rock\session\Session::getUseCustomStorage()} returns true.
      * Do not call this method directly.
      * @return boolean whether session is closed successfully
      */
@@ -436,7 +446,8 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
 
     /**
      * Session read handler.
-     * This method should be overridden if [[useCustomStorage]] returns true.
+     * 
+     * This method should be overridden if {@see \rock\session\Session::getUseCustomStorage()} returns true.
      * Do not call this method directly.
      * @param string $id session ID
      * @return string the session data
@@ -448,7 +459,8 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
 
     /**
      * Session write handler.
-     * This method should be overridden if [[useCustomStorage]] returns true.
+     * 
+     * This method should be overridden if {@see \rock\session\Session::getUseCustomStorage()} returns true.
      * Do not call this method directly.
      * @param string $id session ID
      * @param string $data session data
@@ -461,7 +473,8 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
 
     /**
      * Session destroy handler.
-     * This method should be overridden if [[useCustomStorage]] returns true.
+     * 
+     * This method should be overridden if {@see \rock\session\Session::getUseCustomStorage()} returns true.
      * Do not call this method directly.
      * @param string $id session ID
      * @return boolean whether session is destroyed successfully
@@ -473,7 +486,8 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
 
     /**
      * Session GC (garbage collection) handler.
-     * This method should be overridden if [[useCustomStorage]] returns true.
+     * 
+     * This method should be overridden if {@see \rock\session\Session::getUseCustomStorage()} returns true.
      * Do not call this method directly.
      * @param integer $maxLifetime the number of seconds after which data will be seen as 'garbage' and cleaned up.
      * @return boolean whether session is GCed successfully
@@ -528,6 +542,7 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
 
     /**
      * Returns an iterator for traversing the session variables.
+     * 
      * This method is required by the interface IteratorAggregate.
      *
      * @param array $only

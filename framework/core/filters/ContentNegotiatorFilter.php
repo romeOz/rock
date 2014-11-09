@@ -9,16 +9,15 @@ use rock\Rock;
 /**
  * ContentNegotiator supports response format negotiation and application language negotiation.
  *
- * When the @see ContentNegotiatorFilter::formats property is specified, ContentNegotiator will support response format
- * negotiation based on the value of the GET parameter @see ContentNegotiatorFilter::formatParam and the `Accept` HTTP header.
- * If a match is found, the @see Response::format property will be set as the chosen format.
- * The @see Response::acceptMimeType as well
- * as  @see Response::acceptParams will also be updated accordingly.
+ * When the {@see \rock\filters\ContentNegotiatorFilter::$formats} property is specified, ContentNegotiator will support response format
+ * negotiation based on the value of the GET parameter {@see rock\filters\ContentNegotiatorFilter::$formatParam} and the `Accept` HTTP header.
+ * If a match is found, the {@see \rock\response\Response::$format} property will be set as the chosen format.
+ * The {@see \rock\response\Response::$acceptMimeType} as well as  {@see \rock\response\Response::$acceptParams} will also be updated accordingly.
  *
- * When the @see ContentNegotiatorFilter::languages is specified, ContentNegotiator will support application
- * language negotiation based on the value of the GET parameter @see ContentNegotiatorFilter::languageParam
+ * When the {@see \rock\filters\ContentNegotiatorFilter::$languages} is specified, ContentNegotiator will support application
+ * language negotiation based on the value of the GET parameter {@see \rock\filters\ContentNegotiatorFilter::$languageParam}
  * and the `Accept-Language` HTTP header.
- * If a match is found, the @see Rock::language property will be set as the chosen language.
+ * If a match is found, the {@see \rock\Rock::$language} property will be set as the chosen language.
  *
  *
  * The following code shows how you can use ContentNegotiator as an action filter in either a controller or a module.
@@ -48,8 +47,8 @@ class ContentNegotiatorFilter extends ActionFilter
 {
     /**
      * @var string the name of the GET parameter that specifies the response format.
-     * Note that if the specified format does not exist in @see Response::formats,
-     * a @see ContentNegotiatorFilter
+     * Note that if the specified format does not exist in {@see \rock\response\Response::$format}s,
+     * a {@see \rock\filters\ContentNegotiatorFilter}
      * exception will be thrown.  If the parameter value is empty or if this property is null,
      * the response format will be determined based on the `Accept` HTTP header only.
      * @see formats
@@ -57,9 +56,9 @@ class ContentNegotiatorFilter extends ActionFilter
     public $formatParam = '_format';
     /**
      * @var string the name of the GET parameter that specifies
-     * the @see Rock::language. Note that if the specified language does not match
-     * any of @see ContentNegotiatorFilter::languages,
-     * the first language in @see ContentNegotiatorFilter::languages
+     * the {@see \rock\Rock::$language}. Note that if the specified language does not match
+     * any of {@see \rock\filters\ContentNegotiatorFilter::$languages},
+     * the first language in {@see \rock\filters\ContentNegotiatorFilter::$languages}
      * will be used. If the parameter value is empty or if this property is null,
      * the application language will be determined based on the `Accept-Language` HTTP header only.
      * @see languages
@@ -68,7 +67,7 @@ class ContentNegotiatorFilter extends ActionFilter
     /**
      * @var array list of supported response formats. The keys are MIME types (e.g. `application/json`)
      * while the values are the corresponding formats (e.g. `html`, `json`) which must be supported
-     * as declared in @see Response::formatters.
+     * as declared in {@see \rock\response\Response::$format}ters.
      *
      * If this property is empty or not set, response format negotiation will be skipped.
      */
@@ -111,9 +110,6 @@ class ContentNegotiatorFilter extends ActionFilter
      */
     public function beforeAction($action)
     {
-//        if (!$this->isActive($action)) {
-//            return parent::beforeAction($action);
-//        }
         $this->negotiate();
         return true;
     }

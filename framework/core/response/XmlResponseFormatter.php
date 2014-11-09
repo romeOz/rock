@@ -23,7 +23,8 @@ class XmlResponseFormatter implements ResponseFormatterInterface
      */
     public $version = '1.0';
     /**
-     * @var string the XML encoding. If not set, it will use the value of [[Response::charset]].
+     * @var string the XML encoding.
+     * If not set, it will use the value of {@see \rock\response\Response::$charset}.
      */
     public $encoding;
     /**

@@ -12,6 +12,43 @@ use rock\route\Route;
 use rock\route\RouteEvent;
 use rock\template\Template;
 
+/**
+ * Access provides simple access control based on a set of rules.
+ *
+ * AccessControl is an action filter. It will check its {@see \rock\filters\AccessFilter::$rules} to find
+ * the first rule that matches the current context variables (such as user IP address, user role).
+ * The matching rule will dictate whether to allow or deny the access to the requested controller
+ * action. If no rule matches, the access will be denied.
+ *
+ * To use AccessControl, declare it in the `behaviors()` method of your controller class.
+ * For example, the following declarations will allow authenticated users to access the "create"
+ * and "update" actions and deny all other users from accessing these two actions.
+ *
+ * ```php
+ * public function behaviors()
+ * {
+ *  return [
+ *   'access' => [
+ *          'class' => AccessControl::className(),
+ *          'only' => ['actionCreate', 'actionUpdate'],
+ *          'rules' => [
+ *              // deny all POST requests
+ *              [
+ *               'allow' => false,
+ *               'verbs' => ['POST']
+ *              ],
+ *              // allow authenticated users
+ *              [
+ *                  'allow' => true,
+ *                  'roles' => ['@'],
+ *              ],
+ *          // everything else is denied
+ *          ],
+ *      ],
+ * ];
+ * }
+ * ```
+ */
 class AccessFilter extends ActionFilter
 {
     public $rules = [];
@@ -65,7 +102,6 @@ class AccessFilter extends ActionFilter
         $access = Rock::factory([
             'class' => Access::className(),
             'owner' => $this->owner,
-            //'action' => $action,
             'rules' => $this->rules,
             'success' => $this->success,
             'fail' => $this->fail

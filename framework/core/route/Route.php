@@ -528,16 +528,6 @@ class Route implements RequestInterface, ErrorsInterface
             return false;
         }
         return true;
-//        if (!$behaviors->before()) {
-//
-//            $this->errors |= $behaviors->getAccessErrors();
-//
-//            return false;
-//        }
-//
-//        $behaviors->after(null/*, $result*/);
-//
-//        return true;
     }
 
     protected function callAction(\Closure $handler)

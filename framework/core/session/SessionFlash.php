@@ -20,7 +20,7 @@ abstract class SessionFlash implements ComponentsInterface
 
     /**
      * Updates the counters for flash messages and removes outdated flash messages.
-     * This method should only be called once in @see init() .
+     * This method should only be called once in {@see \rock\base\ObjectTrait::init()} .
      */
     protected function updateFlashCounters()
     {
@@ -46,6 +46,7 @@ abstract class SessionFlash implements ComponentsInterface
 
     /**
      * Returns a flash message.
+     *
      * A flash message is available only in the current request and the next request.
      *
      * @param string  $key     the key identifying the flash message

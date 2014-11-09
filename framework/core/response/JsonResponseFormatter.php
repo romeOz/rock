@@ -11,7 +11,7 @@ class JsonResponseFormatter implements ResponseFormatterInterface
     use ObjectTrait;
 
     /**
-     * @var boolean whether to use JSONP response format. When this is true, the [[Response::data|response data]]
+     * @var boolean whether to use JSONP response format. When this is true, the {@see \rock\response\Response::$data}
      * must be an array consisting of `data` and `callback` members. The latter should be a JavaScript
      * function name while the former will be passed to this function as a parameter.
      */

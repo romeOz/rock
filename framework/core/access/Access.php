@@ -28,19 +28,14 @@ class Access implements ErrorsInterface
      */
     public $sendHeaders = true;
 
-//    /**
-//     * Name method (action)
-//     *
-//     * @var string
-//     */
-//    public $action;
 
     /**
-     * ~~~~~~~~~~~~~~~
+     * ```php
      * [[new Object, 'method'], $args]
      * [['Object', 'staticMethod'], $args]
      * [callback, $args]
-     * ~~~~~~~~~~~~~~~
+     * ```
+     *
      * function(array params, Access $access){}
      *
      * @var array
@@ -159,29 +154,21 @@ class Access implements ErrorsInterface
     /**
      * Match by users
      *
-     * @param array $users - array data of access
+     * @param array $users array data of access
      * @return null|bool
      */
     protected function matchUsers(array $users)
     {
-        /**
-         * All users
-         */
+        // All users
         if (in_array('*', $users)) {
             return true;
-            /**
-             * guest
-             */
+        // guest
         } elseif (in_array('?', $users) && $this->Rock->user->isGuest()) {
             return true;
-            /**
-             * Authenticated
-             */
+        // Authenticated
         } elseif (in_array('@', $users) && !$this->Rock->user->isGuest()) {
             return true;
-            /**
-             * username
-             */
+        // username
         } elseif (in_array($this->Rock->user->get('username'), $users)) {
             return true;
         }
@@ -194,14 +181,12 @@ class Access implements ErrorsInterface
     /**
      * Match ips
      *
-     * @param array $ips - array data of access
+     * @param array $ips array data of access
      * @return bool
      */
     protected function matchIps(array $ips)
     {
-        /**
-         * all ips
-         */
+        // all ips
         if (in_array('*', $ips)) {
             return true;
         }
@@ -215,14 +200,12 @@ class Access implements ErrorsInterface
     /**
      * Match methods by request
      *
-     * @param array $verbs - array data of access
+     * @param array $verbs array data of access
      * @return bool
      */
     protected function matchVerbs(array $verbs)
     {
-        /**
-         * all methods by request
-         */
+        // all methods by request
         if (in_array('*', $verbs)) {
             return true;
         }
@@ -247,17 +230,13 @@ class Access implements ErrorsInterface
      */
     protected function matchRole(array $roles)
     {
-        /**
-         * all roles
-         */
+        // all roles
         if (in_array('*', $roles)) {
 
             return true;
         } elseif (in_array('?', $roles) && $this->Rock->user->isGuest()) {
             return true;
-            /**
-             * Authenticated
-             */
+        // Authenticated
         } elseif (in_array('@', $roles) && !$this->Rock->user->isGuest()) {
             return true;
         }
@@ -277,7 +256,7 @@ class Access implements ErrorsInterface
     /**
      * Match by Custom
      *
-     * @param array $rule - array data of access
+     * @param array $rule array data of access
      * @return bool
      */
     protected function matchCustom(array $rule)

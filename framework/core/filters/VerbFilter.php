@@ -44,7 +44,7 @@ class VerbFilter extends ActionFilter
      * @var array this property defines the allowed request methods for each action.
      * For each action that should only support limited set of request methods
      * you add an entry with the action id as array key and an array of
-     * allowed methods (e.g. GET, HEAD, PUT) as the value.
+     * allowed methods (e.g. `GET`, `HEAD`, `PUT`) as the value.
      * If an action is not listed all request methods are considered allowed.
      *
      * You can use '*' to stand for all actions. When an action is explicitly
@@ -81,7 +81,7 @@ class VerbFilter extends ActionFilter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function beforeAction($action)
     {

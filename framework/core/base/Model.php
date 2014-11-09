@@ -1,8 +1,6 @@
 <?php
 namespace rock\base;
 
-
-use rock\event\Event;
 use rock\helpers\Inflector;
 use rock\Rock;
 use rock\validate\Validate;
@@ -20,22 +18,20 @@ use rock\validate\Validate;
  *
  * Model also raises the following events when performing data validation:
  *
- * - @see Model::EVENT_BEFORE_VALIDATE: an event raised at
- * the beginning of @see Model::validate()
- * - @see Model::EVENT_AFTER_VALIDATE : an event raised at
- * the end of @see Model::validate()
+ * - {@see \rock\base\Model::EVENT_BEFORE_VALIDATE}: an event raised at the beginning of {@see \rock\base\Model::validate()}
+ * - {@see \rock\base\Model::EVENT_AFTER_VALIDATE} : an event raised at the end of {@see \rock\base\Model::validate()}
  *
  * You may directly use Model to store model data, or extend it with customization.
  *
  * @property array          $attributes  Attribute values (name => value).
  * @property array          $errors      An array of errors for all attributes. Empty array is returned if no error. The
- *          result is a two-dimensional array. See @see Model::getErrors() for detailed description. This property is read-only.
+ *          result is a two-dimensional array. See {@see \rock\base\Model::getErrors()} for detailed description. This property is read-only.
  * @property array          $firstErrors The first errors. An empty array will be returned if there is no error. This
  *          property is read-only.
  * @property \ArrayIterator $iterator    An iterator for traversing the items in the list. This property is
  *          read-only.
  * @property string         $scenario    The scenario that this model is in.
- * Defaults to @see Model::DEFAULT_SCENARIO .
+ * Defaults to {@see \rock\base\Model::DEFAULT_SCENARIO} .
  * @property \ArrayObject   $validators  All the validators declared in the model. This property is read-only.
  *
  * @package models
@@ -47,14 +43,9 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
     }
 
     use ArrayableTrait;
-
-//    const RULE_BEFORE_FILTERS = 'beforeFilters';
-//    const RULE_AFTER_FILTERS = 'afterFilters';
-//    const RULE_VALIDATION = 'validation';
-//    const RULE_DEFAULT = 'default';
+    
     const RULE_VALIDATE = 1;
     const RULE_SANITIZE = 2;
-
     /**
      * The name of the default scenario.
      */
@@ -62,13 +53,13 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
 
     /**
      * @event ModelEvent an event raised at the beginning
-     * of @see validate() .
+     * of {@see \rock\base\Model::validate()}.
      */
     const EVENT_BEFORE_VALIDATE = 'beforeValidate';
 
     /**
      * @event Event an event raised at the end
-     * of @see validate()
+     * of {@see \rock\base\Model::validate()}
      */
     const EVENT_AFTER_VALIDATE = 'afterValidate';
 
@@ -82,36 +73,38 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
      */
     protected $_errors = [];
 
-    //protected $enableCsrfValidation = true;
     protected $useLabelsAsPlaceholders = true;
 
     /**
      * Returns the validation rules for attributes.
      *
-     * Validation rules are used by @see validate() to check if attribute values are valid.
+     * Validation rules are used by {@see \rock\base\Model::validate()} to check if attribute values are valid.
      * Child classes may override this method to declare different validation rules.
      *
      * Each rule is an array with the following structure:
      *
      * ```php
      * [
-     *     'type',
-     *     'handler',
-     *     ['scenario1', 'scenario2']
+     *  'type',
+     *  ['attribute1', 'attribute2'],
+     *  rule_1,
+     *  rule_2,
+     *  ...
+     *  'on' => ['scenario1', 'scenario2'],
      * ]
      * ```
      *
      * where
      *
-     *  - attribute list: required, specifies the attributes array to be validated, for single attribute you can pass string;
-     *  - validator type: required, specifies the validator to be used. It can be a built-in validator name,
-     *    a method name of the model class, an anonymous function, or a validator class name.
-     *  - on: optional, specifies the @see scenario array when the validation
-     *    rule can be applied. If this option is not set, the rule will apply to all scenarios.
-     *  - additional name-value pairs can be specified to initialize the corresponding validator properties.
-     *    Please refer to individual validator class API for possible properties.
+     * - attribute list: required, specifies the attributes array to be validated, for single attribute you can pass string;
+     * - validator type: required, specifies the validator to be used. It can be a built-in validator name,
+     * a method name of the model class, an anonymous function, or a validator class name.
+     * - on: optional, specifies the {@see \rock\base\Model::$scenario} array when the validation
+     * rule can be applied. If this option is not set, the rule will apply to all scenarios.
+     * - additional name-value pairs can be specified to initialize the corresponding validator properties.
+     * Please refer to individual validator class API for possible properties.
      *
-     * A validator can be either an object of a class extending @see \rock\validate\Validate , or a model class method
+     * A validator can be either an object of a class extending {@see \rock\validate\Validate}, or a model class method
      * (called *inline validator*) that has the following signature:
      *
      * ```php
@@ -123,16 +116,18 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
      * validator configuration options such as `max` in case of `string` validator. Currently validate attribute value
      * can be accessed as `$this->[$attribute]`.
      *
-     * Rock also provides a set of [[Validator::builtInValidators|built-in validators]].
-     * They each has an alias name which can be used when specifying a validation rule.
-     *
      * Below are some examples:
      *
      * ```php
      * [
-     *   [ActiveRecord::RULE_FILTERS, [Sanitize::STRIP_TAGS, 'trim'], ['scenario1']]
-     *   [ActiveRecord::RULE_VALIDATION, function(array $attributes){return Rock::$app->validation->notEmpty()->validate($attributes['name'], 'e_placeholder');}, ['scenario1']]
-     *   [ActiveRecord::RULE_DEFAULT, ['time' => time(), 'password'=>function(array $attributes){return md5($attributes['password']);}]]
+     *  // built-in "required" validator
+     *  [Model::RULE_VALIDATE, ['username', 'password'], 'required'],
+     *  // built-in "string" validator customized with "min" and "max" properties
+     *  [Model::RULE_VALIDATE, 'username', 'string', 'min' => [3], 'max' => [12]],
+     *  // built-in "compare" validator that is used in "register" scenario only
+     *  [Model::RULE_VALIDATE, 'password', 'confirm' => [$this->password], 'scenarios' => ['signup']],
+     *  // an inline validator defined via the "authenticate()" method in the model class
+     *  [Model::RULE_VALIDATE, 'password', 'authenticate', 'scenarios' => ['login']],
      * ];
      * ```
      *
@@ -140,6 +135,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
      * merge the parent rules with child rules using functions such as `array_merge()`.
      *
      * @return array validation rules
+     * @see \rock\base\Model::$scenario
      */
     public function rules()
     {
@@ -149,7 +145,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
     /**
      * Sets the scenario for the model.
      * Note that this method does not check if the scenario exists or not.
-     * The method [[validate()]] will perform this check.
+     * The method {@see \rock\base\Model::validate()} will perform this check.
      * @param string $value the scenario that this model is in.
      */
     public function setScenario($value)
@@ -160,7 +156,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
     /**
      * Returns the form name that this model class should use.
      *
-     * The form name is mainly used by `\rock\widgets\ActiveForm` to determine how to name
+     * The form name is mainly used by {@see \rock\widgets\ActiveForm} to determine how to name
      * the input fields for the attributes in a model. If the form name is "A" and an attribute
      * name is "b", then the corresponding input name would be "A[b]". If the form name is
      * an empty string, then the input name would be "b".
@@ -209,7 +205,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
      * `firstName`, we can declare a label `First Name` which is more user-friendly and can
      * be displayed to end users.
      *
-     * By default an attribute label is generated using [[generateAttributeLabel()]].
+     * By default an attribute label is generated using {@see \rock\base\Model::generateAttributeLabel()}.
      * This method allows you to explicitly specify attribute labels.
      *
      * Note, in order to inherit labels defined in the parent class, a child class needs to
@@ -233,8 +229,8 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
      * - the rules must be effective for the current scenario.
      *
      * This method will call {@see \rock\base\Model::beforeValidate()} and {@see \rock\base\Model::afterValidate()} before and
-     * after the actual validation, respectively. If @see beforeValidate() returns false,
-     * the validation will be cancelled and @see afterValidate() will not be called.
+     * after the actual validation, respectively. If {@see \rock\base\Model::beforeValidate()} returns false,
+     * the validation will be cancelled and {@see \rock\base\Model::afterValidate()} will not be called.
      *
      * Errors found during the validation can be retrieved via {@see \rock\base\Model::getErrors()}, {@see \rock\base\Model::getFirstErrors()}
      * and {@see \rock\base\Model::getFirstError()}.
@@ -242,8 +238,8 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
      * @param array $attributes list of attributes that should be validated.
      *                          If this parameter is empty, it means any attribute listed in the applicable
      *                          validation rules should be validated.
-     * @param boolean $clearErrors whether to call {@see \rock\base\Model::clearErrors()} before performing validation
-     * @return boolean whether the validation is successful without any error.
+     * @param bool $clearErrors whether to call {@see \rock\base\Model::clearErrors()} before performing validation
+     * @return bool whether the validation is successful without any error.
      */
     public function validate(array $attributes = null, $clearErrors = true)
     {
@@ -263,7 +259,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
             return false;
         }
         if ($this->_rulesInternal($attributes, $rules) === false) {
-            Event::offClass($this);
+            //Event::offClass($this);
             //$this->detachEvents();
             return false;
         }
@@ -473,21 +469,9 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
         return true;
     }
 
-//    protected $_activeAttributeName;
-//
-//    public function getActiveAttributeName()
-//    {
-//        return $this->_activeAttributeName;
-//    }
-//
-//    public function setActiveAttributeName($attribute)
-//    {
-//        $this->_activeAttributeName = $attribute;
-//    }
-
-
     /**
      * Validates multiple models.
+     * 
      * This method will validate every model. The models being validated may
      * be of the same or different types.
      * @param array $models the models to be validated
@@ -507,7 +491,6 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
 
         return $valid;
     }
-
 
     /**
      * This method is invoked before validation starts.
@@ -536,11 +519,10 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
     {
         $this->trigger(self::EVENT_AFTER_VALIDATE);
     }
-
-
-
+    
     /**
      * Returns a value indicating whether the attribute is safe for massive assignments.
+     * 
      * @param string $attribute attribute name
      * @return boolean whether the attribute is safe for massive assignments
      */
@@ -583,7 +565,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
      *
      * @param string   $attribute attribute name. Use null to retrieve errors for all attributes.
      * @property array An         array of errors for all attributes. Empty array is returned if no error.
-     *                            The result is a two-dimensional array. See @see getErrors() for detailed description.
+     *                            The result is a two-dimensional array. See {@see \rock\base\Model::getErrors()} for detailed description.
      * @return array errors for all attributes or the specified attribute. Empty array is returned if no error.
      *                            Note that when returning errors for all attributes, the result is a two-dimensional array, like the following:
      *
@@ -700,6 +682,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
 
     /**
      * Generates a user friendly attribute label based on the give attribute name.
+     * 
      * This is done by replacing underscores, dashes and dots with blanks and
      * changing the first letter of each word to upper case.
      * For example, 'department_name' or 'DepartmentName' will generate 'Department Name'.
@@ -716,7 +699,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
      * Returns attribute values.
      *
      * @param array $only  list of attributes whose value needs to be returned.
-     *                      Defaults to null, meaning all attributes listed in @see attributes() will be returned.
+     *                      Defaults to null, meaning all attributes listed in {@see \rock\base\Model::attributes()} will be returned.
      *                      If it is an array, only the attributes in the array will be returned.
      * @param array $exclude list of attributes whose value should NOT be returned.
      * @return array attribute values (name => value).
@@ -740,11 +723,12 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
 
     /**
      * Sets the attribute values in a massive way.
+     * 
      * @param array $values attribute values (name => value) to be assigned to the model.
-     * @param boolean $safeOnly whether the assignments should only be done to the safe attributes.
-     * A safe attribute is one that is associated with a validation rule in the current @see scenario .
+     * @param bool $safeOnly whether the assignments should only be done to the safe attributes.
+     * A safe attribute is one that is associated with a validation rule in the current {@see \rock\base\Model::$scenario}.
      * @see safeAttributes()
-     * @see attributes()
+     * @see \rock\base\Model::attributes()
      */
     public function setAttributes(array $values, $safeOnly = true)
     {
@@ -760,6 +744,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
 
     /**
      * This method is invoked when an unsafe attribute is being massively assigned.
+     * 
      * The default implementation will log a warning message if `DEBUG` is on.
      * It does nothing otherwise.
      * @param string $name the unsafe attribute name
@@ -777,7 +762,8 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
      * Scenario affects how validation is performed and which attributes can
      * be massively assigned.
      *
-     * @return string the scenario that this model is in. Defaults to [[DEFAULT_SCENARIO]].
+     * @return string the scenario that this model is in.
+     * Defaults to {@see \rock\base\Model::DEFAULT_SCENARIO}.
      */
     public function getScenario()
     {
@@ -798,9 +784,10 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
 
     /**
      * Populates the model with the data from end user.
-     * The data to be loaded is `$data[formName]`, where `formName` refers to the value of @see formName() .
-     * If @see formName() is empty, the whole `$data` array will be used to populate the model.
-     * The data being populated is subject to the safety check by @see setAttributes() .
+     * 
+     * The data to be loaded is `$data[formName]`, where `formName` refers to the value of {@see \rock\base\Model::formName()} .
+     * If {@see \rock\base\Model::formName()} is empty, the whole `$data` array will be used to populate the model.
+     * The data being populated is subject to the safety check by {@see \rock\base\Model::setAttributes()} .
      * @param array $data the data array. This is usually `$_POST` or `$_GET`, but can also be any valid array
      * supplied by end user.
      * @return bool whether the model is successfully populated with some data.
@@ -821,11 +808,12 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
 
     /**
      * Populates a set of models with the data from end user.
+     * 
      * This method is mainly used to collect tabular data input.
      * The data to be loaded for each model is `$data[formName][index]`, where `formName`
-     * refers to the value of @see formName() , and `index` the index of the model in the `$models` array.
-     * If @see formName() is empty, `$data[index]` will be used to populate each model.
-     * The data being populated to each model is subject to the safety check by @see setAttributes() .
+     * refers to the value of {@see \rock\base\Model::formName()} , and `index` the index of the model in the `$models` array.
+     * If {@see \rock\base\Model::formName()} is empty, `$data[index]` will be used to populate each model.
+     * The data being populated to each model is subject to the safety check by {@see \rock\base\Model::setAttributes()} .
      * @param array $models the models to be populated. Note that all models should have the same class.
      * @param array $data the data array. This is usually `$_POST` or `$_GET`, but can also be any valid array
      * supplied by end user.
@@ -856,9 +844,9 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
     }
 
     /**
-     * Returns the list of fields that should be returned by default by @see toArray() when no specific fields are specified.
+     * Returns the list of fields that should be returned by default by {@see \rock\base\ArrayableTrait::toArray()} when no specific fields are specified.
      *
-     * A field is a named element in the returned array by @see toArray() .
+     * A field is a named element in the returned array by {@see \rock\base\ArrayableTrait::toArray()}.
      *
      * This method should return an array of field names or field definitions.
      * If the former, the field name will be treated as an object property name whose value will be used
@@ -892,13 +880,13 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
      * ```
      *
      * In this method, you may also want to return different lists of fields based on some context
-     * information. For example, depending on @see scenario or the privilege of the current application user,
+     * information. For example, depending on {@see \rock\base\Model::$scenario} or the privilege of the current application user,
      * you may return different sets of visible fields or filter out some fields.
      *
-     * The default implementation of this method returns @see attributes() indexed by the same attribute names.
+     * The default implementation of this method returns {@see \rock\base\Model::attributes()} indexed by the same attribute names.
      *
      * @return array the list of field names or field definitions.
-     * @see toArray()
+     * @see \rock\base\ArrayableTrait::toArray()
      */
     public function fields()
     {
@@ -909,6 +897,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
 
     /**
      * Returns an iterator for traversing the attributes in the model.
+     *
      * This method is required by the interface IteratorAggregate.
      *
      * @param array $only
@@ -923,6 +912,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
 
     /**
      * Returns whether there is an element at the specified offset.
+     *
      * This method is required by the SPL interface `ArrayAccess`.
      * It is implicitly called when you use something like `isset($model[$offset])`.
      *
@@ -936,6 +926,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
 
     /**
      * Returns the element at the specified offset.
+     *
      * This method is required by the SPL interface `ArrayAccess`.
      * It is implicitly called when you use something like `$value = $model[$offset];`.
      *
@@ -949,6 +940,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
 
     /**
      * Sets the element at the specified offset.
+     *
      * This method is required by the SPL interface `ArrayAccess`.
      * It is implicitly called when you use something like `$model[$offset] = $item;`.
      *
@@ -962,6 +954,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
 
     /**
      * Sets the element value at the specified offset to null.
+     *
      * This method is required by the SPL interface `ArrayAccess`.
      * It is implicitly called when you use something like `unset($model[$offset])`.
      *

@@ -58,7 +58,7 @@ class Cookie extends SessionFlash implements \ArrayAccess, CollectionInterface, 
 
 
     /**
-     * @param string|array $keys        - chain keys
+     * @param string|array $keys        chain keys
      * @param mixed   $default
      * @param Sanitize  $sanitize
      * @return mixed|null

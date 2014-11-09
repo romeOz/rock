@@ -32,7 +32,7 @@ class Request implements RequestInterface, ComponentsInterface
      */
     public $allowDomains = [];
     /**
-     * @var string|boolean the name of the POST parameter that is used to indicate if a request is a PUT, PATCH or DELETE
+     * @var string|boolean the name of the POST parameter that is used to indicate if a request is a `PUT`, `PATCH` or `DELETE`
      * request tunneled through POST. Default to '_method'.
      * @see getMethod()
      * @see getBodyParams()
@@ -97,7 +97,7 @@ class Request implements RequestInterface, ComponentsInterface
     }
 
     /**
-     * @param string      $name - name of request-value
+     * @param string      $name name of request-value
      * @param mixed  $default
      * @param Sanitize $sanitize
      * @return mixed
@@ -108,7 +108,7 @@ class Request implements RequestInterface, ComponentsInterface
     }
 
     /**
-     * @param string      $name - name of request-value
+     * @param string      $name name of request-value
      * @param mixed  $default
      * @param Sanitize $sanitize
      * @return mixed
@@ -119,7 +119,7 @@ class Request implements RequestInterface, ComponentsInterface
     }
 
     /**
-     * @param string      $name - name of request-value
+     * @param string      $name name of request-value
      * @param mixed  $default
      * @param Sanitize $sanitize
      * @return mixed
@@ -130,7 +130,7 @@ class Request implements RequestInterface, ComponentsInterface
     }
 
     /**
-     * @param string      $name - name of request-value
+     * @param string      $name name of request-value
      * @param mixed  $default
      * @param Sanitize $sanitize
      * @return mixed
@@ -144,6 +144,7 @@ class Request implements RequestInterface, ComponentsInterface
     
     /**
      * Returns the content types acceptable by the end user.
+     * 
      * This is determined by the `Accept` HTTP header. For example,
      *
      * ```php
@@ -177,10 +178,11 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Sets the acceptable content types.
-     * Please refer to @see getAcceptableContentTypes() on the format of the parameter.
+     * 
+     * Please refer to {@see \rock\request\Request::getAcceptableContentTypes()} on the format of the parameter.
      * @param array $value the content types that are acceptable by the end user. They should
      * be ordered by the preference level.
-     * @see getAcceptableContentTypes()
+     * @see \rock\request\Request::getAcceptableContentTypes()
      * @see parseAcceptHeader()
      */
     public function setAcceptableContentTypes($value)
@@ -189,11 +191,12 @@ class Request implements RequestInterface, ComponentsInterface
     }
     
     /**
-     * Returns request content-type
+     * Returns request content-type.
+     * 
      * The Content-Type header field indicates the MIME type of the data
      * contained in the case of the HEAD method, the
      * media type that would have been sent had the request been a GET.
-     * For the MIME-types the user expects in response, see @see getAcceptableContentTypes() .
+     * For the MIME-types the user expects in response, see {@see \rock\request\Request::getAcceptableContentTypes()} .
      * @return string request content-type. Null is returned if this information is not available.
      * @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.17
      * HTTP 1.1 header field definitions
@@ -215,6 +218,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns the languages acceptable by the end user.
+     * 
      * This is determined by the `Accept-Language` HTTP header.
      * @return array the languages ordered by the preference level. The first element
      * represents the most preferred language.
@@ -327,6 +331,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns the user-preferred language that should be used by this application.
+     * 
      * The language resolution is based on the user preferred languages and the languages
      * supported by the application. The method will try to find the best match.
      * @param array $languages a list of the languages supported by the application. If this is empty, the current
@@ -372,10 +377,11 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns the path info of the currently requested URL.
+     * 
      * A path info refers to the part that is after the entry script and before the question mark (query string).
      * The starting and ending slashes are both removed.
      *
-*@return string part of the request URL that is after the entry script and before the question mark.
+     * @return string part of the request URL that is after the entry script and before the question mark.
      * Note, the returned path info is already URL-decoded.
      * @throws RequestException if the path info cannot be determined due to unexpected server configuration
      */
@@ -390,6 +396,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Sets the path info of the current request.
+     * 
      * This method is mainly provided for testing purpose.
      * @param string $value the path info of the current request
      */
@@ -400,10 +407,11 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Resolves the path info part of the currently requested URL.
+     * 
      * A path info refers to the part that is after the entry script and before the question mark (query string).
      * The starting slashes are both removed (ending slashes will be kept).
      *
-*@return string part of the request URL that is after the entry script and before the question mark.
+     * @return string part of the request URL that is after the entry script and before the question mark.
      * Note, the returned path info is decoded.
      * @throws RequestException if the path info cannot be determined due to unexpected server configuration
      */
@@ -453,9 +461,9 @@ class Request implements RequestInterface, ComponentsInterface
     }
 
     /**
-     * Is self domain
+     * Is self domain.
      *
-     * @param bool $throw - throw an exception (default: false)
+     * @param bool $throw throw an exception (default: false)
      * @throws RequestException
      * @return bool
      */
@@ -480,11 +488,9 @@ class Request implements RequestInterface, ComponentsInterface
         return true;
     }
 
-
     /**
      * Returns the currently requested absolute URL.
-     * This is a shortcut to the concatenation of @see getHostInfo()
-     * and @see getUrl() .
+     * This is a shortcut to the concatenation of {@see \rock\request\Request::getHostInfo()} and {@see \rock\request\Request::getUrl()}.
      *
      * @param bool $strip
      * @return string the currently requested absolute URL.
@@ -499,10 +505,10 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns the currently requested relative URL.
-     * This refers to the portion of the URL that is after the @see getHostInfo() part.
-     * It includes the @see getQueryString() part if any.
+     * This refers to the portion of the URL that is after the {@see \rock\request\Request::getHostInfo()} part.
+     * It includes the {@see \rock\request\Request::getQueryString()} part if any.
      *
-*@return string the currently requested relative URL. Note that the URI returned is URL-encoded.
+     * @return string the currently requested relative URL. Note that the URI returned is URL-encoded.
      * @throws RequestException if the URL cannot be determined due to unusual server configuration
      */
     public function getUrl()
@@ -515,7 +521,8 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Sets the currently requested relative URL.
-     * The URI must refer to the portion that is after @see getHostInfo() .
+     * 
+     * The URI must refer to the portion that is after {@see \rock\request\Request::getHostInfo()}.
      * Note that the URI should be URL-encoded.
      * @param string $value the request URI to be set
      */
@@ -526,7 +533,8 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Resolves the request URI portion for the currently requested URL.
-     * This refers to the portion that is after the @see hostInfo part. It includes
+     * 
+     * This refers to the portion that is after the {@see \rock\request\Request::$hostInfo} part. It includes
      * the @see queryString part if any.
      * The implementation of this method referenced Zend_Controller_Request_Http in Zend Framework.
      *
@@ -560,9 +568,10 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns the schema and host part of the current request URL.
+     * 
      * The returned URL does not have an ending slash.
      * By default this is determined based on the user request information.
-     * You may explicitly specify it by setting the @see hostInfo property.
+     * You may explicitly specify it by setting the {@see \rock\request\Request::$hostInfo} property.
      * @return string schema and hostname part (with port number if needed) of the request URL (e.g. `http://www.site.com`)
      */
     public function getHostInfo()
@@ -619,7 +628,8 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns the relative URL for the application.
-     * This is similar to @see getScriptUrl() except that it does not include the script file name,
+     *
+     * This is similar to {@see \rock\request\Request::getScriptUrl()} except that it does not include the script file name,
      * and the ending slashes are removed.
      * @return string the relative URL for the application
      * @see setScriptUrl()
@@ -634,6 +644,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Sets the relative URL for the application.
+     *
      * By default the URL is determined based on the entry script URL.
      * This setter is provided in case you want to change this behavior.
      * @param string $value the relative URL for the application
@@ -647,6 +658,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns the relative URL of the entry script.
+     *
      * The implementation of this method referenced Zend_Controller_Request_Http in Zend Framework.
      * @return string the relative URL of the entry script.
      * @throws \Exception if unable to determine the entry script URL
@@ -675,6 +687,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Sets the relative URL for the application entry script.
+     *
      * This setter is provided in case the entry script URL cannot be determined
      * on certain Web servers.
      * @param string $value the relative URL for the application entry script.
@@ -689,6 +702,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns the entry script file path.
+     *
      * The default implementation will simply return `$_SERVER['SCRIPT_FILENAME']`.
      * @return string the entry script file path
      */
@@ -699,6 +713,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns part of the request URL that is after the question mark.
+     *
      * @return string part of the request URL that is after the question mark
      */
     public function getQueryString()
@@ -708,6 +723,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Return if the request is sent via secure channel (https).
+     *
      * @return boolean if the request is sent via secure channel (https)
      */
     public function isSecureConnection()
@@ -718,6 +734,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns the server name.
+     *
      * @return string server name
      */
     public function getServerName()
@@ -727,6 +744,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns the server port number.
+     *
      * @return integer server port number
      */
     public function getServerPort()
@@ -735,7 +753,8 @@ class Request implements RequestInterface, ComponentsInterface
     }
 
     /**
-     * Returns the URL referrer, null if not present
+     * Returns the URL referrer, null if not present.
+     *
      * @return string URL referrer, null if not present
      */
     public function getReferrer()
@@ -745,6 +764,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns the user agent, null if not present.
+     *
      * @return string user agent, null if not present
      */
     public function getUserAgent()
@@ -754,6 +774,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns the user IP address.
+     *
      * @return string user IP address
      */
     public function getUserIP()
@@ -763,6 +784,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns the user host name, null if it cannot be determined.
+     *
      * @return string user host name, null if cannot be determined
      */
     public function getUserHost()
@@ -791,6 +813,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns the port to use for insecure requests.
+     *
      * Defaults to 80, or the port specified by the server if the current
      * request is insecure.
      * @return integer port number for insecure requests.
@@ -822,6 +845,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns the port to use for secure requests.
+     *
      * Defaults to 443, or the port specified by the server if the current
      * request is secure.
      * @return integer port number for secure requests.
@@ -837,6 +861,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Sets the port to use for secure requests.
+     *
      * This setter is provided in case a custom port is necessary for certain
      * server configurations.
      * @param integer $value port number.
@@ -850,9 +875,9 @@ class Request implements RequestInterface, ComponentsInterface
     }
 
     /**
-     * Is methods request
+     * Is methods request.
      *
-     * @param array $methods - names of methods
+     * @param array $methods names of methods
      * @return bool
      */
     public function isMethods(array $methods)
@@ -861,9 +886,9 @@ class Request implements RequestInterface, ComponentsInterface
     }
 
     /**
-     * Is ips request
+     * Is ips request.
      *
-     * @param array $ips - ips
+     * @param array $ips ips
      * @return bool
      */
     public function isIps(array $ips)
@@ -872,8 +897,9 @@ class Request implements RequestInterface, ComponentsInterface
     }
 
     /**
-     * Returns the method of the current request (e.g. GET, POST, HEAD, PUT, PATCH, DELETE).
-     * @return string request method, such as GET, POST, HEAD, PUT, PATCH, DELETE.
+     * Returns the method of the current request (e.g. `GET`, `POST`, `HEAD`, `PUT`, `PATCH`, `DELETE`).
+     *
+     * @return string request method, such as `GET`, `POST`, `HEAD`, `PUT`, `PATCH`, `DELETE`.
      * The value returned is turned into upper case.
      */
     public function getMethod()
@@ -889,6 +915,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns whether this is a GET request.
+     *
      * @return boolean whether this is a GET request.
      */
     public function isGet()
@@ -898,6 +925,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns whether this is an OPTIONS request.
+     *
      * @return boolean whether this is a OPTIONS request.
      */
     public function isOptions()
@@ -907,6 +935,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns whether this is a HEAD request.
+     *
      * @return boolean whether this is a HEAD request.
      */
     public function isHead()
@@ -916,6 +945,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns whether this is a POST request.
+     *
      * @return boolean whether this is a POST request.
      */
     public function isPost()
@@ -925,6 +955,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns whether this is a DELETE request.
+     *
      * @return boolean whether this is a DELETE request.
      */
     public function isDelete()
@@ -934,6 +965,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns whether this is a PUT request.
+     *
      * @return boolean whether this is a PUT request.
      */
     public function isPut()
@@ -943,6 +975,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns whether this is a PATCH request.
+     *
      * @return boolean whether this is a PATCH request.
      */
     public function isPatch()
@@ -952,6 +985,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns whether this is an AJAX (XMLHttpRequest) request.
+     *
      * @return boolean whether this is an AJAX (XMLHttpRequest) request.
      */
     public function isAjax()
@@ -960,7 +994,8 @@ class Request implements RequestInterface, ComponentsInterface
     }
 
     /**
-     * Returns whether this is a PJAX request
+     * Returns whether this is a PJAX request.
+     *
      * @return boolean whether this is a PJAX request
      */
     public function isPjax()
@@ -970,6 +1005,7 @@ class Request implements RequestInterface, ComponentsInterface
 
     /**
      * Returns whether this is an Adobe Flash or Flex request.
+     *
      * @return boolean whether this is an Adobe Flash or Adobe Flex request.
      */
     public function isFlash()
@@ -1047,8 +1083,8 @@ class Request implements RequestInterface, ComponentsInterface
     /**
      * Sanitize request-value.
      *
-     * @param string      $method - method request
-     * @param string      $name - name of request-value
+     * @param string      $method  method request
+     * @param string      $name name of request-value
      * @param mixed  $default
      * @param Sanitize $sanitize
      * @return null

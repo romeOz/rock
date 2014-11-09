@@ -19,6 +19,7 @@ class RequestCollection implements \ArrayAccess, CollectionInterface
 
     /**
      * Returns an iterator for traversing the global vars in the collection.
+     *
      * This method is required by the SPL interface `IteratorAggregate`.
      * It will be implicitly called when you use `foreach` to traverse the collection.
      *

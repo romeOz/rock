@@ -5,14 +5,13 @@ namespace rock\session;
 use rock\db\Connection;
 use rock\db\Query;
 use rock\exception\BaseException;
-use rock\exception\ErrorHandler;
 use rock\Rock;
 
 /**
- * DbSession extends [[Session]] by using database as session data storage.
+ * DbSession extends {@see \rock\session\Session} by using database as session data storage.
  *
  * By default, DbSession stores session data in a DB table named 'session'. This table
- * must be pre-created. The table name can be changed by setting [[sessionTable]].
+ * must be pre-created. The table name can be changed by setting {@see \rock\session\DbSession::$sessionTable}.
  *
  * The following example shows how you can configure the application to use DbSession:
  * Add the following to your application config under `components`:
@@ -37,14 +36,14 @@ class DbSession extends Session
      * @var string the name of the DB table that stores the session data.
      * The table should be pre-created as follows:
      *
-     * ~~~
+     * ```sql
      * CREATE TABLE sessions
      * (
      *     id CHAR(40) NOT NULL PRIMARY KEY,
      *     expire INTEGER,
      *     data BLOB
      * )
-     * ~~~
+     * ```
      *
      * where 'BLOB' refers to the BLOB-type of your preferred DBMS. Below are the BLOB type
      * that can be used for some popular DBMS:
@@ -60,8 +59,9 @@ class DbSession extends Session
 
     /**
      * Initializes the DbSession component.
-     * This method will initialize the [[db]] property to make sure it refers to a valid DB connection.
-     * @throws SessionException if [[db]] is invalid.
+     *
+     * This method will initialize the {@see \rock\session\DbSession::$db} property to make sure it refers to a valid DB connection.
+     * @throws SessionException if {@see \rock\session\DbSession::$db} is invalid.
      */
     public function init()
     {
@@ -82,6 +82,7 @@ class DbSession extends Session
 
     /**
      * Updates the current session ID with a newly generated one .
+     *
      * Please refer to <http://php.net/session_regenerate_id> for more details.
      * @param boolean $deleteOldSession Whether to delete the old associated session file or not.
      */
@@ -125,6 +126,7 @@ class DbSession extends Session
 
     /**
      * Session read handler.
+     *
      * Do not call this method directly.
      * @param string $id session ID
      * @return string the session data
@@ -143,6 +145,7 @@ class DbSession extends Session
 
     /**
      * Session write handler.
+     *
      * Do not call this method directly.
      * @param string $id session ID
      * @param string $data session data
@@ -188,6 +191,7 @@ class DbSession extends Session
 
     /**
      * Session destroy handler.
+     *
      * Do not call this method directly.
      * @param string $id session ID
      * @return boolean whether session is destroyed successfully
@@ -203,6 +207,7 @@ class DbSession extends Session
 
     /**
      * Session GC (garbage collection) handler.
+     *
      * Do not call this method directly.
      * @param integer $maxLifetime the number of seconds after which data will be seen as 'garbage' and cleaned up.
      * @return boolean whether session is GCed successfully

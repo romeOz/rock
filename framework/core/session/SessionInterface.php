@@ -9,6 +9,7 @@ interface SessionInterface extends CollectionInterface
 {
     /**
      * Returns a flash message.
+     *
      * A flash message is available only in the current request and the next request.
      *
      * @param string $key the key identifying the flash message
@@ -21,12 +22,14 @@ interface SessionInterface extends CollectionInterface
 
     /**
      * Returns all flash messages.
+     * 
      * @return array flash messages (key => message).
      */
     public function getAllFlashes();
 
     /**
      * Stores a flash message.
+     *
      * A flash message will be automatically deleted after it is accessed in a request and the deletion will happen
      * in the next request.
      * @param string $key the key identifying the flash message. Note that flash messages
@@ -44,6 +47,7 @@ interface SessionInterface extends CollectionInterface
 
     /**
      * Removes a flash message.
+     *
      * Note that flash messages will be automatically removed after the next request.
      * @param string $key the key identifying the flash message. Note that flash messages
      * and normal session variables share the same name space.  If you have a normal

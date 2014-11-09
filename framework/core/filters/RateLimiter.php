@@ -29,11 +29,7 @@ use rock\user\User;
  * }
  * ```
  *
- * When the user has exceeded his rate limit, RateLimiter will throw a [[TooManyRequestsHttpException]] exception.
- *
- * Note that RateLimiter requires [[user]] to implement the [[RateLimitInterface]]. RateLimiter will
- * do nothing if [[user]] is not set or does not implement [[RateLimitInterface]].
- *
+ * When the user has exceeded his rate limit, RateLimiter will throw a {@see \rock\filters\RateLimiterException} exception.
  */
 class RateLimiter extends ActionFilter
 {
@@ -75,7 +71,6 @@ class RateLimiter extends ActionFilter
         ];
     }
 
-
     public function init()
     {
         if ($this->dependency instanceof \Closure) {
@@ -83,15 +78,11 @@ class RateLimiter extends ActionFilter
         }
     }
 
-
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function beforeAction($action)
     {
-//        if (!$this->isActive($action)) {
-//            return parent::beforeAction($action);
-//        }
         if (empty($this->actions) || empty($action)) {
             return true;
         }
