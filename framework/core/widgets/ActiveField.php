@@ -7,7 +7,6 @@ use rock\base\Model;
 use rock\base\Widget;
 use rock\cache\CacheInterface;
 use rock\exception\BaseException;
-use rock\exception\ErrorHandler;
 use rock\filters\RateLimiter;
 use rock\helpers\Html;
 use rock\helpers\Json;
@@ -95,29 +94,24 @@ class ActiveField
      * @var boolean whether to enable client-side data validation.
      * If not set, it will take the value of {@see \rock\widgets\ActiveForm::enableClientValidation}.
      */
-    public $enableClientValidation;
-    /**
-     * @var boolean whether to enable AJAX-based data validation.
-     * If not set, it will take the value of {@see \rock\widgets\ActiveForm::enableAjaxValidation}.
-     */
-    public $enableAjaxValidation;
+    public $enableClientValidation = true;
+//    /**
+//     * @var boolean whether to enable AJAX-based data validation.
+//     * If not set, it will take the value of {@see \rock\widgets\ActiveForm::enableAjaxValidation}.
+//     */
+//    public $enableAjaxValidation;
     /**
      * @var boolean whether to perform validation when the input field loses focus and its value is found changed.
-     * If not set, it will take the value of {@see \rock\widgets\ActiveForm::validateOnChange}.
+     * If not set, it will take the value of {@see \rock\widgets\ActiveForm::validateOnChanged}.
      */
-    public $validateOnChange;
-    /**
-     * @var boolean whether to perform validation while the user is typing in the input field.
-     * If not set, it will take the value of {@see \rock\widgets\ActiveForm::$validateOnType}.
-     * @see validationDelay
-     */
-    public $validateOnType;
-    /**
-     * @var integer number of milliseconds that the validation should be delayed when the input field
-     * is changed or the user types in the field.
-     * If not set, it will take the value of {@see \rock\widgets\ActiveForm::$validationDelay}.
-     */
-    public $validationDelay;
+    public $validateOnChanged = false;
+
+//    /**
+//     * @var integer number of milliseconds that the validation should be delayed when the input field
+//     * is changed or the user types in the field.
+//     * If not set, it will take the value of {@see \rock\widgets\ActiveForm::$validationDelay}.
+//     */
+//    public $validationDelay;
     /**
      * @var array the jQuery selectors for selecting the container, input and error tags.
      * The array keys should be "container", "input", and/or "error", and the array values
@@ -266,25 +260,69 @@ class ActiveField
         return false;
     }
 
-    protected function calculateClientInputOption($options = [])
+    public function calculateClientInputOption($options = [])
     {
+        $formName = $this->formName;
         if (!isset($options['data-ng-model'])) {
-            $options['data-ng-model'] = isset($this->formName)
-                ? "{$this->formName}.values.{$this->attribute}"
+            $options['data-ng-model'] = isset($formName)
+                ? "{$formName}.values.{$this->attribute}"
                 : "form.values.{$this->attribute}";
         }
         if (!isset($options['data-ng-class'])) {
-            $options['data-ng-class'] = isset($this->formName)
-                ? 'showHighlightError("' . $this->formName . '[' . $this->attribute . ']")'
+            $options['data-ng-class'] = isset($formName)
+                ? 'showHighlightError("' . $formName . '[' . $this->attribute . ']")'
                 : 'showHighlightError("' . $this->attribute . '")';
         }
-        if ($this->form->validateOnChanged) {
+        if ($this->validateOnChanged) {
             $options['data-rock-form-focus'] = '';
         }
         if (isset($options['value']) && empty($options['value']) && !isset($options['data-rock-reset-field'])) {
             $options['data-rock-reset-field'] = '';
         }
+        return $this->calculateValidateOptions($options);
+    }
 
+    protected function calculateValidateOptions(array $options)
+    {
+        if (!$this->enableClientValidation) {
+            return $options;
+        }
+        foreach ($this->model->rules() as $rule) {
+            list($type, $attributes) = $rule;
+            if ($type === Model::RULE_VALIDATE && in_array($this->attribute, (array)$attributes, true)) {
+                $rule = array_slice($rule, 2);
+                foreach ($rule as $ruleName => $args) {
+                    if (is_int($ruleName)) {
+                        $ruleName = $args;
+                        $args = [];
+                    }
+                    if ($ruleName === 'length' && !isset($options['data-ng-minlength']) && !isset($options['data-ng-maxlength'])) {
+                        $options['data-ng-minlength'] = $args[0];
+                        $options['data-ng-maxlength'] = $args[1];
+                        continue;
+                    }
+                    if ($ruleName === 'max' && !isset($options['data-ng-maxlength'])) {
+                        $options['data-ng-maxlength'] = $args[0];
+                        continue;
+                    }
+                    if ($ruleName === 'min' && !isset($options['data-ng-minlength'])) {
+                        $options['data-ng-minlength'] = $args[0];
+                        continue;
+                    }
+                    if ($ruleName === 'email' && !isset($options['data-ng-pattern'])) {
+                        $options['data-ng-pattern'] = '/^([\\wА-яё]+[\\wА-яё\\.\\+\\-]+)?[\\wА-яё]+@([\\wА-яё]+\\.)+[\\wА-яё]+$/i';
+                        continue;
+                    }
+                    if ($ruleName === 'regex' && !isset($options['data-ng-pattern'])) {
+                        $options['data-ng-pattern'] = $args[0];
+                        continue;
+                    }
+                    if ($ruleName === 'required' && !isset($options['data-ng-required'])) {
+                        $options['data-ng-required'] = 'true';
+                    }
+                }
+            }
+        }
         return $options;
     }
 
@@ -886,10 +924,10 @@ class ActiveField
      * be initialized with `model` and `attribute` of this field, respectively.
      *
      * If you want to use a widget that does not have `model` and `attribute` properties,
-     * please use @see render() instead.
+     * please use {@see \rock\widgets\ActiveField::render()} instead.
      *
-     * For example to use the @see \rock\widgets\Captcha widget to get some date input, you can use
-     * the following code, assuming that `$form` is your @see \rock\widgets\ActiveForm instance:
+     * For example to use the {@see \rock\widgets\Captcha} widget to get some date input, you can use
+     * the following code, assuming that `$form` is your {@see \rock\widgets\ActiveForm} instance:
      *
      * ```php
      * $form->field($model, 'captcha')->widget(\rock\widgets\Captcha::className(), [
@@ -906,6 +944,7 @@ class ActiveField
         /** @var Widget $class */
         $config['model'] = $this->model;
         $config['attribute'] = $this->attribute;
+        $config['activeField'] = $this;
         //$config['view'] = $this->form->getView();
         $this->parts['{input}'] = $class::widget($config);
 

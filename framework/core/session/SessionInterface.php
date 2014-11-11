@@ -22,7 +22,7 @@ interface SessionInterface extends CollectionInterface
 
     /**
      * Returns all flash messages.
-     * 
+     *
      * @return array flash messages (key => message).
      */
     public function getAllFlashes();

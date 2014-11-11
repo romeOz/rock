@@ -13,6 +13,8 @@ class InputWidget extends Widget
      * @var Model the data model that this widget is associated with.
      */
     public $model;
+    /** @var  ActiveField */
+    public $activeField;
     /**
      * @var string the model attribute that this widget is associated with.
      */
@@ -27,7 +29,7 @@ class InputWidget extends Widget
     public $value;
     /**
      * @var array the HTML attributes for the input tag.
-     * @see Html::renderTagAttributes() for details on how attributes are being rendered.
+     * @see \rock\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
      */
     public $options = [];
 

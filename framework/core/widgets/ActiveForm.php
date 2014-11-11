@@ -10,9 +10,8 @@ use rock\Rock;
 
 class ActiveForm extends Widget
 {
-
     /**
-     * @param array|string $action the form action URL. This parameter will be processed by `\rock\url\Url::getAbsoluteUrl()`.
+     * @param array|string $action the form action URL. This parameter will be processed by {@see \rock\url\Url::getAbsoluteUrl()}.
      * @see method for specifying the HTTP method for this form.
      */
     public $action;
@@ -20,7 +19,7 @@ class ActiveForm extends Widget
      * @var string the form submission method. This should be either 'post' or 'get'. Defaults to 'post'.
      *
      * When you set this to 'get' you may see the url parameters repeated on each request.
-     * This is because the default value of [[action]] is set to be the current request url and each submit
+     * This is because the default value of {@see \rock\widgets\ActiveForm::$action} is set to be the current request url and each submit
      * will add new parameters instead of replacing existing ones.
      * You may set `action` explicitly to avoid this:
      *
@@ -68,17 +67,17 @@ class ActiveForm extends Widget
     public $validatingCssClass = 'validating';
     /**
      * @var boolean whether to enable client-side data validation.
-     * If [[ActiveField::enableClientValidation]] is set, its value will take precedence for that input field.
+     * If {@see \rock\widgets\ActiveField::enableClientValidation} is set, its value will take precedence for that input field.
      */
     public $enableClientValidation = true;
-    /**
-     * @var boolean whether to enable AJAX-based data validation.
-     * If [[ActiveField::enableAjaxValidation]] is set, its value will take precedence for that input field.
-     */
-    public $enableAjaxValidation = false;
+//    /**
+//     * @var boolean whether to enable AJAX-based data validation.
+//     * If {@see \rock\widgets\ActiveField::enableAjaxValidation} is set, its value will take precedence for that input field.
+//     */
+//    public $enableAjaxValidation = false;
     /**
      * @var array|string the URL for performing AJAX-based validation. This property will be processed by
-     * `\rock\url\Url::getAbsoluteUrl()`. Please refer to `\rock\url\Url::getAbsoluteUrl()` for more details on how to configure this property.
+     * {@see \rock\url\Url::getAbsoluteUrl()}. Please refer to {@see \rock\url\Url::getAbsoluteUrl()} for more details on how to configure this property.
      * If this property is not set, it will take the value of the form's action attribute.
      */
     public $validationUrl;
@@ -88,7 +87,7 @@ class ActiveForm extends Widget
     public $validateOnSubmit = true;
     /**
      * @var boolean whether to perform validation when an input field loses focus and its value is found changed.
-     * If [[ActiveField::validateOnBlur]] is set, its value will take precedence for that input field.
+     * If {@see \rock\widgets\ActiveField::validateOnChanged} is set, its value will take precedence for that input field.
      * @see validationDelay
      */
     public $validateOnChanged = false;
@@ -111,6 +110,8 @@ class ActiveForm extends Widget
         }
         if (!isset($this->fieldConfig['class'])) {
             $this->fieldConfig['class'] = ActiveField::className();
+            $this->fieldConfig['enableClientValidation'] = $this->enableClientValidation;
+            $this->fieldConfig['validateOnChanged'] = $this->validateOnChanged;
         }
         $name = $this->model->formName();
         $this->clientOptions($name);
