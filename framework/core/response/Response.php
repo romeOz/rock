@@ -992,13 +992,13 @@ class Response
         if (!$this->sendCSRF) {
             return;
         }
-        $token = $this->Rock->csrf;
-        $csrf = $token->create();
-        if ($csrf) {
+        $csrf = $this->Rock->csrf;
+        $csrfToken = $csrf->create();
+        if ($csrfToken) {
             if (is_array($this->data)) {
-                $this->data[$token->csrfParam] = $csrf;
+                $this->data[$csrf->csrfParam] = $csrfToken;
             }
-            $this->getHeaders()->add(CSRF::CSRF_HEADER, $csrf);
+            $this->getHeaders()->add(CSRF::CSRF_HEADER, $csrfToken);
         }
     }
 
