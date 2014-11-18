@@ -11,9 +11,10 @@ use rock\request\Request;
 use rock\response\Response;
 use rock\Rock;
 use rock\sanitize\Sanitize;
+use rock\url\Url;
 
 /**
- * ActiveDataProvider implements a data provider based on [[\rock\db\Query]] and [[\rock\db\ActiveQuery]].
+ * ActiveDataProvider implements a data provider based on {@see \rock\db\Query} and {@see \rock\db\ActiveQuery}.
  *
  * ActiveDataProvider provides data by performing DB queries using [[query]].
  *
@@ -36,7 +37,7 @@ use rock\sanitize\Sanitize;
  * And the following example shows how to use ActiveDataProvider without ActiveRecord:
  *
  * ```php
- * $query = new \rock\db\Query;
+ * $query = new Query;
  * $provider = new ActiveDataProvider([
  *     'query' => $query->from('post'),
  *     'pagination' => [
@@ -75,6 +76,7 @@ class ActiveDataProvider
     public $only = [];
     public $exclude = [];
     public $expand = [];
+    public $referrer = false;
 
     /**
      * @var array
@@ -227,14 +229,7 @@ class ActiveDataProvider
         if (empty($this->pagination)) {
             return $this->query;
         }
-        $this->_pagination = Pagination::get(
-            $this->totalCount,
-            $this->pagination['pageCurrent'],
-            Helper::getValue($this->pagination['limit'], Pagination::LIMIT),
-            Helper::getValue($this->pagination['sort'], Pagination::SORT),
-            Helper::getValue($this->pagination['pageLimit'],Pagination::PAGE_LIMIT)
-        );
-
+        $this->calculatePagination();
         return array_slice($this->query, $this->_pagination['offset'], $this->_pagination['limit'], true);
     }
 
@@ -249,6 +244,16 @@ class ActiveDataProvider
         if (!$this->totalCount = $this->calculateTotalCount($connection)) {
             return [];
         }
+        $this->calculatePagination();
+        $this->addHeaders($this->totalCount, $this->_pagination);
+        return $this->query
+            ->limit($this->_pagination['limit'])
+            ->offset($this->_pagination['offset'])
+            ->all($connection, $subAttributes);
+    }
+
+    protected function calculatePagination()
+    {
         $this->_pagination = Pagination::get(
             $this->totalCount,
             $this->pagination['pageCurrent'],
@@ -256,12 +261,9 @@ class ActiveDataProvider
             Helper::getValue($this->pagination['sort'], Pagination::SORT),
             Helper::getValue($this->pagination['pageLimit'],Pagination::PAGE_LIMIT)
         );
-
-        $this->addHeaders($this->totalCount, $this->_pagination);
-        return $this->query
-            ->limit($this->_pagination['limit'])
-            ->offset($this->_pagination['offset'])
-            ->all($connection, $subAttributes);
+        if (isset($this->pagination['pageVar'])) {
+            $this->_pagination['pageVar'] = $this->pagination['pageVar'];
+        }
     }
 
     protected function addHeaders($total, array $data)
@@ -271,8 +273,16 @@ class ActiveDataProvider
             return;
         }
 
-        $absoluteUrl = $this->Rock->url->removeAllArgs()->getAbsoluteUrl(true);
+        $url = null;
+        if ($this->referrer === true) {
+            $url = Rock::$app->request->getReferrer() ?: '';
+        }
 
+        /** @var Url $urlBuilder */
+        $urlBuilder = Rock::factory($url,[
+           'class' => Url::className()
+        ]);
+        $absoluteUrl = $urlBuilder->removeAllArgs()->getAbsoluteUrl(true);
         $links = [];
         $links[] = "<{$absoluteUrl}?{$data['pageVar']}={$data['pageCurrent']}>; rel=self";
         if (!empty($data['pagePrev'])) {
