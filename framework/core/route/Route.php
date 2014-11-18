@@ -60,9 +60,9 @@ class Route implements RequestInterface, ErrorsInterface
     }
 
     /**
-     * SetConfigScope
+     * Set config scope
      *
-     * @param string $path - path config
+     * @param string $path path to config
      * @throws RouteException
      */
     public static function setConfigScope($path)
@@ -71,6 +71,7 @@ class Route implements RequestInterface, ErrorsInterface
         if (!file_exists($path) || (!$configs = require($path))) {
             throw new RouteException(RouteException::UNKNOWN_FILE, ['path' => $path]);
         }
+        Container::removeAll();
         Config::set($configs);
         Container::addMulti($configs['_components']);
     }
