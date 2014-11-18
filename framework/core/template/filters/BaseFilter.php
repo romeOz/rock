@@ -67,6 +67,7 @@ class BaseFilter implements ThumbInterface
      * @param array  $params params:
      *
      * - format: date format
+     * - locale: date locale. See {@see \rock\i18n\i18nInterface}
      *
      * @return string|null
      */
@@ -77,9 +78,11 @@ class BaseFilter implements ThumbInterface
         }
         $params['config'] = Helper::getValue($params['config'], []);
         $params['config']['class'] = DateTime::className();
+        if (!empty($params['locale'])) {
+            $params['config']['locale'] = $params['locale'];
+        }
         /** @var DateTime $dateTime */
         $dateTime = Rock::factory($date, null, $params['config']);
-
         return $dateTime->convertTimezone(Helper::getValue($params['timezone']))->format(
             Helper::getValue($params['format']));
     }
