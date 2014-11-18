@@ -169,6 +169,12 @@ class Response
      */
     public $sendCSRF = false;
     /**
+     * Content Security Policy.
+     * @var string
+     * @link http://www.w3.org/TR/CSP/
+     */
+    public $CSP;
+    /**
      * @var array list of HTTP status codes and the corresponding texts
      */
     public $httpStatuses = [
@@ -325,7 +331,8 @@ class Response
             return;
         }
         Event::trigger(static::className(), self::EVENT_BEFORE_SEND);
-        $this->sendCSRF();
+        $this->addCSP();
+        $this->addCSRF();
         $this->prepare();
         Event::trigger(static::className(), self::EVENT_AFTER_PREPARE);
         $this->sendHeaders();
@@ -980,7 +987,7 @@ class Response
         }
     }
 
-    protected function sendCSRF()
+    protected function addCSRF()
     {
         if (!$this->sendCSRF) {
             return;
@@ -993,5 +1000,19 @@ class Response
             }
             $this->getHeaders()->add(CSRF::CSRF_HEADER, $csrf);
         }
+    }
+
+    protected function addCSP()
+    {
+        if (!isset($this->CSP)) {
+            return;
+        }
+        $this->CSP = str_replace(["\n", "\t"], ' ', $this->CSP);
+        // @link http://caniuse.com/#feat=contentsecuritypolicy
+        $headers = [
+            'Content-Security-Policy' => $this->CSP,
+            'X-Content-Security-Policy' => $this->CSP // for IE10 or great
+        ];
+        $this->getHeaders()->addMulti($headers);
     }
 }
