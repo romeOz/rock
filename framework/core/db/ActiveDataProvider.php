@@ -11,7 +11,6 @@ use rock\request\Request;
 use rock\response\Response;
 use rock\Rock;
 use rock\sanitize\Sanitize;
-use rock\url\Url;
 
 /**
  * ActiveDataProvider implements a data provider based on {@see \rock\db\Query} and {@see \rock\db\ActiveQuery}.
@@ -76,7 +75,6 @@ class ActiveDataProvider
     public $only = [];
     public $exclude = [];
     public $expand = [];
-    public $referrer = false;
 
     /**
      * @var array
@@ -273,29 +271,25 @@ class ActiveDataProvider
             return;
         }
 
-        $url = null;
-        if ($this->referrer === true) {
-            $url = Rock::$app->request->getReferrer() ?: '';
-        }
-
-        /** @var Url $urlBuilder */
-        $urlBuilder = Rock::factory($url,[
-           'class' => Url::className()
-        ]);
-        $absoluteUrl = $urlBuilder->removeAllArgs()->getAbsoluteUrl(true);
+        $absoluteUrl = $this->Rock->url->removeAllArgs()->getAbsoluteUrl(true);
         $links = [];
         $links[] = "<{$absoluteUrl}?{$data['pageVar']}={$data['pageCurrent']}>; rel=self";
+        $response->content['_links']['self'] = "{$absoluteUrl}?{$data['pageVar']}={$data['pageCurrent']}";
         if (!empty($data['pagePrev'])) {
             $links[] = "<{$absoluteUrl}?{$data['pageVar']}={$data['pagePrev']}>; rel=prev";
+            $response->content['_links']['prev'] = "{$absoluteUrl}?{$data['pageVar']}={$data['pagePrev']}";
         }
         if (!empty($data['pageNext'])) {
             $links[] = "<{$absoluteUrl}?{$data['pageVar']}={$data['pageNext']}>; rel=next";
+            $response->content['_links']['next'] = "{$absoluteUrl}?{$data['pageVar']}={$data['pageNext']}";
         }
         if (!empty($data['pageFirst'])) {
             $links[] = "<{$absoluteUrl}?{$data['pageVar']}={$data['pageFirst']}>; rel=first";
+            $response->content['_links']['first'] = "{$absoluteUrl}?{$data['pageVar']}={$data['pageFirst']}";
         }
         if (!empty($data['pageLast'])) {
             $links[] = "<{$absoluteUrl}?{$data['pageVar']}={$data['pageLast']}>; rel=last";
+            $response->content['_links']['last'] = "{$absoluteUrl}?{$data['pageVar']}={$data['pageLast']}";
         }
 
         $response->getHeaders()
