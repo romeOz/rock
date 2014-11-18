@@ -105,8 +105,8 @@ class BaseFilter implements ThumbInterface
      * - anchor:       anchor for adding.
      * - removeAnchor:       remove anchor.
      * - referrer: referrer URL for formatting.
-     * - const: - adduce URL to: @see Url::ABS, Url::HTTP,
-     *                  and @see Url::HTTPS.
+     * - const: - adduce URL to: {@see \rock\url\Url::ABS}, {@see \rock\url\Url::HTTP},
+     *                  and {@see \rock\url\Url::HTTPS}.
      * @return string
      */
     public static function modifyUrl($url, array $params = [])
