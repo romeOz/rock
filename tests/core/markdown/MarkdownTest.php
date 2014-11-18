@@ -6,6 +6,7 @@ namespace rockunit\core\markdown;
 use League\Flysystem\Adapter\Local;
 use rock\file\FileManager;
 use rock\image\DataProvider;
+use rock\markdown\Markdown;
 use rock\Rock;
 use rockunit\core\db\DatabaseTestCase;
 use rockunit\core\db\models\ActiveRecord;
@@ -54,8 +55,7 @@ Test</p>',
     public function testVideoDummy()
     {
         $markdown = Rock::$app->markdown;
-        $markdown->enabledDummy = true;
-        $markdown->imgDummy = '/src/play.png';
+        $markdown->dummy = Markdown::DUMMY;
         $markdown->specialAttributesDummy = '.dummy-video';
         //$markdown->denyTags = ['code'];
         $result = $markdown->parse('![:youtube 480x360][video]
@@ -63,7 +63,7 @@ Test
 
 [video]: 6JvDSwFtEC0 {.class1 #id1 .class2}');
         $this->assertSame(
-            '<p><a href="https://www.youtube.com/watch?v=6JvDSwFtEC0" style="width: 480px; height: 360px" target="_blank" rel="nofollow"  class="dummy-video class1 class2" id="id1"></a>
+            '<p><a href="https://www.youtube.com/watch?v=6JvDSwFtEC0" style="width: 480px; height: 360px" target="_blank" rel="nofollow"  class="dummy-video class1 class2" id="id1" ></a>
 Test</p>',
             $result
         );

@@ -180,7 +180,7 @@ class StringFilter
             return $value;
         }
         $markdown = Rock::$app->markdown;
-        $markdown->enabledDummy = Helper::getValue($params['enabledDummy'], false);
+        $markdown->dummy = Helper::getValue($params['dummy'], 0);
         if (!empty($params['enableNewlines'])) {
             $markdown->enableNewlines = true;
         }
@@ -194,7 +194,7 @@ class StringFilter
             return $value;
         }
         $markdown = Rock::$app->markdown;
-        $markdown->enabledDummy = Helper::getValue($params['enabledDummy'], false);
+        $markdown->dummy = Helper::getValue($params['enabledDummy'], false);
         if (!empty($params['enableNewlines'])) {
             $markdown->enableNewlines = true;
         }

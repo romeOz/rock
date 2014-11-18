@@ -12,8 +12,13 @@ use rock\Rock;
 class Markdown extends MarkdownExtra
 {
     use ComponentsTrait;
+
+    const DUMMY = 1;
+    const DUMMY_PLAY = 2;
+    const DUMMY_PLAY_IN_MODAL = 4;
+
     /**
-     * @var boolean whether to interpret newlines as `<br />`-tags.
+     * @var bool whether to interpret newlines as `<br>`-tags.
      * This feature is useful for comments where newlines are often meant to be real new lines.
      */
     public $enableNewlines = false;
@@ -25,9 +30,18 @@ class Markdown extends MarkdownExtra
             'rel' => 'nofollow'
         ]
     ];
-    public $enabledDummy = false;
+    /**
+     * Enabled Dummy for video as:
+     *
+     * - {@see \rock\markdown\Markdown::DUMMY_VIDEO} - link ```<a href ="..." target="_blank">...</a>```
+     * - {@see \rock\markdown\Markdown::DUMMY_PLAY} - when clicking on the link shows video (JavaScript)
+     * - {@see \rock\markdown\Markdown::DUMMY_PLAY_IN_MODAL} - when clicking on the link shows modal window with video (JavaScript)
+     *
+     * @var int
+     */
+    public $dummy = 0;
+
     public $specialAttributesDummy = '.dummy-video';
-    public $imgDummy = '/assets/ico/play.png';
     public $defaultWidthVideo = 560;
     public $defaultHeightVideo = 315;
 
@@ -248,7 +262,7 @@ class Markdown extends MarkdownExtra
 
     protected function calculateVideo($url, $width, $height, $title)
     {
-        if ($this->enabledDummy === true) {
+        if ($this->dummy & self::DUMMY) {
             return [
                 'a',
                 'text' => '',
@@ -281,7 +295,7 @@ class Markdown extends MarkdownExtra
         if (empty($block['hosting'])) {
             $block['hosting'] = '';
         }
-        $block['url'] = $this->getHostingUrl($block['hosting'], $block['url']);
+        list($block['url']) = $this->getHostingUrl($block['hosting'], $block['url']);
         $attributes = $this->renderAttributes($block);
         return '<iframe src="' . htmlspecialchars($block['url'], ENT_COMPAT | ENT_HTML401, 'UTF-8') . '"'
                . (empty($block['title']) ? '' : ' title="' . htmlspecialchars($block['title'], ENT_COMPAT | ENT_HTML401 | ENT_SUBSTITUTE, 'UTF-8') . '"')
@@ -307,42 +321,62 @@ class Markdown extends MarkdownExtra
         if (empty($block['hosting'])) {
             $block['hosting'] = '';
         }
-        $block['url'] = $this->getHostingUrl($block['hosting'], $block['url']);
+        list($block['url'], $src) = $this->getHostingUrl($block['hosting'], $block['url']);
         $block['attributes'] = "{$this->specialAttributesDummy} " . $block['attributes'];
         $attributes = $this->renderAttributes($block);
+        $title = htmlspecialchars($block['title'], ENT_COMPAT | ENT_HTML401 | ENT_SUBSTITUTE, 'UTF-8');
+        $playVideo = $this->clientPlayVideo($src, $block['width'], $block['height'], $title);
         return '<a href="' . htmlspecialchars($block['url'], ENT_COMPAT | ENT_HTML401, 'UTF-8') . '"'
-               . (empty($block['title']) ? '' : ' title="' . htmlspecialchars($block['title'], ENT_COMPAT | ENT_HTML401 | ENT_SUBSTITUTE, 'UTF-8') . '"')
-               . ' style="width: '.$block['width'].'px; height: '.$block['height'].'px" target="_blank" rel="nofollow" '.$attributes.'></a>';
+               . (empty($block['title']) ? '' : ' title="' . $title . '"')
+               . ' style="width: '.$block['width'].'px; height: '.$block['height'].'px" target="_blank" rel="nofollow" '.$attributes.' '.$playVideo.'></a>';
+    }
+
+    protected function clientPlayVideo($src, $width, $height, $title)
+    {
+        if ($this->dummy & self::DUMMY_PLAY) {
+            return 'data-ng-click="rock.html.playVideo(\''.$src.'\', '.$width.', '.$height.', \''.$title.'\', $event)"';
+        }
+        if ($this->dummy & self::DUMMY_PLAY_IN_MODAL) {
+            return 'data-ng-click="rock.html.playVideoModal(\''.$src.'\', '.$width.', '.$height.', \''.$title.'\', $event)"';
+        }
+        return '';
     }
 
     protected function getHostingUrl($hosting, $url)
     {
         switch ($hosting) {
             case 'youtube':
-                $url = $this->enabledDummy === true ? "https://www.youtube.com/watch?v={$url}" : "//youtube.com/embed/{$url}/";
+                $src = "//youtube.com/embed/{$url}/";
+                $url = $this->dummy & self::DUMMY ? "https://www.youtube.com/watch?v={$url}" : $src;
                 break;
             case 'vimeo':
-                $url = $this->enabledDummy === true ? "http://vimeo.com/{$url}" : "//player.vimeo.com/video/{$url}";
+                $src = "//player.vimeo.com/video/{$url}";
+                $url = $this->dummy & self::DUMMY ? "http://vimeo.com/{$url}" : $src;
                 break;
             case 'rutube':
-                $url = $this->enabledDummy === true ? "http://rutube.ru/video/{$url}/": "//rutube.ru/play/embed/{$url}";
+                $src = "//rutube.ru/play/embed/{$url}";
+                $url = $this->dummy & self::DUMMY ? "http://rutube.ru/video/{$url}/": $src;
                 break;
             case 'vk':
-                $url = $this->enabledDummy === true ? "https://vk.com/video_ext.php?{$url}" :"//vk.com/video_ext.php?{$url}";
+                $src = "//vk.com/video_ext.php?{$url}";
+                $url = $this->dummy & self::DUMMY ? "https://vk.com/video_ext.php?{$url}" : $src;
                 break;
             case 'ivi':
-                $url = $this->enabledDummy === true ? "http://www.ivi.ru/watch/{$url}" : "//ivi.ru/external/stub/?videoId={$url}";
+                $src = "//ivi.ru/external/stub/?videoId={$url}";
+                $url = $this->dummy & self::DUMMY ? "http://www.ivi.ru/watch/{$url}" : $src;
                 break;
             case 'dailymotion':
-                $url = $this->enabledDummy === true ? "http://www.dailymotion.com/embed/video/{$url}" : "//dailymotion.com/embed/video/{$url}";
+                $src = "//dailymotion.com/embed/video/{$url}";
+                $url = $this->dummy & self::DUMMY ? "http://www.dailymotion.com/embed/video/{$url}" : $src;
                 break;
             case 'sapo':
-                $url = $this->enabledDummy === true ? "http://rd3.videos.sapo.pt/{$url}" : "http://videos.sapo.pt/playhtml?file=http://rd3.videos.sapo.pt/{$url}/mov/1";
+                $src = "http://videos.sapo.pt/playhtml?file=http://rd3.videos.sapo.pt/{$url}/mov/1";
+                $url = $this->dummy & self::DUMMY ? "http://rd3.videos.sapo.pt/{$url}" : $src;
                 break;
             default:
                 throw new MarkdownException(MarkdownException::UNKNOWN_HOSTING, ['name' => $hosting]);
         }
-        return $url;
+        return [$url, $src];
     }
 
     protected function renderOtherAttributes(array $attributes)
