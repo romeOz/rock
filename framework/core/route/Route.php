@@ -51,7 +51,6 @@ class Route implements RequestInterface, ErrorsInterface
         $this->RESTHandlers = empty($this->RESTHandlers) ? $handlers : array_merge($handlers, $this->RESTHandlers);
     }
 
-
     public function run()
     {
         Event::trigger($this, self::EVENT_BEGIN_ROUTER);
@@ -63,15 +62,19 @@ class Route implements RequestInterface, ErrorsInterface
      * Set config scope
      *
      * @param string $path path to config
+     * @param bool   $clear clear DIC.
      * @throws RouteException
+     * @throws \Exception
      */
-    public static function setConfigScope($path)
+    public static function setConfigScope($path, $clear = true)
     {
         $path = Rock::getAlias($path);
         if (!file_exists($path) || (!$configs = require($path))) {
             throw new RouteException(RouteException::UNKNOWN_FILE, ['path' => $path]);
         }
-        Container::removeAll();
+        if ($clear) {
+            Container::removeAll();
+        }
         Config::set($configs);
         Container::addMulti($configs['_components']);
     }
