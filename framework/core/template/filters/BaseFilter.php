@@ -104,7 +104,6 @@ class BaseFilter implements ThumbInterface
      * - replace:       the replacement data.
      * - anchor:       anchor for adding.
      * - removeAnchor:       remove anchor.
-     * - referrer: referrer URL for formatting.
      * - const: - adduce URL to: {@see \rock\url\Url::ABS}, {@see \rock\url\Url::HTTP},
      *                  and {@see \rock\url\Url::HTTPS}.
      * @return string
@@ -113,9 +112,6 @@ class BaseFilter implements ThumbInterface
     {
         if (empty($url)) {
             return '#';
-        }
-        if (isset($params['referrer'])) {
-            $url = Rock::$app->request->getReferrer() ?: '';
         }
         /** @var Url $urlBuilder */
         $urlBuilder = Rock::factory($url, Url::className());

@@ -26,6 +26,9 @@ class Url implements UrlInterface
         ObjectTrait::__construct as parentConstruct;
     }
 
+    const DEFAULT_ABSOLUTE = 0;
+    const DEFAULT_REFERRER = 1;
+
     /**
      * Array URL-data.
      *
@@ -43,6 +46,11 @@ class Url implements UrlInterface
      * @var bool
      */
     public $strip = true;
+    /**
+     * Default URL.
+     * @var int
+     */
+    public $defaultUrl = self::DEFAULT_ABSOLUTE;
 
     /**
      * @param string|null  $url URL for formatting. If url as `NULL`, then use current (self) URL.
@@ -51,7 +59,7 @@ class Url implements UrlInterface
     public function __construct($url = null, $config = [])
     {
         $this->parentConstruct($config);
-        $url = !isset($url) ? $this->Rock->request->getAbsoluteUrl() : Rock::getAlias($url);
+        $url = $this->defaultUrlInternal($url);
         $this->dataUrl = parse_url(trim($url));
         if (isset($this->dataUrl['query'])) {
             parse_str($this->dataUrl['query'], $this->dataUrl['query']);
@@ -314,5 +322,14 @@ class Url implements UrlInterface
     public function getHttpsUrl($selfHost = false)
     {
         return $this->get(self::HTTPS, $selfHost);
+    }
+
+    protected function defaultUrlInternal($url)
+    {
+        if (!isset($url)) {
+            $request = $this->Rock->request;
+            return $this->defaultUrl === self::DEFAULT_ABSOLUTE ? $request->getAbsoluteUrl() : $request->getReferrer();
+        }
+        return Rock::getAlias($url);
     }
 }

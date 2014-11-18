@@ -30,11 +30,6 @@ class Url extends Snippet implements UrlInterface
      */
     public $url;
     /**
-     * Referrer URL for formatting.
-     * @var bool
-     */
-    public $referrer = false;
-    /**
      * Adding CSRF-token.
      * @var bool
      */
@@ -108,10 +103,6 @@ class Url extends Snippet implements UrlInterface
      */
     public function get()
     {
-        if ($this->referrer) {
-            $this->url = $this->Rock->request->getReferrer() ? : '';
-        }
-
         /** @var \rock\url\Url $urlBuilder */
         $urlBuilder = Rock::factory($this->url, \rock\url\Url::className());
         if (isset($this->removeArgs)) {
