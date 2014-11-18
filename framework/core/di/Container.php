@@ -11,6 +11,26 @@ use rock\Rock;
 class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterface
 {
     use ObjectTrait;
+
+    /**
+     * Array of pointers to a single instance.
+     *
+     * @var array
+     */
+    protected static $instances = [];
+    /**
+     * Aliases of class by dependencies.
+     *
+     * @var array
+     */
+    protected static $classAliases = [];
+    /**
+     * Names of class by dependencies.
+     *
+     * @var array
+     */
+    protected static $classNames = [];
+
     /**
      * Get instance.
      *
@@ -75,7 +95,6 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
 
         return true;
     }
-
 
     /**
      * @inheritdoc
@@ -289,25 +308,6 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
             static::remove($name);
         }
     }
-
-    /**
-     * Array of pointers to a single instance.
-     *
-     * @var array
-     */
-    protected static $instances = [];
-    /**
-     * Aliases of class by dependencies.
-     *
-     * @var array
-     */
-    protected static $classAliases = [];
-    /**
-     * Names of class by dependencies.
-     *
-     * @var array
-     */
-    protected static $classNames = [];
 
     protected static function getSingleton(array $data, array $configs = [], array $args = [])
     {
