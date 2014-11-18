@@ -43,6 +43,8 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
         self::ISO_DATE_FORMAT => 'Y-m-d',
         self::ISO_TIME_FORMAT => 'H:i:s',
         self::ISO_DATETIME_FORMAT => 'Y-m-d H:i:s',
+        self::JS_FORMAT => self::RFC1123,
+
     );
     /** @var Locale */
     protected  static $localeObject;
