@@ -11,7 +11,7 @@ use rock\helpers\Numeric;
  * @property string email
  * @property string token
  * @property int status
- * @property int createdon
+ * @property int ctime
  * @property int login_last
  */
 class BaseUsers extends ActiveRecord
@@ -32,7 +32,7 @@ class BaseUsers extends ActiveRecord
 //                self::RULE_DEFAULT,
 //                [
 //                    'login_last' => $timestamp,
-//                    //'createdon' => $timestamp,
+//                    //'ctime' => $timestamp,
 //                ],
 //                [self::S_REGISTRATION]
 //            ]

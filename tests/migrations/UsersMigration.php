@@ -34,7 +34,7 @@ class UsersMigration extends Migration
                 'email' => Schema::TYPE_STRING . '(100) NOT NULL',
                 'email_hash' => Schema::TYPE_BINARY . '(16) NOT NULL',
                 'status' => Schema::TYPE_BOOLEAN . '(3) unsigned NOT NULL DEFAULT 2',
-                'createdon' => Schema::TYPE_TIMESTAMP . ' NOT NULL DEFAULT CURRENT_TIMESTAMP()',
+                'ctime' => Schema::TYPE_TIMESTAMP . ' NOT NULL DEFAULT CURRENT_TIMESTAMP()',
                 'login_last' => Schema::TYPE_TIMESTAMP . ' NULL',
                 'url' => Schema::TYPE_TEXT,
             ],

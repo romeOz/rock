@@ -26,8 +26,8 @@ class ArticlesMigration extends Migration
                 'id' => Schema::TYPE_PK,
                 'title'=> Schema::TYPE_STRING . '(255) NOT NULL',
                 'category' => Schema::TYPE_INTEGER . ' unsigned',
-                'createdon' => Schema::TYPE_TIMESTAMP,
-                'editedon' => Schema::TYPE_TIMESTAMP,
+                'ctime' => Schema::TYPE_TIMESTAMP,
+                'mtime' => Schema::TYPE_TIMESTAMP,
 
             ],
             $tableOptions,

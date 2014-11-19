@@ -12,7 +12,7 @@ use rock\helpers\Numeric;
  * @property string email
  * @property string token
  * @property int status
- * @property int createdon
+ * @property int ctime
  * @property int login_last
  */
 class BaseUsers extends ActiveRecord

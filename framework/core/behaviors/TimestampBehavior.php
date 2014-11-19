@@ -82,12 +82,12 @@ class TimestampBehavior extends AttributeBehavior
      * @var string the attribute that will receive timestamp value
      * Set this property to false if you do not want to record the creation time.
      */
-    public $createdAtAttribute = 'createdon';
+    public $createdAtAttribute = 'ctime';
     /**
      * @var string the attribute that will receive timestamp value.
      * Set this property to false if you do not want to record the update time.
      */
-    public $updatedAtAttribute = 'editedon';
+    public $updatedAtAttribute = 'mtime';
     /**
      * @var callable|Expression The expression that will be used for generating the timestamp.
      * This can be either an anonymous function that returns the timestamp value,
