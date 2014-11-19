@@ -20,4 +20,5 @@ interface DateTimeInterface
     const ISO_TIME_FORMAT = 'isoTime';
     const ISO_DATETIME_FORMAT = 'isoDatetime';
     const JS_FORMAT = 'js';
+    const W3C_FORMAT = 'w3c';
 }
