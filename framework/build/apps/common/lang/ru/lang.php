@@ -1,11 +1,4 @@
 <?php
-use rock\validation\exceptions\ru\CaptchaException;
-use rock\validation\exceptions\ru\ConfirmException;
-use rock\validation\exceptions\ru\EmailException;
-use rock\validation\exceptions\ru\MaxException;
-use rock\validation\exceptions\ru\MinException;
-use rock\validation\exceptions\ru\NotEmptyException;
-use rock\validation\exceptions\ru\RegexException;
 
 return [
     'siteUnavailable'           => 'Cайт временно недоступен. Пожалуйста, зайдите на страницу позже.',
@@ -63,15 +56,7 @@ return [
     'invalidPasswordOrEmail'            => 'Указан неверный пароль или email.',
     'invalidPasswordOrUsername'            => 'Указан неверный пароль или логин.',
     'notActivatedUser'            => 'Учётная запись не активирована.',
-//    'validToken' => 'токен должен быть верным',
     'invalidTokenActivated' => 'Неверный токен или пользователь уже активирован.',
-    //'invalidEmail'              => 'неверный адрес электронной почты.',
-    //'invalidUsername'           => 'псевдоним содержит неверные символы (использование кавычек, а также знаков "<", ">" не допускается).',
-    //'invalidPassword'           => 'пароль должен состоять из символов латинского алфавита и цифр (использование пробелов не допускается).',
-    //'passwordEqual'             => 'пароли должны совпадать.',
-    //'invalidFirstname'          => 'имя пользователя должно состоять из символов алфавита и пробелов.',
-    //'invalidLastname'           => 'фамилия пользователя должна состоять из символов алфавита и пробелов.',
-    //'invalidCaptcha'            => 'неверный код подтверждения (каптча).',
     'subjectRegistration'                => 'Спасибо за регистрацию! {{site_name}}',
     'subjectRecovery'             => 'Восстановление пароля. {{site_name}}',
     'successLogin'       => 'Вы успешно авторизировались.',
@@ -84,7 +69,6 @@ return [
     'failActivated' => 'Ошибка при активации.',
     'failLogout'               => 'Ошибка при разлогировании.',
     'failSendEmail'               => 'email не отправлен.',
-    //'failQuery'              => 'ошибка в запросе'
     'loginLogout'             => 'Вы авторизированы. Для повторной авторизации требуется <a href="{{url}}" rel="nofollow" data-rock-url="{csrf : true, self : true}" data-ng-click="logout(\'/ajax/logout/\', $event)">выйти</a> из своего профиля.',
     'signupLogout'             => 'Вы авторизированы. Для регистрации требуется <a href="{{url}}" rel="nofollow" data-rock-url="{csrf : true, self : true}" data-ng-click="logout(\'/ajax/logout/\', $event)">выйти</a> из своего профиля.',
     'recoveryLogout'       => 'Вы авторизированы. Для для восстановлении пароля требуется <a href="{{url}}" rel="nofollow" data-rock-url="{csrf : true, self : true}" data-ng-click="logout(\'/ajax/logout/\', $event)">выйти</a> из своего профиля.',
@@ -94,4 +78,6 @@ return [
     'failHTTPRequest' => 'Ошибка HTTP-запроса.',
     'failServer' => 'Ошибка сервера.',
     'failAccess' => 'Отказано в доступе.',
+    'logged'             => 'вы авторизированы',
+    'unlogged'             => 'вы не авторизированы',
 ];

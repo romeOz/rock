@@ -60,4 +60,6 @@ return [
     'failHTTPRequest'               => 'HTTP-request error.',
     'failServer' => 'Server error.',
     'failAccess' => 'Denied access.',
+    'logged'             => 'you have logged',
+    'unlogged'             => 'you have not logged',
 ];
