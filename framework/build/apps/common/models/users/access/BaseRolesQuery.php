@@ -32,6 +32,6 @@ class BaseRolesQuery extends ActiveQuery
     /** order by */
     public function sortByMenuIndex()
     {
-        return $this->orderBy([static::tableName() . '.menuindex' => SORT_DESC]);
+        return $this->orderBy([static::tableName() . '.order_index' => SORT_DESC]);
     }
 } 

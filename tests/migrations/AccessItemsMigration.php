@@ -31,7 +31,7 @@ class AccessItemsMigration extends Migration
                     'type' => Schema::TYPE_BOOLEAN . '(2) unsigned NOT NULL DEFAULT 1',
                     'description' => Schema::TYPE_STRING . '(255) NOT NULL DEFAULT \'\'',
                     'data' => Schema::TYPE_TEXT . ' NOT NULL',
-                    'menuindex' => Schema::TYPE_INTEGER . ' unsigned NOT NULL DEFAULT 0',
+                    'order_index' => Schema::TYPE_INTEGER . ' unsigned NOT NULL DEFAULT 0',
                 ],
                 $tableOptions,
                 true
@@ -46,7 +46,7 @@ class AccessItemsMigration extends Migration
 
         $this->batchInsert(
             $table,
-            ['name', 'type', 'description', 'data', 'menuindex'],
+            ['name', 'type', 'description', 'data', 'order_index'],
             [
                 ['godmode', RBACInterface::TYPE_ROLE, 'super admin', serialize(new Role), 999],
                 ['admin', RBACInterface::TYPE_ROLE, 'administrator',serialize(new Role), 998],

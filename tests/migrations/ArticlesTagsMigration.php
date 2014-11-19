@@ -25,7 +25,7 @@ class ArticlesTagsMigration extends Migration
                 [
                     'resource_id' => Schema::TYPE_INTEGER . ' unsigned NOT NULL',
                     'tag_id' => Schema::TYPE_INTEGER . ' unsigned NOT NULL',
-                    'menuindex' => Schema::TYPE_INTEGER . ' unsigned NOT NULL DEFAULT 0',
+                    'order_index' => Schema::TYPE_INTEGER . ' unsigned NOT NULL DEFAULT 0',
                 ],
                 $tableOptions,
                 true
