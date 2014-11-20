@@ -96,7 +96,7 @@ Test</p>',
     {
         $result = Rock::$app->markdown->parseParagraph('[text](http://test/ "title text"){.class1 #id1 .class2}');
         $this->assertSame(
-            '<a href="http://test/" title="title text" class="class1 class2" id="id1"  rel="nofollow">text</a>',
+            '<a href="http://test/" title="title text" class="class1 class2" id="id1"  rel="nofollow" target="_blank">text</a>',
             $result
         );
     }
@@ -108,7 +108,7 @@ Test
 
 [link]: http://test/ {.class1 #id1 .class2}');
         $this->assertSame(
-            '<p><a href="http://test/" class="class1 class2" id="id1"  rel="nofollow">text</a>
+            '<p><a href="http://test/" class="class1 class2" id="id1"  rel="nofollow" target="_blank">text</a>
 Test</p>',
             $result
         );
