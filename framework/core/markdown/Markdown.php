@@ -27,7 +27,8 @@ class Markdown extends MarkdownExtra
     public $denyTags = [];
     public $defaultAttributes = [
         'link' => [
-            'rel' => 'nofollow'
+            'rel' => 'nofollow',
+            'target' => '_blank'
         ]
     ];
     /**
