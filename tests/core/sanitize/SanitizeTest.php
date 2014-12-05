@@ -283,7 +283,7 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
     public function testMultiRules()
     {
         $s = Sanitize::call('strip_tags')->call('abs');
-        $this->assertSame(5.5, $s->sanitize('-5.5</b>     '));
+        $this->assertSame(5.5, $s->sanitize('<b>-5.5</b>'));
     }
 
     /**
