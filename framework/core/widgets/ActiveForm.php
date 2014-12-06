@@ -147,7 +147,7 @@ class ActiveForm extends Widget
                 'data-ng-model' => (isset($name) ? $name : 'form') . '.values.'. $token->csrfParam,
                 'data-simple-name' => $token->csrfParam,
                 'data-rock-form-add-csrf' => '',
-                'data-ng-value' => 'getCSRF()'
+                'data-ng-value' => 'rock.csrf.getToken()'
 
             ],
             ArrayHelper::getValue($this->options, 'hiddenCsrf', [])
