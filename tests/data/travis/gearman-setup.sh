@@ -8,7 +8,9 @@ fi
 #sudo apt-get update
 
 # Install Gearman
-sudo apt-get install -y libboost-all-dev gperf libevent-dev uuid-dev libcloog-ppl-dev
+sudo apt-get install -y libboost-graph-parallel-dev libboost-mpi-dev libboost-mpi-python-dev
+sudo apt-get install -y libboost-all-dev
+sudo apt-get install -y gperf libevent-dev uuid-dev libcloog-ppl-dev
 wget https://launchpad.net/gearmand/1.2/1.1.12/+download/gearmand-1.1.12.tar.gz
 tar xf gearmand-1.1.12.tar.gz
 cd gearmand-1.1.12
