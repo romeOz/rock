@@ -251,7 +251,7 @@ abstract class CommonTraitTest extends \PHPUnit_Framework_TestCase
         /** @var $this \PHPUnit_Framework_TestCase */
 
         $this->assertTrue($cache->set('key2', 'three', 0, ['foo']));
-        $this->assertTrue($cache->has('key2'), 'should be get: true');
+        $this->assertTrue($cache->exists('key2'), 'should be get: true');
     }
 
     /**
@@ -261,7 +261,7 @@ abstract class CommonTraitTest extends \PHPUnit_Framework_TestCase
     {
         /** @var $this \PHPUnit_Framework_TestCase */
 
-        $this->assertFalse($cache->has('key9'), 'should be get: false');
+        $this->assertFalse($cache->exists('key9'), 'should be get: false');
     }
 
     /**
@@ -274,7 +274,7 @@ abstract class CommonTraitTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($cache->set('key1', ['one', 'two'], 0, ['foo', 'bar']));
         $this->assertTrue($cache->touch('key1', 1), 'should be get: true');
         sleep(2);
-        $this->assertFalse($cache->has('key1'), 'should be get: false');
+        $this->assertFalse($cache->exists('key1'), 'should be get: false');
     }
 
     /**
@@ -286,7 +286,7 @@ abstract class CommonTraitTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($cache->set('key1', ['one', 'two'], 0, ['foo', 'bar']));
         $this->assertTrue($cache->remove('key1'), 'should be get: true');
-        $this->assertFalse($cache->has('key1'), 'should be get: false');
+        $this->assertFalse($cache->exists('key1'), 'should be get: false');
     }
 
     /**
@@ -370,7 +370,7 @@ abstract class CommonTraitTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($cache->set('key1', ['one', 'two'], 0, ['foo', 'bar']));
         $this->assertTrue($cache->set('key2', 'three', 0, ['foo']));
         $cache->removeMulti(['key2']);
-        $this->assertTrue($cache->has('key1'), 'should be get: true');
+        $this->assertTrue($cache->exists('key1'), 'should be get: true');
         $this->assertFalse($cache->get('key2'), 'should be get: false');
     }
 

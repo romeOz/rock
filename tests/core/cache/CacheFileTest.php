@@ -117,7 +117,7 @@ class CacheFileTest extends CommonTraitTest
         $this->assertEquals($cache->increment('key7', 5), 5, 'should be get: 5');
         $this->assertEquals($cache->decrement('key7', 2, 1), 3, 'should be get: 3');
         sleep(2);
-        $this->assertFalse($cache->has('key7'), 'should be get: false');
+        $this->assertFalse($cache->exists('key7'), 'should be get: false');
     }
 
 

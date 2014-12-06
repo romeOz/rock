@@ -93,7 +93,7 @@ interface CacheInterface extends SerializeInterface
      * @param string $key - key of cache
      * @return bool
      */
-    public function has($key);
+    public function exists($key);
     /**
      * Change ttl
      *

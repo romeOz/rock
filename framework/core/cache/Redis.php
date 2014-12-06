@@ -71,7 +71,7 @@ class Redis implements CacheInterface
             return false;
         }
 
-        if ($this->has($key)) {
+        if ($this->exists($key)) {
             return false;
         }
 
@@ -89,7 +89,7 @@ class Redis implements CacheInterface
     /**
      * @inheritdoc
      */
-    public function has($key)
+    public function exists($key)
     {
         return static::$storage->exists($this->prepareKey($key));
     }
@@ -100,7 +100,7 @@ class Redis implements CacheInterface
     public function increment($key, $offset = 1, $expire = 0)
     {
         $hash = $this->prepareKey($key);
-        if ($this->has($key) === false) {
+        if ($this->exists($key) === false) {
             $expire > 0 ? static::$storage->setex($hash, $expire, 0) : static::$storage->set($hash, 0);
         }
 
@@ -113,7 +113,7 @@ class Redis implements CacheInterface
     public function decrement($key, $offset = 1, $expire = 0)
     {
         $hash = $this->prepareKey($key);
-        if ($this->has($key) === false) {
+        if ($this->exists($key) === false) {
             return false;
         }
 
