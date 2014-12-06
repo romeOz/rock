@@ -24,6 +24,7 @@ echo "extension = gearman.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/p
 # Install gearman-server
 sudo apt-get install gearman-job-server
 
+cd -
 # Run servers (workers)
 php tests/data/mq/gearman/simple_server.php &
 
