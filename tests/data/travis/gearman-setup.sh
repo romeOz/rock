@@ -8,7 +8,7 @@ sudo add-apt-repository -y ppa:ondrej/php5-5.6
 sudo apt-get update
 
 # Install Gearman
-sudo apt-get install -y libgearman-dev
+sudo apt-get install -y libgearman6
 sudo apt-get install -y php5-gearman
 
 # Install gearman-server
