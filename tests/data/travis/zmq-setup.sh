@@ -22,7 +22,7 @@ sudo apt-get install pkg-config libzmq3-dev libpgm-5.1-0
 # compile manually, because `pecl install apcu-beta` keep asking questions
 git clone https://github.com/mkoppanen/php-zmq.git
 cd php-zmq
-phpize && ./configure && make install && echo "Installed ext/php-zmq-dev"
+phpize && ./configure && make && make install && echo "Installed ext/php-zmq-dev"
 
 echo "extension = zmq.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
