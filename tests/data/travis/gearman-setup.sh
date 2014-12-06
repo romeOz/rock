@@ -14,7 +14,7 @@ sudo apt-get install -y gperf libevent-dev uuid-dev libcloog-ppl-dev
 wget https://launchpad.net/gearmand/1.2/1.1.12/+download/gearmand-1.1.12.tar.gz
 tar xf gearmand-1.1.12.tar.gz
 cd gearmand-1.1.12
-./configure --with-boost-libdir=/usr/lib/x86_64-linux-gnu
+./configure
 make
 sudo make install
 cd -
