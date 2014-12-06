@@ -14,7 +14,7 @@ class APCTest extends CommonTraitTest
 {
     public static function flush()
     {
-        (new APC(['enabled' => true]))->flush();
+        (new APC())->flush();
     }
 
     public function init($serialize)
@@ -24,7 +24,7 @@ class APCTest extends CommonTraitTest
                 'The APC is not available.'
             );
         }
-        return new APC(['enabled' => true, 'serializer' => $serialize]);
+        return new APC(['serializer' => $serialize]);
     }
 
     /**

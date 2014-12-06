@@ -70,22 +70,6 @@ abstract class CommonTraitTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider providerCache
      */
-    public function testEnabled(CacheInterface $cache)
-    {
-        /** @var $this \PHPUnit_Framework_TestCase */
-
-        $cache->enabled(false);
-        $this->assertFalse($cache->set('key5'));
-        $this->assertFalse($cache->get('key5'));
-
-        $cache->enabled();
-        $this->assertTrue($cache->set('key5', ['foo']));
-        $this->assertSame($cache->get('key5'), ['foo']);
-    }
-
-    /**
-     * @dataProvider providerCache
-     */
     public function testAddPrefix(CacheInterface $cache)
     {
         /** @var $this \PHPUnit_Framework_TestCase */
@@ -163,9 +147,6 @@ abstract class CommonTraitTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($cache->set('key1', ['one', 'two'], 0, ['foo', 'bar']));
         $this->assertFalse($cache->add('key1'), 'should be get: false');
-
-        $cache->enabled(false);
-        $this->assertFalse($cache->add('key1'));
     }
 
     /**

@@ -12,7 +12,7 @@ class MemcachedTest extends CommonTraitTest
 {
     public static function flush()
     {
-        (new Memcached(['enabled' => true]))->flush();
+        (new Memcached())->flush();
     }
 
     public function init($serialize)
@@ -22,7 +22,7 @@ class MemcachedTest extends CommonTraitTest
                 'The \Memcached is not available.'
             );
         }
-        return new Memcached(['enabled' => true, 'serializer' => $serialize]);
+        return new Memcached(['serializer' => $serialize]);
     }
 
     /**

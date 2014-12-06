@@ -69,7 +69,7 @@ class CacheFile implements CacheInterface
      */
     public function get($key)
     {
-        if ($this->enabled === false || empty($key)) {
+        if (empty($key)) {
             return false;
         }
 
@@ -96,7 +96,7 @@ class CacheFile implements CacheInterface
      */
     public function set($key, $value = null, $expire = 0, array $tags = null)
     {
-        if (empty($key) || $this->enabled === false) {
+        if (empty($key)) {
             return false;
         }
         $key = $this->prepareKey($key);
@@ -111,7 +111,7 @@ class CacheFile implements CacheInterface
      */
     public function add($key, $value = null, $expire = 0, array $tags = null)
     {
-        if (empty($key) || $this->enabled === false) {
+        if (empty($key)) {
             return false;
         }
 
@@ -128,12 +128,7 @@ class CacheFile implements CacheInterface
      */
     public function exists($key)
     {
-        if ($this->enabled === false) {
-            return false;
-        }
         $key = $this->prepareKey($key);
-
-
         if ($this->provideGet($key, $file) === false) {
             return false;
         }
@@ -146,9 +141,6 @@ class CacheFile implements CacheInterface
      */
     public function touch($key, $expire = 0)
     {
-        if ($this->enabled === false) {
-            return false;
-        }
         $key = $this->prepareKey($key);
         if (($result = $this->provideGet($key, $file, $data)) === false) {
             return false;
@@ -163,9 +155,6 @@ class CacheFile implements CacheInterface
      */
     public function increment($key, $offset = 1, $expire = 0)
     {
-        if ($this->enabled === false) {
-            return false;
-        }
         $hash = $this->prepareKey($key);
 
         if ($this->provideGet($hash, $file, $data) !== false) {
@@ -188,9 +177,6 @@ class CacheFile implements CacheInterface
      */
     public function decrement($key, $offset = 1, $expire = 0)
     {
-        if ($this->enabled === false) {
-            return false;
-        }
         $hash = $this->prepareKey($key);
         if ($this->provideGet($hash, $file, $data) !== false) {
             $data['expire'] = $this->calculateExpire($expire);
@@ -210,9 +196,6 @@ class CacheFile implements CacheInterface
      */
     public function remove($key)
     {
-        if ($this->enabled === false) {
-            return false;
-        }
         $key = $this->prepareKey($key);
         return $this->getAdapter()->delete("~/{$key}.{$this->extensionFileCache}$/");
     }

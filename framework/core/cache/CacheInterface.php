@@ -211,9 +211,4 @@ interface CacheInterface extends SerializeInterface
      * @return mixed
      */
     public function status();
-
-    /**
-     * Enabled caching
-     */
-    public function enabled();
 }

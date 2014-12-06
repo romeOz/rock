@@ -225,10 +225,7 @@ class ListViewTest extends TemplateCommon
                     }
             ]
         );
-        return new CacheFile([
-               'enabled' => true,
-               'adapter' => $adapter,
-           ]);
+        return new CacheFile(['adapter' => $adapter]);
     }
 }
  

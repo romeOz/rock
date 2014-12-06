@@ -4,7 +4,6 @@ namespace rock\cache;
 
 
 use rock\base\ComponentsTrait;
-use rock\base\ObjectTrait;
 use rock\helpers\Serialize;
 
 trait CommonTrait
@@ -27,21 +26,6 @@ trait CommonTrait
      * @var int
      */
     public $serializer = self::SERIALIZE_PHP;
-
-    /**
-     * Enabled cache
-     *
-     * @var bool
-     */
-    public $enabled = false;
-
-    /**
-     * Enabled caching
-     */
-    public function enabled($enabled = true)
-    {
-        $this->enabled = $enabled;
-    }
 
     /**
      * Add prefix to key

@@ -13,7 +13,7 @@ class CouchbaseTest extends CommonTraitTest
 {
     public static function flush()
     {
-        (new Couchbase(['enabled' => true]))->flush();
+        (new Couchbase())->flush();
     }
 
     public function init($serialize)
@@ -24,7 +24,7 @@ class CouchbaseTest extends CommonTraitTest
             );
         }
 
-        return new Couchbase(['enabled' => true, 'serializer' => $serialize]);
+        return new Couchbase(['serializer' => $serialize]);
     }
 
     /**

@@ -37,7 +37,6 @@ class CacheFileTest extends CommonTraitTest
     {
         (new CacheFile(
             [
-                'enabled' => true,
                 'adapter' => static::getFileManager(),
             ]
         ))->flush();
@@ -72,7 +71,6 @@ class CacheFileTest extends CommonTraitTest
     public function init($serialize)
     {
         return new CacheFile([
-           'enabled' => true,
            'adapter' => static::getFileManager(),
            'serializer' => $serialize
         ]);
