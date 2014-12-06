@@ -28,7 +28,7 @@ VERSION=1.2.2
 
 #cd /tmp/
 
-# compile manually, because `pecl install apcu-beta` keep asking questions
+# compile manually, because `pecl install` keep asking questions
 wget http://pecl.php.net/get/couchbase-$VERSION.tgz
 tar zxvf couchbase-$VERSION.tgz
 cd "couchbase-${VERSION}"

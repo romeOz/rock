@@ -6,7 +6,7 @@ if (php --version | grep -i HipHop > /dev/null); then
 fi
 
 sudo add-apt-repository -y ppa:chris-lea/zeromq
-sudo add-apt-repository -y ppa:ondrej/php5
+#sudo add-apt-repository -y ppa:ondrej/php5
 sudo apt-get update
 
 # Install ZeroMQ
@@ -18,7 +18,13 @@ sudo apt-get install libzmq3 libpgm-5.1-0
 #make
 #sudo make install
 #cd -
-yes | pecl install zmq-beta
+#yes | pecl install zmq-beta
+# compile manually, because `pecl install apcu-beta` keep asking questions
+mkdir phpzmq
+cd phpzmq
+git clone https://github.com/mkoppanen/php-zmq.git
+phpize && ./configure && make install && echo "Installed ext/php-zmq-dev"
+
 echo "extension = zmq.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 
