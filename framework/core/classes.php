@@ -37,6 +37,8 @@ return array_merge(
         ],
         'cache' => [
             'class' => \rock\cache\CacheStub::className(),
+        ],
+//        'cache' => [
 //            'class' => \rock\cache\CacheFile::className(),
 //            'adapter' => function () {
 //                    return Rock::factory(
@@ -56,7 +58,7 @@ return array_merge(
 //                        ]
 //                    );
 //                }
-        ],
+//        ],
         'template' => [
             'class' => Template::className(),
             'autoEscape' => Template::ESCAPE | Template::TO_TYPE,
