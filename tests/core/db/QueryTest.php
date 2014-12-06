@@ -273,8 +273,7 @@ class QueryTest extends DatabaseTestCase
 
     public function testCache()
     {
-        $cache = Rock::$app->cache;
-        $cache->enabled();
+        $cache = static::getCache();
         $cache->flush();
         $cacheConfig = [
             'class' => CacheFile::className(),
