@@ -314,7 +314,6 @@ class QueryTest extends DatabaseTestCase
         $cache->flush();
         Trace::removeAll();
         // beginCache and EndCache
-        $cacheConfig['enabled'] = true;
         Rock::$app->di['cache'] = $cacheConfig;
         $connection->queryCache = 'cache';
         $connection->enableQueryCache = false;
@@ -331,8 +330,7 @@ class QueryTest extends DatabaseTestCase
         $this->assertTrue(Trace::getIterator('db.query')->current()['cache']);
         $this->assertNotEmpty($query->beginCache()->endCache()->all());
         $this->assertFalse(Trace::getIterator('db.query')->current()['cache']);
-        $cacheConfig['enabled'] = false;
-        Rock::$app->di['cache'] = $cacheConfig;
+        static::disableCache();
     }
 
 
