@@ -36,26 +36,26 @@ return array_merge(
             'class' => BatchQueryResult::className(),
         ],
         'cache' => [
-            'class' => \rock\cache\CacheFile::className(),
-            'adapter' => function () {
-                    return Rock::factory(
-                        [
-                            'class' => FileManager::className(),
-                            'adapter' =>
-                                function () {
-                                    return new Local(Rock::getAlias('@common/runtime/cache'));
-                                },
-                            'config' => ['visibility' => FileManager::VISIBILITY_PRIVATE],
-                            'cache' => function () {
-                                    $local = new Local(Rock::getAlias('@common/runtime/filesystem'));
-                                    $cache = new Adapter($local, 'cache.tmp');
-
-                                    return $cache;
-                                }
-                        ]
-                    );
-                },
-            'enabled' => false,
+            'class' => \rock\cache\CacheStub::className(),
+//            'class' => \rock\cache\CacheFile::className(),
+//            'adapter' => function () {
+//                    return Rock::factory(
+//                        [
+//                            'class' => FileManager::className(),
+//                            'adapter' =>
+//                                function () {
+//                                    return new Local(Rock::getAlias('@common/runtime/cache'));
+//                                },
+//                            'config' => ['visibility' => FileManager::VISIBILITY_PRIVATE],
+//                            'cache' => function () {
+//                                    $local = new Local(Rock::getAlias('@common/runtime/filesystem'));
+//                                    $cache = new Adapter($local, 'cache.tmp');
+//
+//                                    return $cache;
+//                                }
+//                        ]
+//                    );
+//                }
         ],
         'template' => [
             'class' => Template::className(),
