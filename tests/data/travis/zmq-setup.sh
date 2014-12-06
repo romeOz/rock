@@ -10,7 +10,7 @@ sudo add-apt-repository -y ppa:chris-lea/zeromq
 sudo apt-get update
 
 # Install ZeroMQ
-sudo apt-get install libzmq3 libpgm-5.1-0
+sudo apt-get install pkg-config libzmq3-dev libpgm-5.1-0
 #wget http://download.zeromq.org/zeromq-4.0.4.tar.gz
 #tar -xf zeromq-4.0.4.tar.gz
 #cd zeromq-4.0.4
@@ -20,9 +20,8 @@ sudo apt-get install libzmq3 libpgm-5.1-0
 #cd -
 #yes | pecl install zmq-beta
 # compile manually, because `pecl install apcu-beta` keep asking questions
-mkdir phpzmq
-cd phpzmq
 git clone https://github.com/mkoppanen/php-zmq.git
+cd php-zmq
 phpize && ./configure && make install && echo "Installed ext/php-zmq-dev"
 
 echo "extension = zmq.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
