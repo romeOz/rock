@@ -21,6 +21,7 @@ cd -
 
 # Install pecl gearman
 yes | pecl install gearman
+echo "extension = gearman.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 # Install gearman-server
 sudo apt-get install gearman-job-server
