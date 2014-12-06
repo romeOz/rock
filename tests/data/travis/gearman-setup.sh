@@ -17,14 +17,12 @@ sudo apt-get install libuuid1
 #sudo apt-get install libev-libevent-dev
 sudo apt-get install uuid-dev
 sudo apt-get install libgearman-dev
-wget https://launchpad.net/gearmand/1.2/1.1.12/+download/gearmand-1.1.12.tar.gz
-tar xf gearmand-1.1.12.tar.gz
-cd gearmand-1.1.12
-./configure
-make
-sudo make install
-cd -
-yes | pecl install gearman
+
+git clone https://github.com/hjr3/pecl-gearman.git
+cd pecl-gearman
+phpize && ./configure && make && make install && echo "Installed ext/php-gearman-dev"
+
+echo "extension = gearman.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 # Run servers (workers)
 php tests/data/mq/gearman/simple_server.php &
