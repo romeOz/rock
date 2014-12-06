@@ -114,8 +114,8 @@ class Memcached implements CacheInterface
     public function increment($key, $offset = 1, $expire = 0)
     {
         $hash = $this->prepareKey($key);
-        if ($this->has($key) === false) {
-            $this->provideLock($hash, 0, $expire);
+        if (static::$storage->add($hash, $offset, $expire)) {
+            return $offset;
         }
 
         return static::$storage->increment($hash, $offset);

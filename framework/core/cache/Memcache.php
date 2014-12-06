@@ -31,6 +31,19 @@ class Memcache extends Memcached
     /**
      * @inheritdoc
      */
+    public function increment($key, $offset = 1, $expire = 0)
+    {
+        $hash = $this->prepareKey($key);
+        if (static::$storage->add($hash, $offset, MEMCACHE_COMPRESSED, $expire)) {
+            return $offset;
+        }
+
+        return static::$storage->increment($hash, $offset);
+    }
+    
+    /**
+     * @inheritdoc
+     */
     public function removeMulti(array $keys)
     {
         foreach ($keys as $key) {

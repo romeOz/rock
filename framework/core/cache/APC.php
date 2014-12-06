@@ -90,8 +90,8 @@ class APC implements CacheInterface
     public function increment($key, $offset = 1, $expire = 0)
     {
         $hash = $this->prepareKey($key);
-        if ($this->has($key) === false) {
-            $this->provideLock($hash, 0, $expire);
+        if (apc_add($hash, $offset, $expire)) {
+            return $offset;
         }
 
         return apc_inc($hash, $offset);
