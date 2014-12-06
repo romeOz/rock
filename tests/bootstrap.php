@@ -1,8 +1,5 @@
 <?php
-use League\Flysystem\Adapter\Local;
-use rock\cache\CacheFile;
 use rock\execute\CacheExecute;
-use rock\file\FileManager;
 use rock\log\Log;
 use rock\rbac\PhpManager;
 use rock\Rock;
@@ -49,17 +46,8 @@ require(dirname(__DIR__) . '/framework/mixins.php');
 \rock\exception\BaseException::$logged = false;
 
 Rock::$app->di['cache'] = [
-    'class' => CacheFile::className(),
-    'enabled' => false,
-    'adapter' => function (){
-            return new FileManager([
-                'adapter' => function(){
-                    return new Local(Rock::getAlias('@tests/runtime/cache'));
-                },
-            ]);
-        }
+    'class' => \rock\cache\CacheStub::className()
 ];
-
 
 Rock::$app->di['session'] = [
     'class' => SessionMock::className(),
@@ -70,7 +58,6 @@ Rock::$app->di['cookie'] = [
     'class' => CookieMock::className(),
     'singleton' => true
 ];
-
 
 
 Rock::$app->di['eval'] = [

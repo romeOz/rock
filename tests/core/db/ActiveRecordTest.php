@@ -3,12 +3,7 @@
 namespace rockunit\core\db;
 
 
-use rock\access\Access;
-use rock\db\ActiveQuery;
-use rock\db\ActiveRecordInterface;
-use rock\event\Event;
 use rock\helpers\Trace;
-use rock\Rock;
 use rockunit\common\CommonTrait;
 use rockunit\core\db\models\ActiveRecord;
 use rockunit\core\db\models\Customer;
@@ -71,9 +66,7 @@ class ActiveRecordTest extends DatabaseTestCase
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
-        $cache = Rock::$app->cache;
-        $cache->enabled();
-        $cache->flush();
+        static::getCache()->flush();
         static::clearRuntime();
     }
 
@@ -81,9 +74,8 @@ class ActiveRecordTest extends DatabaseTestCase
     public static function tearDownAfterClass()
     {
         parent::tearDownAfterClass();
-        $cache = Rock::$app->cache;
-        $cache->enabled();
-        $cache->flush();
+        static::getCache()->flush();
+        static::disableCache();
         static::clearRuntime();
     }
 

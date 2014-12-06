@@ -4,7 +4,6 @@ namespace rockunit\core\db;
 use rock\db\Expression;
 use rock\db\Schema;
 use rock\db\TableSchema;
-use rock\Rock;
 use rockunit\common\CommonTrait;
 
 /**
@@ -59,8 +58,7 @@ class SchemaTest extends DatabaseTestCase
         $schema = $this->getConnection()->schema;
 
         $schema->db->enableSchemaCache = true;
-        $cache = Rock::$app->cache;
-        $cache->enabled();
+        $cache = static::getCache();
         $schema->db->schemaCache = $cache;
         $noCacheTable = $schema->getTableSchema('type', true);
         $cachedTable = $schema->getTableSchema('type', true);

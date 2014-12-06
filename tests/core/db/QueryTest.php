@@ -25,9 +25,8 @@ class QueryTest extends DatabaseTestCase
     public static function tearDownAfterClass()
     {
         parent::tearDownAfterClass();
-        $cache = Rock::$app->cache;
-        $cache->enabled();
-        $cache->flush();
+        static::getCache()->flush();
+        static::disableCache();
         static::clearRuntime();
     }
 

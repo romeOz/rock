@@ -2,6 +2,7 @@
 namespace rockunit\core\db;
 
 use rock\access\Access;
+use rock\cache\CacheInterface;
 use rock\db\ActiveQuery;
 use rock\db\ActiveQueryInterface;
 use rock\db\ActiveRecordInterface;
@@ -1153,8 +1154,9 @@ trait ActiveRecordTestTrait
         /* @var $orderClass BaseActiveRecord */
         $orderClass = $this->getOrderClass();
         /* @var $this \PHPUnit_Framework_TestCase|ActiveRecordTestTrait|DatabaseTestCase */
-        $cache = Rock::$app->cache;
-        $cache->enabled();
+
+        /** @var CacheInterface $cache */
+        $cache = static::getCache();
         $cache->flush();
 
         /* @var $connection Connection */

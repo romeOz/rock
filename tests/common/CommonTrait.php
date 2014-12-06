@@ -3,6 +3,10 @@
 namespace rockunit\common;
 
 
+use League\Flysystem\Adapter\Local;
+use rock\cache\CacheFile;
+use rock\cache\CacheStub;
+use rock\file\FileManager;
 use rock\helpers\File;
 use rock\Rock;
 
@@ -46,5 +50,31 @@ trait CommonTrait
     {
         sort($value);
         return $value;
+    }
+
+    /**
+     * @return \rock\cache\CacheInterface
+     */
+    protected static function getCache()
+    {
+        Rock::$app->di['cache'] = [
+            'class' => CacheFile::className(),
+            'adapter' => function (){
+                return new FileManager([
+                   'adapter' => function(){
+                       return new Local(Rock::getAlias('@tests/runtime/cache'));
+                   },
+               ]);
+            }
+        ];
+        return Rock::$app->cache;
+    }
+
+
+    protected static function disableCache()
+    {
+        Rock::$app->di['cache'] = [
+            'class' => CacheStub::className()
+        ];
     }
 } 
