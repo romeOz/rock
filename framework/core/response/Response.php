@@ -961,10 +961,10 @@ class Response
         if ($this->stream !== null || $this->data === null) {
             return;
         }
-        if (!empty($this->content) && is_array($this->data)) {
-            $this->data = array_merge($this->data, $this->content);
-            $this->content = null;
-        }
+//        if (!empty($this->content) && is_array($this->data)) {
+//            $this->data = array_merge($this->data, $this->content);
+//            $this->content = null;
+//        }
         if (isset($this->formatters[$this->format])) {
             $formatter = $this->formatters[$this->format];
             if (!is_object($formatter)) {
