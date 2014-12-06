@@ -533,7 +533,7 @@ class ActiveField
     {
         $options = array_merge($this->inputOptions, $options);
         $options = $this->calculateClientInputOption($options);
-        if (!isset($options['data-ng-init']) && isset($options['value'])) {
+        if (!isset($options['data-ng-init']) && isset($options['value']) && trim($options['value']) !== '') {
             $options['data-ng-init'] = isset($this->formName)
                 ? "{$this->formName}.values.{$this->attribute}={$options['value']}"
                 : "form.values.{$this->attribute}={$options['value']}";
