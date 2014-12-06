@@ -2,16 +2,12 @@
 
 namespace rockunit\core\db;
 
-use League\Flysystem\Adapter\Local;
 use rock\access\Access;
-use rock\cache\CacheFile;
 use rock\db\Expression;
 use rock\db\Query;
 use rock\db\SelectBuilder;
 use rock\event\Event;
-use rock\file\FileManager;
 use rock\helpers\Trace;
-use rock\Rock;
 use rockunit\common\CommonTrait;
 
 /**
@@ -275,18 +271,7 @@ class QueryTest extends DatabaseTestCase
     {
         $cache = static::getCache();
         $cache->flush();
-        $cacheConfig = [
-            'class' => CacheFile::className(),
-            'enabled' => false,
-            'adapter' => function () {
-                return new FileManager(
-                    [
-                        'adapter' => function () {
-                            return new Local(Rock::getAlias('@tests/runtime/cache'));
-                        },
-                    ]);
-            }
-        ];
+
         $connection = $this->getConnection();
         Trace::removeAll();
         $connection->enableQueryCache = true;
@@ -313,8 +298,8 @@ class QueryTest extends DatabaseTestCase
         $this->assertSame(Trace::getIterator('db.query')->current()['count'], 3);
         $cache->flush();
         Trace::removeAll();
+
         // beginCache and EndCache
-        Rock::$app->di['cache'] = $cacheConfig;
         $connection->queryCache = 'cache';
         $connection->enableQueryCache = false;
         $query = (new Query())->setConnection($connection)->from(['customer']);

@@ -2,14 +2,10 @@
 
 namespace rockunit\extensions\sphinx;
 
-use League\Flysystem\Adapter\Local;
 use rock\access\Access;
-use rock\cache\CacheFile;
 use rock\db\Expression;
 use rock\event\Event;
-use rock\file\FileManager;
 use rock\helpers\Trace;
-use rock\Rock;
 use rock\sphinx\Query;
 use rockunit\common\CommonTrait;
 
@@ -322,18 +318,7 @@ class QueryTest extends SphinxTestCase
         $connection = $this->getConnection();
         $cache = static::getCache();
         $cache->flush();
-        $cacheConfig = [
-            'class' => CacheFile::className(),
-            'enabled' => false,
-            'adapter' => function () {
-                return new FileManager(
-                    [
-                        'adapter' => function () {
-                            return new Local(Rock::getAlias('@tests/runtime/cache'));
-                        },
-                    ]);
-            }
-        ];
+
         Trace::removeAll();
         $connection->enableQueryCache = true;
         $connection->queryCache = $cache;
@@ -347,9 +332,8 @@ class QueryTest extends SphinxTestCase
         $this->assertSame(Trace::getIterator('db.query')->current()['count'], 3);
         $cache->flush();
         Trace::removeAll();
+
         // beginCache and EndCache
-        $cacheConfig['enabled'] = true;
-        Rock::$app->di['cache'] = $cacheConfig;
         $this->assertNotEmpty((new Query())->from('article_index')->all());
         $this->assertFalse(Trace::getIterator('db.query')->current()['cache']);
         $this->assertNotEmpty((new Query())->from('article_index')->all());
@@ -362,8 +346,7 @@ class QueryTest extends SphinxTestCase
         $this->assertTrue(Trace::getIterator('db.query')->current()['cache']);
         $this->assertNotEmpty((new Query())->from('article_index')->beginCache()->endCache()->all());
         $this->assertFalse(Trace::getIterator('db.query')->current()['cache']);
-        $cacheConfig['enabled'] = false;
-        Rock::$app->di['cache'] = $cacheConfig;
+        static::disableCache();
     }
 
     public function testCheckAccessFail()
