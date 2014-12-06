@@ -25,9 +25,7 @@ class QueryTest extends SphinxTestCase
     public static function tearDownAfterClass()
     {
         parent::tearDownAfterClass();
-        $cache = Rock::$app->cache;
-        $cache->enabled();
-        $cache->flush();
+        static::getCache()->flush();
         static::clearRuntime();
     }
 
@@ -322,8 +320,7 @@ class QueryTest extends SphinxTestCase
     public function testCache()
     {
         $connection = $this->getConnection();
-        $cache = Rock::$app->cache;
-        $cache->enabled();
+        $cache = static::getCache();
         $cache->flush();
         $cacheConfig = [
             'class' => CacheFile::className(),

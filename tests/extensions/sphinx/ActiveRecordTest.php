@@ -31,9 +31,7 @@ class ActiveRecordTest extends SphinxTestCase
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
-        $cache = Rock::$app->cache;
-        $cache->enabled();
-        $cache->flush();
+        static::getCache()->flush();
         static::clearRuntime();
     }
 
@@ -41,9 +39,8 @@ class ActiveRecordTest extends SphinxTestCase
     public static function tearDownAfterClass()
     {
         parent::tearDownAfterClass();
-        $cache = Rock::$app->cache;
-        $cache->enabled();
-        $cache->flush();
+        static::getCache()->flush();
+        static::disableCache();
         static::clearRuntime();
     }
 
@@ -285,8 +282,7 @@ class ActiveRecordTest extends SphinxTestCase
 
     public function testCache()
     {
-        $cache = Rock::$app->cache;
-        $cache->enabled();
+        $cache = static::getCache();
         $cache->flush();
         $cacheConfig = [
             'class' => CacheFile::className(),

@@ -52,8 +52,7 @@ class SchemaTest extends SphinxTestCase
         $schema = $this->getConnection()->schema;
 
         $schema->db->enableSchemaCache = true;
-        $cache = Rock::$app->cache;
-        $cache->enabled();
+        $cache = static::getCache();
         $schema->db->schemaCache = $cache;
         $noCacheIndex = $schema->getIndexSchema('rt_index', true);
         $cachedIndex = $schema->getIndexSchema('rt_index', true);
