@@ -4,7 +4,7 @@ if (php --version | grep -i HipHop > /dev/null); then
     echo "Skipping Gearman on HHVM"
     exit 0
 fi
-sudo add-apt-repository -y ppa:ondrej/php5-5.6
+sudo add-apt-repository -y ppa:ondrej/php5
 sudo apt-get update
 
 # Install Gearman
@@ -17,12 +17,14 @@ sudo apt-get install libuuid1
 #sudo apt-get install libev-libevent-dev
 sudo apt-get install uuid-dev
 sudo apt-get install libgearman-dev
-
-git clone https://github.com/hjr3/pecl-gearman.git
-cd pecl-gearman
-phpize && ./configure && make && make install && echo "Installed ext/php-gearman-dev"
-
-echo "extension = gearman.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+wget https://launchpad.net/gearmand/1.2/1.1.11/+download/gearmand-1.1.11.tar.gz
+tar xf gearmand-1.1.11.tar.gz
+cd gearmand-1.1.11
+./configure
+make
+sudo make install
+cd -
+yes | pecl install gearman
 
 # Run servers (workers)
 php tests/data/mq/gearman/simple_server.php &
