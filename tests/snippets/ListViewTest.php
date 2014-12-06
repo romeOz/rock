@@ -130,7 +130,7 @@ class ListViewTest extends TemplateCommon
 
     public function testCache()
     {
-        $cache = $this->getCache();
+        $cache = static::getCache();
         $this->template = new Template();
         $this->template->cache = $cache;
 
@@ -169,7 +169,7 @@ class ListViewTest extends TemplateCommon
     public function testCacheExpire()
     {
         static::clearRuntime();
-        $cache = $this->getCache();
+        $cache = static::getCache();
         $this->template->cache = $cache;
         $this->assertSame(
             $this->removeSpace($this->template->replace('
@@ -209,7 +209,7 @@ class ListViewTest extends TemplateCommon
         return Pagination::get(count(static::getAll()), 1, 1, SORT_DESC);
     }
 
-    protected function getCache()
+    protected static function getCache()
     {
         $adapter = new FileManager(
             [

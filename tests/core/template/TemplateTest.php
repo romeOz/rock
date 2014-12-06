@@ -594,7 +594,7 @@ class TemplateTest extends TemplateCommon
 
     public function testCacheSnippet()
     {
-        $cache = $this->getCache();
+        $cache = static::getCache();
         $className = TestSnippet::className();
         $this->template = new Template();
         $this->template->cache = $cache;
@@ -611,7 +611,7 @@ class TemplateTest extends TemplateCommon
 
     public function testCacheLayout()
     {
-        $cache = $this->getCache();
+        $cache = static::getCache();
         $this->template = new Template();
         $this->template->cache = $cache;
         $this->template->addMultiPlaceholders(['foo'=> ['bar' => '<b>text_bar</b>']], true);
@@ -634,7 +634,7 @@ class TemplateTest extends TemplateCommon
         $this->assertSame($this->template->getChunk($this->path . '/subchunk.php', ['title'=> 'test']), '<b>subchunk</b>test');
     }
 
-    protected function getCache()
+    protected static function getCache()
     {
         $adapter = new FileManager(
             [
