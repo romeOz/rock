@@ -11,9 +11,9 @@ sudo apt-get update
 sudo apt-get install -y libboost-all-dev
 sudo apt-get install -y gperf libevent-dev uuid-dev libcloog-ppl-dev
 sudo apt-get install -y libgearman-dev
-wget https://launchpad.net/gearmand/1.2/1.1.9/+download/gearmand-1.1.9.tar.gz
-tar xf gearmand-1.1.9.tar.gz
-cd gearmand-1.1.9
+wget https://launchpad.net/gearmand/1.2/1.1.11/+download/gearmand-1.1.11.tar.gz
+tar xf gearmand-1.1.11.tar.gz
+cd gearmand-1.1.11
 ./configure
 make
 sudo make install
