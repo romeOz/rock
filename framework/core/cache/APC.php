@@ -129,7 +129,7 @@ class APC implements CacheInterface
     /**
      * @inheritdoc
      */
-    public function hasTag($tag)
+    public function existsTag($tag)
     {
         return (bool)apc_exists($this->prepareTag($tag));
     }

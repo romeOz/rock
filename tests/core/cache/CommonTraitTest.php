@@ -441,24 +441,24 @@ abstract class CommonTraitTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider providerCache
      */
-    public function testHasTag(CacheInterface $cache)
+    public function testExistsTag(CacheInterface $cache)
     {
         /** @var $this \PHPUnit_Framework_TestCase */
 
         $this->assertTrue($cache->set('key1', ['one', 'two'], 0, ['foo', 'bar']));
         $this->assertTrue($cache->set('key2', 'three', 0, ['foo']));
-        $this->assertTrue($cache->hasTag('foo'), 'should be get: true');
+        $this->assertTrue($cache->existsTag('foo'), 'should be get: true');
     }
 
 
     /**
      * @dataProvider providerCache
      */
-    public function testHasTagFalse(CacheInterface $cache)
+    public function testExistsTagFalse(CacheInterface $cache)
     {
         /** @var $this \PHPUnit_Framework_TestCase */
 
-        $this->assertFalse($cache->hasTag('baz'), 'should be get: false');
+        $this->assertFalse($cache->existsTag('baz'), 'should be get: false');
     }
 
     /**

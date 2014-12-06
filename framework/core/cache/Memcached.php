@@ -167,7 +167,7 @@ class Memcached implements CacheInterface
     /**
      * @inheritdoc
      */
-    public function hasTag($tag)
+    public function existsTag($tag)
     {
         return (bool)static::$storage->get($this->prepareTag($tag));
     }

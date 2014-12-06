@@ -40,7 +40,7 @@ class Memcache extends Memcached
 
         return static::$storage->increment($hash, $offset);
     }
-    
+
     /**
      * @inheritdoc
      */

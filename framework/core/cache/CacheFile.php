@@ -243,7 +243,7 @@ class CacheFile implements CacheInterface
     /**
      * @inheritdoc
      */
-    public function hasTag($tag)
+    public function existsTag($tag)
     {
         $tag = $this->prepareTag($tag);
         return $this->getAdapter()->has("~/[^\/]*{$tag}[^\/]*$/", FileManager::TYPE_DIR);
