@@ -24,7 +24,7 @@ class MemorySessionTest extends DbSessionTest
         }
 
         parent::setUp();
-        $this->handlerSession = new MemorySession(['cache' => new Memcached(['enabled' => true])]);
+        $this->handlerSession = new MemorySession(['cache' => new Memcached()]);
         $this->handlerSession->removeAll();
     }
 
@@ -49,7 +49,7 @@ class MemorySessionTest extends DbSessionTest
 
     public static function flush()
     {
-        (new Memcached(['enabled' => true]))->flush();
+        (new Memcached())->flush();
     }
 }
  
