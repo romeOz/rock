@@ -70,12 +70,12 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     public function testNumeric()
     {
-        $_GET['foo'] = '-5.5</b>     ';
+        $_GET['foo'] = '<b>-5.5</b>';
         $_GET['bar'] = '5.5';
         $_GET['baz'] = '{"baz" : "5.6"}';
         $result = Request::getAll(Sanitize::attributes(
             [
-                'foo' => Sanitize::call('abs')->call('ceil'),
+                'foo' => Sanitize::call('strip_tags')->call('abs')->call('ceil'),
                 'bar' => Sanitize::call('floor'),
                 'baz' => Sanitize::unserialize()->call('round'),
             ]
