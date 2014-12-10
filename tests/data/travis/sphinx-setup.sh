@@ -4,7 +4,7 @@ SCRIPT=$(readlink -f "$0")
 CWD=$(dirname "$SCRIPT")
 
 # Install Sphinx
-sudo add-apt-repository -y ppa:builds/sphinxsearch-rel21
+sudo add-apt-repository -y ppa:builds/sphinxsearch-rel22
 sudo apt-get update
 sudo apt-get install sphinxsearch
 sudo service sphinxsearch stop
