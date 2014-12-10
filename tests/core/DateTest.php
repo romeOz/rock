@@ -93,13 +93,13 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
     public function testDiff()
     {
         $dateTime = new DateTime('1988-11-12');
-        $this->assertSame($dateTime->diff(time())->w, (int)floor($dateTime->diff(time())->days / 7));
+        $this->assertSame($dateTime->diff(time())->w, (int)floor($dateTime->diff(time())->_days / 7));
 
         $dateInterval = $dateTime->diff('1988-11-12');
-        $this->assertSame($dateInterval->w, (int)floor($dateInterval->days / 7) * -1);
+        $this->assertSame($dateInterval->w, (int)floor($dateInterval->_days / 7) * -1);
 
         $dateInterval = $dateTime->diff('1988-11-12', true);
-        $this->assertSame($dateInterval->w, (int)floor($dateInterval->days / 7));
+        $this->assertSame($dateInterval->w, (int)floor($dateInterval->_days / 7));
     }
 
     /**
