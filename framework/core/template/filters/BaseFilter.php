@@ -77,12 +77,10 @@ class BaseFilter implements ThumbInterface
             return null;
         }
         $params['config'] = Helper::getValue($params['config'], []);
-        $params['config']['class'] = DateTime::className();
         if (!empty($params['locale'])) {
             $params['config']['locale'] = $params['locale'];
         }
-        /** @var DateTime $dateTime */
-        $dateTime = Rock::factory($date, null, $params['config']);
+        $dateTime = DateTime::set($date, null, $params['config']);
         return $dateTime->convertTimezone(Helper::getValue($params['timezone']))->format(
             Helper::getValue($params['format']));
     }

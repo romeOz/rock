@@ -7,6 +7,7 @@ use DateTimeZone;
 use rock\base\ComponentsTrait;
 use rock\date\locale\En;
 use rock\date\locale\Locale;
+use rock\di\Container;
 use rock\i18n\i18nInterface;
 
 /**
@@ -57,7 +58,7 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
 
     /**
      * @param string|int          $time
-     * @param string|DateTimeZone $timezone
+     * @param string|\DateTimeZone $timezone
      * @param array               $config
      */
     public function __construct($time = 'now', $timezone = null, array $config = [])
@@ -79,6 +80,22 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
                 $this->addFormatOption($alias, $callback);
             }
         }
+    }
+
+    /**
+     * Set url for modify.
+     *
+     * @param string|int $time    time for modify
+     * @param string|\DateTimeZone        $timezone
+     * @param array       $config  the configuration. It can be either a string representing the class name
+     *                             or an array representing the object configuration.
+     * @throws \rock\di\ContainerException
+     * @return $this
+     */
+    public static function set($time = 'now', $timezone = null, array $config = [])
+    {
+        $config['class'] = static::className();
+        return Container::load($time, $timezone, $config);
     }
 
     /**

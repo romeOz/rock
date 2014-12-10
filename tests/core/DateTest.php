@@ -18,6 +18,7 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
     public function testGetTimestamp($time)
     {
         $this->assertSame((new DateTime($time))->getTimestamp(), 595296000);
+        $this->assertSame(DateTime::set($time)->getTimestamp(), 595296000);
     }
 
     public function providerData()
@@ -33,6 +34,7 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertSame((new DateTime)->format('j  n  Y'), date('j  n  Y'));
         $this->assertSame((new DateTime)->format(), date('Y-m-d H:i:s'));
+        $this->assertSame(DateTime::set()->format(), date('Y-m-d H:i:s'));
     }
 
     public function testDefaultFormat()
@@ -69,7 +71,7 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
 
     public function testAddCustomFormat()
     {
-        $datetime = new DateTime('1988-11-12');
+        $datetime = DateTime::set('1988-11-12');
         $datetime->addCustomFormat('shortDate', 'j / F / Y');
         $this->assertSame($datetime->shortDate(), '12 / November / 1988');
         $this->assertArrayHasKey('shortDate', $datetime->getCustomFormats());
