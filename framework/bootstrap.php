@@ -10,7 +10,7 @@ error_reporting(E_ALL | E_STRICT);
 if (version_compare(PHP_VERSION, '5.4.0', '<')) {
     die('need to use PHP version 5.4.x or greater');
 }
-require('mixins.php');
+require('polyfills.php');
 defined('DEBUG') or define('DEBUG', true);
 defined('DS') or define('DS', DIRECTORY_SEPARATOR);
 Rock::$app = new Rock();

@@ -36,7 +36,7 @@ Rock::setAlias('runtime', '@tests/runtime');
 Rock::$app = new Rock();
 Rock::$app->language = \rock\i18n\i18nInterface::EN;
 
-require(dirname(__DIR__) . '/framework/mixins.php');
+require(dirname(__DIR__) . '/framework/polyfills.php');
 
 \rock\base\Config::set($configs);
 
