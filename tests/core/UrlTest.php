@@ -29,6 +29,7 @@ class UrlTest extends \PHPUnit_Framework_TestCase
         // relative
         $url = new Url();
         $this->assertSame('/', $url->getRelativeUrl());
+        $this->assertSame('/', Url::set()->getRelativeUrl());
 
         // http
         $url = new Url();
@@ -180,6 +181,16 @@ class UrlTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(
             'http://site2.com/parts/news/?view=all#name',
             $url
+                ->addBeginPath('/parts')
+                ->addEndPath('/news/')
+                ->addArgs(['view'=> 'all'])
+                ->removeArgs(['page'])
+                ->getAbsoluteUrl()
+        );
+
+        $this->assertSame(
+            'http://site2.com/parts/news/?view=all#name',
+            Url::set('http://site2.com/?page=2#name')
                 ->addBeginPath('/parts')
                 ->addEndPath('/news/')
                 ->addArgs(['view'=> 'all'])

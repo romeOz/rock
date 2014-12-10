@@ -40,8 +40,7 @@ class Facebook implements ComponentsInterface, ClientInterface
         $serviceFactory = new ServiceFactory();
         // Session storage
         $storage = new Session();
-        /** @var Url $urlBuilder */
-        $urlBuilder = Rock::factory($this->redirectUrl, Url::className());
+        $urlBuilder = Url::set($this->redirectUrl);
 
         // Setup the credentials for the requests
         $credentials = new Credentials(

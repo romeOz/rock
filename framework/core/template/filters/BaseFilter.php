@@ -104,7 +104,7 @@ class BaseFilter implements ThumbInterface
      * - replace:       the replacement data.
      * - anchor:       anchor for adding.
      * - removeAnchor:       remove anchor.
-     * - const: - adduce URL to: {@see \rock\url\Url::ABS}, {@see \rock\url\Url::HTTP},
+     * - const: adduce URL to: {@see \rock\url\Url::ABS}, {@see \rock\url\Url::HTTP},
      *                  and {@see \rock\url\Url::HTTPS}.
      * @return string
      */
@@ -113,8 +113,7 @@ class BaseFilter implements ThumbInterface
         if (empty($url)) {
             return '#';
         }
-        /** @var Url $urlBuilder */
-        $urlBuilder = Rock::factory($url, Url::className());
+        $urlBuilder = Url::set($url);
         if (isset($params['removeAllArgs'])) {
             $urlBuilder->removeAllArgs();
         }

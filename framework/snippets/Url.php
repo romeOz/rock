@@ -2,7 +2,6 @@
 namespace rock\snippets;
 
 use rock\base\Snippet;
-use rock\Rock;
 use rock\template\Template;
 use rock\url\UrlInterface;
 
@@ -103,8 +102,7 @@ class Url extends Snippet implements UrlInterface
      */
     public function get()
     {
-        /** @var \rock\url\Url $urlBuilder */
-        $urlBuilder = Rock::factory($this->url, \rock\url\Url::className());
+        $urlBuilder = \rock\url\Url::set($this->url);
         if (isset($this->removeArgs)) {
             $urlBuilder->removeArgs($this->removeArgs);
         }

@@ -74,14 +74,12 @@ return array_merge(
 
                     //  Get url by context
                     if (count($link) === 1) {
-                        /** @var \rock\url\Url $urlBuilder */
-                        $urlBuilder = Rock::factory($class::context(['url']), \rock\url\Url::className());
+                        $urlBuilder = \rock\url\Url::set($class::context(['url']));
                         return $template->autoEscape($urlBuilder->get());
                     }
                     // Get url by resource
                     if (count($link) > 1) {
-                        /** @var \rock\url\Url $urlBuilder */
-                        $urlBuilder = Rock::factory($class::findUrlById($link[1]), \rock\url\Url::className());
+                        $urlBuilder = \rock\url\Url::set($class::findUrlById($link[1]));
                         return $template->autoEscape($urlBuilder->get());
                     }
                     return '#';

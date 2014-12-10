@@ -69,8 +69,7 @@ class Captcha extends InputWidget implements CaptchaInterface
             $captcha = $this->Rock->captcha;
             $src = $captcha->getDataUri();
         } else {
-            /** @var Url $urlBuilder */
-            $urlBuilder = Rock::factory($this->captchaAction, Url::className());
+            $urlBuilder = Url::set($this->captchaAction);
             $src = $urlBuilder->addArgs(['v' => uniqid()])->getAbsoluteUrl(true);
         }
 

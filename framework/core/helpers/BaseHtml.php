@@ -244,8 +244,7 @@ class BaseHtml
         if (!isset($options['rel'])) {
             $options['rel'] = 'stylesheet';
         }
-        /** @var Url $urlBuilder */
-        $urlBuilder = Rock::factory($url, Url::className());
+        $urlBuilder = Url::set($url);
         $options['href'] = $urlBuilder->getAbsoluteUrl();
         if (isset($options['condition'])) {
             $condition = $options['condition'];
@@ -275,8 +274,7 @@ class BaseHtml
      */
     public static function jsFile($url, $options = [])
     {
-        /** @var Url $urlBuilder */
-        $urlBuilder = Rock::factory($url, Url::className());
+        $urlBuilder = Url::set($url);
         $options['src'] = $urlBuilder->getAbsoluteUrl();
         if (isset($options['condition'])) {
             $condition = $options['condition'];
@@ -324,8 +322,7 @@ class BaseHtml
      */
     public static function beginForm($name = null, $action = null, $method = 'post', $options = [])
     {
-        /** @var Url $urlBuilder */
-        $urlBuilder = Rock::factory($action, Url::className());
+        $urlBuilder = Url::set($url);
         $action = $urlBuilder->getAbsoluteUrl();
         $hiddenInputs = [];
         $request = Rock::$app->request;
@@ -459,8 +456,7 @@ class BaseHtml
     public static function a($text, $url = null, $options = [])
     {
         if ($url !== null) {
-            /** @var Url $urlBuilder */
-            $urlBuilder = Rock::factory($url, Url::className());
+            $urlBuilder = Url::set($url);
             $options['href'] = $urlBuilder->getAbsoluteUrl();
         }
 
@@ -503,8 +499,7 @@ class BaseHtml
     {
         $options['src'] = $src;
         if (!static::isBase64($src)) {
-            /** @var Url $urlBuilder */
-            $urlBuilder = Rock::factory($src, Url::className());
+            $urlBuilder = Url::set($src);
             $options['src'] = $urlBuilder->getAbsoluteUrl();
         }
         if (!isset($options['alt'])) {

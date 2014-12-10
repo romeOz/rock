@@ -40,9 +40,7 @@ class Google implements ComponentsInterface, ClientInterface
         $serviceFactory = new ServiceFactory();
         // Session storage
         $storage = new Session(false);
-
-        /** @var Url $urlBuilder */
-        $urlBuilder = Rock::factory($this->redirectUrl, Url::className());
+        $urlBuilder = Url::set($this->redirectUrl);
 
         // Setup the credentials for the requests
         $credentials = new Credentials(

@@ -3,6 +3,7 @@
 namespace rock\url;
 
 use rock\base\ObjectTrait;
+use rock\di\Container;
 use rock\helpers\Helper;
 use rock\helpers\String;
 use rock\Rock;
@@ -64,6 +65,21 @@ class Url implements UrlInterface
         if (isset($this->dataUrl['query'])) {
             parse_str($this->dataUrl['query'], $this->dataUrl['query']);
         }
+    }
+
+    /**
+     * Set url for modify.
+     *
+     * @param string|null $url url for modify (default: NULL)
+     * @param array       $config the configuration. It can be either a string representing the class name
+     *                             or an array representing the object configuration.
+     * @throws \rock\di\ContainerException
+     * @return $this
+     */
+    public static function set($url = null, array $config = [])
+    {
+        $config['class'] = static::className();
+        return Container::load($url, $config);
     }
 
     /**

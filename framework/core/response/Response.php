@@ -756,8 +756,7 @@ class Response
 //        }
 
         $request = $this->Rock->request;
-        /** @var Url $urlBuilder */
-        $urlBuilder = Rock::factory($url, Url::className());
+        $urlBuilder = Url::set($url);
         $url = $urlBuilder->getAbsoluteUrl();
         if (strpos($url, '/') === 0 && strpos($url, '//') !== 0) {
             $url = $request->getHostInfo() . $url;
