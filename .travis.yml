@@ -43,7 +43,7 @@ script:
     if (php --version | grep -i HipHop > /dev/null); then
       vendor/bin/phpunit --verbose --exclude-group php,couchbase,memcache,memcached,redis,apc,mq
     else
-      vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml --exclude-group hhvm,gearman,rabbitmq
+      vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml --exclude-group hhvm,rabbitmq
     fi
 
 after_script:
