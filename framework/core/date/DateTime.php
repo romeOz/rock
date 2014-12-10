@@ -310,6 +310,7 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
         if (($interval = parent::diff($datetime2, $absolute)) === false){
             return false;
         }
+        $interval = new \rock\date\DateInterval($interval);
         $sign = $interval->invert;
         $days = $interval->days;
         /**
