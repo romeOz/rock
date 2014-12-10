@@ -296,7 +296,7 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
     /**
      * @param string|int|\DateTime $datetime2
      * @param bool      $absolute
-     * @return bool|\rock\date\DateInterval
+     * @return bool|DateInterval
      */
     public function diff($datetime2, $absolute = false)
     {
@@ -309,9 +309,13 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
         if (($interval = parent::diff($datetime2, $absolute)) === false){
             return false;
         }
-        $interval = new \rock\date\DateInterval($interval);
+        $properties = (array)get_object_vars($interval);
+        $interval = clone $interval;
+        foreach ($properties as $property => $value) {
+            $interval->{$property} = $value;
+        }
         $sign = $interval->invert;
-        $days = $interval->_days;
+        $days = $interval->days;
         // calculate seconds
         $seconds = $days * 24 * 60 * 60;
         $seconds += $interval->h * 60 * 60;
