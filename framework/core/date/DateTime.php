@@ -3,7 +3,6 @@
 namespace rock\date;
 
 
-use DateInterval;
 use DateTimeZone;
 use rock\base\ComponentsTrait;
 use rock\date\locale\En;
@@ -297,7 +296,7 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
     /**
      * @param string|int|\DateTime $datetime2
      * @param bool      $absolute
-     * @return bool|DateInterval
+     * @return bool|\rock\date\DateInterval
      */
     public function diff($datetime2, $absolute = false)
     {
@@ -312,8 +311,7 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
         }
         $interval = new \rock\date\DateInterval($interval);
         $sign = $interval->invert;
-        $days = $interval->days;
-        
+        $days = $interval->_days;
         // calculate seconds
         $seconds = $days * 24 * 60 * 60;
         $seconds += $interval->h * 60 * 60;
