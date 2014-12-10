@@ -6,7 +6,10 @@ namespace rock\date;
 use DateTimeZone;
 use rock\base\ComponentsTrait;
 use rock\date\locale\En;
+use rock\date\locale\EnUK;
 use rock\date\locale\Locale;
+use rock\date\locale\Ru;
+use rock\date\locale\Ua;
 use rock\di\Container;
 use rock\i18n\i18nInterface;
 
@@ -29,8 +32,16 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
      * @var string
      */
     public $format = self::DEFAULT_FORMAT;
-    /** @var  string */
-    public $locale;
+    /**
+     * Current locale.
+     * @var  string
+     */
+    public $locale = self::EN;
+    /**
+     * Locales.
+     * @var array
+     */
+    public $locales = [];
     public $formats = [];
 
     /** @var  array */
@@ -74,6 +85,7 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
             $this->locale = $this->Rock->language;
         }
         $this->formats = array_merge(static::$defaultFormats, $this->formats);
+        $this->locales = array_merge($this->defaultLocales(), $this->locales);
         $this->initCustomFormatOptions();
         if (!empty(static::$formatsOption)) {
             foreach (static::$formatsOption as $alias => $callback) {
@@ -83,7 +95,7 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
     }
 
     /**
-     * Set url for modify.
+     * Set date for modify.
      *
      * @param string|int $time    time for modify
      * @param string|\DateTimeZone        $timezone
@@ -105,11 +117,10 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
     {
         if (empty(static::$localeObject[$this->locale])) {
 
-            $className = Locale::getNamespace() .'\\' . ucfirst(str_replace('-', '', $this->locale));
-            if(!class_exists($className)) {
-                $className = En::className();
+            if (!isset($this->locales[$this->locale])) {
+                $this->locale = self::EN;
             }
-            static::$localeObject[$this->locale] = new $className;
+            static::$localeObject[$this->locale] = new $this->locales[$this->locale];
         }
 
         return static::$localeObject[$this->locale];
@@ -432,5 +443,15 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
         $format = preg_replace_callback('/~(\d+)~/', function ($matches) use ($dateTime, $formatOptionsCallbacks) {
             return call_user_func($formatOptionsCallbacks[$matches[1]], $dateTime);
         }, $format);
+    }
+
+    protected function defaultLocales()
+    {
+        return [
+            'en' => En::className(),
+            'en-UK' => EnUK::className(),
+            'ru' => Ru::className(),
+            'ua' => Ua::className(),
+        ];
     }
 }
