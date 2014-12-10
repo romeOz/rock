@@ -309,11 +309,6 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
         if (($interval = parent::diff($datetime2, $absolute)) === false){
             return false;
         }
-        $properties = (array)get_object_vars($interval);
-        $interval = clone $interval;
-        foreach ($properties as $property => $value) {
-            $interval->{$property} = $value;
-        }
         $sign = $interval->invert;
         $days = $interval->days;
         // calculate seconds
