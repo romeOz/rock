@@ -28,7 +28,7 @@ install:
   - tests/data/travis/redis-setup.sh
   - tests/data/travis/couchbase-setup.sh
   - tests/data/travis/zmq-setup.sh
-  - tests/data/travis/gearman-setup.sh
+#  - tests/data/travis/gearman-setup.sh
 #  - tests/data/travis/rabbitmq-setup.sh
   - tests/data/travis/image-setup.sh
   - framework/rock.sh
@@ -43,7 +43,7 @@ script:
     if (php --version | grep -i HipHop > /dev/null); then
       vendor/bin/phpunit --verbose --exclude-group php,couchbase,memcache,memcached,redis,apc,mq
     else
-      vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml --exclude-group hhvm,rabbitmq
+      vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml --exclude-group hhvm,gearman,rabbitmq
     fi
 
 after_script:
