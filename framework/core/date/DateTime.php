@@ -296,7 +296,7 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
     /**
      * @param string|int|\DateTime $datetime2
      * @param bool      $absolute
-     * @return bool|DateInterval
+     * @return bool|\DateInterval
      */
     public function diff($datetime2, $absolute = false)
     {
