@@ -313,9 +313,8 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
         $interval = new \rock\date\DateInterval($interval);
         $sign = $interval->invert;
         $days = $interval->days;
-        /**
-         * Seconds
-         */
+        
+        // calculate seconds
         $seconds = $days * 24 * 60 * 60;
         $seconds += $interval->h * 60 * 60;
         $seconds += $interval->i * 60;
