@@ -26,6 +26,8 @@ sudo make install
 cd ~
 yes | pecl install gearman
 
+sudo ldconfig
+
 cd ~
 # Run servers (workers)
 php tests/data/mq/gearman/simple_server.php &
