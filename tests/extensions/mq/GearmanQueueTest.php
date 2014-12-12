@@ -23,20 +23,18 @@ class GearmanQueueTest extends \PHPUnit_Framework_TestCase
         $gearman->blocking = true;
         $gearman->sendBackground('background');
 
-        //return message
-
-        //non blocking
-        $gearman->blocking = false;
-        $this->assertSame('I am server: test', $gearman->send('test'));
-
-        //blocking
-        $gearman->blocking = true;
-        $this->assertSame('I am server: test', $gearman->send('test'));
-
-        // unknown queueName
-        $gearman->id = 'demo';
-        $gearman->blocking = false;
-        $this->assertNull($gearman->send('test', 2));
+//        //non blocking
+//        $gearman->blocking = false;
+//        $this->assertSame('I am server: test', $gearman->send('test'));
+//
+//        //blocking
+//        $gearman->blocking = true;
+//        $this->assertSame('I am server: test', $gearman->send('test'));
+//
+//        // unknown queueName
+//        $gearman->id = 'demo';
+//        $gearman->blocking = false;
+//        $this->assertNull($gearman->send('test', 2));
     }
 }
  
