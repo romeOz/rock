@@ -27,11 +27,11 @@ class ZeroQueueTest extends \PHPUnit_Framework_TestCase
 
         //non blocking
         $zero->blocking = false;
-        $this->assertSame('I am server: test', $zero->send('test'));
+        $this->assertSame('I am server: test', $zero->send('test', 2));
 
         //blocking
         $zero->blocking = true;
-        $this->assertSame('I am server: test', $zero->send('test'));
+        $this->assertSame('I am server: test', $zero->send('test', 2));
     }
 
     public function testPubSub()

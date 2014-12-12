@@ -26,11 +26,11 @@ class RabbitQueueTest extends \PHPUnit_Framework_TestCase
         $rabbit = new RabbitQueue();
         $rabbit->id = 'simple';
         $rabbit->blocking = false;
-        $this->assertSame('Hi! I am server: test', $rabbit->send('test'));
+        $this->assertSame('Hi! I am server: test', $rabbit->send('test', 2));
 
         //blocking
         $rabbit->blocking = true;
-        $this->assertSame('Hi! I am server: block', $rabbit->send('block'));
+        $this->assertSame('Hi! I am server: block', $rabbit->send('block', 2));
 
         //return message
 
