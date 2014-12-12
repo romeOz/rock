@@ -17,14 +17,14 @@ cd gearmand-1.1.12
 ./configure
 make
 sudo make install
-
+cd -
 sudo ldconfig
-cd ~
+
 # Install pecl gearman
 yes | pecl install gearman
 #echo "extension=gearman.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 # Install gearman-server
 sudo apt-get install -y gearman-job-server
-cd ~
+
 # Run servers (workers)
 php tests/data/mq/gearman/simple_server.php &
