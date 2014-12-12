@@ -14,10 +14,10 @@ class GearmanQueueTest extends \PHPUnit_Framework_TestCase
 
     public function testSend()
     {
-//        //non blocking
-//        $gearman = new GearmanQueue();
-//        $gearman->blocking = false;
-//        $gearman->sendBackground('background');
+        //non blocking
+        $gearman = new GearmanQueue();
+        $gearman->blocking = false;
+        $gearman->sendBackground('background');
 
 //        //blocking
 //        $gearman->blocking = true;
