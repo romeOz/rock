@@ -5,7 +5,7 @@ if (php --version | grep -i HipHop > /dev/null); then
     exit 0
 fi
 
-cd -
+
 php tests/data/mq/rabbit/simple_server.php &
 php tests/data/mq/rabbit/pub_server.php &
 # Install RabbitMQ
