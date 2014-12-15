@@ -11,7 +11,7 @@ use rock\helpers\ObjectHelper;
  * ActiveRecord is the base class for classes representing relational data in terms of objects.
  *
  * Active Record implements the [Active Record design pattern](http://en.wikipedia.org/wiki/Active_record).
- * The premise behind Active Record is that an individual [[ActiveRecord]] object is associated with a specific
+ * The premise behind Active Record is that an individual {@see \rock\db\ActiveRecord} object is associated with a specific
  * row in a database table. The object's attributes are mapped to the columns of the corresponding table.
  * Referencing an Active Record attribute is equivalent to accessing the corresponding table column for that record.
  *
@@ -22,7 +22,7 @@ use rock\helpers\ObjectHelper;
  * In this example, Active Record is providing an object-oriented interface for accessing data stored in the database.
  * But Active Record provides much more functionality than this.
  *
- * To declare an ActiveRecord class you need to extend [[\rock\db\ActiveRecord]] and
+ * To declare an ActiveRecord class you need to extend {@see \rock\db\ActiveRecord} and
  * implement the `tableName` method:
  *
  * ```php
@@ -38,9 +38,6 @@ use rock\helpers\ObjectHelper;
  * ```
  *
  * The `tableName` method only has to return the name of the database table associated with the class.
- *
- * > Tip: You may also use the [Gii code generator][guide-gii] to generate ActiveRecord classes from your
- * > database tables.
  *
  * Class instances are obtained in one of two ways:
  *
@@ -61,28 +58,26 @@ use rock\helpers\ObjectHelper;
  * $orders = $user->orders;
  * ```
  *
- * For more details and usage information on ActiveRecord, see the [guide article on ActiveRecord][guide-active-record].
- *
- * @method ActiveQuery hasMany(string $class, array $link) see BaseActiveRecord::hasMany() for more info
- * @method ActiveQuery hasOne(string $class, array $link) see BaseActiveRecord::hasOne() for more info
+ * @method ActiveQuery hasMany(string $class, array $link) see {@see \rock\db\BaseActiveRecord::hasMany()} for more info
+ * @method ActiveQuery hasOne(string $class, array $link) see {@see \rock\db\BaseActiveRecord::BaseActiveRecord::hasOne()} for more info
  */
 class ActiveRecord extends BaseActiveRecord
 {
     /**
-     * The insert operation. This is mainly used when overriding [[transactions()]] to specify which operations are transactional.
+     * The insert operation. This is mainly used when overriding {@see \rock\db\ActiveRecord::transactions()} to specify which operations are transactional.
      */
     const OP_INSERT = 0x01;
     /**
-     * The update operation. This is mainly used when overriding [[transactions()]] to specify which operations are transactional.
+     * The update operation. This is mainly used when overriding {@see \rock\db\ActiveRecord::transactions()} to specify which operations are transactional.
      */
     const OP_UPDATE = 0x02;
     /**
-     * The delete operation. This is mainly used when overriding [[transactions()]] to specify which operations are transactional.
+     * The delete operation. This is mainly used when overriding {@see \rock\db\ActiveRecord::transactions()} to specify which operations are transactional.
      */
     const OP_DELETE = 0x04;
     /**
      * All three operations: insert, update, delete.
-     * This is a shortcut of the expression: OP_INSERT | OP_UPDATE | OP_DELETE.
+     * This is a shortcut of the expression: `OP_INSERT | OP_UPDATE | OP_DELETE`.
      */
     const OP_ALL = 0x07;
 
@@ -91,8 +86,19 @@ class ActiveRecord extends BaseActiveRecord
     /**
      * Loads default values from database table schema
      *
-     * @param boolean $skipIfSet if existing value should be preserved
-     * @return static model instance
+     * To enable loading defaults for every newly created record, you can add a call to this method to {@see \rock\base\ObjectInterface::init()}:
+     *
+     * ```php
+     * public function init()
+     * {
+     *     parent::init();
+     *     $this->loadDefaultValues();
+     * }
+     * ```
+     *
+     * @param boolean $skipIfSet whether existing value should be preserved.
+     * This will only set defaults for attributes that are `null`.
+     * @return static the model instance itself.
      */
     public function loadDefaultValues($skipIfSet = true)
     {
@@ -116,10 +122,10 @@ class ActiveRecord extends BaseActiveRecord
     }
 
     /**
-     * Creates an [[ActiveQuery]] instance with a given SQL statement.
+     * Creates an {@see \rock\db\ActiveQuery} instance with a given SQL statement.
      *
      * Note that because the SQL statement is already specified, calling additional
-     * query modification methods (such as `where()`, `order()`) on the created [[ActiveQuery]]
+     * query modification methods (such as `where()`, `order()`) on the created {@see \rock\db\ActiveQuery}
      * instance will have no effect. However, calling `with()`, `asArray()` or `indexBy()` is
      * still fine.
      *
@@ -131,7 +137,7 @@ class ActiveRecord extends BaseActiveRecord
      *
      * @param string $sql the SQL statement to be executed
      * @param array $params parameters to be bound to the SQL statement during execution.
-     * @return ActiveQuery the newly created [[ActiveQuery]] instance
+     * @return ActiveQuery the newly created {@see \rock\db\ActiveQuery} instance
      */
     public static function findBySql($sql, $params = [])
     {
@@ -143,13 +149,12 @@ class ActiveRecord extends BaseActiveRecord
 
     /**
      * Finds ActiveRecord instance(s) by the given condition.
-     * This method is internally called by @see ActiveRecord::findOne()
-     * and @see ActiveRecord::findAll() .
+     * This method is internally called by {@see \rock\db\ActiveRecord::findOne()}
+     * and {@see \rock\db\ActiveRecord::findAll()}.
      *
-     * @param mixed $condition please refer to @see ActiveRecord::findOne() for the explanation of this parameter
-     * @param boolean $one whether this method
-     *                     is called by @see ActiveRecord::findOne()
-     *                     or @see ActiveRecord::findAll()
+     * @param mixed $condition please refer to {@see \rock\db\ActiveRecord::findOne()} for the explanation of this parameter
+     * @param boolean $one whether this method is called by {@see \rock\db\ActiveRecord::findOne()}
+     *                     or {@see \rock\db\ActiveRecord::findAll()}
      * @return static|static[]
      * @throws Exception if there is no primary key defined
      * @internal
@@ -185,7 +190,7 @@ class ActiveRecord extends BaseActiveRecord
      *
      * @param array $attributes attribute values (name-value pairs) to be saved into the table
      * @param string|array $condition the conditions that will be put in the WHERE part of the UPDATE SQL.
-     * Please refer to @see Query::where() on how to specify this parameter.
+     * Please refer to {@see \rock\db\Query::where()} on how to specify this parameter.
      * @param array $params the parameters (name => value) to be bound to the query.
      * @return integer the number of rows updated
      */
@@ -208,7 +213,7 @@ class ActiveRecord extends BaseActiveRecord
      * @param array $counters the counters to be updated (attribute name => increment value).
      * Use negative values if you want to decrement the counters.
      * @param string|array $condition the conditions that will be put in the WHERE part of the UPDATE SQL.
-     * Please refer to @see Query::where() on how to specify this parameter.
+     * Please refer to {@see \rock\db\Query::where()} on how to specify this parameter.
      * @param array $params the parameters (name => value) to be bound to the query.
      * Do not name the parameters as `:bp0`, `:bp1`, etc., because they are used internally by this method.
      * @return integer the number of rows updated
@@ -237,7 +242,7 @@ class ActiveRecord extends BaseActiveRecord
      * ```
      *
      * @param string|array $condition the conditions that will be put in the WHERE part of the DELETE SQL.
-     * Please refer to @see Query::where() on how to specify this parameter.
+     * Please refer to {@see \rock\db\Query::where()} on how to specify this parameter.
      * @param array $params the parameters (name => value) to be bound to the query.
      * @return integer the number of rows deleted
      */
@@ -259,9 +264,9 @@ class ActiveRecord extends BaseActiveRecord
 
     /**
      * Declares the name of the database table associated with this AR class.
-     * By default this method returns the class name as the table name by calling @see Inflector::camel2id()
-     * with prefix @see Connection::tablePrefix .
-     * For example if @see Connection::tablePrefix is 'tbl_', 'Customer' becomes 'tbl_customer',
+     * By default this method returns the class name as the table name by calling {@see \rock\helpers\Inflector::camel2id()}
+     * with prefix {@see \rock\db\Connection::$tablePrefix}.
+     * For example if {@see \rock\db\Connection::$tablePrefix} is 'tbl_', 'Customer' becomes 'tbl_customer',
      * and 'OrderItem' becomes 'tbl_order_item'. You may override this method
      * if the table is not named after this convention.
      *
@@ -346,8 +351,8 @@ class ActiveRecord extends BaseActiveRecord
 
     /**
      * Declares which DB operations should be performed within a transaction in different scenarios.
-     * The supported DB operations are: @see ActiveRecord::OP_INSERT , @see ActiveRecord::OP_UPDATE and @see ActiveRecord::OP_DELETE ,
-     * which correspond to the @see ActiveRecord::insert() , @see ActiveRecord::update() and @see ActiveRecord::delete() methods, respectively.
+     * The supported DB operations are: {@see \rock\db\ActiveRecord::OP_INSERT} , {@see \rock\db\ActiveRecord::OP_UPDATE} and {@see \rock\db\ActiveRecord::OP_DELETE},
+     * which correspond to the {@see \rock\db\ActiveRecord::insert()}, {@see \rock\db\ActiveRecord::update()} and {@see \rock\db\ActiveRecord::delete()} methods, respectively.
      * By default, these methods are NOT enclosed in a DB transaction.
      *
      * In some scenarios, to ensure data consistency, you may want to enclose some or all of them
@@ -364,7 +369,7 @@ class ActiveRecord extends BaseActiveRecord
      * ];
      * ```
      *
-     * The above declaration specifies that in the "admin" scenario, the insert operation ([[insert()]])
+     * The above declaration specifies that in the "admin" scenario, the insert operation ({@see \rock\db\ActiveRecord::insert()})
      * should be done in a transaction; and in the "api" scenario, all the operations should be done
      * in a transaction.
      *
@@ -403,19 +408,19 @@ class ActiveRecord extends BaseActiveRecord
      *
      * This method performs the following steps in order:
      *
-     * 1. call @see ActiveRecord::beforeValidate() when `$runValidation` is true. If validation
+     * 1. call {@see \rock\base\Model::beforeValidate()} when `$runValidation` is true. If validation
      *    fails, it will skip the rest of the steps;
-     * 2. call @see ActiveRecord::afterValidate() when `$runValidation` is true.
-     * 3. call @see ActiveRecord::beforeSave() . If the method returns false, it will skip the
+     * 2. call {@see \rock\base\Model::afterValidate()} when `$runValidation` is true.
+     * 3. call {@see \rock\db\BaseActiveRecord::beforeSave()}. If the method returns false, it will skip the
      *    rest of the steps;
      * 4. insert the record into database. If this fails, it will skip the rest of the steps;
-     * 5. call @see ActiveRecord::afterSave() ;
+     * 5. call {@see \rock\db\BaseActiveRecord::afterSave()};
      *
-     * In the above step 1, 2, 3 and 5, events [[EVENT_BEFORE_VALIDATE]],
-     * [[EVENT_BEFORE_INSERT]], [[EVENT_AFTER_INSERT]] and [[EVENT_AFTER_VALIDATE]]
+     * In the above step 1, 2, 3 and 5, events {@see \rock\base\Model::EVENT_BEFORE_VALIDATE},
+     * {@see \rock\db\BaseActiveRecord::EVENT_BEFORE_INSERT}, {@see \rock\db\BaseActiveRecord::EVENT_AFTER_INSERT} and {@see \rock\base\Model::EVENT_AFTER_VALIDATE}
      * will be raised by the corresponding methods.
      *
-     * Only the [[dirtyAttributes|changed attribute values]] will be inserted into database.
+     * Only the {@see \rock\db\BaseActiveRecord::$dirtyAttributes}(changed attribute values) will be inserted into database.
      *
      * If the table's primary key is auto-incremental and is null during insertion,
      * it will be populated with the actual value after insertion.
@@ -509,19 +514,19 @@ class ActiveRecord extends BaseActiveRecord
      *
      * This method performs the following steps in order:
      *
-     * 1. call @see ActiveRecord::beforeValidate() when `$runValidation` is true. If validation
+     * 1. call {@see \rock\base\Model::beforeValidate()} when `$runValidation` is true. If validation
      *    fails, it will skip the rest of the steps;
-     * 2. call @see ActiveRecord::afterValidate() when `$runValidation` is true.
-     * 3. call @see ActiveRecord::beforeSave() . If the method returns false, it will skip the
+     * 2. call {@see \rock\base\Model::afterValidate()} when `$runValidation` is true.
+     * 3. call {@see \rock\db\BaseActiveRecord::beforeSave()}. If the method returns false, it will skip the
      *    rest of the steps;
      * 4. save the record into database. If this fails, it will skip the rest of the steps;
-     * 5. call @see ActiveRecord::afterSave() ;
+     * 5. call {@see \rock\db\BaseActiveRecord::afterSave()};
      *
-     * In the above step 1, 2, 3 and 5, events [[EVENT_BEFORE_VALIDATE]],
-     * [[EVENT_BEFORE_UPDATE]], [[EVENT_AFTER_UPDATE]] and [[EVENT_AFTER_VALIDATE]]
+     * In the above step 1, 2, 3 and 5, events {@see \rock\base\Model::EVENT_BEFORE_VALIDATE},
+     * {@see \rock\db\BaseActiveRecord::EVENT_BEFORE_UPDATE}, {@see \rock\db\BaseActiveRecord::EVENT_AFTER_UPDATE} and {@see \rock\base\Model::EVENT_AFTER_VALIDATE}
      * will be raised by the corresponding methods.
      *
-     * Only the [[dirtyAttributes|changed attribute values]] will be saved into database.
+     * Only the {@see \rock\db\BaseActiveRecord::$dirtyAttributes}(changed attribute values) will be saved into database.
      *
      * For example, to update a customer record:
      *
@@ -549,8 +554,8 @@ class ActiveRecord extends BaseActiveRecord
      * @param array $attributeNames list of attributes that need to be saved. Defaults to null,
      * meaning all attributes that are loaded from DB will be saved.
      * @return integer|boolean the number of rows affected, or false if validation fails
-     * or [[beforeSave()]] stops the updating process.
-     * @throws Exception if [[optimisticLock|optimistic locking]] is enabled and the data
+     * or {@see \rock\db\BaseActiveRecord::beforeSave()} stops the updating process.
+     * @throws Exception if {@see \rock\db\BaseActiveRecord::optimisticLock()}(optimistic locking) is enabled and the data
      * being updated is outdated.
      * @throws \Exception in case update failed.
      */
@@ -586,17 +591,17 @@ class ActiveRecord extends BaseActiveRecord
      *
      * This method performs the following steps in order:
      *
-     * 1. call [[beforeDelete()]]. If the method returns false, it will skip the
+     * 1. call {@see \rock\db\BaseActiveRecord::beforeDelete()}. If the method returns false, it will skip the
      *    rest of the steps;
      * 2. delete the record from the database;
-     * 3. call [[afterDelete()]].
+     * 3. call {@see \rock\db\BaseActiveRecord::afterDelete()}.
      *
-     * In the above step 1 and 3, events named [[EVENT_BEFORE_DELETE]] and [[EVENT_AFTER_DELETE]]
+     * In the above step 1 and 3, events named {@see \rock\db\BaseActiveRecord::EVENT_BEFORE_DELETE} and {@see \rock\db\BaseActiveRecord::EVENT_AFTER_DELETE}
      * will be raised by the corresponding methods.
      *
      * @return integer|boolean the number of rows deleted, or false if the deletion is unsuccessful for some reason.
      * Note that it is possible the number of rows deleted is 0, even though the deletion execution is successful.
-     * @throws Exception if [[optimisticLock|optimistic locking]] is enabled and the data
+     * @throws Exception if {@see \rock\db\BaseActiveRecord::optimisticLock()}(optimistic locking) is enabled and the data
      * being deleted is outdated.
      * @throws \Exception in case delete failed.
      */
@@ -654,7 +659,7 @@ class ActiveRecord extends BaseActiveRecord
     /**
      * Returns a value indicating whether the given active record is the same as the current one.
      * The comparison is made by comparing the table names and the primary key values of the two active records.
-     * If one of the records [[isNewRecord|is new]] they are also considered not equal.
+     * If one of the records {@see \rock\db\BaseActiveRecord::$isNewRecord}(is new) they are also considered not equal.
      * @param ActiveRecord $record record to compare to
      * @return boolean whether the two active records refer to the same row in the same database table.
      */
@@ -668,9 +673,9 @@ class ActiveRecord extends BaseActiveRecord
     }
 
     /**
-     * Returns a value indicating whether the specified operation is transactional in the current [[scenario]].
-     * @param integer $operation the operation to check. Possible values are [[OP_INSERT]], [[OP_UPDATE]] and [[OP_DELETE]].
-     * @return boolean whether the specified operation is transactional in the current [[scenario]].
+     * Returns a value indicating whether the specified operation is transactional in the current {@see \rock\base\Model::$scenario}.
+     * @param integer $operation the operation to check. Possible values are {@see \rock\db\ActiveRecord::OP_INSERT}, {@see \rock\db\ActiveRecord::OP_UPDATE} and {@see \rock\db\ActiveRecord::OP_DELETE}.
+     * @return boolean whether the specified operation is transactional in the current {@see \rock\base\Model::$scenario}.
      */
     public function isTransactional($operation)
     {

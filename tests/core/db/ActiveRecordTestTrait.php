@@ -12,7 +12,6 @@ use rock\db\Exception;
 use rock\db\SelectBuilder;
 use rock\event\Event;
 use rock\helpers\Trace;
-use rock\Rock;
 use rockunit\core\db\models\Customer;
 use rockunit\core\db\models\CustomerRules;
 use rockunit\core\db\models\Order;
@@ -818,6 +817,58 @@ trait ActiveRecordTestTrait
         $this->assertEquals(5, $itemClass::find()->count());
     }
 
+    public function testUnlinkAllAndConditionSetNull()
+    {
+        /* @var $this \PHPUnit_Framework_TestCase|ActiveRecordTestTrait */
+
+        /* @var $customerClass \rock\db\BaseActiveRecord */
+        $customerClass = $this->getCustomerClass();
+        /* @var $orderClass \rock\db\BaseActiveRecord */
+        $orderClass = $this->getOrderWithNullFKClass();
+
+        // in this test all orders are owned by customer 1
+        $orderClass::updateAll(['customer_id' => 1]);
+        $this->afterSave();
+
+        $customer = $customerClass::findOne(1);
+        $this->assertEquals(3, count($customer->ordersWithNullFK));
+        $this->assertEquals(1, count($customer->expensiveOrdersWithNullFK));
+        $this->assertEquals(3, $orderClass::find()->count());
+        $customer->unlinkAll('expensiveOrdersWithNullFK');
+        $this->assertEquals(3, count($customer->ordersWithNullFK));
+        $this->assertEquals(0, count($customer->expensiveOrdersWithNullFK));
+        $this->assertEquals(3, $orderClass::find()->count());
+        $customer = $customerClass::findOne(1);
+        $this->assertEquals(2, count($customer->ordersWithNullFK));
+        $this->assertEquals(0, count($customer->expensiveOrdersWithNullFK));
+    }
+
+    public function testUnlinkAllAndConditionDelete()
+    {
+        /* @var $this \PHPUnit_Framework_TestCase|ActiveRecordTestTrait */
+
+        /* @var $customerClass \rock\db\BaseActiveRecord */
+        $customerClass = $this->getCustomerClass();
+        /* @var $orderClass \rock\db\BaseActiveRecord */
+        $orderClass = $this->getOrderClass();
+
+        // in this test all orders are owned by customer 1
+        $orderClass::updateAll(['customer_id' => 1]);
+        $this->afterSave();
+
+        $customer = $customerClass::findOne(1);
+        $this->assertEquals(3, count($customer->orders));
+        $this->assertEquals(1, count($customer->expensiveOrders));
+        $this->assertEquals(3, $orderClass::find()->count());
+        $customer->unlinkAll('expensiveOrders', true);
+        $this->assertEquals(3, count($customer->orders));
+        $this->assertEquals(0, count($customer->expensiveOrders));
+        $this->assertEquals(2, $orderClass::find()->count());
+        $customer = $customerClass::findOne(1);
+        $this->assertEquals(2, count($customer->orders));
+        $this->assertEquals(0, count($customer->expensiveOrders));
+    }
+
     public static $afterSaveNewRecord;
     public static $afterSaveInsert;
 
@@ -1145,6 +1196,51 @@ trait ActiveRecordTestTrait
         $this->expectOutputString('1success');
 
         unset($_POST['_method']);
+    }
+
+
+    public function testFindEmptyInCondition()
+    {
+        /* @var $customerClass \rock\db\ActiveRecordInterface */
+        $customerClass = $this->getCustomerClass();
+        /* @var $this \PHPUnit_Framework_TestCase|ActiveRecordTestTrait */
+
+        $customers = $customerClass::find()->where(['id' => [1]])->all();
+        $this->assertEquals(1, count($customers));
+
+        $customers = $customerClass::find()->where(['id' => []])->all();
+        $this->assertEquals(0, count($customers));
+
+        $customers = $customerClass::find()->where(['IN', 'id', [1]])->all();
+        $this->assertEquals(1, count($customers));
+
+        $customers = $customerClass::find()->where(['IN', 'id', []])->all();
+        $this->assertEquals(0, count($customers));
+    }
+
+    public function testFindEagerIndexBy()
+    {
+        /* @var $this \PHPUnit_Framework_TestCase|ActiveRecordTestTrait */
+
+        /* @var $orderClass \rock\db\ActiveRecordInterface */
+        $orderClass = $this->getOrderClass();
+
+        /* @var $order Order */
+        $order = $orderClass::find()->with('itemsIndexed')->where(['id' => 1])->one();
+        $this->assertTrue($order->isRelationPopulated('itemsIndexed'));
+        $items = $order->itemsIndexed;
+        $this->assertEquals(2, count($items));
+        $this->assertTrue(isset($items[1]));
+        $this->assertTrue(isset($items[2]));
+
+        /* @var $order Order */
+        $order = $orderClass::find()->with('itemsIndexed')->where(['id' => 2])->one();
+        $this->assertTrue($order->isRelationPopulated('itemsIndexed'));
+        $items = $order->itemsIndexed;
+        $this->assertEquals(3, count($items));
+        $this->assertTrue(isset($items[3]));
+        $this->assertTrue(isset($items[4]));
+        $this->assertTrue(isset($items[5]));
     }
 
     public function testCache()

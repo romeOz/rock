@@ -32,6 +32,7 @@ class Expression
      */
     public $params = [];
 
+
     /**
      * Constructor.
      * @param string $expression the DB expression

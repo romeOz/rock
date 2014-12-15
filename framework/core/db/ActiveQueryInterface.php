@@ -9,20 +9,20 @@ namespace rock\db;
  * in which the query represents a relation between two active record classes and will return related
  * records only.
  *
- * A class implementing this interface should also use [[ActiveQueryTrait]] and [[ActiveRelationTrait]].
+ * A class implementing this interface should also use {@see \rock\db\ActiveQueryTrait} and {@see \rock\db\ActiveRelationTrait}.
  *
  */
 interface ActiveQueryInterface extends QueryInterface
 {
     /**
-     * Sets the [[asArray]] property.
+     * Sets the {@see \rock\db\ActiveQueryTrait::$asArray} property.
      * @param boolean $value whether to return the query results in terms of arrays instead of Active Records.
      * @return static the query object itself
      */
     public function asArray($value = true);
 
     /**
-     * Sets the [[indexBy]] property.
+     * Sets the {@see \rock\db\QueryTrait::$indexBy} property.
      * @param string|callable $column the name of the column by which the query results should be indexed by.
      * This can also be a callable (e.g. anonymous function) that returns the index value based on the given
      * row or model data. The signature of the callable should be:
@@ -46,14 +46,14 @@ interface ActiveQueryInterface extends QueryInterface
      * The parameters to this method can be either one or multiple strings, or a single array
      * of relation names and the optional callbacks to customize the relations.
      *
-     * A relation name can refer to a relation defined in [[ActiveQueryTrait::modelClass|modelClass]]
+     * A relation name can refer to a relation defined in {@see \rock\db\ActiveQueryTrait::$modelClass}
      * or a sub-relation that stands for a relation of a related record.
      * For example, `orders.address` means the `address` relation defined
      * in the model class corresponding to the `orders` relation.
      *
      * The followings are some usage examples:
      *
-     * ~~~
+     * ```php
      * // find customers together with their orders and country
      * Customer::find()->with('orders', 'country')->all();
      * // find customers together with their orders and the orders' shipping address
@@ -65,7 +65,7 @@ interface ActiveQueryInterface extends QueryInterface
      *     },
      *     'country',
      * ])->all();
-     * ~~~
+     * ```
      *
      * @return static the query object itself
      */
@@ -73,15 +73,18 @@ interface ActiveQueryInterface extends QueryInterface
 
     /**
      * Specifies the relation associated with the pivot table for use in relational query.
-     * @param string $relationName the relation name. This refers to a relation declared in the [[ActiveRelationTrait::primaryModel|primaryModel]] of the relation.
+     *
+     * @param string $relationName the relation name. This refers to a relation declared in
+     *                             the {@see \rock\db\ActiveRelationTrait::$primaryModel} of the relation.
      * @param callable $callable a PHP callback for customizing the relation associated with the pivot table.
      * Its signature should be `function($query)`, where `$query` is the query to be customized.
      * @return static the relation object itself.
      */
-    public function via($relationName, \Closure $callable = null);
+    public function via($relationName, callable $callable = null);
 
     /**
      * Finds the related records for the specified primary record.
+     *
      * This method is invoked when a relation of an ActiveRecord is being accessed in a lazy fashion.
      * @param string $name the relation name
      * @param ActiveRecordInterface $model the primary model

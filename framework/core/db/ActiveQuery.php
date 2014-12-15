@@ -25,14 +25,14 @@ namespace rock\db;
  * - {@see \rock\db\ActiveQuery::column()}: returns the value of the first column in the query result.
  * - {@see \rock\db\ActiveQuery::exists()}: returns a value indicating whether the query result has data or not.
  *
- * Because ActiveQuery extends from [[Query]], one can use query methods, such as [[where()]],
- * [[orderBy()]] to customize the query options.
+ * Because ActiveQuery extends from {@see \rock\db\Query}, one can use query methods, such as {@see \rock\db\Query::where()},
+ * {@see \rock\db\Query::orderBy()} to customize the query options.
  *
  * ActiveQuery also provides the following additional query options:
  *
- * - [[with()]]: list of relations that this query should be performed with.
- * - [[indexBy()]]: the name of the column by which the query result should be indexed.
- * - [[asArray()]]: whether to return each record as an array.
+ * - {@see \rock\db\ActiveQuery::with()}: list of relations that this query should be performed with.
+ * - {@see \rock\db\ActiveQuery::indexBy()}: the name of the column by which the query result should be indexed.
+ * - {@see \rock\db\ActiveQuery::asArray()}: whether to return each record as an array.
  *
  * These options can be configured using methods of the same name. For example:
  *
@@ -45,16 +45,16 @@ namespace rock\db;
  *
  * In relational context ActiveQuery represents a relation between two Active Record classes.
  *
- * Relational ActiveQuery instances are usually created by calling [[ActiveRecord::hasOne()]] and
- * [[ActiveRecord::hasMany()]]. An Active Record class declares a relation by defining
+ * Relational ActiveQuery instances are usually created by calling {@see \rock\db\ActiveRecord::hasOne()} and
+ * {@see \rock\db\ActiveRecord::hasMany()}. An Active Record class declares a relation by defining
  * a getter method which calls one of the above methods and returns the created ActiveQuery object.
  *
- * A relation is specified by [[link]] which represents the association between columns
- * of different tables; and the multiplicity of the relation is indicated by [[multiple]].
+ * A relation is specified by {@see \rock\db\ActiveRelationTrait::$link} which represents the association between columns
+ * of different tables; and the multiplicity of the relation is indicated by {@see \rock\db\ActiveRelationTrait::$multiple}.
  *
- * If a relation involves a pivot table, it may be specified by [[via()]] or [[viaTable()]] method.
- * These methods may only be called in a relational context. Same is true for [[inverseOf()]], which
- * marks a relation as inverse of another relation and [[onCondition()]] which adds a condition that
+ * If a relation involves a pivot table, it may be specified by {@see \rock\db\ActiveRelationTrait::via()} or {@see \rock\db\ActiveRecord::viaTable()} method.
+ * These methods may only be called in a relational context. Same is true for {@see \rock\db\ActiveRelationTrait::inverseOf()}, which
+ * marks a relation as inverse of another relation and {@see \rock\db\ActiveQuery::onCondition()} which adds a condition that
  * is to be added to relational query join condition.
  */
 class ActiveQuery extends Query implements ActiveQueryInterface
@@ -63,15 +63,20 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     use ActiveRelationTrait;
 
     /**
+     * @event Event an event that is triggered when the query is initialized via {@see \rock\base\ObjectInterface::init()}.
+     */
+    const EVENT_INIT = 'init';
+
+    /**
      * @var string the SQL statement to be executed for retrieving AR records.
-     * This is set by [[ActiveRecord::findBySql()]].
+     * This is set by {@see \rock\db\ActiveRecord::findBySql()}.
      */
     public $sql;
     /**
      * @var string|array the join condition to be used when this query is used in a relational context.
-     * The condition will be used in the ON part when [[ActiveQuery::joinWith()]] is called.
+     * The condition will be used in the ON part when {@see \rock\db\ActiveQuery::joinWith()} is called.
      * Otherwise, the condition will be used in the WHERE part of a query.
-     * Please refer to [[Query::where()]] on how to specify this parameter.
+     * Please refer to {@see \rock\db\Query::where()} on how to specify this parameter.
      * @see onCondition()
      */
     public $on;
@@ -93,10 +98,21 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     }
 
     /**
+     * Initializes the object.
+     * This method is called at the end of the constructor. The default implementation will trigger
+     * an {@see \rock\db\ActiveQuery::EVENT_INIT} event. If you override this method, make sure you call the parent implementation at the end
+     * to ensure triggering of the event.
+     */
+    public function init()
+    {
+        $this->trigger(self::EVENT_INIT);
+    }
+
+    /**
      * Executes query and returns all results as an array.
      *
      * @param Connection $connection the DB connection used to create the DB command.
-     * If null, the DB connection returned by [[modelClass]] will be used.
+     * If null, the DB connection returned by {@see \rock\db\ActiveQueryTrait::modleClass()} will be used.
      * @param boolean       $subAttributes
      * @return array|ActiveRecord[] the query results. If the query results in nothing, an empty array will be returned.
      */
@@ -114,8 +130,12 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     /**
      * @inheritdoc
      */
-    public function prepareBuild($builder)
+    public function prepare($builder)
     {
+        // NOTE: because the same ActiveQuery may be used to build different SQL statements
+        // (e.g. by ActiveDataProvider, one for count query, the other for row data query,
+        // it is important to make sure the same ActiveQuery can be used to build SQL statements
+        // multiple times.
         if (!empty($this->joinWith)) {
             $this->buildJoinWith();
             $this->joinWith = null;    // clean it up to avoid issue https://github.com/yiisoft/yii2/issues/2687
@@ -129,7 +149,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
         }
 
         if (empty($this->select) && !empty($this->join)) {
-            foreach ((array)$this->from as $alias => $table) {
+            foreach ((array) $this->from as $alias => $table) {
                 if (is_string($alias)) {
                     $this->select = ["$alias.*"];
                 } elseif (is_string($table)) {
@@ -143,6 +163,44 @@ class ActiveQuery extends Query implements ActiveQueryInterface
                 break;
             }
         }
+
+        if ($this->primaryModel === null) {
+            // eager loading
+            $query = Query::create($this);
+        } else {
+            // lazy loading of a relation
+            $where = $this->where;
+
+            if ($this->via instanceof self) {
+                // via junction table
+                $viaModels = $this->via->findPivotRows([$this->primaryModel]);
+                $this->filterByModels($viaModels);
+            } elseif (is_array($this->via)) {
+                // via relation
+                /* @var $viaQuery ActiveQuery */
+                list($viaName, $viaQuery) = $this->via;
+                if ($viaQuery->multiple) {
+                    $viaModels = $viaQuery->all();
+                    $this->primaryModel->populateRelation($viaName, $viaModels);
+                } else {
+                    $model = $viaQuery->one();
+                    $this->primaryModel->populateRelation($viaName, $model);
+                    $viaModels = $model === null ? [] : [$model];
+                }
+                $this->filterByModels($viaModels);
+            } else {
+                $this->filterByModels([$this->primaryModel]);
+            }
+
+            $query = Query::create($this);
+            $this->where = $where;
+        }
+
+        if (!empty($this->on)) {
+            $query->andWhere($this->on);
+        }
+
+        return $query;
     }
 
     /**
@@ -153,6 +211,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
         if (empty($rows)) {
             return [];
         }
+
         $models = $this->createModels($rows);
         if (!empty($this->join) && $this->indexBy === null) {
             $models = $this->removeDuplicatedModels($models);
@@ -164,13 +223,12 @@ class ActiveQuery extends Query implements ActiveQueryInterface
             }
             $this->findWith($this->with, $models);
         }
+        //$this->afterFind($models);
         if (!$this->asArray) {
-            $this->afterFind($models);
             foreach ($models as $model) {
                 $model->afterFind();
             }
         } else {
-            $this->afterFind($models);
             /** @var ActiveRecord $class */
             $class = $this->modelClass;
             /** @var ActiveRecord $activeRecord */
@@ -182,6 +240,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
 
     /**
      * Removes duplicated models by checking their primary key values.
+     *
      * This method is mainly called when a join query is performed, which may cause duplicated rows being returned.
      * @param array $models the models to be checked
      * @return array the distinctive models
@@ -233,11 +292,11 @@ class ActiveQuery extends Query implements ActiveQueryInterface
      * Executes query and returns a single row of result.
      *
      * @param Connection $connection the DB connection used to create the DB command.
-     * If null, the DB connection returned by [[modelClass]] will be used.
+     * If null, the DB connection returned by {@see \rock\db\ActiveQueryTrait::modleClass()} will be used.
      * @param bool       $subAttributes
-     * @return ActiveRecord|array|null a single row of query result. Depending on the setting of [[asArray]],
-     *                       the query result may be either an array or an ActiveRecord object. Null will be returned
-     *                       if the query results in nothing.
+     * @return ActiveRecord|array|null a single row of query result. Depending on the setting
+     * of {@see \rock\db\ActiveQueryTrait::$asArray},the query result may be either an array or an ActiveRecord object. Null will be returned
+     * if the query results in nothing.
      */
     public function one($connection = null, $subAttributes = false)
     {
@@ -245,32 +304,16 @@ class ActiveQuery extends Query implements ActiveQueryInterface
         $class = $this->modelClass;
         /** @var ActiveRecord $activeRecord */
         $model  = $activeRecord = $class::instantiate([]);
-        if (!$this->beforeFind()) {
-            return null;
-        }
+//        if (!$this->beforeFind()) {
+//            return null;
+//        }
         if (!$model->beforeFind()) {
             return null;
         }
-        $row = $this->createCommand($connection)->queryOne(null, $subAttributes);
+        $row = parent::one($connection, $subAttributes);
         if ($row !== false) {
-
-            if ($this->asArray) {
-                $model = $this->typeCast($row, $connection);
-            }else {
-                $class::populateRecord($model, $row, $connection);
-            }
-            if (!empty($this->with)) {
-                $models = [$model];
-                if (isset($this->queryBuild->entities)) {
-                    $this->queryBuild->entities = [];
-                }
-                $this->findWith($this->with, $models);
-                $model = $models[0];
-            }
-
-            $this->afterFind($model);
-            $activeRecord->afterFind($model);
-            return $model;
+            $models = $this->prepareResult([$row], $connection);
+            return reset($models) ?: null;
         } else {
             return null;
         }
@@ -280,27 +323,31 @@ class ActiveQuery extends Query implements ActiveQueryInterface
      * Creates a DB command that can be used to execute this query.
      *
      * @param Connection $connection the DB connection used to create the DB command.
-     * If null, the DB connection returned by [[modelClass]] will be used.
+     * If null, the DB connection returned by {@see \rock\db\ActiveQueryTrait::modleClass()} will be used.
      * @return Command the created DB command instance.
      */
     public function createCommand($connection = null)
     {
-        if ($this->primaryModel === null) {
-            // not a relational context or eager loading
-            if (!empty($this->on)) {
-                $where = $this->where;
-                $this->andWhere($this->on);
-                $command = $this->createCommandInternal($connection);
-                $this->where = $where;
-
-                return $command;
-            } else {
-                return $this->createCommandInternal($connection);
-            }
-        } else {
-            // lazy loading of a relation
-            return $this->createRelationalCommand($connection);
+        if ($connection instanceof Connection) {
+            $this->setConnection($connection);
         }
+        $connection = $this->getConnection();
+
+        $entities = [];
+        if ($this->sql === null) {
+            $build =  $connection->getQueryBuilder();
+            $result = $build->build($this);
+            $entities = $build->entities;
+            $this->queryBuild = $build;
+            list ($sql, $params) = $result;
+        } else {
+            $sql = $this->sql;
+            $params = $this->params;
+        }
+        $command = $connection->createCommand($sql, $params);
+        $command->entities = $entities;
+
+        return $command;
     }
 
     /**
@@ -324,7 +371,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
      * Creates a DB command that can be used to execute this query.
      *
      * @param Connection|null $connection the DB connection used to create the DB command.
-     * If null, the DB connection returned by [[modelClass]] will be used.
+     * If null, the DB connection returned by {@see \rock\db\ActiveQueryTrait::modleClass()} will be used.
      * @return Command the created DB command instance.
      */
     protected function createCommandInternal($connection)
@@ -401,17 +448,17 @@ class ActiveQuery extends Query implements ActiveQueryInterface
      * JOIN statements to the current query.
      *
      * If the `$eagerLoading` parameter is true, the method will also eager loading the specified relations,
-     * which is equivalent to calling [[with()]] using the specified relations.
+     * which is equivalent to calling {@see \rock\db\ActiveQueryTrait::with()} using the specified relations.
      *
      * Note that because a JOIN query will be performed, you are responsible to disambiguate column names.
      *
-     * This method differs from [[with()]] in that it will build up and execute a JOIN SQL statement
-     * for the primary table. And when `$eagerLoading` is true, it will call [[with()]] in addition with the specified relations.
+     * This method differs from {@see \rock\db\ActiveQueryTrait::with()} in that it will build up and execute a JOIN SQL statement
+     * for the primary table. And when `$eagerLoading` is true, it will call {@see \rock\db\ActiveQueryTrait::with()} in addition with the specified relations.
      *
      * @param array $with the relations to be joined. Each array element represents a single relation.
      * The array keys are relation names, and the array values are the corresponding anonymous functions that
      * can be used to modify the relation queries on-the-fly. If a relation query does not need modification,
-     * you may use the relation name as the array value. Sub-relations can also be specified (see [[with()]]).
+     * you may use the relation name as the array value. Sub-relations can also be specified (see {@see \rock\db\ActiveQueryTrait::with()}).
      * For example,
      *
      * ```php
@@ -483,8 +530,8 @@ class ActiveQuery extends Query implements ActiveQueryInterface
 
     /**
      * Inner joins with the specified relations.
-     * This is a shortcut method to [[joinWith()]] with the join type set as "INNER JOIN".
-     * Please refer to [[joinWith()]] for detailed usage of this method.
+     * This is a shortcut method to {@see \rock\db\ActiveQuery::joinWith()} with the join type set as "INNER JOIN".
+     * Please refer to {@see \rock\db\ActiveQuery::joinWith()} for detailed usage of this method.
      * @param array $with the relations to be joined with
      * @param boolean|array $eagerLoading whether to eager loading the relations
      * @return static the query object itself
@@ -536,6 +583,9 @@ class ActiveQuery extends Query implements ActiveQueryInterface
                 if ($callback !== null) {
                     call_user_func($callback, $relation);
                 }
+                if (!empty($relation->joinWith)) {
+                    $relation->buildJoinWith();
+                }
                 $this->joinWithRelation($parent, $relation, $this->getJoinType($joinType, $fullName));
             }
         }
@@ -557,7 +607,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     }
 
     /**
-     * Returns the table name and the table alias for [[modelClass]].
+     * Returns the table name and the table alias for {@see \rock\db\ActiveQueryTrait::modleClass()}.
      * @param ActiveQuery $query
      * @return array the table name and the table alias.
      */
@@ -602,13 +652,11 @@ class ActiveQuery extends Query implements ActiveQueryInterface
             // via table
             $this->joinWithRelation($parent, $via, $joinType);
             $this->joinWithRelation($via, $child, $joinType);
-
             return;
         } elseif (is_array($via)) {
             // via relation
             $this->joinWithRelation($parent, $via[1], $joinType);
             $this->joinWithRelation($via[1], $child, $joinType);
-
             return;
         }
 
@@ -666,10 +714,10 @@ class ActiveQuery extends Query implements ActiveQueryInterface
 
     /**
      * Sets the ON condition for a relational query.
-     * The condition will be used in the ON part when [[ActiveQuery::joinWith()]] is called.
+     * The condition will be used in the ON part when {@see \rock\db\ActiveQuery::joinWith()} is called.
      * Otherwise, the condition will be used in the WHERE part of a query.
      *
-     * Use this method to specify additional conditions when declaring a relation in the [[ActiveRecord]] class:
+     * Use this method to specify additional conditions when declaring a relation in the {@see \rock\db\ActiveRecord} class:
      *
      * ```php
      * public function getActiveUsers()
@@ -678,7 +726,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
      * }
      * ```
      *
-     * @param string|array $condition the ON condition. Please refer to [[Query::where()]] on how to specify this parameter.
+     * @param string|array $condition the ON condition. Please refer to {@see \rock\db\Query::where()} on how to specify this parameter.
      * @param array $params the parameters (name => value) to be bound to the query.
      * @return static the query object itself
      */
@@ -692,7 +740,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     /**
      * Adds an additional ON condition to the existing one.
      * The new condition and the existing one will be joined using the 'AND' operator.
-     * @param string|array $condition the new ON condition. Please refer to [[where()]]
+     * @param string|array $condition the new ON condition. Please refer to {@see \rock\db\Query::where()}
      * on how to specify this parameter.
      * @param array $params the parameters (name => value) to be bound to the query.
      * @return static the query object itself
@@ -713,7 +761,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     /**
      * Adds an additional ON condition to the existing one.
      * The new condition and the existing one will be joined using the 'OR' operator.
-     * @param string|array $condition the new ON condition. Please refer to [[where()]]
+     * @param string|array $condition the new ON condition. Please refer to {@see \rock\db\Query::where()}
      * on how to specify this parameter.
      * @param array $params the parameters (name => value) to be bound to the query.
      * @return static the query object itself
@@ -734,7 +782,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     /**
      * Specifies the pivot table for a relational query.
      *
-     * Use this method to specify a pivot table when declaring a relation in the [[ActiveRecord]] class:
+     * Use this method to specify a pivot table when declaring a relation in the {@see \rock\db\ActiveRecord} class:
      *
      * ```php
      * public function getItems()
@@ -745,9 +793,9 @@ class ActiveQuery extends Query implements ActiveQueryInterface
      * ```
      *
      * @param string $tableName the name of the pivot table.
-     * @param array $link the link between the pivot table and the table associated with [[primaryModel]].
+     * @param array $link the link between the pivot table and the table associated with {@see \rock\db\ActiveRelationTrait::$primaryModel}.
      * The keys of the array represent the columns in the pivot table, and the values represent the columns
-     * in the [[primaryModel]] table.
+     * in the {@see \rock\db\ActiveRelationTrait::$primaryModel} table.
      * @param callable $callable a PHP callback for customizing the relation associated with the pivot table.
      * Its signature should be `function($query)`, where `$query` is the query to be customized.
      * @return static
@@ -771,6 +819,4 @@ class ActiveQuery extends Query implements ActiveQueryInterface
 
         return $this;
     }
-
-
 }

@@ -6,15 +6,11 @@ use rock\base\ComponentsInterface;
 /**
  * The QueryInterface defines the minimum set of methods to be implemented by a database query.
  *
- * The default implementation of this interface is provided by [[QueryTrait]].
+ * The default implementation of this interface is provided by {@see \rock\db\QueryTrait}.
  *
- * It has support for getting [[one]] instance or [[all]].
- * Allows pagination via [[limit]] and [[offset]].
- * Sorting is supported via [[orderBy]] and items can be limited to match some conditions using [[where]].
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @author Carsten Brandt <mail@cebe.cc>
- * @since 2.0
+ * It has support for getting {@see \rock\db\QueryInterface::one()} instance or {@see \rock\db\QueryInterface::all()}.
+ * Allows pagination via {@see \rock\db\QueryInterface::limit()} and {@see \rock\db\QueryInterface::offset()}.
+ * Sorting is supported via {@see \rock\db\QueryInterface::orderBy()} and items can be limited to match some conditions using {@see \rock\db\QueryInterface::where()}.
  */
 interface QueryInterface extends ComponentsInterface
 {
@@ -99,7 +95,7 @@ interface QueryInterface extends ComponentsInterface
     public function column($connection = null);
 
     /**
-     * Sets the [[indexBy]] property.
+     * Sets the {@see \rock\db\QueryTrait::$indexBy} property.
      * @param string|callable $column the name of the column by which the query results should be indexed by.
      * This can also be a callable (e.g. anonymous function) that returns the index value based on the given
      * row data. The signature of the callable should be:
@@ -118,16 +114,14 @@ interface QueryInterface extends ComponentsInterface
     /**
      * Sets the WHERE part of the query.
      *
-     * The method requires a $condition parameter.
-     *
-     * The $condition parameter should be an array in one of the following two formats:
+     * The `$condition` specified as an array can be in one of the following two formats:
      *
      * - hash format: `['column1' => value1, 'column2' => value2, ...]`
      * - operator format: `[operator, operand1, operand2, ...]`
      *
      * A condition in hash format represents the following SQL expression in general:
      * `column1=value1 AND column2=value2 AND ...`. In case when a value is an array,
-     * an `IN` expression will be generated. And if a value is null, `IS NULL` will be used
+     * an `IN` expression will be generated. And if a value is `null`, `IS NULL` will be used
      * in the generated expression. Below are some examples:
      *
      * - `['type' => 1, 'status' => 2]` generates `(type = 1) AND (status = 2)`.
@@ -137,29 +131,39 @@ interface QueryInterface extends ComponentsInterface
      * A condition in operator format generates the SQL expression according to the specified operator, which
      * can be one of the followings:
      *
-     * - `and`: the operands should be concatenated together using `AND`. For example,
+     * - **and**: the operands should be concatenated together using `AND`. For example,
      *   `['and', 'id=1', 'id=2']` will generate `id=1 AND id=2`. If an operand is an array,
      *   it will be converted into a string using the rules described here. For example,
      *   `['and', 'type=1', ['or', 'id=1', 'id=2']]` will generate `type=1 AND (id=1 OR id=2)`.
-     *   The method will NOT do any quoting or escaping.
+     *   The method will *not* do any quoting or escaping.
      *
-     * - `or`: similar to the `and` operator except that the operands are concatenated using `OR`.
+     * - **or**: similar to the `and` operator except that the operands are concatenated using `OR`. For example,
+     *   `['or', ['type' => [7, 8, 9]], ['id' => [1, 2, 3]]` will generate `(type IN (7, 8, 9) OR (id IN (1, 2, 3)))`.
      *
-     * - `between`: operand 1 should be the column name, and operand 2 and 3 should be the
+     * - **not**: this will take only one operand and build the negation of it by prefixing the query string with `NOT`.
+     *   For example `['not', ['attribute' => null]]` will result in the condition `NOT (attribute IS NULL)`.
+     *
+     * - **between**: operand 1 should be the column name, and operand 2 and 3 should be the
      *   starting and ending values of the range that the column is in.
      *   For example, `['between', 'id', 1, 10]` will generate `id BETWEEN 1 AND 10`.
      *
-     * - `not between`: similar to `between` except the `BETWEEN` is replaced with `NOT BETWEEN`
+     * - **not between**: similar to `between` except the `BETWEEN` is replaced with `NOT BETWEEN`
      *   in the generated condition.
      *
-     * - `in`: operand 1 should be a column or DB expression, and operand 2 be an array representing
+     * - **in**: operand 1 should be a column or DB expression, and operand 2 be an array representing
      *   the range of the values that the column or DB expression should be in. For example,
      *   `['in', 'id', [1, 2, 3]]` will generate `id IN (1, 2, 3)`.
      *   The method will properly quote the column name and escape values in the range.
      *
-     * - `not in`: similar to the `in` operator except that `IN` is replaced with `NOT IN` in the generated condition.
+     *   To create a composite `IN` condition you can use and array for the column name and value, where the values are indexed by the column name:
+     *   `['in', ['id', 'name'], [['id' => 1, 'name' => 'foo'], ['id' => 2, 'name' => 'bar']] ]`.
      *
-     * - `like`: operand 1 should be a column or DB expression, and operand 2 be a string or an array representing
+     *   You may also specify a sub-query that is used to get the values for the `IN`-condition:
+     *   `['in', 'user_id', (new Query())->select('id')->from('users')->where(['active' => 1])]`
+     *
+     * - **not in**: similar to the `in` operator except that `IN` is replaced with `NOT IN` in the generated condition.
+     *
+     * - **like**: operand 1 should be a column or DB expression, and operand 2 be a string or an array representing
      *   the values that the column or DB expression should be like.
      *   For example, `['like', 'name', 'tester']` will generate `name LIKE '%tester%'`.
      *   When the value range is given as an array, multiple `LIKE` predicates will be generated and concatenated
@@ -169,14 +173,23 @@ interface QueryInterface extends ComponentsInterface
      *   Sometimes, you may want to add the percentage characters to the matching value by yourself, you may supply
      *   a third operand `false` to do so. For example, `['like', 'name', '%tester', false]` will generate `name LIKE '%tester'`.
      *
-     * - `or like`: similar to the `like` operator except that `OR` is used to concatenate the `LIKE`
+     * - **or like**: similar to the `like` operator except that `OR` is used to concatenate the `LIKE`
      *   predicates when operand 2 is an array.
      *
-     * - `not like`: similar to the `like` operator except that `LIKE` is replaced with `NOT LIKE`
+     * - **not like**: similar to the `like` operator except that `LIKE` is replaced with `NOT LIKE`
      *   in the generated condition.
      *
-     * - `or not like`: similar to the `not like` operator except that `OR` is used to concatenate
+     * - **or not like**: similar to the `not like` operator except that `OR` is used to concatenate
      *   the `NOT LIKE` predicates.
+     *
+     * - **exists**: operand 1 is a query object that used to build an `EXISTS` condition. For example
+     *   `['exists', (new Query())->select('id')->from('users')->where(['active' => 1])]` will result in the following SQL expression:
+     *   `EXISTS (SELECT "id" FROM "users" WHERE "active"=1)`.
+     *
+     * - **not exists**: similar to the `exists` operator except that `EXISTS` is replaced with `NOT EXISTS` in the generated condition.
+     *
+     * - Additionally you can specify arbitrary operators as follows: A condition of `['>=', 'id', 10]` will result in the
+     *   following SQL expression: `id >= 10`.
      *
      * @param string|array $condition the conditions that should be put in the WHERE part.
      * @return static the query object itself
@@ -187,8 +200,9 @@ interface QueryInterface extends ComponentsInterface
 
     /**
      * Adds an additional WHERE condition to the existing one.
+     * 
      * The new condition and the existing one will be joined using the 'AND' operator.
-     * @param string|array $condition the new WHERE condition. Please refer to [[where()]]
+     * @param string|array $condition the new WHERE condition. Please refer to {@see \rock\db\QueryInterface::where()}
      * on how to specify this parameter.
      * @return static the query object itself
      * @see where()
@@ -198,8 +212,9 @@ interface QueryInterface extends ComponentsInterface
 
     /**
      * Adds an additional WHERE condition to the existing one.
+     * 
      * The new condition and the existing one will be joined using the 'OR' operator.
-     * @param string|array $condition the new WHERE condition. Please refer to [[where()]]
+     * @param string|array $condition the new WHERE condition. Please refer to {@see \rock\db\QueryInterface::where()}
      * on how to specify this parameter.
      * @return static the query object itself
      * @see where()
@@ -210,7 +225,7 @@ interface QueryInterface extends ComponentsInterface
     /**
      * Sets the WHERE part of the query ignoring empty parameters.
      *
-     * @param array $condition the conditions that should be put in the WHERE part. Please refer to [[where()]]
+     * @param array $condition the conditions that should be put in the WHERE part. Please refer to {@see \rock\db\QueryInterface::where()}
      * on how to specify this parameter.
      * @return static the query object itself
      * @see andFilterWhere()
@@ -220,8 +235,9 @@ interface QueryInterface extends ComponentsInterface
 
     /**
      * Adds an additional WHERE condition to the existing one ignoring empty parameters.
+     * 
      * The new condition and the existing one will be joined using the 'AND' operator.
-     * @param array $condition the new WHERE condition. Please refer to [[where()]]
+     * @param array $condition the new WHERE condition. Please refer to {@see \rock\db\QueryInterface::where()}
      * on how to specify this parameter.
      * @return static the query object itself
      * @see filterWhere()
@@ -232,7 +248,7 @@ interface QueryInterface extends ComponentsInterface
     /**
      * Adds an additional WHERE condition to the existing one ignoring empty parameters.
      * The new condition and the existing one will be joined using the 'OR' operator.
-     * @param array $condition the new WHERE condition. Please refer to [[where()]]
+     * @param array $condition the new WHERE condition. Please refer to {@see \rock\db\QueryInterface::where()}
      * on how to specify this parameter.
      * @return static the query object itself
      * @see filterWhere()

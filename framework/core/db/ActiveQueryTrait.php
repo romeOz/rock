@@ -19,13 +19,13 @@ trait ActiveQueryTrait
     public $with;
     /**
      * @var boolean whether to return each record as an array. If false (default), an object
-     * of [[modelClass]] will be created to represent each record.
+     * of {@see \rock\db\ActiveQueryTrait::$modelClass} will be created to represent each record.
      */
     public $asArray;
 
 
     /**
-     * Sets the [[asArray]] property.
+     * Sets the {@see \rock\db\ActiveQueryTrait::$asArray} property.
      * @param boolean $value whether to return the query results in terms of arrays instead of Active Records.
      * @return static the query object itself
      */
@@ -41,7 +41,7 @@ trait ActiveQueryTrait
      * The parameters to this method can be either one or multiple strings, or a single array
      * of relation names and the optional callbacks to customize the relations.
      *
-     * A relation name can refer to a relation defined in [[modelClass]]
+     * A relation name can refer to a relation defined in {@see \rock\db\ActiveQueryTrait::$modelClass}
      * or a sub-relation that stands for a relation of a related record.
      * For example, `orders.address` means the `address` relation defined
      * in the model class corresponding to the `orders` relation.
@@ -155,7 +155,7 @@ trait ActiveQueryTrait
     /**
      * Finds records corresponding to one or multiple relations and populates them into the primary models.
      * @param array $with a list of relations that this query should be performed with. Please
-     * refer to [[with()]] for details about specifying this parameter.
+     * refer to {@see \rock\db\ActiveQueryTrait::with()} for details about specifying this parameter.
      * @param array|ActiveRecord[] $models the primary models (can be either AR instances or arrays)
      */
     public function findWith($with, &$models)

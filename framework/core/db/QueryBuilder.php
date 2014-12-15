@@ -4,10 +4,10 @@ namespace rock\db;
 use rock\base\ObjectTrait;
 
 /**
- * QueryBuilder builds a SELECT SQL statement based on the specification given as a [[Query]] object.
+ * QueryBuilder builds a SELECT SQL statement based on the specification given as a {@see \rock\db\Query} object.
  *
  * QueryBuilder can also be used to build SQL statements such as INSERT, UPDATE, DELETE, CREATE TABLE,
- * from a [[Query]] object.
+ * from a {@see \rock\db\Query} object.
  */
 class QueryBuilder
 {
@@ -27,7 +27,7 @@ class QueryBuilder
     public $db;
     /**
      * @var string the separator between different fragments of a SQL statement.
-     * Defaults to an empty space. This is mainly used by [[build()]] when generating a SQL statement.
+     * Defaults to an empty space. This is mainly used by {@see \rock\db\QueryBuilder::build()} when generating a SQL statement.
      */
     public $separator = " ";
     /**
@@ -38,7 +38,7 @@ class QueryBuilder
     public $typeMap = [];
     /**
      * @var array map of query condition to builder methods.
-     * These methods are used by [[buildCondition]] to build SQL conditions from array syntax.
+     * These methods are used by {@see \rock\db\QueryBuilder::buildCondition()} to build SQL conditions from array syntax.
      */
     protected $conditionBuilders = [
         'NOT' => 'buildNotCondition',
@@ -69,8 +69,8 @@ class QueryBuilder
     }
 
     /**
-     * Generates a SELECT SQL statement from a [[Query]] object.
-     * @param Query $query the [[Query]] object from which the SQL statement will be generated.
+     * Generates a SELECT SQL statement from a {@see \rock\db\Query} object.
+     * @param Query $query the {@see \rock\db\Query} object from which the SQL statement will be generated.
      * @param array $params the parameters to be bound to the generated SQL statement. These parameters will
      * be included in the result with the additional parameters generated during the query building process.
      * @return array the generated SQL statement (the first array element) and the corresponding
@@ -79,7 +79,7 @@ class QueryBuilder
      */
     public function build($query, $params = [])
     {
-        $query->prepareBuild($this);
+        $query = $query->prepare($this);
 
         $params = empty($params) ? $query->params : array_merge($params, $query->params);
 
@@ -90,11 +90,10 @@ class QueryBuilder
             $this->buildWhere($query->where, $params),
             $this->buildGroupBy($query->groupBy),
             $this->buildHaving($query->having, $params),
-            $this->buildOrderBy($query->orderBy),
-            $this->buildLimit($query->limit, $query->offset),
         ];
 
         $sql = implode($this->separator, array_filter($clauses));
+        $sql = $this->buildOrderByAndLimit($sql, $query->orderBy, $query->limit, $query->offset);
 
         $union = $this->buildUnion($query->union, $params);
         if ($union !== '') {
@@ -136,7 +135,8 @@ class QueryBuilder
      */
     public function insert($table, $columns, &$params)
     {
-        if (($tableSchema = $this->db->getTableSchema($table)) !== null) {
+        $schema = $this->db->getSchema();
+        if (($tableSchema = $schema->getTableSchema($table)) !== null) {
             $columnSchemas = $tableSchema->columns;
         } else {
             $columnSchemas = [];
@@ -144,7 +144,7 @@ class QueryBuilder
         $names = [];
         $placeholders = [];
         foreach ($columns as $name => $value) {
-            $names[] = $this->db->quoteColumnName($name);
+            $names[] = $schema->quoteColumnName($name);
             if ($value instanceof Expression) {
                 $placeholders[] = $value->expression;
                 foreach ($value->params as $n => $v) {
@@ -157,7 +157,7 @@ class QueryBuilder
             }
         }
 
-        return 'INSERT INTO ' . $this->db->quoteTableName($table)
+        return 'INSERT INTO ' . $schema->quoteTableName($table)
             . ' (' . implode(', ', $names) . ') VALUES ('
             . implode(', ', $placeholders) . ')';
     }
@@ -183,7 +183,8 @@ class QueryBuilder
      */
     public function batchInsert($table, $columns, $rows)
     {
-        if (($tableSchema = $this->db->getTableSchema($table)) !== null) {
+        $schema = $this->db->getSchema();
+        if (($tableSchema = $schema->getTableSchema($table)) !== null) {
             $columnSchemas = $tableSchema->columns;
         } else {
             $columnSchemas = [];
@@ -197,7 +198,7 @@ class QueryBuilder
                     $value = $columnSchemas[$columns[$i]]->dbTypecast($value);
                 }
                 if (is_string($value)) {
-                    $value = $this->db->quoteValue($value);
+                    $value = $schema->quoteValue($value);
                 } elseif ($value === false) {
                     $value = 0;
                 } elseif ($value === null) {
@@ -209,10 +210,10 @@ class QueryBuilder
         }
 
         foreach ($columns as $i => $name) {
-            $columns[$i] = $this->db->quoteColumnName($name);
+            $columns[$i] = $schema->quoteColumnName($name);
         }
 
-        return 'INSERT INTO ' . $this->db->quoteTableName($table)
+        return 'INSERT INTO ' . $schema->quoteTableName($table)
         . ' (' . implode(', ', $columns) . ') VALUES ' . implode(', ', $values);
     }
 
@@ -220,17 +221,17 @@ class QueryBuilder
      * Creates an UPDATE SQL statement.
      * For example,
      *
-     * ~~~
+     * ```php
      * $params = [];
      * $sql = $queryBuilder->update('user', ['status' => 1], 'age > 30', $params);
-     * ~~~
+     * ```
      *
      * The method will properly escape the table and column names.
      *
      * @param string $table the table to be updated.
      * @param array $columns the column data (name => value) to be updated.
      * @param array|string $condition the condition that will be put in the WHERE part. Please
-     * refer to [[Query::where()]] on how to specify condition.
+     * refer to {@see \rock\db\Query::where()} on how to specify condition.
      * @param array $params the binding parameters that will be modified by this method
      * so that they can be bound to the DB command later.
      * @return string the UPDATE SQL
@@ -267,15 +268,15 @@ class QueryBuilder
      * Creates a DELETE SQL statement.
      * For example,
      *
-     * ~~~
+     * ```php
      * $sql = $queryBuilder->delete('user', 'status = 0');
-     * ~~~
+     * ```
      *
      * The method will properly escape the table and column names.
      *
      * @param string $table the table where the data will be deleted from.
      * @param array|string $condition the condition that will be put in the WHERE part. Please
-     * refer to [[Query::where()]] on how to specify condition.
+     * refer to {@see \rock\db\Query::where()} on how to specify condition.
      * @param array $params the binding parameters that will be modified by this method
      * so that they can be bound to the DB command later.
      * @return string the DELETE SQL
@@ -294,20 +295,20 @@ class QueryBuilder
      * The columns in the new  table should be specified as name-definition pairs (e.g. 'name' => 'string'),
      * where name stands for a column name which will be properly quoted by the method, and definition
      * stands for the column type which can contain an abstract DB type.
-     * The [[getColumnType()]] method will be invoked to convert any abstract type into a physical one.
+     * The {@see \rock\db\QueryBuilder::getColumnType()} method will be invoked to convert any abstract type into a physical one.
      *
      * If a column is specified with definition only (e.g. 'PRIMARY KEY (name, type)'), it will be directly
      * inserted into the generated SQL.
      *
      * For example,
      *
-     * ~~~
+     * ```php
      * $sql = $queryBuilder->createTable('user', [
      *  'id' => 'pk',
      *  'name' => 'string',
      *  'age' => 'integer',
      * ]);
-     * ~~~
+     * ```
      *
      * @param string $table the name of the table to be created. The name will be properly quoted by the method.
      * @param array $columns the columns (name => definition) in the new table.
@@ -402,7 +403,7 @@ class QueryBuilder
      * Builds a SQL statement for adding a new DB column.
      * @param string $table the table that the new column will be added to. The table name will be properly quoted by the method.
      * @param string $column the name of the new column. The name will be properly quoted by the method.
-     * @param string $type the column type. The [[getColumnType()]] method will be invoked to convert abstract column type (if any)
+     * @param string $type the column type. The {@see \rock\db\QueryBuilder::getColumnType()} method will be invoked to convert abstract column type (if any)
      * into the physical one. Anything that is not recognized as abstract type will be kept in the generated SQL.
      * For example, 'string' will be turned into 'varchar(255)', while 'string not null' will become 'varchar(255) not null'.
      * @return string the SQL statement for adding a new column.
@@ -444,7 +445,7 @@ class QueryBuilder
      * Builds a SQL statement for changing the definition of a column.
      * @param string $table the table whose column is to be changed. The table name will be properly quoted by the method.
      * @param string $column the name of the column to be changed. The name will be properly quoted by the method.
-     * @param string $type the new column type. The [[getColumnType()]] method will be invoked to convert abstract
+     * @param string $type the new column type. The {@see \rock\db\QueryBuilder::getColumnType()} method will be invoked to convert abstract
      * column type (if any) into the physical one. Anything that is not recognized as abstract type will be kept
      * in the generated SQL. For example, 'string' will be turned into 'varchar(255)', while 'string not null'
      * will become 'varchar(255) not null'.
@@ -560,7 +561,7 @@ class QueryBuilder
 
     /**
      * Converts an abstract column type into a physical column type.
-     * The conversion is done using the type map specified in [[typeMap]].
+     * The conversion is done using the type map specified in {@see \rock\db\QueryBuilder::$typeMap}.
      * The following abstract column types are supported (using MySQL as an example to explain the corresponding
      * physical types):
      *
@@ -591,7 +592,7 @@ class QueryBuilder
      * If the underlying DBMS does not support these kind of constraints for a type it will
      * be ignored.
      *
-     * If a type cannot be found in [[typeMap]], it will be returned without any change.
+     * If a type cannot be found in {@see \rock\db\QueryBuilder::$typeMap}, it will be returned without any change.
      * @param string $type abstract column type
      * @return string physical column type.
      */
@@ -617,7 +618,7 @@ class QueryBuilder
      * @param array $params the binding parameters to be populated
      * @param boolean $distinct
      * @param string $selectOption
-     * @return string the SELECT clause built from [[Query::$select]].
+     * @return string the SELECT clause built from {@see \rock\db\Query::$select}.
      */
     public function buildSelect($columns, &$params, $distinct = false, $selectOption = null)
     {
@@ -634,6 +635,9 @@ class QueryBuilder
             if ($column instanceof Expression) {
                 $columns[$i] = $column->expression;
                 $params = array_merge($params, $column->params);
+            } elseif ($column instanceof Query) {
+                list($sql, $params) = $this->build($column, $params);
+                $columns[$i] = "($sql) AS " . $this->db->quoteColumnName($i);
             } elseif ($column instanceof SelectBuilder) {
                 $columns[$i] = $column->build($this->db, $params);
             } elseif (is_string($i)) {
@@ -661,7 +665,7 @@ class QueryBuilder
     /**
      * @param array $tables
      * @param array $params the binding parameters to be populated
-     * @return string the FROM clause built from [[Query::$from]].
+     * @return string the FROM clause built from {@see \rock\db\Query::$from}.
      */
     public function buildFrom($tables, &$params)
     {
@@ -678,7 +682,7 @@ class QueryBuilder
     /**
      * @param array $joins
      * @param array $params the binding parameters to be populated
-     * @return string the JOIN clause built from [[Query::$join]].
+     * @return string the JOIN clause built from {@see \rock\db\Query::$join}.
      * @throws Exception if the $joins parameter is not in proper format
      */
     public function buildJoin($joins, &$params)
@@ -689,7 +693,7 @@ class QueryBuilder
 
         foreach ($joins as $i => $join) {
             if (!is_array($join) || !isset($join[0], $join[1])) {
-                throw new Exception(Exception::JOIN_IS_NOT_ARRAY);
+                throw new Exception('A join clause must be specified as an array of join type, join table, and optionally join condition.');
             }
             // 0:join type, 1:join table, 2:on-condition (optional)
             list ($joinType, $table) = $join;
@@ -708,6 +712,13 @@ class QueryBuilder
         return implode($this->separator, $joins);
     }
 
+    /**
+     * Quotes table names passed
+     *
+     * @param array $tables
+     * @param array $params
+     * @return array
+     */
     private function quoteTableNames($tables, &$params)
     {
         foreach ($tables as $i => $table) {
@@ -733,7 +744,7 @@ class QueryBuilder
     /**
      * @param string|array $condition
      * @param array $params the binding parameters to be populated
-     * @return string the WHERE clause built from [[Query::$where]].
+     * @return string the WHERE clause built from {@see \rock\db\Query::$where}.
      */
     public function buildWhere($condition, &$params)
     {
@@ -754,7 +765,7 @@ class QueryBuilder
     /**
      * @param string|array $condition
      * @param array $params the binding parameters to be populated
-     * @return string the HAVING clause built from [[Query::$having]].
+     * @return string the HAVING clause built from {@see \rock\db\Query::$having}.
      */
     public function buildHaving($condition, &$params)
     {
@@ -764,8 +775,29 @@ class QueryBuilder
     }
 
     /**
+     * Builds the ORDER BY and LIMIT/OFFSET clauses and appends them to the given SQL.
+     * @param string $sql the existing SQL (without ORDER BY/LIMIT/OFFSET)
+     * @param array $orderBy the order by columns. See {@see \rock\db\Query::$orderBy} for more details on how to specify this parameter.
+     * @param integer $limit the limit number. See {@see \rock\db\Query::$limit} for more details.
+     * @param integer $offset the offset number. See {@see \rock\db\Query::$offset} for more details.
+     * @return string the SQL completed with ORDER BY/LIMIT/OFFSET (if any)
+     */
+    public function buildOrderByAndLimit($sql, $orderBy, $limit, $offset)
+    {
+        $orderBy = $this->buildOrderBy($orderBy);
+        if ($orderBy !== '') {
+            $sql .= $this->separator . $orderBy;
+        }
+        $limit = $this->buildLimit($limit, $offset);
+        if ($limit !== '') {
+            $sql .= $this->separator . $limit;
+        }
+        return $sql;
+    }
+
+    /**
      * @param array $columns
-     * @return string the ORDER BY clause built from [[Query::$orderBy]].
+     * @return string the ORDER BY clause built from {@see \rock\db\Query::$orderBy}.
      */
     public function buildOrderBy($columns)
     {
@@ -825,7 +857,7 @@ class QueryBuilder
     /**
      * @param array $unions
      * @param array $params the binding parameters to be populated
-     * @return string the UNION clause built from [[Query::$union]].
+     * @return string the UNION clause built from {@see \rock\db\Query::$union}.
      */
     public function buildUnion($unions, &$params)
     {
@@ -849,6 +881,7 @@ class QueryBuilder
 
     /**
      * Processes columns and properly quote them if necessary.
+     *
      * It will join all columns into a string with comma as separators.
      * @param string|array $columns the columns to be processed
      * @return string the processing result
@@ -875,11 +908,10 @@ class QueryBuilder
 
     /**
      * Parses the condition specification and generates the corresponding SQL expression.
-     * @param string|array $condition the condition specification. Please refer to [[Query::where()]]
+     * @param string|array $condition the condition specification. Please refer to {@see \rock\db\Query::where()}
      * on how to specify a condition.
      * @param array $params the binding parameters to be populated
      * @return string the generated SQL expression
-     * @throws Exception if the condition is in bad format
      */
     public function buildCondition($condition, &$params)
     {
@@ -893,11 +925,11 @@ class QueryBuilder
             $operator = strtoupper($condition[0]);
             if (isset($this->conditionBuilders[$operator])) {
                 $method = $this->conditionBuilders[$operator];
-                array_shift($condition);
-                return $this->$method($operator, $condition, $params);
             } else {
-                throw new Exception(Exception::UNKNOWN_OPERATOR, ['operator' => $operator]);
+                $method = 'buildSimpleCondition';
             }
+            array_shift($condition);
+            return $this->$method($operator, $condition, $params);
         } else { // hash format: 'column1' => 'value1', 'column2' => 'value2', ...
             return $this->buildHashCondition($condition, $params);
         }
@@ -964,6 +996,7 @@ class QueryBuilder
 
     /**
      * Inverts an SQL expressions with `NOT` operator.
+     *
      * @param string $operator the operator to use for connecting the given operands
      * @param array $operands the SQL expressions to connect.
      * @param array $params the binding parameters to be populated
@@ -989,6 +1022,7 @@ class QueryBuilder
 
     /**
      * Creates an SQL expressions with the `BETWEEN` operator.
+     *
      * @param string $operator the operator to use (e.g. `BETWEEN` or `NOT BETWEEN`)
      * @param array $operands the first operand is the column name. The second and third operands
      * describe the interval that column value should be in.
@@ -1007,16 +1041,31 @@ class QueryBuilder
         if (strpos($column, '(') === false) {
             $column = $this->db->quoteColumnName($column);
         }
-        $phName1 = self::PARAM_PREFIX . count($params);
-        $params[$phName1] = $value1;
-        $phName2 = self::PARAM_PREFIX . count($params);
-        $params[$phName2] = $value2;
+        if ($value1 instanceof Expression) {
+            foreach ($value1->params as $n => $v) {
+                $params[$n] = $v;
+            }
+            $phName1 = $value1->expression;
+        } else {
+            $phName1 = self::PARAM_PREFIX . count($params);
+            $params[$phName1] = $value1;
+        }
+        if ($value2 instanceof Expression) {
+            foreach ($value2->params as $n => $v) {
+                $params[$n] = $v;
+            }
+            $phName2 = $value2->expression;
+        } else {
+            $phName2 = self::PARAM_PREFIX . count($params);
+            $params[$phName2] = $value2;
+        }
 
         return "$column $operator $phName1 AND $phName2";
     }
 
     /**
      * Creates an SQL expressions with the `IN` operator.
+     *
      * @param string $operator the operator to use (e.g. `IN` or `NOT IN`)
      * @param array $operands the first operand is the column name. If it is an array
      * a composite IN condition will be generated.
@@ -1042,7 +1091,7 @@ class QueryBuilder
         if ($values instanceof Query) {
             // sub-query
             list($sql, $params) = $this->build($values, $params);
-            $column = (array)$column;
+            $column = (array) $column;
             if (is_array($column)) {
                 foreach ($column as $i => $col) {
                     if (strpos($col, '(') === false) {
@@ -1096,6 +1145,15 @@ class QueryBuilder
         }
     }
 
+    /**
+     * Builds SQL for IN condition
+     *
+     * @param string $operator
+     * @param array $columns
+     * @param array $values
+     * @param array $params
+     * @return string SQL
+     */
     protected function buildCompositeInCondition($operator, $columns, $values, &$params)
     {
         $vss = [];
@@ -1123,6 +1181,7 @@ class QueryBuilder
 
     /**
      * Creates an SQL expressions with the `LIKE` operator.
+     *
      * @param string $operator the operator to use (e.g. `LIKE`, `NOT LIKE`, `OR LIKE` or `OR NOT LIKE`)
      * @param array $operands an array of two or three operands
      *
@@ -1159,7 +1218,9 @@ class QueryBuilder
 
         list($column, $values) = $operands;
 
-        $values = (array) $values;
+        if (!is_array($values)) {
+            $values = [$values];
+        }
 
         if (empty($values)) {
             return $not ? '' : '0=1';
@@ -1171,8 +1232,15 @@ class QueryBuilder
 
         $parts = [];
         foreach ($values as $value) {
-            $phName = self::PARAM_PREFIX . count($params);
-            $params[$phName] = empty($escape) ? $value : ('%' . strtr($value, $escape) . '%');
+            if ($value instanceof Expression) {
+                foreach ($value->params as $n => $v) {
+                    $params[$n] = $v;
+                }
+                $phName = $value->expression;
+            } else {
+                $phName = self::PARAM_PREFIX . count($params);
+                $params[$phName] = empty($escape) ? $value : ('%' . strtr($value, $escape) . '%');
+            }
             $parts[] = "$column $operator $phName";
         }
 
@@ -1182,10 +1250,10 @@ class QueryBuilder
     /**
      * Creates an SQL expressions with the `EXISTS` operator.
      * @param string $operator the operator to use (e.g. `EXISTS` or `NOT EXISTS`)
-     * @param array $operands contains only one element which is a [[Query]] object representing the sub-query.
+     * @param array $operands contains only one element which is a {@see \rock\db\Query} object representing the sub-query.
      * @param array $params the binding parameters to be populated
      * @return string the generated SQL expression
-     * @throws Exception if the operand is not a [[Query]] object.
+     * @throws Exception if the operand is not a {@see \rock\db\Query} object.
      */
     public function buildExistsCondition($operator, $operands, &$params)
     {
@@ -1194,6 +1262,40 @@ class QueryBuilder
             return "$operator ($sql)";
         } else {
             throw new Exception('Subquery for EXISTS operator must be a Query object.');
+        }
+    }
+
+    /**
+     * Creates an SQL expressions like `"column" operator value`.
+     * @param string $operator the operator to use. Anything could be used e.g. `>`, `<=`, etc.
+     * @param array $operands contains two column names.
+     * @param array $params the binding parameters to be populated
+     * @return string the generated SQL expression
+     * @throws Exception if wrong number of operands have been given.
+     */
+    public function buildSimpleCondition($operator, $operands, &$params)
+    {
+        if (count($operands) !== 2) {
+            throw new Exception("Operator '$operator' requires two operands.");
+        }
+
+        list($column, $value) = $operands;
+
+        if (strpos($column, '(') === false) {
+            $column = $this->db->quoteColumnName($column);
+        }
+
+        if ($value === null) {
+            return "$column $operator NULL";
+        } elseif ($value instanceof Expression) {
+            foreach ($value->params as $n => $v) {
+                $params[$n] = $v;
+            }
+            return "$column $operator {$value->expression}";
+        } else {
+            $phName = self::PARAM_PREFIX . count($params);
+            $params[$phName] = $value;
+            return "$column $operator $phName";
         }
     }
 }

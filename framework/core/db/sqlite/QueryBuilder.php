@@ -2,7 +2,6 @@
 namespace rock\db\sqlite;
 
 use rock\db\Exception;
-use rock\helpers\ObjectHelper;
 
 /**
  * QueryBuilder is the query builder for SQLite databases.
@@ -59,7 +58,8 @@ class QueryBuilder extends \rock\db\QueryBuilder
             return parent::batchInsert($table, $columns, $rows);
         }
 
-        if (($tableSchema = $this->db->getTableSchema($table)) !== null) {
+        $schema = $this->db->getSchema();
+        if (($tableSchema = $schema->getTableSchema($table)) !== null) {
             $columnSchemas = $tableSchema->columns;
         } else {
             $columnSchemas = [];
@@ -73,7 +73,7 @@ class QueryBuilder extends \rock\db\QueryBuilder
                     $value = $columnSchemas[$columns[$i]]->dbTypecast($value);
                 }
                 if (is_string($value)) {
-                    $value = $this->db->quoteValue($value);
+                    $value = $schema->quoteValue($value);
                 } elseif ($value === false) {
                     $value = 0;
                 } elseif ($value === null) {
@@ -85,10 +85,10 @@ class QueryBuilder extends \rock\db\QueryBuilder
         }
 
         foreach ($columns as $i => $name) {
-            $columns[$i] = $this->db->quoteColumnName($name);
+            $columns[$i] = $schema->quoteColumnName($name);
         }
 
-        return 'INSERT INTO ' . $this->db->quoteTableName($table)
+        return 'INSERT INTO ' . $schema->quoteTableName($table)
         . ' (' . implode(', ', $columns) . ') SELECT ' . implode(' UNION SELECT ', $values);
     }
 
@@ -110,7 +110,9 @@ class QueryBuilder extends \rock\db\QueryBuilder
             if ($value === null) {
                 $key = reset($table->primaryKey);
                 $tableName = $db->quoteTableName($tableName);
-                $value = $db->createCommand("SELECT MAX('$key') FROM $tableName")->queryScalar();
+                $value = $this->db->useMaster(function (Connection $db) use ($key, $tableName) {
+                    return $db->createCommand("SELECT MAX('$key') FROM $tableName")->queryScalar();
+                });
             } else {
                 $value = (int) $value - 1;
             }
@@ -218,9 +220,10 @@ class QueryBuilder extends \rock\db\QueryBuilder
 
     /**
      * Builds a SQL statement for changing the definition of a column.
+     *
      * @param string $table the table whose column is to be changed. The table name will be properly quoted by the method.
      * @param string $column the name of the column to be changed. The name will be properly quoted by the method.
-     * @param string $type the new column type. The [[getColumnType()]] method will be invoked to convert abstract
+     * @param string $type the new column type. The {@see \rock\db\QueryBuilder::getColumnType()} method will be invoked to convert abstract
      * column type (if any) into the physical one. Anything that is not recognized as abstract type will be kept
      * in the generated SQL. For example, 'string' will be turned into 'varchar(255)', while 'string not null'
      * will become 'varchar(255) not null'.

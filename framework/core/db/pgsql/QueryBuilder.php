@@ -29,9 +29,10 @@ class QueryBuilder extends \rock\db\QueryBuilder
         Schema::TYPE_BOOLEAN => 'boolean',
         Schema::TYPE_MONEY => 'numeric(19,4)',
     ];
+
     /**
      * @var array map of query condition to builder methods.
-     * These methods are used by [[buildCondition]] to build SQL conditions from array syntax.
+     * These methods are used by {@see \rock\db\QueryBuilder::buildCondition()} to build SQL conditions from array syntax.
      */
     protected $conditionBuilders = [
         'NOT' => 'buildNotCondition',
@@ -76,7 +77,6 @@ class QueryBuilder extends \rock\db\QueryBuilder
         return 'ALTER TABLE ' . $this->db->quoteTableName($oldName) . ' RENAME TO ' . $this->db->quoteTableName($newName);
     }
 
-
     /**
      * Creates a SQL statement for resetting the sequence value of a table's primary key.
      * The sequence will be reset such that the primary key of the next new row inserted
@@ -119,8 +119,8 @@ class QueryBuilder extends \rock\db\QueryBuilder
     public function checkIntegrity($check = true, $schema = '', $table = '')
     {
         $enable = $check ? 'ENABLE' : 'DISABLE';
-        $schema = $schema ? $schema : $this->db->schema->defaultSchema;
-        $tableNames = $table ? [$table] : $this->db->schema->getTableNames($schema);
+        $schema = $schema ? $schema : $this->db->getSchema()->defaultSchema;
+        $tableNames = $table ? [$table] : $this->db->getSchema()->getTableNames($schema);
         $command = '';
 
         foreach ($tableNames as $tableName) {
@@ -128,26 +128,72 @@ class QueryBuilder extends \rock\db\QueryBuilder
             $command .= "ALTER TABLE $tableName $enable TRIGGER ALL; ";
         }
 
-        #enable to have ability to alter several tables
-        $this->db->pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, true);
+        // enable to have ability to alter several tables
+        $this->db->getMasterPdo()->setAttribute(\PDO::ATTR_EMULATE_PREPARES, true);
 
         return $command;
     }
 
     /**
      * Builds a SQL statement for changing the definition of a column.
+     *
      * @param string $table the table whose column is to be changed. The table name will be properly quoted by the method.
      * @param string $column the name of the column to be changed. The name will be properly quoted by the method.
-     * @param string $type the new column type. The [[getColumnType()]] method will be invoked to convert abstract
+     * @param string $type the new column type. The {@see \rock\db\QueryBuilder::getColumnType()} method will be invoked to convert abstract
      * column type (if any) into the physical one. Anything that is not recognized as abstract type will be kept
      * in the generated SQL. For example, 'string' will be turned into 'varchar(255)', while 'string not null'
-     * will become 'varchar(255) not null'.
+     * will become 'varchar(255) not null'. You can also use PostgreSQL-specific syntax such as `SET NOT NULL`.
      * @return string the SQL statement for changing the definition of a column.
      */
     public function alterColumn($table, $column, $type)
     {
+        // https://github.com/yiisoft/yii2/issues/4492
+        // http://www.postgresql.org/docs/9.1/static/sql-altertable.html
+        if (!preg_match('/^(DROP|SET|RESET)\s+/i', $type)) {
+            $type = 'TYPE ' . $this->getColumnType($type);
+        }
         return 'ALTER TABLE ' . $this->db->quoteTableName($table) . ' ALTER COLUMN '
-            . $this->db->quoteColumnName($column) . ' TYPE '
-            . $this->getColumnType($type);
+            . $this->db->quoteColumnName($column) . ' ' . $type;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function batchInsert($table, $columns, $rows)
+    {
+        $schema = $this->db->getSchema();
+        if (($tableSchema = $schema->getTableSchema($table)) !== null) {
+            $columnSchemas = $tableSchema->columns;
+        } else {
+            $columnSchemas = [];
+        }
+
+        $values = [];
+        foreach ($rows as $row) {
+            $vs = [];
+            foreach ($row as $i => $value) {
+                if (!is_array($value) && isset($columnSchemas[$columns[$i]])) {
+                    $value = $columnSchemas[$columns[$i]]->dbTypecast($value);
+                }
+                if (is_string($value)) {
+                    $value = $schema->quoteValue($value);
+                } elseif ($value === true) {
+                    $value = 'TRUE';
+                } elseif ($value === false) {
+                    $value = 'FALSE';
+                } elseif ($value === null) {
+                    $value = 'NULL';
+                }
+                $vs[] = $value;
+            }
+            $values[] = '(' . implode(', ', $vs) . ')';
+        }
+
+        foreach ($columns as $i => $name) {
+            $columns[$i] = $schema->quoteColumnName($name);
+        }
+
+        return 'INSERT INTO ' . $schema->quoteTableName($table)
+        . ' (' . implode(', ', $columns) . ') VALUES ' . implode(', ', $values);
     }
 }

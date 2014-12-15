@@ -7,7 +7,7 @@ use rock\base\ObjectTrait;
  * BatchQueryResult represents a batch query from which you can retrieve data in batches.
  *
  * You usually do not instantiate BatchQueryResult directly. Instead, you obtain it by
- * calling [[Query::batch()]] or [[Query::each()]]. Because BatchQueryResult implements the `Iterator` interface,
+ * calling {@see \rock\db\Query::batch()} or {@see \rock\db\Query::each()}. Because `BatchQueryResult` implements the `Iterator` interface,
  * you can iterate it to obtain a batch of data in each iteration. For example,
  *
  * ```php
@@ -30,7 +30,7 @@ class BatchQueryResult implements \Iterator
     public $connection;
     /**
      * @var Query the query object associated with this batch query.
-     * Do not modify this property directly unless after [[reset()]] is called explicitly.
+     * Do not modify this property directly unless after {@see \rock\db\BatchQueryResult::reset()} is called explicitly.
      */
     public $query;
     /**

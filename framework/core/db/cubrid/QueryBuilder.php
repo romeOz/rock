@@ -4,7 +4,7 @@ namespace rock\db\cubrid;
 use rock\db\Exception;
 
 /**
- * QueryBuilder is the query builder for CUBRID databases (version 9.1.x and higher).
+ * QueryBuilder is the query builder for CUBRID databases (version 9.3.x and higher).
  */
 class QueryBuilder extends \rock\db\QueryBuilder
 {

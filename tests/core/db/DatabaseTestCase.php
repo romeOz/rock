@@ -5,6 +5,8 @@ namespace rockunit\core\db;
 
 use rock\db\Connection;
 use rock\db\Migration;
+use rock\di\Container;
+use rock\helpers\ArrayHelper;
 use rock\Rock;
 
 class DatabaseTestCase extends \PHPUnit_Framework_TestCase
@@ -13,9 +15,9 @@ class DatabaseTestCase extends \PHPUnit_Framework_TestCase
     protected $database;
     protected $driverName = 'mysql';
     /**
-     * @var Connection
+     * @var Connection|string
      */
-    protected $connection;
+    protected $connection = 'db';
 
     protected function setUp()
     {
@@ -34,7 +36,7 @@ class DatabaseTestCase extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        if ($this->connection) {
+        if ($this->connection instanceof Connection) {
             $this->connection->close();
         }
         //$this->destroyApplication();
@@ -62,18 +64,17 @@ class DatabaseTestCase extends \PHPUnit_Framework_TestCase
      */
     public function getConnection($reset = true, $open = true)
     {
-        if (!$reset && $this->connection) {
+        if (!$reset && $this->connection instanceof Connection) {
             return $this->connection;
         }
-        $connection = new Connection;
-        $connection->dsn = $this->database['dsn'];
-        if (isset($this->database['username'])) {
-            $connection->username = $this->database['username'];
-            $connection->password = $this->database['password'];
+
+        $config = ArrayHelper::intersectByKeys($this->database, ['dsn', 'username', 'password', 'attributes']);
+        $config['class'] = Connection::className();
+        if (is_string($this->connection)) {
+            Container::add($this->connection, $config);
         }
-        if (isset($this->database['attributes'])) {
-            $connection->attributes = $this->database['attributes'];
-        }
+        /** @var Connection $connection */
+        $connection = Container::load($config);
         if ($open) {
             $connection->open();
             $lines = explode(';', file_get_contents($this->database['fixture']));
@@ -89,7 +90,7 @@ class DatabaseTestCase extends \PHPUnit_Framework_TestCase
                         $migration = new $migration;
                     }
                     $migration->connection = $connection;
-                    $migration->enableNote = false;
+                    $migration->enableVerbose = false;
                     $migration->up();
                 }
             }

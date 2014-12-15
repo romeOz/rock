@@ -1,6 +1,7 @@
 <?php
 namespace rock\db;
 
+use rock\di\Container;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\Rock;
@@ -8,14 +9,14 @@ use rock\Rock;
 /**
  * The BaseQuery trait represents the minimum method set of a database Query.
  *
- * It is supposed to be used in a class that implements the [[\rock\db\QueryInterface]].
+ * It is supposed to be used in a class that implements the [[QueryInterface]].
  */
 trait QueryTrait
 {
     /**
      * @var string|array query condition. This refers to the WHERE clause in a SQL statement.
-     * For example, ```age > 31 AND team = 1```.
-     * @see where()
+     * For example, `['age' => 31, 'team' => 1]`.
+     * @see where() for valid syntax on specifying this value.
      */
     public $where;
     /**
@@ -63,7 +64,7 @@ trait QueryTrait
         /** @var self|Query $this */
 
         if (is_string($this->connection)) {
-            $this->connection = Rock::factory($this->connection);
+            $this->connection = Container::load($this->connection);
         }
         return $this->calculateCacheParams($this->connection);
     }
@@ -95,7 +96,7 @@ trait QueryTrait
      * See [[QueryInterface::where()]] for detailed documentation.
      *
      * @param string|array $condition the conditions that should be put in the WHERE part.
-     * @return static the query object itself
+     * @return static the query object itself.
      * @see andWhere()
      * @see orWhere()
      */
@@ -269,20 +270,6 @@ trait QueryTrait
                     return [];
                 }
                 break;
-            case 'IN':
-            case 'NOT IN':
-            case 'LIKE':
-            case 'OR LIKE':
-            case 'NOT LIKE':
-            case 'OR NOT LIKE':
-            case 'ILIKE': // PostgreSQL operator for case insensitive LIKE
-            case 'OR ILIKE':
-            case 'NOT ILIKE':
-            case 'OR NOT ILIKE':
-                if (array_key_exists(1, $condition) && $this->isEmpty($condition[1])) {
-                    return [];
-                }
-                break;
             case 'BETWEEN':
             case 'NOT BETWEEN':
                 if (array_key_exists(1, $condition) && array_key_exists(2, $condition)) {
@@ -292,7 +279,9 @@ trait QueryTrait
                 }
                 break;
             default:
-                throw new Exception("Operator not supported: $operator");
+                if (array_key_exists(1, $condition) && $this->isEmpty($condition[1])) {
+                    return [];
+                }
         }
 
         array_unshift($condition, $operator);
@@ -358,6 +347,12 @@ trait QueryTrait
         return $this;
     }
 
+    /**
+     * Normalizes format of ORDER BY data
+     *
+     * @param array|string $columns
+     * @return array
+     */
     protected function normalizeOrderBy($columns)
     {
         if (is_array($columns)) {

@@ -45,6 +45,7 @@ class Schema extends \rock\db\Schema
         'binary' => self::TYPE_BINARY,
     ];
 
+
     /**
      * Quotes a table name for use in a query.
      * A simple table name has no schema prefix.
@@ -113,13 +114,13 @@ class Schema extends \rock\db\Schema
     }
 
     /**
-     * Loads the column information into a [[ColumnSchema]] object.
+     * Loads the column information into a {@see \rock\db\ColumnSchema} object.
      * @param array $info column information
      * @return ColumnSchema the column schema object
      */
     protected function loadColumnSchema($info)
     {
-        $column = new ColumnSchema;
+        $column = $this->createColumnSchema();
 
         $column->name = $info['Field'];
         $column->allowNull = $info['Null'] === 'YES';
@@ -217,7 +218,7 @@ class Schema extends \rock\db\Schema
      */
     protected function getCreateTableSql($table)
     {
-        $row = $this->db->createCommand('SHOW CREATE TABLE ' . $this->quoteTableName($table->name))->queryOne();
+        $row = $this->db->createCommand('SHOW CREATE TABLE ' . $this->quoteTableName($table->fullName))->queryOne();
         if (isset($row['Create Table'])) {
             $sql = $row['Create Table'];
         } else {
@@ -254,12 +255,12 @@ class Schema extends \rock\db\Schema
      * Returns all unique indexes for the given table.
      * Each array element is of the following structure:
      *
-     * ~~~
+     * ```php
      * [
      *  'IndexName1' => ['col1' [, ...]],
      *  'IndexName2' => ['col2' [, ...]],
      * ]
-     * ~~~
+     * ```
      *
      * @param TableSchema $table the table metadata
      * @return array all unique indexes for the given table.

@@ -2,26 +2,27 @@
 namespace rock\db;
 
 use rock\base\ComponentsTrait;
-use rock\Rock;
+use rock\di\Container;
 
 /**
  * Migration is the base class for representing a database migration.
  *
+ *
  * Each child class of Migration represents an individual database migration which
  * is identified by the child class name.
  *
- * Within each migration, the [[up()]] method should be overridden to contain the logic
- * for "upgrading" the database; while the [[down()]] method for the "downgrading"
+ * Within each migration, the {@see \rock\db\Migration::up()} method should be overridden to contain the logic
+ * for "upgrading" the database; while the {@see \rock\db\Migration::down()} method for the "downgrading"
  * logic.
  *
- * If the database supports transactions, you may also override [[safeUp()]] and
- * [[safeDown()]] so that if anything wrong happens during the upgrading or downgrading,
+ * If the database supports transactions, you may also override {@see \rock\db\Migration::safeUp()} and
+ * {@see \rock\db\Migration::safeDown()} so that if anything wrong happens during the upgrading or downgrading,
  * the whole migration can be reverted in a whole.
  *
  * Migration provides a set of convenient methods for manipulating database data and schema.
- * For example, the [[insert()]] method can be used to easily insert a row of data into
- * a database table; the [[createTable()]] method can be used to create a database table.
- * Compared with the same methods in [[Command]], these methods will display extra
+ * For example, the {@see \rock\db\Migration::insert()} method can be used to easily insert a row of data into
+ * a database table; the {@see \rock\db\Migration::createTable()} method can be used to create a database table.
+ * Compared with the same methods in {@see \rock\db\Command}, these methods will display extra
  * information showing the method parameters and execution time, which may be useful when
  * applying migrations.
  *
@@ -32,19 +33,33 @@ class Migration
 
     /**
      * @var Connection|string the DB connection object or the application component ID of the DB connection
-     * that this migration should work with.
+     * that this migration should work with. Note that when a Migration object is created by
+     * the `migrate` command, this property will be overwritten by the command. If you do not want to
+     * use the DB connection provided by the command, you may override the {@see \rock\base\ObjectTrait::init()} method like the following:
+     *
+     * ```php
+     * public function init()
+     * {
+     *     $this->db = 'db2';
+     *     parent::init();
+     * }
+     * ```
      */
     public $connection = 'db';
-    public $enableNote = true;
+    /**
+     * Enable verbose query.
+     * @var bool
+     */
+    public $enableVerbose = true;
 
     /**
      * Initializes the migration.
-     * This method will set [[db]] to be the 'db' application component, if it is null.
+     * This method will set {@see \rock\db\Migration::$connection} to be the 'db' application component, if it is null.
      */
     public function init()
     {
         if (is_string($this->connection)) {
-            $this->connection = Rock::factory($this->connection);
+            $this->connection = Container::load($this->connection);
         }
     }
 
@@ -105,9 +120,9 @@ class Migration
 
     /**
      * This method contains the logic to be executed when applying this migration.
-     * This method differs from [[up()]] in that the DB logic implemented here will
+     * This method differs from {@see \rock\db\Migration::up()} in that the DB logic implemented here will
      * be enclosed within a DB transaction.
-     * Child classes may implement this method instead of [[up()]] if the DB logic
+     * Child classes may implement this method instead of {@see \rock\db\Migration::up()} if the DB logic
      * needs to be within a transaction.
      * @return boolean return a false value to indicate the migration fails
      * and should not proceed further. All other return values mean the migration succeeds.
@@ -118,9 +133,9 @@ class Migration
 
     /**
      * This method contains the logic to be executed when removing this migration.
-     * This method differs from [[down()]] in that the DB logic implemented here will
+     * This method differs from {@see \rock\db\Migration::down()} in that the DB logic implemented here will
      * be enclosed within a DB transaction.
-     * Child classes may implement this method instead of [[up()]] if the DB logic
+     * Child classes may implement this method instead of {@see \rock\db\Migration::up()} if the DB logic
      * needs to be within a transaction.
      * @return boolean return a false value to indicate the migration fails
      * and should not proceed further. All other return values mean the migration succeeds.
@@ -131,10 +146,10 @@ class Migration
 
     /**
      * Executes a SQL statement.
-     * This method executes the specified SQL statement using [[db]].
+     * This method executes the specified SQL statement using {@see \rock\db\Migration::$connection}.
      * @param string $sql the SQL statement to be executed
      * @param array $params input parameters (name => value) for the SQL execution.
-     * See [[Command::execute()]] for more details.
+     * See {@see \rock\db\Command::execute()} for more details.
      */
     public function execute($sql, $params = [])
     {
@@ -152,12 +167,12 @@ class Migration
      */
     public function insert($table, $columns)
     {
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo "    > insert into $table ...";
         }
         $time = microtime(true);
         $this->connection->createCommand()->insert($table, $columns)->execute();
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
         }
     }
@@ -171,12 +186,12 @@ class Migration
      */
     public function batchInsert($table, $columns, $rows)
     {
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo "    > insert into $table ...";
         }
         $time = microtime(true);
         $this->connection->createCommand()->batchInsert($table, $columns, $rows)->execute();
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
         }
     }
@@ -187,17 +202,17 @@ class Migration
      * @param string $table the table to be updated.
      * @param array $columns the column data (name => value) to be updated.
      * @param array|string $condition the conditions that will be put in the WHERE part. Please
-     * refer to [[Query::where()]] on how to specify conditions.
+     * refer to {@see \rock\db\Query::where()} on how to specify conditions.
      * @param array $params the parameters to be bound to the query.
      */
     public function update($table, $columns, $condition = '', $params = [])
     {
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo "    > update $table ...";
         }
         $time = microtime(true);
         $this->connection->createCommand()->update($table, $columns, $condition, $params)->execute();
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
         }
     }
@@ -206,17 +221,17 @@ class Migration
      * Creates and executes a DELETE SQL statement.
      * @param string $table the table where the data will be deleted from.
      * @param array|string $condition the conditions that will be put in the WHERE part. Please
-     * refer to [[Query::where()]] on how to specify conditions.
+     * refer to {@see \rock\db\Query::where()} on how to specify conditions.
      * @param array $params the parameters to be bound to the query.
      */
     public function delete($table, $condition = '', $params = [])
     {
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo "    > delete from $table ...";
         }
         $time = microtime(true);
         $this->connection->createCommand()->delete($table, $condition, $params)->execute();
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
         }
     }
@@ -228,7 +243,7 @@ class Migration
      * where name stands for a column name which will be properly quoted by the method, and definition
      * stands for the column type which can contain an abstract DB type.
      *
-     * The [[QueryBuilder::getColumnType()]] method will be invoked to convert any abstract type into a physical one.
+     * The {@see \rock\db\QueryBuilder::getColumnType()} method will be invoked to convert any abstract type into a physical one.
      *
      * If a column is specified with definition only (e.g. 'PRIMARY KEY (name, type)'), it will be directly
      * put into the generated SQL.
@@ -240,12 +255,12 @@ class Migration
      */
     public function createTable($table, $columns, $options = null, $exists = false)
     {
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo "    > create table $table ...";
         }
         $time = microtime(true);
         $this->connection->createCommand()->createTable($table, $columns, $options, $exists)->execute();
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
         }
     }
@@ -257,12 +272,12 @@ class Migration
      */
     public function renameTable($table, $newName)
     {
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo "    > rename table $table to $newName ...";
         }
         $time = microtime(true);
         $this->connection->createCommand()->renameTable($table, $newName)->execute();
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
         }
     }
@@ -274,12 +289,12 @@ class Migration
      */
     public function dropTable($table, $exists = false)
     {
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo "    > drop table $table ...";
         }
         $time = microtime(true);
         $this->connection->createCommand()->dropTable($table, $exists)->execute();
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
         }
     }
@@ -290,12 +305,12 @@ class Migration
      */
     public function truncateTable($table)
     {
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo "    > truncate table $table ...";
         }
         $time = microtime(true);
         $this->connection->createCommand()->truncateTable($table)->execute();
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
         }
     }
@@ -304,18 +319,18 @@ class Migration
      * Builds and executes a SQL statement for adding a new DB column.
      * @param string $table the table that the new column will be added to. The table name will be properly quoted by the method.
      * @param string $column the name of the new column. The name will be properly quoted by the method.
-     * @param string $type the column type. The [[QueryBuilder::getColumnType()]] method will be invoked to convert abstract column type (if any)
+     * @param string $type the column type. The {@see \rock\db\QueryBuilder::getColumnType()} method will be invoked to convert abstract column type (if any)
      * into the physical one. Anything that is not recognized as abstract type will be kept in the generated SQL.
      * For example, 'string' will be turned into 'varchar(255)', while 'string not null' will become 'varchar(255) not null'.
      */
     public function addColumn($table, $column, $type)
     {
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo "    > add column $column $type to table $table ...";
         }
         $time = microtime(true);
         $this->connection->createCommand()->addColumn($table, $column, $type)->execute();
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
         }
     }
@@ -327,12 +342,12 @@ class Migration
      */
     public function dropColumn($table, $column)
     {
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo "    > drop column $column from table $table ...";
         }
         $time = microtime(true);
         $this->connection->createCommand()->dropColumn($table, $column)->execute();
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
         }
     }
@@ -345,12 +360,12 @@ class Migration
      */
     public function renameColumn($table, $name, $newName)
     {
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo "    > rename column $name in table $table to $newName ...";
         }
         $time = microtime(true);
         $this->connection->createCommand()->renameColumn($table, $name, $newName)->execute();
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
         }
     }
@@ -359,18 +374,18 @@ class Migration
      * Builds and executes a SQL statement for changing the definition of a column.
      * @param string $table the table whose column is to be changed. The table name will be properly quoted by the method.
      * @param string $column the name of the column to be changed. The name will be properly quoted by the method.
-     * @param string $type the new column type. The [[QueryBuilder::getColumnType()]] method will be invoked to convert abstract column type (if any)
+     * @param string $type the new column type. The {@see \rock\db\QueryBuilder::getColumnType()} method will be invoked to convert abstract column type (if any)
      * into the physical one. Anything that is not recognized as abstract type will be kept in the generated SQL.
      * For example, 'string' will be turned into 'varchar(255)', while 'string not null' will become 'varchar(255) not null'.
      */
     public function alterColumn($table, $column, $type)
     {
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo "    > alter column $column in table $table to $type ...";
         }
         $time = microtime(true);
         $this->connection->createCommand()->alterColumn($table, $column, $type)->execute();
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
         }
     }
@@ -384,12 +399,12 @@ class Migration
      */
     public function addPrimaryKey($name, $table, $columns)
     {
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo "    > add primary key $name on $table (" . (is_array($columns) ? implode(',', $columns) : $columns).") ...";
         }
         $time = microtime(true);
         $this->connection->createCommand()->addPrimaryKey($name, $table, $columns)->execute();
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
         }
     }
@@ -401,12 +416,12 @@ class Migration
      */
     public function dropPrimaryKey($name, $table)
     {
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo "    > drop primary key $name ...";
         }
         $time = microtime(true);
         $this->connection->createCommand()->dropPrimaryKey($name, $table)->execute();
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
         }
     }
@@ -424,12 +439,12 @@ class Migration
      */
     public function addForeignKey($name, $table, $columns, $refTable, $refColumns, $delete = null, $update = null)
     {
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo "    > add foreign key $name: $table (" . implode(',', (array) $columns) . ") references $refTable (" . implode(',', (array) $refColumns) . ") ...";
         }
         $time = microtime(true);
         $this->connection->createCommand()->addForeignKey($name, $table, $columns, $refTable, $refColumns, $delete, $update)->execute();
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
         }
     }
@@ -441,12 +456,12 @@ class Migration
      */
     public function dropForeignKey($name, $table)
     {
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo "    > drop foreign key $name from table $table ...";
         }
         $time = microtime(true);
         $this->connection->createCommand()->dropForeignKey($name, $table)->execute();
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
         }
     }
@@ -461,12 +476,12 @@ class Migration
      */
     public function createIndex($name, $table, $columns, $unique = false)
     {
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo "    > create" . ($unique ? ' unique' : '') . " index $name on $table (" . implode(',', (array) $columns) . ") ...";
         }
         $time = microtime(true);
         $this->connection->createCommand()->createIndex($name, $table, $columns, $unique)->execute();
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
         }
     }
@@ -478,12 +493,12 @@ class Migration
      */
     public function dropIndex($name, $table)
     {
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo "    > drop index $name ...";
         }
         $time = microtime(true);
         $this->connection->createCommand()->dropIndex($name, $table)->execute();
-        if ($this->enableNote) {
+        if ($this->enableVerbose) {
             echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
         }
     }

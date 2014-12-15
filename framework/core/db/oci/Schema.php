@@ -8,23 +8,11 @@ use rock\db\TableSchema;
 /**
  * Schema is the class for retrieving metadata from an Oracle database
  *
- * @todo mapping from physical types to abstract types
+ * @property string $lastInsertID The row ID of the last row inserted, or the last value retrieved from the
+ * sequence object. This property is read-only.
  */
 class Schema extends \rock\db\Schema
 {
-    const TYPE_PK = 'NUMBER(10) NOT NULL PRIMARY KEY';
-    const TYPE_STRING = 'VARCHAR2(255)';
-    const TYPE_TEXT = 'CLOB';
-    const TYPE_INTEGER = 'NUMBER(10)';
-    const TYPE_FLOAT = 'NUMBER';
-    const TYPE_DECIMAL = 'NUMBER';
-    const TYPE_DATETIME = 'TIMESTAMP';
-    const TYPE_TIMESTAMP = 'TIMESTAMP';
-    const TYPE_TIME = 'TIMESTAMP';
-    const TYPE_DATE = 'DATE';
-    const TYPE_BINARY = 'BLOB';
-    const TYPE_BOOLEAN = 'NUMBER(1)';
-    const TYPE_MONEY = 'NUMBER(19,4)';
     /**
      * @inheritdoc
      */
@@ -50,14 +38,6 @@ class Schema extends \rock\db\Schema
     public function quoteSimpleTableName($name)
     {
         return strpos($name, '"') !== false ? $name : '"' . $name . '"';
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function quoteSimpleColumnName($name)
-    {
-        return '"' . $name . '"';
     }
 
     /**
@@ -151,6 +131,10 @@ EOD;
             return false;
         }
 
+        if (empty($columns)) {
+            return false;
+        }
+
         foreach ($columns as $column) {
             $c = $this->createColumn($column);
             $table->columns[$c->name] = $c;
@@ -167,9 +151,9 @@ EOD;
      * Sequence name of table
      *
      * @param $tablename
+     * @internal param \rock\db\TableSchema $table ->name the table schema
      * @return string whether the sequence exists
      */
-
     protected function getTableSequenceName($tablename){
 
         $seq_name_sql="select ud.referenced_name as sequence_name
@@ -181,27 +165,36 @@ EOD;
         return $this->db->createCommand($seq_name_sql)->queryScalar();
     }
 
-    /*
+    /**
      * @Overrides method in class 'Schema'
      * @see http://www.php.net/manual/en/function.PDO-lastInsertId.php -> Oracle does not support this
      *
      * Returns the ID of the last inserted row or sequence value.
      * @param string $sequenceName name of the sequence object (required by some DBMS)
      * @return string the row ID of the last row inserted, or the last value retrieved from the sequence object
-     * @throws InvalidCallException if the DB connection is not active
+     * @throws Exception if the DB connection is not active
      */
     public function getLastInsertID($sequenceName = '')
     {
         if ($this->db->isActive) {
-            return $this->db->createCommand("SELECT {$sequenceName}.CURRVAL FROM DUAL")->queryScalar();
+            // get the last insert id from the master connection
+            return $this->db->useMaster(function (Connection $db) use ($sequenceName) {
+                return $db->createCommand("SELECT {$sequenceName}.CURRVAL FROM DUAL")->queryScalar();
+            });
         } else {
             throw new Exception('DB Connection is not active.');
         }
     }
 
+    /**
+     * Creates ColumnSchema instance
+     *
+     * @param array $column
+     * @return ColumnSchema
+     */
     protected function createColumn($column)
     {
-        $c = new ColumnSchema();
+        $c = $this->createColumnSchema();
         $c->name = $column['COLUMN_NAME'];
         $c->allowNull = $column['NULLABLE'] === 'Y';
         $c->isPrimaryKey = strpos($column['KEY'], 'P') !== false;
@@ -221,6 +214,10 @@ EOD;
         return $c;
     }
 
+    /**
+     * Finds constraints and fills them into TableSchema object passed
+     * @param TableSchema $table
+     */
     protected function findConstraints($table)
     {
         $sql = <<<EOD

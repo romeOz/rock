@@ -7,7 +7,7 @@ use rock\base\ObjectTrait;
 /**
  * DataReader represents a forward-only stream of rows from a query result set.
  *
- * To read the current row of data, call [[read()]]. The method [[readAll()]]
+ * To read the current row of data, call {@see \rock\db\DataReader::read()}. The method {@see \rock\db\DataReader::readAll()}
  * returns all the rows in a single array. Rows of data can also be read by
  * iterating through the reader. For example,
  *
@@ -32,7 +32,7 @@ use rock\base\ObjectTrait;
  * Doing it the second time will throw an exception.
  *
  * It is possible to use a specific mode of data fetching by setting
- * [[fetchMode]]. See the [PHP manual](http://www.php.net/manual/en/function.PDOStatement-setFetchMode.php)
+ * {@see \rock\db\DataReader::$fetchMode}. See the [PHP manual](http://www.php.net/manual/en/function.PDOStatement-setFetchMode.php)
  * for more details about possible fetch mode.
  *
  * @property integer $columnCount The number of columns in the result set. This property is read-only.

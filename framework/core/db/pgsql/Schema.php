@@ -21,9 +21,9 @@ class Schema extends \rock\db\Schema
      * @see http://www.postgresql.org/docs/current/static/datatype.html#DATATYPE-TABLE
      */
     public $typeMap = [
-        'bit' => self::TYPE_STRING,
-        'bit varying' => self::TYPE_STRING,
-        'varbit' => self::TYPE_STRING,
+        'bit' => self::TYPE_INTEGER,
+        'bit varying' => self::TYPE_INTEGER,
+        'varbit' => self::TYPE_INTEGER,
 
         'bool' => self::TYPE_BOOLEAN,
         'boolean' => self::TYPE_BOOLEAN,
@@ -98,6 +98,7 @@ class Schema extends \rock\db\Schema
         'xml' => self::TYPE_STRING
     ];
 
+
     /**
      * Creates a query builder for the PostgreSQL database.
      * @return QueryBuilder query builder instance
@@ -154,29 +155,6 @@ class Schema extends \rock\db\Schema
         } else {
             return null;
         }
-    }
-
-    /**
-     * Determines the PDO type for the given PHP data value.
-     * @param mixed $data the data whose PDO type is to be determined
-     * @return integer the PDO type
-     * @see http://www.php.net/manual/en/pdo.constants.php
-     */
-    public function getPdoType($data)
-    {
-        // php type => PDO type
-        static $typeMap = [
-            // https://github.com/yiisoft/yii2/issues/1115
-            // Cast boolean to integer values to work around problems with PDO casting false to string '' https://bugs.php.net/bug.php?id=33876
-            'boolean' => \PDO::PARAM_INT,
-            'integer' => \PDO::PARAM_INT,
-            'string' => \PDO::PARAM_STR,
-            'resource' => \PDO::PARAM_LOB,
-            'NULL' => \PDO::PARAM_NULL,
-        ];
-        $type = gettype($data);
-
-        return isset($typeMap[$type]) ? $typeMap[$type] : \PDO::PARAM_STR;
     }
 
     /**
@@ -402,6 +380,8 @@ SQL;
             } elseif ($column->defaultValue) {
                 if ($column->type === 'timestamp' && $column->defaultValue === 'now()') {
                     $column->defaultValue = new Expression($column->defaultValue);
+                } elseif ($column->type === 'boolean') {
+                        $column->defaultValue = ($column->defaultValue === 'true');
                 } elseif (stripos($column->dbType, 'bit') === 0 || stripos($column->dbType, 'varbit') === 0) {
                     $column->defaultValue = bindec(trim($column->defaultValue, 'B\''));
                 } elseif (preg_match("/^'(.*?)'::/", $column->defaultValue, $matches)) {
@@ -418,13 +398,13 @@ SQL;
     }
 
     /**
-     * Loads the column information into a [[ColumnSchema]] object.
+     * Loads the column information into a {@see \rock\db\ColumnSchema} object.
      * @param array $info column information
      * @return ColumnSchema the column schema object
      */
     protected function loadColumnSchema($info)
     {
-        $column = new ColumnSchema();
+        $column = $this->createColumnSchema();
         $column->allowNull = $info['is_nullable'];
         $column->autoIncrement = $info['is_autoinc'];
         $column->comment = $info['column_comment'];
@@ -436,7 +416,7 @@ SQL;
         $column->name = $info['column_name'];
         $column->precision = $info['numeric_precision'];
         $column->scale = $info['numeric_scale'];
-        $column->size = $info['size'];
+        $column->size = $info['size'] === null ? null : (int) $info['size'];
         if (isset($this->typeMap[$column->dbType])) {
             $column->type = $this->typeMap[$column->dbType];
         } else {

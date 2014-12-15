@@ -1,6 +1,8 @@
 <?php
 namespace rockunit\core\db\models;
 
+use rock\db\ActiveQuery;
+
 /**
  * Class Category.
  *
@@ -17,5 +19,24 @@ class Category extends ActiveRecord
     public function getItems()
     {
         return $this->hasMany(Item::className(), ['category_id' => 'id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getLimitedItems()
+    {
+        return $this->hasMany(Item::className(), ['category_id' => 'id'])
+            ->onCondition(['item.id' => [1, 2, 3]]);
+    }
+
+    public function getOrderItems()
+    {
+        return $this->hasMany(OrderItem::className(), ['item_id' => 'id'])->via('items');
+    }
+
+    public function getOrders()
+    {
+        return $this->hasMany(Order::className(), ['id' => 'order_id'])->via('orderItems');
     }
 }

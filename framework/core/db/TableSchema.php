@@ -16,12 +16,12 @@ class TableSchema
      */
     public $schemaName;
     /**
-     * @var string the name of this table. The schema name is not included. Use [[fullName]] to get the name with schema name prefix.
+     * @var string the name of this table. The schema name is not included. Use {@see \rock\db\TableSchema::$fullName} to get the name with schema name prefix.
      */
     public $name;
     /**
      * @var string the full name of this table, which includes the schema name prefix, if any.
-     * Note that if the schema name is the same as the [[Schema::defaultSchema|default schema name]],
+     * Note that if the schema name is the same as the {@see \rock\db\Schema::$defaultSchema}(default schema name),
      * the schema name will not be included.
      */
     public $fullName;
@@ -36,19 +36,20 @@ class TableSchema
     /**
      * @var array foreign keys of this table. Each array element is of the following structure:
      *
-     * ~~~
+     * ```php
      * [
      *  'ForeignTableName',
      *  'fk1' => 'pk1',  // pk1 is in foreign table
      *  'fk2' => 'pk2',  // if composite foreign key
      * ]
-     * ~~~
+     * ```
      */
     public $foreignKeys = [];
     /**
-     * @var ColumnSchema[] column metadata of this table. Each array element is a [[ColumnSchema]] object, indexed by column names.
+     * @var ColumnSchema[] column metadata of this table. Each array element is a {@see \rock\db\ColumnSchema} object, indexed by column names.
      */
     public $columns = [];
+
 
     /**
      * Gets the named column metadata.

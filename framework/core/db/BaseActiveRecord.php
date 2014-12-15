@@ -77,6 +77,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      */
     private $_related = [];
 
+
     /**
      * @inheritdoc
      * @return static ActiveRecord instance matching the condition, or `null` if nothing matches.
@@ -126,9 +127,9 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * Updates the whole table using the provided attribute values and conditions.
      * For example, to change the status to be 1 for all customers whose status is 2:
      *
-     * ~~~
+     * ```php
      * Customer::updateAll(['status' => 1], 'status = 2');
-     * ~~~
+     * ```
      *
      * @param array $attributes attribute values (name-value pairs) to be saved into the table
      * @param string|array $condition the conditions that will be put in the WHERE part of the UPDATE SQL.
@@ -196,9 +197,10 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      *
      * 1. Create a column to store the version number of each row. The column type should be `BIGINT DEFAULT 0`.
      *    Override this method to return the name of this column.
-     * 2. In the Web form that collects the user input, add a hidden field that stores
+     * 2. Add a `required` validation rule for the version column to ensure the version value is submitted.
+     * 3. In the Web form that collects the user input, add a hidden field that stores
      *    the lock version of the recording being updated.
-     * 3. In the controller action that does the data updating, try to catch the {@see \rock\db\Exception}
+     * 4. In the controller action that does the data updating, try to catch the {@see \rock\db\Exception}
      *    and implement necessary business logic (e.g. merging the changes, prompting stated data)
      *    to resolve the conflict.
      *
@@ -590,13 +592,13 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * 1. call [[beforeValidate()]] when `$runValidation` is true. If validation
      *    fails, it will skip the rest of the steps;
      * 2. call [[afterValidate()]] when `$runValidation` is true.
-     * 3. call {@see BaseActiveRecord::beforeSave()}. If the method returns false, it will skip the
+     * 3. call {@see \rock\db\BaseActiveRecord::beforeSave()}. If the method returns false, it will skip the
      *    rest of the steps;
      * 4. save the record into database. If this fails, it will skip the rest of the steps;
-     * 5. call {@see BaseActiveRecord::afterSave()};
+     * 5. call {@see \rock\db\BaseActiveRecord::afterSave()};
      *
-     * In the above step 1, 2, 3 and 5, events [[EVENT_BEFORE_VALIDATE]], {@see BaseActiveRecord::EVENT_BEFORE_UPDATE},
-     * {@see BaseActiveRecord::EVENT_AFTER_UPDATE} and [[EVENT_AFTER_VALIDATE]]
+     * In the above step 1, 2, 3 and 5, events [[EVENT_BEFORE_VALIDATE]], {@see \rock\db\BaseActiveRecord::EVENT_BEFORE_UPDATE},
+     * {@see \rock\db\BaseActiveRecord::EVENT_AFTER_UPDATE} and [[EVENT_AFTER_VALIDATE]]
      * will be raised by the corresponding methods.
      *
      * Only the [[dirtyAttributes|changed attribute values]] will be saved into database.
@@ -627,8 +629,8 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * @param array $attributeNames list of attribute names that need to be saved. Defaults to null,
      * meaning all attributes that are loaded from DB will be saved.
      * @return integer|boolean the number of rows affected, or false if validation fails
-     * or {@see BaseActiveRecord::beforeSave()} stops the updating process.
-     * @throws Exception if {@see BaseActiveRecord::optimisticLock()} optimistic locking is enabled and the data
+     * or {@see \rock\db\BaseActiveRecord::beforeSave()} stops the updating process.
+     * @throws Exception if {@see \rock\db\BaseActiveRecord::optimisticLock()} optimistic locking is enabled and the data
      * being updated is outdated.
      * @throws Exception in case update failed.
      */
@@ -683,6 +685,8 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
 
     /**
      * @see update()
+     * @param array $attributes attributes to update
+     * @return integer number of rows updated
      * @throws Exception
      */
     protected function updateInternal($attributes = null)
@@ -698,9 +702,9 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
         $condition = $this->getOldPrimaryKey(true);
         $lock = $this->optimisticLock();
         if ($lock !== null) {
-            if (!isset($values[$lock])) {
+            //if (!isset($values[$lock])) {
                 $values[$lock] = $this->$lock + 1;
-            }
+            //}
             $condition[$lock] = $this->$lock;
         }
         // We do not check the return value of updateAll() because it's possible
@@ -756,17 +760,17 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      *
      * This method performs the following steps in order:
      *
-     * 1. call {@see BaseActiveRecord::beforeDelete()}. If the method returns false, it will skip the
+     * 1. call {@see \rock\db\BaseActiveRecord::beforeDelete()}. If the method returns false, it will skip the
      *    rest of the steps;
      * 2. delete the record from the database;
-     * 3. call {@see BaseActiveRecord::afterDelete()}.
+     * 3. call {@see \rock\db\BaseActiveRecord::afterDelete()}.
      *
-     * In the above step 1 and 3, events named {@see BaseActiveRecord::EVENT_BEFORE_DELETE} and {@see BaseActiveRecord::EVENT_AFTER_DELETE}
+     * In the above step 1 and 3, events named {@see \rock\db\BaseActiveRecord::EVENT_BEFORE_DELETE} and {@see \rock\db\BaseActiveRecord::EVENT_AFTER_DELETE}
      * will be raised by the corresponding methods.
      *
      * @return integer|boolean the number of rows deleted, or false if the deletion is unsuccessful for some reason.
      * Note that it is possible the number of rows deleted is 0, even though the deletion execution is successful.
-     * @throws Exception if {@see BaseActiveRecord::optimisticLock()} optimistic locking is enabled and the data
+     * @throws Exception if {@see \rock\db\BaseActiveRecord::optimisticLock()} optimistic locking is enabled and the data
      * being deleted is outdated.
      */
     public function delete()
@@ -794,7 +798,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
     /**
      * Returns a value indicating whether the current record is new.
      * 
-     * @return boolean whether the record is new and should be inserted when calling {@see BaseActiveRecord::save()}.
+     * @return boolean whether the record is new and should be inserted when calling {@see \rock\db\BaseActiveRecord::save()}.
      */
     public function getIsNewRecord()
     {
@@ -804,7 +808,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
     /**
      * Sets the value indicating whether the record is new.
      * 
-     * @param boolean $value whether the record is new and should be inserted when calling {@see BaseActiveRecord::save()}.
+     * @param boolean $value whether the record is new and should be inserted when calling {@see \rock\db\BaseActiveRecord::save()}.
      * @see getIsNewRecord()
      */
     public function setIsNewRecord($value)
@@ -816,7 +820,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * Initializes the object.
      * 
      * This method is called at the end of the constructor.
-     * The default implementation will trigger an {@see BaseActiveRecord::EVENT_INIT} event.
+     * The default implementation will trigger an {@see \rock\db\BaseActiveRecord::EVENT_INIT} event.
      * If you override this method, make sure you call the parent implementation at the end
      * to ensure triggering of the event.
      */
@@ -829,7 +833,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
     /**
      * This method is called when the AR object is created and populated with the query result.
      * 
-     * The default implementation will trigger an {@see BaseActiveRecord::EVENT_BEFORE_FIND} event.
+     * The default implementation will trigger an {@see \rock\db\BaseActiveRecord::EVENT_BEFORE_FIND} event.
      * When overriding this method, make sure you call the parent implementation to ensure the
      * event is triggered.
      */
@@ -843,7 +847,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
     /**
      * This method is called when the AR object is created and populated with the query result.
      *
-     * The default implementation will trigger an {@see BaseActiveRecord::EVENT_AFTER_FIND} event.
+     * The default implementation will trigger an {@see \rock\db\BaseActiveRecord::EVENT_AFTER_FIND} event.
      * When overriding this method, make sure you call the parent implementation to ensure the
      * event is triggered.
      *
@@ -891,8 +895,8 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
     /**
      * This method is called at the end of inserting or updating a record.
      * 
-     * The default implementation will trigger an {@see BaseActiveRecord::EVENT_AFTER_INSERT} event when `$insert` is true,
-     * or an {@see BaseActiveRecord::EVENT_AFTER_UPDATE} event if `$insert` is false. The event class used is [[AfterSaveEvent]].
+     * The default implementation will trigger an {@see \rock\db\BaseActiveRecord::EVENT_AFTER_INSERT} event when `$insert` is true,
+     * or an {@see \rock\db\BaseActiveRecord::EVENT_AFTER_UPDATE} event if `$insert` is false. The event class used is [[AfterSaveEvent]].
      * When overriding this method, make sure you call the parent implementation so that
      * the event is triggered.
      * @param boolean $insert whether this method called while inserting a record.
@@ -914,7 +918,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
     /**
      * This method is invoked before deleting a record.
      * 
-     * The default implementation raises the {@see BaseActiveRecord::EVENT_BEFORE_DELETE} event.
+     * The default implementation raises the {@see \rock\db\BaseActiveRecord::EVENT_BEFORE_DELETE} event.
      * When overriding this method, make sure you call the parent implementation like the following:
      *
      * ```php
@@ -935,13 +939,14 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
     {
         $event = new ModelEvent;
         $this->trigger(self::EVENT_BEFORE_DELETE, $event);
+
         return $event->isValid;
     }
 
     /**
      * This method is invoked after deleting a record.
      * 
-     * The default implementation raises the {@see BaseActiveRecord::EVENT_AFTER_DELETE} event.
+     * The default implementation raises the {@see \rock\db\BaseActiveRecord::EVENT_AFTER_DELETE} event.
      * You may override this method to do postprocessing after the record is deleted.
      * Make sure you call the parent implementation so that the event is raised properly.
      */
@@ -974,7 +979,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
     /**
      * Returns a value indicating whether the given active record is the same as the current one.
      * The comparison is made by comparing the table names and the primary key values of the two active records.
-     * If one of the records {@see BaseActiveRecord::$isNewRecord} they are also considered not equal.
+     * If one of the records {@see \rock\db\BaseActiveRecord::$isNewRecord} they are also considered not equal.
      * @param ActiveRecordInterface $record record to compare to
      * @return boolean whether the two active records refer to the same row in the same database table.
      */
@@ -1030,10 +1035,14 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * @return mixed the old primary key value. An array (column name => column value) is returned if the primary key
      * is composite or `$asArray` is true. A string is returned otherwise (null will be returned if
      * the key value is null).
+     * @throws Exception if the AR model does not have a primary key
      */
     public function getOldPrimaryKey($asArray = false)
     {
         $keys = $this->primaryKey();
+        if (empty($keys)) {
+            throw new Exception(get_class($this) . ' does not have a primary key. You should either define a primary key for the corresponding table or override the primaryKey() method.');
+        }
         if (count($keys) === 1 && !$asArray) {
             return isset($this->_oldAttributes[$keys[0]]) ? $this->_oldAttributes[$keys[0]] : null;
         } else {
@@ -1053,11 +1062,11 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * fetching data from the database. It is mainly used by {@see \rock\db\ActiveQuery} to populate
      * the query results into active records.
      *
-     * When calling this method manually you should call {@see BaseActiveRecord::afterFind()} on the created
-     * record to trigger the {@see BaseActiveRecord::EVENT_AFTER_FIND}.
+     * When calling this method manually you should call {@see \rock\db\BaseActiveRecord::afterFind()} on the created
+     * record to trigger the {@see \rock\db\BaseActiveRecord::EVENT_AFTER_FIND}.
      *
      * @param BaseActiveRecord $record the record to be populated. In most cases this will be an instance
-     * created by {@see BaseActiveRecord::instantiate()} beforehand.
+     * created by {@see \rock\db\BaseActiveRecord::instantiate()} beforehand.
      * @param array $row attribute values (name => value)
      */
     public static function populateRecord($record, $row)
@@ -1068,7 +1077,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
             $record->_attributes[$name] = $value;
             if (isset($columns[$name])) {
                 $record->_attributes[$name] = $value;
-            } else {
+            } elseif ($record->canSetProperty($name)) {
                 $record->$name = $value;
             }
         }
@@ -1085,7 +1094,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
     /**
      * Creates an active record instance.
      *
-     * This method is called together with {@see BaseActiveRecord::populateRecord()} by {@see \rock\db\ActiveQuery}.
+     * This method is called together with {@see \rock\db\BaseActiveRecord::populateRecord()} by {@see \rock\db\ActiveQuery}.
      * It is not meant to be used for creating new records directly.
      *
      * You may override this method if the instance being created
@@ -1260,6 +1269,8 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      *
      * @param string $name the case sensitive name of the relationship.
      * @param ActiveRecordInterface $model the model to be unlinked from the current one.
+     * You have to make sure that the model is really related with the current model as this method
+     * does not check this.
      * @param boolean $delete whether to delete the model that contains the foreign key.
      * If false, the model's foreign key will be set null and saved.
      * If true, the model containing the foreign key will be deleted.
@@ -1310,14 +1321,22 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
         } else {
             $p1 = $model->isPrimaryKey(array_keys($relation->link));
             $p2 = $this->isPrimaryKey(array_values($relation->link));
-            if ($p1 && $p2 || $p2) {
+            if ($p2) {
                 foreach ($relation->link as $a => $b) {
                     $model->$a = null;
                 }
                 $delete ? $model->delete() : $model->save(false);
             } elseif ($p1) {
-                foreach ($relation->link as $b) {
-                    $this->$b = null;
+                foreach ($relation->link as $a => $b) {
+                    if (is_array($this->$b)) { // relation via array valued attribute
+                        if (($key = array_search($model->$a, $this->$b, false)) !== false) {
+                            $values = $this->$b;
+                            unset($values[$key]);
+                            $this->$b = array_values($values);
+                        }
+                    } else {
+                        $this->$b = null;
+                    }
                 }
                 $delete ? $this->delete() : $this->save(false);
             } else {
@@ -1368,6 +1387,9 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
                 $nulls[$a] = null;
                 $condition[$a] = $this->$b;
             }
+            if (!empty($viaRelation->where)) {
+                $condition = ['and', $condition, $viaRelation->where];
+            }
             if (is_array($relation->via)) {
                 /** @var $viaClass ActiveRecordInterface */
                 if ($delete) {
@@ -1388,16 +1410,25 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
         } else {
             /** @var $relatedModel ActiveRecordInterface */
             $relatedModel = $relation->modelClass;
-            $nulls = [];
-            $condition = [];
-            foreach ($relation->link as $a => $b) {
-                $nulls[$a] = null;
-                $condition[$a] = $this->$b;
-            }
-            if ($delete) {
-                $relatedModel::deleteAll($condition);
+            if (!$delete && count($relation->link) == 1 && is_array($this->{$b = reset($relation->link)})) {
+                // relation via array valued attribute
+                $this->$b = [];
+                $this->save(false);
             } else {
-                $relatedModel::updateAll($nulls, $condition);
+                $nulls = [];
+                $condition = [];
+                foreach ($relation->link as $a => $b) {
+                    $nulls[$a] = null;
+                    $condition[$a] = $this->$b;
+                }
+                if (!empty($relation->where)) {
+                    $condition = ['and', $condition, $relation->where];
+                }
+                if ($delete) {
+                    $relatedModel::deleteAll($condition);
+                } else {
+                    $relatedModel::updateAll($nulls, $condition);
+                }
             }
         }
 
@@ -1418,7 +1449,11 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
                 throw new Exception('Unable to link models: the primary key of ' . get_class($primaryModel) .
                                     ' is null.');
             }
-            $foreignModel->$fk = $value;
+            if (is_array($foreignModel->$fk)) { // relation via array valued attribute
+                $foreignModel->$fk = array_merge($foreignModel->$fk, [$value]);
+            } else {
+                $foreignModel->$fk = $value;
+            }
         }
         $foreignModel->save(false);
     }

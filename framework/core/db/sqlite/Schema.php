@@ -11,7 +11,7 @@ use rock\db\Transaction;
  * Schema is the class for retrieving metadata from a SQLite (2/3) database.
  *
  * @property string $transactionIsolationLevel The transaction isolation level to use for this transaction.
- * This can be either [[Transaction::READ_UNCOMMITTED]] or [[Transaction::SERIALIZABLE]].
+ * This can be either {@see \rock\db\Transaction::READ_UNCOMMITTED} or {@see \rock\db\Transaction::SERIALIZABLE}.
  */
 class Schema extends \rock\db\Schema
 {
@@ -48,6 +48,7 @@ class Schema extends \rock\db\Schema
         'timestamp' => self::TYPE_TIMESTAMP,
         'enum' => self::TYPE_STRING,
     ];
+
 
     /**
      * Quotes a table name for use in a query.
@@ -196,18 +197,18 @@ class Schema extends \rock\db\Schema
     }
 
     /**
-     * Loads the column information into a [[ColumnSchema]] object.
+     * Loads the column information into a {@see \rock\db\ColumnSchema} object.
      * @param array $info column information
      * @return ColumnSchema the column schema object
      */
     protected function loadColumnSchema($info)
     {
-        $column = new ColumnSchema;
+        $column = $this->createColumnSchema();
         $column->name = $info['name'];
         $column->allowNull = !$info['notnull'];
         $column->isPrimaryKey = $info['pk'] != 0;
 
-        $column->dbType = $info['type'];
+        $column->dbType = strtolower($info['type']);
         $column->unsigned = strpos($column->dbType, 'unsigned') !== false;
 
         $column->type = self::TYPE_STRING;
@@ -253,7 +254,7 @@ class Schema extends \rock\db\Schema
     /**
      * Sets the isolation level of the current transaction.
      * @param string $level The transaction isolation level to use for this transaction.
-     * This can be either [[Transaction::READ_UNCOMMITTED]] or [[Transaction::SERIALIZABLE]].
+     * This can be either {@see \rock\db\Transaction::READ_UNCOMMITTED} or {@see \rock\db\Transaction::SERIALIZABLE}.
      * @throws Exception when unsupported isolation levels are used.
      * SQLite only supports SERIALIZABLE and READ UNCOMMITTED.
      * @see http://www.sqlite.org/pragma.html#pragma_read_uncommitted

@@ -4,17 +4,24 @@ namespace rock\db;
 use PDO;
 use rock\base\ComponentsTrait;
 use rock\base\ObjectInterface;
+use rock\cache\CacheInterface;
+use rock\di\Container;
 use rock\Rock;
 
 /**
- * Connection represents a connection to a database via `PDO`(http://www.php.net/manual/en/ref.pdo.php).
+ * Connection represents a connection to a database via [PDO](http://www.php.net/manual/en/book.pdo.php).
  *
- * Connection works together with `Command`, `DataReader` and `Transaction`
+ * Connection works together with {@see \rock\db\Command}, {@see \rock\db\DataReader} and {@see \rock\db\Transaction}
  * to provide data access to various DBMS in a common set of APIs. They are a thin wrapper
- * of the [[PDO PHP extension]](http://www.php.net/manual/en/ref.pdo.php).
+ * of the [PDO PHP extension](http://www.php.net/manual/en/book.pdo.php).
  *
- * To establish a DB connection, set `dsn`, `username` and `password`, and then
- * call `open()` to be true.
+ * Connection supports database replication and read-write splitting. In particular, a Connection component
+ * can be configured with multiple {@see \rock\db\Connection::$masters} and {@see \rock\db\Connection::$slaves}. It will do load balancing and failover by choosing
+ * appropriate servers. It will also automatically direct read operations to the slaves and write operations to
+ * the masters.
+ *
+ * To establish a DB connection, set {@see \rock\db\Connection::$dsn}, {@see \rock\db\Connection::$username} and {@see \rock\db\Connection::$password}, and then
+ * call {@see \rock\db\Connection::open()} to be true.
  *
  * The following example shows how to create a Connection instance and establish
  * the DB connection:
@@ -47,7 +54,7 @@ use rock\Rock;
  * $post = $command->query();
  * ```
  *
- * For more information about how to perform various DB queries, please refer to `Command`.
+ * For more information about how to perform various DB queries, please refer to {@see \rock\db\Command}.
  *
  * If the underlying DBMS supports transactions, you can perform transactional SQL queries
  * like the following:
@@ -101,10 +108,16 @@ use rock\Rock;
  * @property boolean $isActive Whether the DB connection is established. This property is read-only.
  * @property string $lastInsertID The row ID of the last row inserted, or the last value retrieved from the
  * sequence object. This property is read-only.
+ * @property PDO $masterPdo The PDO instance for the currently active master connection. This property is
+ * read-only.
  * @property QueryBuilder $queryBuilder The query builder for the current DB connection. This property is
  * read-only.
  * @property Schema $schema The schema information for the database opened by this connection. This property
  * is read-only.
+ * @property Connection $slave The currently active slave connection. Null is returned if there is slave
+ * available and `$fallbackToMaster` is false. This property is read-only.
+ * @property PDO $slavePdo The PDO instance for the currently active slave connection. Null is returned if no
+ * slave connection is available and `$fallbackToMaster` is false. This property is read-only.
  * @property Transaction $transaction The currently active transaction. Null if no active transaction. This
  * property is read-only.
  */
@@ -145,7 +158,7 @@ class Connection implements ObjectInterface
      */
     public $password;
     /**
-     * @var array PDO attributes (name => value) that should be set when calling `open()`
+     * @var array PDO attributes (name => value) that should be set when calling {@see \rock\db\Connection::open()}
      * to establish a DB connection. Please refer to the
      * [PHP manual](http://www.php.net/manual/en/function.PDO-setAttribute.php) for
      * details about available attributes.
@@ -153,7 +166,7 @@ class Connection implements ObjectInterface
     public $attributes;
     /**
      * @var PDO the PHP PDO instance associated with this DB connection.
-     * This property is mainly managed by `open()` and [[close()]] methods.
+     * This property is mainly managed by {@see \rock\db\Connection::open()} and {@see \rock\db\Connection::close()} methods.
      * When a DB connection is active, this property will represent a PDO instance;
      * otherwise, it will be null.
      */
@@ -161,7 +174,7 @@ class Connection implements ObjectInterface
     /**
      * @var boolean whether to enable schema caching.
      * Note that in order to enable truly schema caching, a valid cache component as specified
-     * by [[schemaCache]] must be enabled and [[enableSchemaCache]] must be set true.
+     * by {@see \rock\db\Connection::$schemaCache} must be enabled and {@see \rock\db\Connection::$enableSchemaCache} must be set true.
      * @see schemaCacheTags
      * @see schemaCacheExclude
      * @see schemaCache
@@ -186,7 +199,7 @@ class Connection implements ObjectInterface
      */
     public $schemaCacheExclude = [];
     /**
-     * @var string the cache object or the ID of the cache application component that
+     * @var \rock\cache\CacheInterface|string the cache object or the ID of the cache application component that
      * is used to cache the table metadata.
      * @see enableSchemaCache
      */
@@ -194,9 +207,9 @@ class Connection implements ObjectInterface
     /**
      * @var boolean whether to enable query caching.
      * Note that in order to enable query caching, a valid cache component as specified
-     * by [[queryCache]] must be enabled and [[enableQueryCache]] must be set true.
+     * by {@see \rock\db\Connection::$queryCache} must be enabled and {@see \rock\db\Connection::$enableQueryCache} must be set true.
      *
-     * Methods [[beginCache()]] and [[endCache()]] can be used as shortcuts to turn on
+     * Methods {@see \rock\db\QueryInterface::beginCache()} and {@see \rock\db\QueryInterface::endCache()} can be used as shortcuts to turn on
      * and off query caching on the fly.
      * @see queryCacheExpire
      * @see queryCache
@@ -219,7 +232,7 @@ class Connection implements ObjectInterface
      */
     public $queryCacheTags;
     /**
-     * @var string the cache object or the ID of the cache application component
+     * @var \rock\cache\CacheInterface|string the cache object or the ID of the cache application component
      * that is used for query caching.
      * @see enableQueryCache
      */
@@ -255,15 +268,16 @@ class Connection implements ObjectInterface
     public $aliasSeparator = '__';
 
     public $typeCast = true;
+    
     /**
-     * @var array mapping between PDO driver names and [[Schema]] classes.
+     * @var array mapping between PDO driver names and {@see \rock\db\Schema} classes.
      * The keys of the array are PDO driver names while the values the corresponding
-     * schema class name or configuration. Please refer to [[Rock::factory()]] for
+     * schema class name or configuration. Please refer to {@see \rock\Rock::factory()} for
      * details on how to specify a configuration.
      *
-     * This property is mainly used by [[getSchema()]] when fetching the database schema information.
+     * This property is mainly used by {@see \rock\db\Connection::getSchema()} when fetching the database schema information.
      * You normally do not need to set this property unless you want to use your own
-     * [[Schema]] class to support DBMS that is not supported by Rock.
+     * {@see \rock\db\Schema} class to support DBMS that is not supported by Rock.
      */
     public $schemaMap = [
         'pgsql'   => 'rock\db\pgsql\Schema', // PostgreSQL
@@ -278,7 +292,7 @@ class Connection implements ObjectInterface
         'cubrid'  => 'rock\db\cubrid\Schema', // CUBRID
     ];
     /**
-     * @var string Custom PDO wrapper class. If not set, it will use "PDO" or "\rock\db\mssql\PDO" when MSSQL is used.
+     * @var string Custom PDO wrapper class. If not set, it will use "PDO" or {@see \rock\db\mssql\PDO} when MSSQL is used.
      */
     public $pdoClass;
     /**
@@ -286,6 +300,72 @@ class Connection implements ObjectInterface
      * Note that if the underlying DBMS does not support savepoint, setting this property to be true will have no effect.
      */
     public $enableSavepoint = true;
+    /**
+     * @var \rock\cache\CacheInterface|string the cache object or the ID of the cache application component that is used to store
+     * the health status of the DB servers specified in {@see \rock\db\Connection::$masters} and {@see \rock\db\Connection::$slaves}.
+     * This is used only when read/write splitting is enabled or {@see \rock\db\Connection::$masters} is not empty.
+     */
+    public $serverStatusCache = 'cache';
+    /**
+     * @var integer the retry interval in seconds for dead servers listed in {@see \rock\db\Connection::$masters} and {@see \rock\db\Connection::$slaves}.
+     * This is used together with {@see \rock\db\Connection::$serverStatusCache}.
+     */
+    public $serverRetryInterval = 600;
+    /**
+     * @var boolean whether to enable read/write splitting by using {@see \rock\db\Connection::$slaves} to read data.
+     * Note that if {@see \rock\db\Connection::$slaves} is empty, read/write splitting will NOT be enabled no matter what value this property takes.
+     */
+    public $enableSlaves = true;
+    /**
+     * @var array list of slave connection configurations. Each configuration is used to create a slave DB connection.
+     * When {@see \rock\db\Connection::$enableSlaves} is true, one of these configurations will be chosen and used to create a DB connection
+     * for performing read queries only.
+     * @see enableSlaves
+     * @see slaveConfig
+     */
+    public $slaves = [];
+    /**
+     * @var array the configuration that should be merged with every slave configuration listed in {@see \rock\db\Connection::$slaves}.
+     * For example,
+     *
+     * ```php
+     * [
+     *     'username' => 'slave',
+     *     'password' => 'slave',
+     *     'attributes' => [
+     *         // use a smaller connection timeout
+     *         PDO::ATTR_TIMEOUT => 10,
+     *     ],
+     * ]
+     * ```
+     */
+    public $slaveConfig = [];
+    /**
+     * @var array list of master connection configurations. Each configuration is used to create a master DB connection.
+     * When {@see \rock\db\Connection::open()} is called, one of these configurations will be chosen and used to create a DB connection
+     * which will be used by this object.
+     * Note that when this property is not empty, the connection setting (e.g. "dsn", "username") of this object will
+     * be ignored.
+     * @see masterConfig
+     */
+    public $masters = [];
+    /**
+     * @var array the configuration that should be merged with every master configuration listed in {@see \rock\db\Connection::$masters}.
+     * For example,
+     *
+     * ```php
+     * [
+     *     'username' => 'master',
+     *     'password' => 'master',
+     *     'attributes' => [
+     *         // use a smaller connection timeout
+     *         PDO::ATTR_TIMEOUT => 10,
+     *     ],
+     * ]
+     * ```
+     */
+    public $masterConfig = [];
+
     /**
      * @var Transaction the currently active transaction
      */
@@ -298,6 +378,11 @@ class Connection implements ObjectInterface
      * @var string driver name
      */
     private $_driverName;
+    /**
+     * @var Connection the currently active slave connection
+     */
+    private $_slave = false;
+
 
     /**
      * Returns a value indicating whether the DB connection is established.
@@ -315,23 +400,33 @@ class Connection implements ObjectInterface
      */
     public function open()
     {
-        if ($this->pdo === null) {
-            if (empty($this->dsn)) {
-                throw new Exception(Exception::GETTING_UNKNOWN_PROPERTY, [
-                    'class' => __CLASS__, 'property' => 'dns'
-                ]);
+        if ($this->pdo !== null) {
+            return;
+        }
+
+        if (!empty($this->masters)) {
+            $db = $this->openFromPool($this->masters, $this->masterConfig);
+            if ($db !== null) {
+                $this->pdo = $db->pdo;
+                return;
+            } else {
+                throw new Exception('None of the master DB servers is available.');
             }
-            $token = 'Opening DB connection: ' . $this->dsn;
-            try {
-                Rock::trace('db', $token);
-                Rock::beginProfile('db', $token);
-                $this->pdo = $this->createPdoInstance();
-                $this->initConnection();
-                Rock::endProfile('db', $token);
-            } catch (\PDOException $e) {
-                Rock::endProfile('db', $token);
-                throw new Exception($e->getMessage(), [], $e);
-            }
+        }
+
+        if (empty($this->dsn)) {
+            throw new Exception('Connection::dsn cannot be empty.');
+        }
+        $token = 'Opening DB connection: ' . $this->dsn;
+        try {
+            Rock::trace('db', $token);
+            Rock::beginProfile('db', $token);
+            $this->pdo = $this->createPdoInstance();
+            $this->initConnection();
+            Rock::endProfile('db', $token);
+        } catch (\PDOException $e) {
+            Rock::endProfile('db', $token);
+            throw new Exception($e->getMessage(), [], $e);
         }
     }
 
@@ -347,11 +442,17 @@ class Connection implements ObjectInterface
             $this->_schema = null;
             $this->_transaction = null;
         }
+
+        if ($this->_slave) {
+            $this->_slave->close();
+            $this->_slave = null;
+        }
     }
 
     /**
      * Creates the PDO instance.
-     * This method is called by [[open]] to establish a DB connection.
+     * 
+     * This method is called by {@see \rock\db\Connection::open()} to establish a DB connection.
      * The default implementation will create a PHP PDO instance.
      * You may override this method if the default PDO needs to be adapted for certain DBMS.
      * @return PDO the pdo instance
@@ -376,10 +477,11 @@ class Connection implements ObjectInterface
 
     /**
      * Initializes the DB connection.
+     * 
      * This method is invoked right after the DB connection is established.
      * The default implementation turns on `PDO::ATTR_EMULATE_PREPARES`
-     * if [[emulatePrepare]] is true, and sets the database [[charset]] if it is not empty.
-     * It then triggers an [[EVENT_AFTER_OPEN]] event.
+     * if {@see \rock\db\Connection::$emulatePrepare} is true, and sets the database {@see \rock\db\Connection::$charset} if it is not empty.
+     * It then triggers an {@see \rock\db\Connection::EVENT_AFTER_OPEN} event.
      */
     protected function initConnection()
     {
@@ -401,7 +503,7 @@ class Connection implements ObjectInterface
      */
     public function createCommand($sql = null, $params = [])
     {
-        $this->open();
+        //$this->open();
         $command = new Command([
             'db' => $this,
             'sql' => $sql,
@@ -419,11 +521,10 @@ class Connection implements ObjectInterface
         return $this->_transaction && $this->_transaction->getIsActive() ? $this->_transaction : null;
     }
 
-
     /**
      * Starts a transaction.
      * @param string|null $isolationLevel The isolation level to use for this transaction.
-     * See [[Transaction::begin()]] for details.
+     * See {@see \rock\db\Transaction::begin()} for details.
      * @return Transaction the transaction initiated
      */
     public function beginTransaction($isolationLevel = null)
@@ -443,7 +544,7 @@ class Connection implements ObjectInterface
      *
      * @param callable $callback a valid PHP callback that performs the job. Accepts connection instance as parameter.
      * @param string|null $isolationLevel The isolation level to use for this transaction.
-     * See [[Transaction::begin()]] for details.
+     * See {@see \rock\db\Transaction::begin()} for details.
      * @throws \Exception
      * @return mixed result of callback function
      */
@@ -479,7 +580,7 @@ class Connection implements ObjectInterface
                 $this->_schema = is_array($this->schemaMap[$driver]) ? $this->schemaMap[$driver]['class'] : $this->schemaMap[$driver];
                 return $this->_schema = new $this->_schema(['db'=>$this]);
             } else {
-                throw new Exception(Exception::NOT_SUPPORT_SCHEMA, ['driver' => $driver]);
+                throw new Exception("Connection does not support reading schema information for '$driver' DBMS.");
             }
         }
     }
@@ -506,6 +607,7 @@ class Connection implements ObjectInterface
 
     /**
      * Returns the ID of the last inserted row or sequence value.
+     *
      * @param string $sequenceName name of the sequence object (required by some DBMS)
      * @return string the row ID of the last row inserted, or the last value retrieved from the sequence object
      * @see http://www.php.net/manual/en/function.PDO-lastInsertId.php
@@ -517,6 +619,7 @@ class Connection implements ObjectInterface
 
     /**
      * Quotes a string value for use in a query.
+     *
      * Note that if the parameter is not a string, it will be returned without change.
      *
      * @param string $value string to be quoted
@@ -530,6 +633,7 @@ class Connection implements ObjectInterface
 
     /**
      * Quotes a table name for use in a query.
+     *
      * If the table name contains schema prefix, the prefix will also be properly quoted.
      * If the table name is already quoted or contains special characters including '(', '[[' and '{{',
      * then this method will do nothing.
@@ -543,6 +647,7 @@ class Connection implements ObjectInterface
 
     /**
      * Quotes a column name for use in a query.
+     *
      * If the column name contains prefix, the prefix will also be properly quoted.
      * If the column name is already quoted or contains special characters including '(', '[[' and '{{',
      * then this method will do nothing.
@@ -556,10 +661,11 @@ class Connection implements ObjectInterface
 
     /**
      * Processes a SQL statement by quoting table and column names that are enclosed within double brackets.
+     *
      * Tokens enclosed within double curly brackets are treated as table names, while
      * tokens enclosed within double square brackets are column names. They will be quoted accordingly.
      * Also, the percentage character "%" at the beginning or ending of a table name will be replaced
-     * with [[tablePrefix]].
+     * with {@see \rock\db\Connection::$tablePrefix}.
      * @param string $sql the SQL to be quoted
      * @return string the quoted SQL
      */
@@ -579,7 +685,7 @@ class Connection implements ObjectInterface
     }
 
     /**
-     * Returns the name of the DB driver. Based on the the current `dsn`, in case it was not set explicitly
+     * Returns the name of the DB driver. Based on the the current {@see \rock\db\Connection::$dsn}, in case it was not set explicitly
      * by an end user.
      * @return string name of the DB driver
      */
@@ -589,8 +695,8 @@ class Connection implements ObjectInterface
             if (($pos = strpos($this->dsn, ':')) !== false) {
                 $this->_driverName = strtolower(substr($this->dsn, 0, $pos));
             } else {
-                $this->open();
-                $this->_driverName = strtolower($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
+                //$this->open();
+                $this->_driverName = strtolower($this->getSlavePdo()->getAttribute(PDO::ATTR_DRIVER_NAME));
             }
         }
         return $this->_driverName;
@@ -603,5 +709,135 @@ class Connection implements ObjectInterface
     public function setDriverName($driverName)
     {
         $this->_driverName = strtolower($driverName);
+    }
+
+    /**
+     * Returns the PDO instance for the currently active slave connection.
+     *
+     * When {@see \rock\db\Connection::$enableSlaves} is true, one of the slaves will be used for read queries, and its PDO instance
+     * will be returned by this method.
+     * @param boolean $fallbackToMaster whether to return a master PDO in case none of the slave connections is available.
+     * @return PDO the PDO instance for the currently active slave connection. Null is returned if no slave connection
+     * is available and `$fallbackToMaster` is false.
+     */
+    public function getSlavePdo($fallbackToMaster = true)
+    {
+        $db = $this->getSlave(false);
+        if ($db === null) {
+            return $fallbackToMaster ? $this->getMasterPdo() : null;
+        } else {
+            return $db->pdo;
+        }
+    }
+
+    /**
+     * Returns the PDO instance for the currently active master connection.
+     *
+     * This method will open the master DB connection and then return {@see \rock\db\Connection::$pdo}.
+     * @return PDO the PDO instance for the currently active master connection.
+     */
+    public function getMasterPdo()
+    {
+        $this->open();
+        return $this->pdo;
+    }
+
+    /**
+     * Returns the currently active slave connection.
+     *
+     * If this method is called the first time, it will try to open a slave connection when {@see \rock\db\Connection::$enableSlaves} is true.
+     * @param boolean $fallbackToMaster whether to return a master connection in case there is no slave connection available.
+     * @return Connection the currently active slave connection. Null is returned if there is slave available and
+     * `$fallbackToMaster` is false.
+     */
+    public function getSlave($fallbackToMaster = true)
+    {
+        if (!$this->enableSlaves) {
+            return $fallbackToMaster ? $this : null;
+        }
+
+        if ($this->_slave === false) {
+            $this->_slave = $this->openFromPool($this->slaves, $this->slaveConfig);
+        }
+
+        return $this->_slave === null && $fallbackToMaster ? $this : $this->_slave;
+    }
+
+    /**
+     * Executes the provided callback by using the master connection.
+     *
+     * This method is provided so that you can temporarily force using the master connection to perform
+     * DB operations even if they are read queries. For example,
+     *
+     * ```php
+     * $result = $db->useMaster(function ($db) {
+     *     return $db->createCommand('SELECT * FROM user LIMIT 1')->queryOne();
+     * });
+     * ```
+     *
+     * @param callable $callback a PHP callable to be executed by this method. Its signature is
+     * `function (Connection $db)`. Its return value will be returned by this method.
+     * @return mixed the return value of the callback
+     */
+    public function useMaster(callable $callback)
+    {
+        $enableSlave = $this->enableSlaves;
+        $this->enableSlaves = false;
+        $result = call_user_func($callback, $this);
+        $this->enableSlaves = $enableSlave;
+        return $result;
+    }
+
+    /**
+     * Opens the connection to a server in the pool.
+     *
+     * This method implements the load balancing among the given list of the servers.
+     * @param array $pool the list of connection configurations in the server pool
+     * @param array $sharedConfig the configuration common to those given in `$pool`.
+     * @return Connection the opened DB connection, or null if no server is available
+     * @throws Exception if a configuration does not specify "dsn"
+     */
+    protected function openFromPool(array $pool, array $sharedConfig)
+    {
+        if (empty($pool)) {
+            return null;
+        }
+
+        if (!isset($sharedConfig['class'])) {
+            $sharedConfig['class'] = get_class($this);
+        }
+
+        $cache = is_string($this->serverStatusCache) ? Container::load($this->serverStatusCache) : $this->serverStatusCache;
+
+        shuffle($pool);
+
+        foreach ($pool as $config) {
+            $config = array_merge($sharedConfig, $config);
+            if (empty($config['dsn'])) {
+                throw new Exception('The "dsn" option must be specified.');
+            }
+
+            $key = [__METHOD__, $config['dsn']];
+            if ($cache instanceof CacheInterface && $cache->get($key)) {
+                // should not try this dead server now
+                continue;
+            }
+
+            /* @var $db Connection */
+            $db = Container::load($config);
+
+            try {
+                $db->open();
+                return $db;
+            } catch (\Exception $e) {
+                Rock::warning("Connection ({$config['dsn']}) failed: " . $e->getMessage(), __METHOD__);
+                if ($cache instanceof CacheInterface) {
+                    // mark this server as dead and only retry it after the specified interval
+                    $cache->set($key, 1, $this->serverRetryInterval);
+                }
+            }
+        }
+
+        return null;
     }
 }

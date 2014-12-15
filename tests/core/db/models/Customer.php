@@ -36,6 +36,17 @@ class Customer extends ActiveRecord
     {
         return $this->hasMany(Order::className(), ['customer_id' => 'id'])->orderBy('id');
     }
+
+    public function getExpensiveOrders()
+    {
+        return $this->hasMany(Order::className(), ['customer_id' => 'id'])->andWhere('total > 50')->orderBy('id');
+    }
+
+    public function getExpensiveOrdersWithNullFK()
+    {
+        return $this->hasMany(OrderWithNullFK::className(), ['customer_id' => 'id'])->andWhere('total > 50')->orderBy('id');
+    }
+
     public function getOrdersWithNullFK()
     {
         return $this->hasMany(OrderWithNullFK::className(), ['customer_id' => 'id'])->orderBy('id');
@@ -49,6 +60,7 @@ class Customer extends ActiveRecord
     // deeply nested table relation
     public function getOrderItems()
     {
+        /* @var $rel ActiveQuery */
         $rel = $this->hasMany(Item::className(), ['id' => 'item_id']);
 
         return $rel->viaTable('order_item', ['order_id' => 'id'], function (ActiveQuery $q) {

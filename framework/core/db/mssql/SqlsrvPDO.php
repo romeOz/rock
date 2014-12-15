@@ -10,7 +10,7 @@ class SqlsrvPDO extends \PDO
     /**
      * Returns value of the last inserted ID.
      *
-     * SQLSRV driver implements [[PDO::lastInsertId()]] method but with a single peculiarity:
+     * SQLSRV driver implements {@see \rock\db\mssql\PDO::lastInsertId()} method but with a single peculiarity:
      * when `$sequence` value is a null or an empty string it returns an empty string.
      * But when parameter is not specified it works as expected and returns actual
      * last inserted ID (like the other PDO drivers).

@@ -3,8 +3,8 @@ namespace rock\db;
 
 use rock\base\ObjectTrait;
 use rock\cache\CacheInterface;
+use rock\di\Container;
 use rock\helpers\Helper;
-use rock\helpers\ObjectHelper;
 use rock\Rock;
 
 /**
@@ -17,10 +17,10 @@ use rock\Rock;
  * @property QueryBuilder $queryBuilder The query builder for this connection. This property is read-only.
  * @property string[] $tableNames All table names in the database. This property is read-only.
  * @property TableSchema[] $tableSchemas The metadata for all tables in the database. Each array element is an
- * instance of [[TableSchema]] or its child class. This property is read-only.
+ * instance of {@see \rock\db\TableSchema} or its child class. This property is read-only.
  * @property string $transactionIsolationLevel The transaction isolation level to use for this transaction.
- * This can be one of [[Transaction::READ_UNCOMMITTED]], [[Transaction::READ_COMMITTED]],
- * [[Transaction::REPEATABLE_READ]] and [[Transaction::SERIALIZABLE]] but also a string containing DBMS specific
+ * This can be one of {@see \rock\db\Transaction::READ_UNCOMMITTED}, {@see \rock\db\Transaction::READ_COMMITTED},
+ * {@see \rock\db\Transaction::REPEATABLE_READ} and {@see \rock\db\Transaction::SERIALIZABLE} but also a string containing DBMS specific
  * syntax to be used after `SET TRANSACTION ISOLATION LEVEL`. This property is write-only.
  */
 abstract class Schema
@@ -69,6 +69,15 @@ abstract class Schema
      */
     private $_builder;
 
+
+    /**
+     * @return \rock\db\ColumnSchema
+     */
+    protected function createColumnSchema()
+    {
+        return Container::load(ColumnSchema::className());
+    }
+
     /**
      * Loads the metadata for the specified table.
      * @param string $name table name
@@ -94,7 +103,7 @@ abstract class Schema
 
         if ($db->enableSchemaCache === true && !in_array($name, $db->schemaCacheExclude, true)) {
             /** @var CacheInterface $cache */
-            $cache = is_string($db->schemaCache) ? Rock::factory($db->schemaCache) : $db->schemaCache;
+            $cache = is_string($db->schemaCache) ? Container::load($db->schemaCache) : $db->schemaCache;
             if ($cache instanceof CacheInterface) {
                 $cacheKey = serialize($this->getCacheKey($name));
                 if ($refresh || ($table = $cache->get($cacheKey)) === false) {
@@ -140,7 +149,7 @@ abstract class Schema
 
     /**
      * Returns the cache group name.
-     * This allows [[refresh()]] to invalidate all cached table schemas.
+     * This allows {@see \rock\db\Schema::refresh()} to invalidate all cached table schemas.
      * @return string the cache group name
      */
     protected function getCacheGroup()
@@ -158,7 +167,7 @@ abstract class Schema
      * @param boolean $refresh whether to fetch the latest available table schemas. If this is false,
      * cached data may be returned if available.
      * @return TableSchema[] the metadata for all tables in the database.
-     * Each array element is an instance of [[TableSchema]] or its child class.
+     * Each array element is an instance of {@see \rock\db\TableSchema} or its child class.
      */
     public function getTableSchemas($schema = '', $refresh = false)
     {
@@ -245,7 +254,7 @@ abstract class Schema
 
     /**
      * Creates a query builder for the database.
-     * This method may be overridden by child core to create a DBMS-specific query builder.
+     * This method may be overridden by child classes to create a DBMS-specific query builder.
      * @return QueryBuilder query builder instance
      */
     public function createQueryBuilder()
@@ -255,7 +264,7 @@ abstract class Schema
 
     /**
      * Returns all table names in the database.
-     * This method should be overridden by child core in order to support this feature
+     * This method should be overridden by child classes in order to support this feature
      * because the default implementation simply throws an exception.
      * @param string $schema the schema of the tables. Defaults to empty string, meaning the current or default schema.
      * @return array all table names in the database. The names have NO schema name prefix.
@@ -270,14 +279,14 @@ abstract class Schema
      * Returns all unique indexes for the given table.
      * Each array element is of the following structure:
      *
-     * ~~~
+     * ```php
      * [
      *  'IndexName1' => ['col1' [, ...]],
      *  'IndexName2' => ['col2' [, ...]],
      * ]
-     * ~~~
+     * ```
      *
-     * This method should be overridden by child core in order to support this feature
+     * This method should be overridden by child classes in order to support this feature
      * because the default implementation simply throws an exception
      * @param TableSchema $table the table metadata
      * @return array all unique indexes for the given table.
@@ -342,8 +351,8 @@ abstract class Schema
     /**
      * Sets the isolation level of the current transaction.
      * @param string $level The transaction isolation level to use for this transaction.
-     * This can be one of [[Transaction::READ_UNCOMMITTED]], [[Transaction::READ_COMMITTED]], [[Transaction::REPEATABLE_READ]]
-     * and [[Transaction::SERIALIZABLE]] but also a string containing DBMS specific syntax to be used
+     * This can be one of {@see \rock\db\Transaction::READ_UNCOMMITTED}, {@see \rock\db\Transaction::READ_COMMITTED}, {@see \rock\db\Transaction::REPEATABLE_READ}
+     * and {@see \rock\db\Transaction::SERIALIZABLE} but also a string containing DBMS specific syntax to be used
      * after `SET TRANSACTION ISOLATION LEVEL`.
      * @see http://en.wikipedia.org/wiki/Isolation_%28database_systems%29#Isolation_levels
      */
@@ -365,11 +374,10 @@ abstract class Schema
             return $str;
         }
 
-        $this->db->open();
-        if (($value = $this->db->pdo->quote($str)) !== false) {
+        if (($value = $this->db->getSlavePdo()->quote($str)) !== false) {
             return $value;
-        } else { // the driver doesn't support quote (e.g. oci)
-
+        } else {
+            // the driver doesn't support quote (e.g. oci)
             return "'" . addcslashes(str_replace("'", "''", $str), "\000\n\r\\\032") . "'";
         }
     }
@@ -451,7 +459,7 @@ abstract class Schema
     /**
      * Returns the actual name of a given table name.
      * This method will strip off curly brackets from the given table name
-     * and replace the percentage character '%' with [[Connection::tablePrefix]].
+     * and replace the percentage character '%' with {@see \rock\db\Connection::$tablePrefix}.
      * @param string $name the table name to be converted
      * @return string the real name of the given table name
      */
@@ -477,18 +485,32 @@ abstract class Schema
             // abstract type => php type
             'smallint' => 'integer',
             'integer' => 'integer',
+            'bigint' => 'integer',
             'boolean' => 'boolean',
             'float' => 'double',
             'binary' => 'resource',
         ];
         if (isset($typeMap[$column->type])) {
-            if ($column->type === 'integer') {
-                return 'integer';//$column->unsigned ? 'string' : 'integer';
+            if ($column->type === 'bigint') {
+                return PHP_INT_SIZE == 8 && !$column->unsigned ? 'integer' : 'string';
+            } elseif ($column->type === 'integer') {
+                return PHP_INT_SIZE == 4 && $column->unsigned ? 'string' : 'integer';
             } else {
                 return $typeMap[$column->type];
             }
         } else {
             return 'string';
         }
+    }
+
+    /**
+     * Returns a value indicating whether a SQL statement is for read purpose.
+     * @param string $sql the SQL statement
+     * @return boolean whether a SQL statement is for read purpose.
+     */
+    public function isReadQuery($sql)
+    {
+        $pattern = '/^\s*(SELECT|SHOW|DESCRIBE)\b/i';
+        return preg_match($pattern, $sql) > 0;
     }
 }

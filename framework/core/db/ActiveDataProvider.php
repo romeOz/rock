@@ -15,7 +15,7 @@ use rock\sanitize\Sanitize;
 /**
  * ActiveDataProvider implements a data provider based on {@see \rock\db\Query} and {@see \rock\db\ActiveQuery}.
  *
- * ActiveDataProvider provides data by performing DB queries using [[query]].
+ * ActiveDataProvider provides data by performing DB queries using {@see \rock\db\ActiveDataProvider::$query }.
  *
  * The following is an example of using ActiveDataProvider to provide ActiveRecord instances:
  *
