@@ -94,22 +94,7 @@ class QueryBuilder
 
         $sql = implode($this->separator, array_filter($clauses));
         $sql = $this->buildOrderByAndLimit($sql, $query->orderBy, $query->limit, $query->offset);
-
-        $union = $this->buildUnion($query->union, $params);
-        if ($union !== '') {
-
-            $sql = implode(
-                $this->separator,
-                array_filter(
-                    [
-                        "($sql)",
-                        $union,
-                        $this->buildOrderBy($query->unionOrderBy),
-                        $this->buildLimit($query->unionLimit, $query->unionOffset)
-                    ]
-                )
-            );
-        }
+        $sql = $this->buildUnion($sql, $query->union, $params, $query->unionOrderBy, $query->unionLimit, $query->unionOffset);
 
         return [$sql, $params];
     }
@@ -855,14 +840,18 @@ class QueryBuilder
     }
 
     /**
-     * @param array $unions
-     * @param array $params the binding parameters to be populated
+     * @param string $sql
+     * @param array  $unions
+     * @param array  $params the binding parameters to be populated
+     * @param array|null   $orderBy
+     * @param int|null   $limit
+     * @param int|null   $offset
      * @return string the UNION clause built from {@see \rock\db\Query::$union}.
      */
-    public function buildUnion($unions, &$params)
+    public function buildUnion($sql, $unions, &$params, $orderBy = null, $limit = null, $offset = null)
     {
         if (empty($unions)) {
-            return '';
+            return $sql;
         }
 
         $result = '';
@@ -876,7 +865,22 @@ class QueryBuilder
             $result .= 'UNION ' . ($union['all'] ? 'ALL ' : '') . '( ' . $unions[$i]['query'] . ' ) ';
         }
 
-        return trim($result);
+        $result = trim($result);
+        if ($result !== '') {
+            return implode(
+                $this->separator,
+                array_filter(
+                    [
+                        "($sql)",
+                        $result,
+                        $this->buildOrderBy($orderBy),
+                        $this->buildLimit($limit, $offset)
+                    ]
+                )
+            );
+        }
+
+        return $sql;
     }
 
     /**
