@@ -1528,6 +1528,7 @@ trait ActiveRecordTestTrait
         // success
         /** @var Customer $customer */
         $customer = new $customerRulesClass;
+        //$customer->id = 5;
         $customer->email = 'user4@example.com';
         $customer->name = 4;
         $customer->address = 'address4';
