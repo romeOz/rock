@@ -177,7 +177,7 @@ class Command
             $this->pdoStatement = $pdo->prepare($sql);
             $this->bindPendingParams();
         } catch (\Exception $e) {
-            $message = $e->getMessage() . "\nFailed to prepare SQL: $sql";
+            $message = $e->getMessage() . "\nFailed to prepare SQL: {$this->getRawSql()}";
             throw new Exception($message, [], $e);
         }
     }
