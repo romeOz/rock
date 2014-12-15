@@ -35,6 +35,7 @@ CREATE TABLE "customer" (
   name varchar(128),
   address text,
   status integer DEFAULT 0,
+  bool_status boolean DEFAULT FALSE,
   profile_id integer
 );
 
@@ -100,6 +101,7 @@ CREATE TABLE "null_values" (
 CREATE TABLE "type" (
   int_col integer NOT NULL,
   int_col2 integer DEFAULT '1',
+  smallint_col smallint DEFAULT '1',
   char_col char(100) NOT NULL,
   char_col2 varchar(100) DEFAULT 'something',
   char_col3 text,
