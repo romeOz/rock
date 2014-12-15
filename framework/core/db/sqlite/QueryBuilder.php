@@ -1,7 +1,9 @@
 <?php
 namespace rock\db\sqlite;
 
+use rock\db\Connection;
 use rock\db\Exception;
+use rock\db\Query;
 
 /**
  * QueryBuilder is the query builder for SQLite databases.
@@ -275,6 +277,50 @@ class QueryBuilder extends \rock\db\QueryBuilder
             // limit is not optional in SQLite
             // http://www.sqlite.org/syntaxdiagrams.html#select-stmt
             $sql = "LIMIT 9223372036854775807 OFFSET $offset"; // 2^63-1
+        }
+
+        return $sql;
+    }
+
+    /**
+     * @param string $sql
+     * @param array  $unions
+     * @param array  $params the binding parameters to be populated
+     * @param array|null   $orderBy
+     * @param int|null   $limit
+     * @param int|null   $offset
+     * @return string the UNION clause built from {@see \rock\db\Query::$union}.
+     */
+    public function buildUnion($sql, $unions, &$params, $orderBy = null, $limit = null, $offset = null)
+    {
+        if (empty($unions)) {
+            return $sql;
+        }
+
+        $result = '';
+
+        foreach ($unions as $i => $union) {
+            $query = $union['query'];
+            if ($query instanceof Query) {
+                list($unions[$i]['query'], $params) = $this->build($query, $params);
+            }
+
+            $result .= 'UNION ' . ($union['all'] ? 'ALL ' : '') . ' ' . $unions[$i]['query'] . ' ';
+        }
+
+        $result = trim($result);
+        if ($result !== '') {
+            return implode(
+                $this->separator,
+                array_filter(
+                    [
+                        $sql,
+                        $result,
+                        $this->buildOrderBy($orderBy),
+                        $this->buildLimit($limit, $offset)
+                    ]
+                )
+            );
         }
 
         return $sql;
