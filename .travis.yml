@@ -7,6 +7,9 @@ php:
   - hhvm
   - hhvm-nightly
 
+env:
+  - CUBRID_VERSION=9.3.0/CUBRID-9.3.0.0206 CUBRID_PDO_VERSION=9.3.0.0001
+
 matrix:
   fast_finish: true
   allow_failures:
@@ -35,6 +38,7 @@ install:
   - tests/data/travis/gearman-setup.sh
   - tests/data/travis/rabbitmq-setup.sh
   - tests/data/travis/image-setup.sh
+  - tests/data/travis/cubrid-setup.sh
   - framework/rock.sh
 
 before_script:
