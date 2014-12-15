@@ -39,18 +39,6 @@ class QueryBuilderTest extends DatabaseTestCase
         throw new \Exception('Test is not implemented for ' . $this->driverName);
     }
 
-    /**
-     * adjust dbms specific escaping
-     * @param $sql
-     * @return mixed
-     */
-    protected function replaceQuotes($sql)
-    {
-        if (!in_array($this->driverName, ['mssql', 'mysql', 'sqlite'])) {
-            return str_replace('`', '"', $sql);
-        }
-        return $sql;
-    }
 
     /**
      * this is not used as a dataprovider for testGetColumnType to speed up the test

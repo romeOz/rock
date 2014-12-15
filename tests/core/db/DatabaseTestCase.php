@@ -99,4 +99,17 @@ class DatabaseTestCase extends \PHPUnit_Framework_TestCase
 
         return $connection;
     }
+
+    /**
+     * adjust dbms specific escaping
+     * @param $sql
+     * @return mixed
+     */
+    protected function replaceQuotes($sql)
+    {
+        if (!in_array($this->driverName, ['mssql', 'mysql', 'sqlite'])) {
+            return str_replace('`', '"', $sql);
+        }
+        return $sql;
+    }
 } 

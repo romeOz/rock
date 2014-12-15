@@ -196,17 +196,16 @@ class QueryTest extends DatabaseTestCase
     {
         $connection = $this->getConnection();
         $query = new Query;
-        $query->select(['id', 'name', new Expression('\'item\' `tbl`')])
+        $query->select(['id', 'name', new Expression("'item' ". $this->replaceQuotes('`tbl`'))])
             ->from('item')
             ->limit(2)
             ->union(
                 (new Query())
-                    ->select(['id', 'name', new Expression('\'category\' `tbl`')])
+                    ->select(['id', 'name', new Expression("'category' ". $this->replaceQuotes('`tbl`'))])
                     ->from(['category'])
                     ->limit(2)
             );
-        $sql =
-            "(SELECT `id`, `name`, 'item' `tbl` FROM `item` LIMIT 2) UNION ( SELECT `id`, `name`, 'category' `tbl` FROM `category` LIMIT 2 )";
+        $sql = $this->replaceQuotes("(SELECT `id`, `name`, 'item' `tbl` FROM `item` LIMIT 2) UNION ( SELECT `id`, `name`, 'category' `tbl` FROM `category` LIMIT 2 )");
         $this->assertSame($query->getRawSql($connection), $sql);
         $this->assertEquals(
             $query->all($connection),
@@ -239,19 +238,18 @@ class QueryTest extends DatabaseTestCase
         );
 
         $query = new Query;
-        $query->select(['id', 'name', new Expression('\'item\' `tbl`')])
+        $query->select(['id', 'name', new Expression("'item' ". $this->replaceQuotes('`tbl`'))])
             ->from('item')
             ->limit(2)
             ->union(
                 (new Query())
-                    ->select(['id', 'name', new Expression('\'category\' `tbl`')])
+                    ->select(['id', 'name', new Expression("'category' ". $this->replaceQuotes('`tbl`'))])
                     ->from(['category'])
                     ->limit(2)
             )
             ->unionOrderBy(['item' => SORT_DESC])
             ->unionLimit(3);
-        $sql =
-            "(SELECT `id`, `name`, 'item' `tbl` FROM `item` LIMIT 2) UNION ( SELECT `id`, `name`, 'category' `tbl` FROM `category` LIMIT 2 ) ORDER BY `item` DESC LIMIT 3";
+        $sql =$this->replaceQuotes("(SELECT `id`, `name`, 'item' `tbl` FROM `item` LIMIT 2) UNION ( SELECT `id`, `name`, 'category' `tbl` FROM `category` LIMIT 2 ) ORDER BY `item` DESC LIMIT 3");
         $this->assertSame($query->getRawSql($connection), $sql);
     }
 
@@ -286,8 +284,8 @@ class QueryTest extends DatabaseTestCase
         )
             ->from(['customer'])
             ->innerJoin('order', 'customer.id=order.customer_id');
-        $sql =
-            "SELECT `customer`.`id` AS `customer__id`, `customer`.`name` AS `customer__name`, `order`.`id` AS `orders+id`, `order`.`total` AS `orders+total` FROM `customer` INNER JOIN `order` ON customer.id=order.customer_id";
+        $sql = $this->replaceQuotes(
+            "SELECT `customer`.`id` AS `customer__id`, `customer`.`name` AS `customer__name`, `order`.`id` AS `orders+id`, `order`.`total` AS `orders+total` FROM `customer` INNER JOIN `order` ON customer.id=order.customer_id");
         $this->assertSame($query->getRawSql($connection), $sql);
     }
 

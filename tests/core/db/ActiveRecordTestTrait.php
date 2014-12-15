@@ -889,7 +889,7 @@ trait ActiveRecordTestTrait
         static::$afterSaveNewRecord = null;
         static::$afterSaveInsert = null;
 
-        $customer->save();
+        $this->assertTrue($customer->save());
         $this->afterSave();
 
         $this->assertNotNull($customer->id);
@@ -1531,6 +1531,8 @@ trait ActiveRecordTestTrait
         $customer->email = 'user4@example.com';
         $customer->name = 4;
         $customer->address = 'address4';
+        static::$afterSaveNewRecord = null;
+        static::$afterSaveInsert = null;
         $this->assertTrue($customer->save());
     }
 }
