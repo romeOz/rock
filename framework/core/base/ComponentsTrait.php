@@ -39,7 +39,7 @@ trait ComponentsTrait
     /**
      * Detaches an existing event handler from this component.
      *
-     * This method is the opposite of [[on()]].
+     * This method is the opposite of {@see \rock\base\ComponentsInterface::on()}.
      * @param string $name event name
      * @param callable $handler the event handler to be removed.
      * If it is null, all handlers attached to the named event will be removed.
@@ -111,7 +111,7 @@ trait ComponentsTrait
     }
 
     /**
-     * Makes sure that the behaviors declared in [[behaviors()]] are attached to this component.
+     * Makes sure that the behaviors declared in {@see \rock\base\ComponentsInterface::behaviors()} are attached to this component.
      */
     public function ensureBehaviors()
     {
@@ -153,6 +153,7 @@ trait ComponentsTrait
 
     /**
      * Sets the value of a component property.
+     *
      * This method will check in the following order and act accordingly:
      *
      *  - a property defined by a setter: set the property value
@@ -215,6 +216,7 @@ trait ComponentsTrait
 
     /**
      * Returns the value of a component property.
+     *
      * This method will check in the following order and act accordingly:
      *
      *  - a property defined by a getter: return the getter result
@@ -261,6 +263,7 @@ trait ComponentsTrait
 
     /**
      * Checks if a property value is null.
+     *
      * This method will check in the following order and act accordingly:
      *
      *  - a property defined by a setter: return whether the property value is null
@@ -292,6 +295,7 @@ trait ComponentsTrait
 
     /**
      * Sets a component property to be null.
+     *
      * This method will check in the following order and act accordingly:
      *
      *  - a property defined by a setter: set the property value to be null
@@ -365,6 +369,7 @@ trait ComponentsTrait
 
     /**
      * Returns a value indicating whether a method is defined.
+     *
      * A method is defined if:
      *
      * - the class has a method with the specified name
@@ -393,6 +398,7 @@ trait ComponentsTrait
 
     /**
      * Returns a value indicating whether a property is defined for this component.
+     *
      * A property is defined if:
      *
      * - the class has a getter or setter method associated with the specified name
@@ -414,6 +420,7 @@ trait ComponentsTrait
 
     /**
      * Returns a value indicating whether a property can be read.
+     *
      * A property can be read if:
      *
      * - the class has a getter method associated with the specified name
@@ -445,6 +452,7 @@ trait ComponentsTrait
     }
     /**
      * Returns a value indicating whether a property can be set.
+     *
      * A property can be written if:
      *
      * - the class has a setter method associated with the specified name
@@ -506,7 +514,8 @@ trait ComponentsTrait
 
     /**
      * Attaches a list of behaviors to the component.
-     * Each behavior is indexed by its name and should be a [[Behavior]] object,
+     *
+     * Each behavior is indexed by its name and should be a {@see \rock\base\Behavior} object,
      * a string specifying the behavior class, or an configuration array for creating the behavior.
      * @param array $behaviors list of behaviors to be attached to the component
      * @see attachBehavior()
@@ -521,15 +530,16 @@ trait ComponentsTrait
 
     /**
      * Attaches a behavior to this component.
+     *
      * This method will create the behavior object based on the given
      * configuration. After that, the behavior object will be attached to
-     * this component by calling the [[Behavior::attach()]] method.
+     * this component by calling the {@see \rock\base\Behavior::attach()} method.
      * @param string $name the name of the behavior.
      * @param string|array|Behavior $behavior the behavior configuration. This can be one of the following:
      *
-     *  - a [[Behavior]] object
+     *  - a {@see \rock\base\Behavior} object
      *  - a string specifying the behavior class
-     *  - an object configuration array that will be passed to @see Rock::factory() to create the behavior object.
+     *  - an object configuration array that will be passed to {@see \rock\di\Container::load()} to create the behavior object.
      *
      * @return Behavior the behavior object
      * @see detachBehavior()
@@ -542,7 +552,8 @@ trait ComponentsTrait
 
     /**
      * Detaches a behavior from the component.
-     * The behavior's [[Behavior::detach()]] method will be invoked.
+     *
+     * The behavior's {@see \rock\base\Behavior::detach()} method will be invoked.
      * @param string $name the behavior's name.
      * @return Behavior the detached behavior. Null if the behavior does not exist.
      */
