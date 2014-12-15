@@ -29,7 +29,7 @@ class IndexSchema
      */
     public $primaryKey;
     /**
-     * @var ColumnSchema[] column metadata of this index. Each array element is a [[ColumnSchema]] object, indexed by column names.
+     * @var ColumnSchema[] column metadata of this index. Each array element is a {@see \rock\sphinx\ColumnSchema} object, indexed by column names.
      */
     public $columns = [];
 

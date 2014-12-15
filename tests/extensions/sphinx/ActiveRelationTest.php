@@ -62,5 +62,4 @@ class ActiveRelationTest extends SphinxTestCase
             'This article is <b>about</b> cats'
         );
     }
-
 }

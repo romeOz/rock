@@ -5,10 +5,10 @@ use rock\base\ObjectTrait;
 use rock\db\Expression;
 
 /**
- * QueryBuilder builds a SELECT SQL statement based on the specification given as a [[Query]] object.
+ * QueryBuilder builds a SELECT SQL statement based on the specification given as a {@see \rock\sphinx\Query} object.
  *
  * QueryBuilder can also be used to build SQL statements such as INSERT, REPLACE, UPDATE, DELETE,
- * from a [[Query]] object.
+ * from a {@see \rock\sphinx\Query} object.
  */
 class QueryBuilder
 {
@@ -26,9 +26,28 @@ class QueryBuilder
     public $db;
     /**
      * @var string the separator between different fragments of a SQL statement.
-     * Defaults to an empty space. This is mainly used by [[build()]] when generating a SQL statement.
+     * Defaults to an empty space. This is mainly used by {@see \rock\sphinx\QueryBuilder::build()} when generating a SQL statement.
      */
     public $separator = " ";
+
+    /**
+     * @var array map of query condition to builder methods.
+     * These methods are used by {@see \rock\sphinx\QueryBuilder::buildCondition()} to build SQL conditions from array syntax.
+     */
+    protected $conditionBuilders = [
+        'AND' => 'buildAndCondition',
+        'OR' => 'buildAndCondition',
+        'BETWEEN' => 'buildBetweenCondition',
+        'NOT BETWEEN' => 'buildBetweenCondition',
+        'IN' => 'buildInCondition',
+        'NOT IN' => 'buildInCondition',
+        'LIKE' => 'buildLikeCondition',
+        'NOT LIKE' => 'buildLikeCondition',
+        'OR LIKE' => 'buildLikeCondition',
+        'OR NOT LIKE' => 'buildLikeCondition',
+        'NOT' => 'buildNotCondition',
+    ];
+
 
     /**
      * Constructor.
@@ -42,33 +61,44 @@ class QueryBuilder
     }
 
     /**
-     * Generates a SELECT SQL statement from a [[Query]] object.
-     * @param Query $query the [[Query]] object from which the SQL statement will be generated
+     * Generates a SELECT SQL statement from a {@see \rock\sphinx\Query} object.
+     * @param Query $query the {@see \rock\sphinx\Query} object from which the SQL statement will be generated
      * @param array $params the parameters to be bound to the generated SQL statement. These parameters will
      * be included in the result with the additional parameters generated during the query building process.
+     * @throws Exception if query contains 'join' option.
      * @return array the generated SQL statement (the first array element) and the corresponding
      * parameters to be bound to the SQL statement (the second array element). The parameters returned
      * include those provided in `$params`.
      */
     public function build($query, $params = [])
     {
+        $query = $query->prepare($this);
+
+        if (!empty($query->join)) {
+            throw new Exception('Build of "' . get_class($query) . '::join" is not supported.');
+        }
+
         $params = empty($params) ? $query->params : array_merge($params, $query->params);
+
         $from = $query->from;
         if ($from === null && $query instanceof ActiveQuery) {
             /* @var $modelClass ActiveRecord */
             $modelClass = $query->modelClass;
             $from = [$modelClass::indexName()];
         }
+
         $clauses = [
             $this->buildSelect($query->select, $params, $query->distinct, $query->selectOption),
             $this->buildFrom($from, $params),
             $this->buildWhere($query->from, $query->where, $params, $query->match),
             $this->buildGroupBy($query->groupBy),
             $this->buildWithin($query->within),
+            $this->buildHaving($query->from, $query->having, $params),
             $this->buildOrderBy($query->orderBy),
             $this->buildLimit($query->limit, $query->offset),
             $this->buildOption($query->options, $params),
         ];
+
         return [implode($this->separator, array_filter($clauses)), $params];
     }
 
@@ -76,13 +106,13 @@ class QueryBuilder
      * Creates an INSERT SQL statement.
      * For example,
      *
-     * ~~~
+     * ```php
      * $sql = $queryBuilder->insert('idx_user', [
      *     'name' => 'Sam',
      *     'age' => 30,
      *     'id' => 10,
      * ], $params);
-     * ~~~
+     * ```
      *
      * The method will properly escape the index and column names.
      *
@@ -101,13 +131,13 @@ class QueryBuilder
      * Creates an REPLACE SQL statement.
      * For example,
      *
-     * ~~~
+     * ```php
      * $sql = $queryBuilder->replace('idx_user', [
      *     'name' => 'Sam',
      *     'age' => 30,
      *     'id' => 10,
      * ], $params);
-     * ~~~
+     * ```
      *
      * The method will properly escape the index and column names.
      *
@@ -153,13 +183,13 @@ class QueryBuilder
      * Generates a batch INSERT SQL statement.
      * For example,
      *
-     * ~~~
+     * ```php
      * $sql = $queryBuilder->batchInsert('idx_user', ['id', 'name', 'age'], [
      *     [1, 'Tom', 30],
      *     [2, 'Jane', 20],
      *     [3, 'Linda', 25],
      * ], $params);
-     * ~~~
+     * ```
      *
      * Note that the values in each row must match the corresponding column names.
      *
@@ -179,13 +209,13 @@ class QueryBuilder
      * Generates a batch REPLACE SQL statement.
      * For example,
      *
-     * ~~~
+     * ```php
      * $sql = $queryBuilder->batchReplace('idx_user', ['id', 'name', 'age'], [
      *     [1, 'Tom', 30],
      *     [2, 'Jane', 20],
      *     [3, 'Linda', 25],
      * ], $params);
-     * ~~~
+     * ```
      *
      * Note that the values in each row must match the corresponding column names.
      *
@@ -239,17 +269,17 @@ class QueryBuilder
      * Creates an UPDATE SQL statement.
      * For example,
      *
-     * ~~~
+     * ```php
      * $params = [];
      * $sql = $queryBuilder->update('idx_user', ['status' => 1], 'age > 30', $params);
-     * ~~~
+     * ```
      *
      * The method will properly escape the index and column names.
      *
      * @param string $index the index to be updated.
      * @param array $columns the column data (name => value) to be updated.
      * @param array|string $condition the condition that will be put in the WHERE part. Please
-     * refer to [[Query::where()]] on how to specify condition.
+     * refer to {@see \rock\sphinx\Query::where()} on how to specify condition.
      * @param array $params the binding parameters that will be modified by this method
      * so that they can be bound to the Sphinx command later.
      * @param array $options list of options in format: optionName => optionValue
@@ -285,15 +315,15 @@ class QueryBuilder
      * Creates a DELETE SQL statement.
      * For example,
      *
-     * ~~~
+     * ```php
      * $sql = $queryBuilder->delete('idx_user', 'status = 0');
-     * ~~~
+     * ```
      *
      * The method will properly escape the index and column names.
      *
      * @param string $index the index where the data will be deleted from.
      * @param array|string $condition the condition that will be put in the WHERE part. Please
-     * refer to [[Query::where()]] on how to specify condition.
+     * refer to {@see \rock\sphinx\Query::where()} on how to specify condition.
      * @param array $params the binding parameters that will be modified by this method
      * so that they can be bound to the Sphinx command later.
      * @return string the DELETE SQL
@@ -390,7 +420,7 @@ class QueryBuilder
      * @param array $params the binding parameters to be populated
      * @param boolean $distinct
      * @param string $selectOption
-     * @return string the SELECT clause built from [[query]].
+     * @return string the SELECT clause built from {@see \rock\sphinx\Query}.
      */
     public function buildSelect($columns, &$params, $distinct = false, $selectOption = null)
     {
@@ -407,6 +437,9 @@ class QueryBuilder
             if ($column instanceof Expression) {
                 $columns[$i] = $column->expression;
                 $params = array_merge($params, $column->params);
+            } elseif ($column instanceof Query) {
+                list($sql, $params) = $this->build($column, $params);
+                $columns[$i] = "($sql) AS " . $this->db->quoteColumnName($i);
             } elseif (is_string($i)) {
                 if (strpos($column, '(') === false) {
                     $column = $this->db->quoteColumnName($column);
@@ -432,7 +465,7 @@ class QueryBuilder
     /**
      * @param array $indexes
      * @param array $params the binding parameters to be populated
-     * @return string the FROM clause built from [[query]].
+     * @return string the FROM clause built from {@see \rock\sphinx\Query}.
      */
     public function buildFrom($indexes, &$params)
     {
@@ -470,7 +503,7 @@ class QueryBuilder
      * @param string|array $condition
      * @param array $params the binding parameters to be populated
      * @param string|Expression|null $match
-     * @return string the WHERE clause built from [[query]].
+     * @return string the WHERE clause built from {@see \rock\sphinx\Query}.
      */
     public function buildWhere($indexes, $condition, &$params, $match = null)
     {
@@ -483,25 +516,20 @@ class QueryBuilder
                 $params[$phName] = $this->db->escapeMatchValue($match);
                 $matchWhere = 'MATCH(' . $phName . ')';
             }
+
             if ($condition === null) {
                 $condition = $matchWhere;
             } else {
                 $condition = ['and', $matchWhere, $condition];
             }
         }
+
         if (empty($condition)) {
             return '';
         }
-        $indexSchemas = [];
-        if (!empty($indexes)) {
-            foreach ($indexes as $indexName) {
-                $index = $this->db->getIndexSchema($indexName);
-                if ($index !== null) {
-                    $indexSchemas[] = $index;
-                }
-            }
-        }
+        $indexSchemas = $this->getIndexSchemas($indexes);
         $where = $this->buildCondition($indexSchemas, $condition, $params);
+
         return $where === '' ? '' : 'WHERE ' . $where;
     }
 
@@ -515,8 +543,47 @@ class QueryBuilder
     }
 
     /**
+     * @param string[] $indexes list of index names, which affected by query
+     * @param string|array $condition
+     * @param array $params the binding parameters to be populated
+     * @return string the HAVING clause built from {@see \rock\db\Query::$having}.
+     */
+    public function buildHaving($indexes, $condition, &$params)
+    {
+        if (empty($condition)) {
+            return '';
+        }
+
+        $indexSchemas = $this->getIndexSchemas($indexes);
+        $having = $this->buildCondition($indexSchemas, $condition, $params);
+
+        return $having === '' ? '' : 'HAVING ' . $having;
+    }
+
+    /**
+     * Builds the ORDER BY and LIMIT/OFFSET clauses and appends them to the given SQL.
+     * @param string $sql the existing SQL (without ORDER BY/LIMIT/OFFSET)
+     * @param array $orderBy the order by columns. See {@see \rock\db\Query::$orderBy} for more details on how to specify this parameter.
+     * @param integer $limit the limit number. See {@see \rock\db\Query::$limit} for more details.
+     * @param integer $offset the offset number. See {@see \rock\db\Query::$offset} for more details.
+     * @return string the SQL completed with ORDER BY/LIMIT/OFFSET (if any)
+     */
+    public function buildOrderByAndLimit($sql, $orderBy, $limit, $offset)
+    {
+        $orderBy = $this->buildOrderBy($orderBy);
+        if ($orderBy !== '') {
+            $sql .= $this->separator . $orderBy;
+        }
+        $limit = $this->buildLimit($limit, $offset);
+        if ($limit !== '') {
+            $sql .= $this->separator . $limit;
+        }
+        return $sql;
+    }
+
+    /**
      * @param array $columns
-     * @return string the ORDER BY clause built from [[query]].
+     * @return string the ORDER BY clause built from {@see \rock\sphinx\Query}.
      */
     public function buildOrderBy($columns)
     {
@@ -538,7 +605,7 @@ class QueryBuilder
     /**
      * @param integer $limit
      * @param integer $offset
-     * @return string the LIMIT and OFFSET clauses built from [[query]].
+     * @return string the LIMIT and OFFSET clauses built from {@see \rock\sphinx\Query}.
      */
     public function buildLimit($limit, $offset)
     {
@@ -584,7 +651,7 @@ class QueryBuilder
     /**
      * Parses the condition specification and generates the corresponding SQL expression.
      * @param IndexSchema[] $indexes list of indexes, which affected by query
-     * @param string|array $condition the condition specification. Please refer to [[Query::where()]]
+     * @param string|array $condition the condition specification. Please refer to {@see \rock\sphinx\Query::where()}
      * on how to specify a condition.
      * @param array $params the binding parameters to be populated
      * @return string the generated SQL expression
@@ -592,19 +659,6 @@ class QueryBuilder
      */
     public function buildCondition($indexes, $condition, &$params)
     {
-        static $builders = [
-            'AND' => 'buildAndCondition',
-            'OR' => 'buildAndCondition',
-            'BETWEEN' => 'buildBetweenCondition',
-            'NOT BETWEEN' => 'buildBetweenCondition',
-            'IN' => 'buildInCondition',
-            'NOT IN' => 'buildInCondition',
-            'LIKE' => 'buildLikeCondition',
-            'NOT LIKE' => 'buildLikeCondition',
-            'OR LIKE' => 'buildLikeCondition',
-            'OR NOT LIKE' => 'buildLikeCondition',
-        ];
-
         if (!is_array($condition)) {
             return (string) $condition;
         } elseif (empty($condition)) {
@@ -612,16 +666,14 @@ class QueryBuilder
         }
         if (isset($condition[0])) { // operator format: operator, operand 1, operand 2, ...
             $operator = strtoupper($condition[0]);
-            if (isset($builders[$operator])) {
-                $method = $builders[$operator];
-                array_shift($condition);
-
-                return $this->$method($indexes, $operator, $condition, $params);
+            if (isset($this->conditionBuilders[$operator])) {
+                $method = $this->conditionBuilders[$operator];
             } else {
-                throw new Exception('Found unknown operator in query: ' . $operator);
+                $method = 'buildSimpleCondition';
             }
+            array_shift($condition);
+            return $this->$method($indexes, $operator, $condition, $params);
         } else { // hash format: 'column1' => 'value1', 'column2' => 'value2', ...
-
             return $this->buildHashCondition($indexes, $condition, $params);
         }
     }
@@ -684,6 +736,32 @@ class QueryBuilder
     }
 
     /**
+     * Inverts an SQL expressions with `NOT` operator.
+     * @param IndexSchema[] $indexes list of indexes, which affected by query
+     * @param string $operator the operator to use for connecting the given operands
+     * @param array $operands the SQL expressions to connect.
+     * @param array $params the binding parameters to be populated
+     * @return string the generated SQL expression
+     * @throws Exception if wrong number of operands have been given.
+     */
+    public function buildNotCondition($indexes, $operator, $operands, &$params)
+    {
+        if (count($operands) != 1) {
+            throw new Exception("Operator '$operator' requires exactly one operand.");
+        }
+
+        $operand = reset($operands);
+        if (is_array($operand)) {
+            $operand = $this->buildCondition($indexes, $operand, $params);
+        }
+        if ($operand === '') {
+            return '';
+        }
+
+        return "$operator ($operand)";
+    }
+
+    /**
      * Creates an SQL expressions with the `BETWEEN` operator.
      * @param IndexSchema[] $indexes list of indexes, which affected by query
      * @param string $operator the operator to use (e.g. `BETWEEN` or `NOT BETWEEN`)
@@ -732,6 +810,7 @@ class QueryBuilder
         }
 
         list($column, $values) = $operands;
+
         if ($values === [] || $column === []) {
             return $operator === 'IN' ? '0=1' : '';
         }
@@ -739,7 +818,7 @@ class QueryBuilder
         if ($values instanceof Query) {
             // sub-query
             list($sql, $params) = $this->build($values, $params);
-            $column = (array)$column;
+            $column = (array) $column;
             if (is_array($column)) {
                 foreach ($column as $i => $col) {
                     if (strpos($col, '(') === false) {
@@ -845,7 +924,9 @@ class QueryBuilder
 
         list($column, $values) = $operands;
 
-        $values = (array) $values;
+        if (!is_array($values)) {
+            $values = [$values];
+        }
 
         if (empty($values)) {
             return $operator === 'LIKE' || $operator === 'OR LIKE' ? '0=1' : '';
@@ -864,8 +945,15 @@ class QueryBuilder
 
         $parts = [];
         foreach ($values as $value) {
-            $phName = self::PARAM_PREFIX . count($params);
-            $params[$phName] = empty($escape) ? $value : ('%' . strtr($value, $escape) . '%');
+            if ($value instanceof Expression) {
+                foreach ($value->params as $n => $v) {
+                    $params[$n] = $v;
+                }
+                $phName = $value->expression;
+            } else {
+                $phName = self::PARAM_PREFIX . count($params);
+                $params[$phName] = empty($escape) ? $value : ('%' . strtr($value, $escape) . '%');
+            }
             $parts[] = "$column $operator $phName";
         }
 
@@ -873,8 +961,43 @@ class QueryBuilder
     }
 
     /**
+     * Creates an SQL expressions like `"column" operator value`.
+     * @param IndexSchema[] $indexes list of indexes, which affected by query
+     * @param string $operator the operator to use. Anything could be used e.g. `>`, `<=`, etc.
+     * @param array $operands contains two column names.
+     * @param array $params the binding parameters to be populated
+     * @return string the generated SQL expression
+     * @throws Exception if count($operands) is not 2
+     */
+    public function buildSimpleCondition($indexes, $operator, $operands, &$params)
+    {
+        if (count($operands) !== 2) {
+            throw new Exception("Operator '$operator' requires two operands.");
+        }
+
+        list($column, $value) = $operands;
+
+        if (strpos($column, '(') === false) {
+            $column = $this->db->quoteColumnName($column);
+        }
+
+        if ($value === null) {
+            return "$column $operator NULL";
+        } elseif ($value instanceof Expression) {
+            foreach ($value->params as $n => $v) {
+                $params[$n] = $v;
+            }
+            return "$column $operator {$value->expression}";
+        } else {
+            $phName = self::PARAM_PREFIX . count($params);
+            $params[$phName] = $value;
+            return "$column $operator $phName";
+        }
+    }
+
+    /**
      * @param array $columns
-     * @return string the ORDER BY clause built from [[query]].
+     * @return string the ORDER BY clause built from {@see \rock\sphinx\Query}.
      */
     public function buildWithin($columns)
     {
@@ -896,7 +1019,7 @@ class QueryBuilder
     /**
      * @param array $options query options in format: optionName => optionValue
      * @param array $params the binding parameters to be populated
-     * @return string the OPTION clause build from [[query]]
+     * @return string the OPTION clause build from {@see \rock\sphinx\Query}
      */
     public function buildOption($options, &$params)
     {
@@ -981,5 +1104,23 @@ class QueryBuilder
 
             return $phName;
         }
+    }
+
+    /**
+     * @param array $indexes index names.
+     * @return IndexSchema[] index schemas.
+     */
+    private function getIndexSchemas($indexes)
+    {
+        $indexSchemas = [];
+        if (!empty($indexes)) {
+            foreach ($indexes as $indexName) {
+                $index = $this->db->getIndexSchema($indexName);
+                if ($index !== null) {
+                    $indexSchemas[] = $index;
+                }
+            }
+        }
+        return $indexSchemas;
     }
 }

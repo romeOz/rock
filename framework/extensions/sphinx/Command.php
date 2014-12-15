@@ -5,22 +5,23 @@ namespace rock\sphinx;
 /**
  * Command represents a SQL statement to be executed against a Sphinx.
  *
- * A command object is usually created by calling [[Connection::createCommand()]].
- * The SQL statement it represents can be set via the [[sql]] property.
+ * A command object is usually created by calling {@see \rock\sphinx\Connection::createCommand()}.
+ * The SQL statement it represents can be set via the {@see \rock\db\Command::$_sql} property.
  *
- * To execute a non-query SQL (such as INSERT, REPLACE, DELETE, UPDATE), call [[execute()]].
+ * To execute a non-query SQL (such as INSERT, REPLACE, DELETE, UPDATE), call {@see \rock\db\Command::execute()}.
  * To execute a SQL statement that returns result data set (such as SELECT, CALL SNIPPETS, CALL KEYWORDS),
- * use [[queryAll()]], [[queryOne()]], [[queryColumn()]], [[queryScalar()]], or [[query()]].
+ * use {@see \rock\db\Command::queryAll()}, {@see \rock\db\Command::queryOne()}, {@see \rock\db\Command::queryColumn()},
+ * {@see \rock\db\Command::queryScalar()}, or {@see \rock\db\Command::query()}.
  * For example,
  *
  * ```php
  * $articles = $connection->createCommand("SELECT * FROM `idx_article` WHERE MATCH('programming')")->queryAll();
  * ```
  *
- * Command supports SQL statement preparation and parameter binding just as [[\rock\db\Command]] does.
+ * Command supports SQL statement preparation and parameter binding just as {@see \rock\db\Command} does.
  *
- * Command also supports building SQL statements by providing methods such as [[insert()]],
- * [[update()]], etc. For example,
+ * Command also supports building SQL statements by providing methods such as {@see \rock\db\Command::insert()},
+ * {@see \rock\db\Command::update()}, etc. For example,
  *
  * ```php
  * $connection->createCommand()->update('idx_article', [
@@ -29,7 +30,7 @@ namespace rock\sphinx;
  * ])->execute();
  * ```
  *
- * To build SELECT SQL statements, please use [[Query]] and [[QueryBuilder]] instead.
+ * To build SELECT SQL statements, please use {@see \rock\sphinx\Query} and {@see \rock\sphinx\QueryBuilder} instead.
  */
 class Command extends \rock\db\Command
 {
@@ -69,16 +70,16 @@ class Command extends \rock\db\Command
      * Creates an REPLACE command.
      * For example,
      *
-     * ~~~
+     * ```php
      * $connection->createCommand()->insert('idx_user', [
      *     'name' => 'Sam',
      *     'age' => 30,
      * ])->execute();
-     * ~~~
+     * ```
      *
      * The method will properly escape the column names, and bind the values to be replaced.
      *
-     * Note that the created command is not executed until [[execute()]] is called.
+     * Note that the created command is not executed until {@see \rock\db\Command::execute()} is called.
      *
      * @param string $index the index that new rows will be replaced into.
      * @param array $columns the column data (name => value) to be replaced into the index.
@@ -96,13 +97,13 @@ class Command extends \rock\db\Command
      * Creates a batch REPLACE command.
      * For example,
      *
-     * ~~~
+     * ```php
      * $connection->createCommand()->batchInsert('idx_user', ['name', 'age'], [
      *     ['Tom', 30],
      *     ['Jane', 20],
      *     ['Linda', 25],
      * ])->execute();
-     * ~~~
+     * ```
      *
      * Note that the values in each row must match the corresponding column names.
      *
@@ -123,18 +124,18 @@ class Command extends \rock\db\Command
      * Creates an UPDATE command.
      * For example,
      *
-     * ~~~
+     * ```php
      * $connection->createCommand()->update('user', ['status' => 1], 'age > 30')->execute();
-     * ~~~
+     * ```
      *
      * The method will properly escape the column names and bind the values to be updated.
      *
-     * Note that the created command is not executed until [[execute()]] is called.
+     * Note that the created command is not executed until {@see \rock\db\Command::execute()} is called.
      *
      * @param string $index the index to be updated.
      * @param array $columns the column data (name => value) to be updated.
      * @param string|array $condition the condition that will be put in the WHERE part. Please
-     * refer to [[Query::where()]] on how to specify condition.
+     * refer to {@see \rock\sphinx\Query::where()} on how to specify condition.
      * @param array $params the parameters to be bound to the command
      * @param array $options list of options in format: optionName => optionValue
      * @return static the command object itself
@@ -180,7 +181,7 @@ class Command extends \rock\db\Command
      * @param string $index the name of the index from which to take the text processing settings
      * @param string $text the text to break down to keywords.
      * @param boolean $fetchStatistic whether to return document and hit occurrence statistics
-     * @return string the SQL statement for call keywords.
+     * @return static the command object itself
      */
     public function callKeywords($index, $text, $fetchStatistic = false)
     {

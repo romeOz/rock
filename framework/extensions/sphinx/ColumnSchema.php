@@ -46,9 +46,10 @@ class ColumnSchema
      */
     public $isMva;
 
+
     /**
-     * Converts the input value according to [[phpType]] after retrieval from the database.
-     * If the value is null or an [[Expression]], it will not be converted.
+     * Converts the input value according to {@see \rock\sphinx\ColumnSchema::$phpType} after retrieval from the database.
+     * If the value is null or an {@see \rock\db\Expression}, it will not be converted.
      * @param mixed $value input value
      * @return mixed converted value
      */
@@ -64,9 +65,9 @@ class ColumnSchema
             case 'string':
                 return is_resource($value) ? $value : (string) $value;
             case 'integer':
-                return (integer) $value;
+                return (int) $value;
             case 'boolean':
-                return (boolean) $value;
+                return (bool) $value;
             case 'double':
                 return (double) $value;
         }
@@ -75,8 +76,8 @@ class ColumnSchema
     }
 
     /**
-     * Converts the input value according to [[type]] and [[dbType]] for use in a db query.
-     * If the value is null or an [[Expression]], it will not be converted.
+     * Converts the input value according to {@see \rock\sphinx\ColumnSchema::$type} and {@see \rock\sphinx\ColumnSchema::$dbType} for use in a db query.
+     * If the value is null or an {@see \rock\db\Expression}, it will not be converted.
      * @param mixed $value input value
      * @return mixed converted value. This may also be an array containing the value as the first element
      * and the PDO type as the second element.

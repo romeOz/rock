@@ -3,9 +3,9 @@
 namespace rock\sphinx;
 
 use rock\db\BaseActiveRecord;
+use rock\di\Container;
 use rock\helpers\Inflector;
 use rock\helpers\ObjectHelper;
-use rock\Rock;
 
 /**
  * ActiveRecord is the base class for classes representing relational data in terms of objects.
@@ -19,15 +19,15 @@ use rock\Rock;
 abstract class ActiveRecord extends BaseActiveRecord
 {
     /**
-     * The insert operation. This is mainly used when overriding [[transactions()]] to specify which operations are transactional.
+     * The insert operation. This is mainly used when overriding {@see \rock\sphinx\ActiveRecord::transactions()} to specify which operations are transactional.
      */
     const OP_INSERT = 0x01;
     /**
-     * The update operation. This is mainly used when overriding [[transactions()]] to specify which operations are transactional.
+     * The update operation. This is mainly used when overriding {@see \rock\sphinx\ActiveRecord::transactions()} to specify which operations are transactional.
      */
     const OP_UPDATE = 0x02;
     /**
-     * The delete operation. This is mainly used when overriding [[transactions()]] to specify which operations are transactional.
+     * The delete operation. This is mainly used when overriding {@see \rock\sphinx\ActiveRecord::transactions()} to specify which operations are transactional.
      */
     const OP_DELETE = 0x04;
     /**
@@ -38,8 +38,8 @@ abstract class ActiveRecord extends BaseActiveRecord
 
     /**
      * @var string current snippet value for this Active Record instance.
-     * It will be filled up automatically when instance found using [[Query::snippetCallback]]
-     * or [[ActiveQuery::snippetByModel()]].
+     * It will be filled up automatically when instance found using {@see \rock\sphinx\Query::$snippetCallback}
+     * or {@see \rock\sphinx\ActiveQuery::snippetByModel()}.
      */
     private $_snippet;
 
@@ -51,26 +51,26 @@ abstract class ActiveRecord extends BaseActiveRecord
      */
     public static function getDb()
     {
-        return Rock::factory('sphinx');
+        return Container::load('sphinx');
     }
 
     /**
-     * Creates an [[ActiveQuery]] instance with a given SQL statement.
+     * Creates an {@see \rock\sphinx\ActiveQuery} instance with a given SQL statement.
      *
      * Note that because the SQL statement is already specified, calling additional
-     * query modification methods (such as `where()`, `order()`) on the created [[ActiveQuery]]
+     * query modification methods (such as `where()`, `order()`) on the created {@see \rock\sphinx\ActiveQuery}
      * instance will have no effect. However, calling `with()`, `asArray()` or `indexBy()` is
      * still fine.
      *
      * Below is an example:
      *
-     * ~~~
+     * ```php
      * $customers = Article::findBySql("SELECT * FROM `idx_article` WHERE MATCH('development')")->all();
-     * ~~~
+     * ```
      *
      * @param string $sql the SQL statement to be executed
      * @param array $params parameters to be bound to the SQL statement during execution.
-     * @return ActiveQuery the newly created [[ActiveQuery]] instance
+     * @return ActiveQuery the newly created {@see \rock\sphinx\ActiveQuery} instance
      */
     public static function findBySql($sql, $params = [])
     {
@@ -84,13 +84,13 @@ abstract class ActiveRecord extends BaseActiveRecord
      * Updates the whole table using the provided attribute values and conditions.
      * For example, to change the status to be 1 for all articles which status is 2:
      *
-     * ~~~
+     * ```php
      * Article::updateAll(['status' => 1], 'status = 2');
-     * ~~~
+     * ```
      *
      * @param array $attributes attribute values (name-value pairs) to be saved into the table
      * @param string|array $condition the conditions that will be put in the WHERE part of the UPDATE SQL.
-     * Please refer to [[Query::where()]] on how to specify this parameter.
+     * Please refer to {@see \rock\sphinx\Query::where()} on how to specify this parameter.
      * @param array $params the parameters (name => value) to be bound to the query.
      * @return integer the number of rows updated
      */
@@ -107,12 +107,12 @@ abstract class ActiveRecord extends BaseActiveRecord
      *
      * For example, to delete all articles whose status is 3:
      *
-     * ~~~
+     * ```php
      * Article::deleteAll('status = 3');
-     * ~~~
+     * ```
      *
      * @param string|array $condition the conditions that will be put in the WHERE part of the DELETE SQL.
-     * Please refer to [[Query::where()]] on how to specify this parameter.
+     * Please refer to {@see \rock\sphinx\Query::where()} on how to specify this parameter.
      * @param array $params the parameters (name => value) to be bound to the query.
      * @return integer the number of rows deleted
      */
@@ -126,6 +126,7 @@ abstract class ActiveRecord extends BaseActiveRecord
 
     /**
      * @inheritdoc
+     * @return ActiveQuery the newly created {@see \rock\sphinx\ActiveQuery} instance.
      */
     public static function find()
     {
@@ -134,7 +135,7 @@ abstract class ActiveRecord extends BaseActiveRecord
 
     /**
      * Declares the name of the Sphinx index associated with this AR class.
-     * By default this method returns the class name as the index name by calling [[Inflector::camel2id()]].
+     * By default this method returns the class name as the index name by calling {@see \rock\helpers\Inflector::camel2id()}.
      * For example, 'Article' becomes 'article', and 'StockItem' becomes
      * 'stock_item'. You may override this method if the index is not named after this convention.
      * @return string the index name
@@ -271,15 +272,15 @@ abstract class ActiveRecord extends BaseActiveRecord
 
     /**
      * Declares which operations should be performed within a transaction in different scenarios.
-     * The supported DB operations are: [[OP_INSERT]], [[OP_UPDATE]] and [[OP_DELETE]],
-     * which correspond to the [[insert()]], [[update()]] and [[delete()]] methods, respectively.
+     * The supported DB operations are: {@see \rock\sphinx\ActiveRecord::OP_INSERT}, {@see \rock\sphinx\ActiveRecord::OP_UPDATE} and {@see \rock\sphinx\ActiveRecord::OP_DELETE},
+     * which correspond to the {@see \rock\sphinx\ActiveRecord::insert()}, {@see \rock\sphinx\ActiveRecord::update()} and {@see \rock\sphinx\ActiveRecord::delete()} methods, respectively.
      * By default, these methods are NOT enclosed in a transaction.
      *
      * In some scenarios, to ensure data consistency, you may want to enclose some or all of them
      * in transactions. You can do so by overriding this method and returning the operations
      * that need to be transactional. For example,
      *
-     * ~~~
+     * ```php
      * return [
      *     'admin' => self::OP_INSERT,
      *     'api' => self::OP_INSERT | self::OP_UPDATE | self::OP_DELETE,
@@ -287,9 +288,9 @@ abstract class ActiveRecord extends BaseActiveRecord
      *     // 'api' => self::OP_ALL,
      *
      * ];
-     * ~~~
+     * ```
      *
-     * The above declaration specifies that in the "admin" scenario, the insert operation ([[insert()]])
+     * The above declaration specifies that in the "admin" scenario, the insert operation ({@see \rock\sphinx\ActiveRecord::insert()})
      * should be done in a transaction; and in the "api" scenario, all the operations should be done
      * in a transaction.
      *
@@ -316,29 +317,29 @@ abstract class ActiveRecord extends BaseActiveRecord
      *
      * This method performs the following steps in order:
      *
-     * 1. call [[beforeValidate()]] when `$runValidation` is true. If validation
+     * 1. call {@see \rock\base\Model::beforeValidate()} when `$runValidation` is true. If validation
      *    fails, it will skip the rest of the steps;
-     * 2. call [[afterValidate()]] when `$runValidation` is true.
-     * 3. call [[beforeSave()]]. If the method returns false, it will skip the
+     * 2. call {@see \rock\base\Model::afterValidate()} when `$runValidation` is true.
+     * 3. call {@see \rock\db\BaseActiveRecord::beforeSave()}. If the method returns false, it will skip the
      *    rest of the steps;
      * 4. insert the record into index. If this fails, it will skip the rest of the steps;
-     * 5. call [[afterSave()]];
+     * 5. call {@see \rock\db\BaseActiveRecord::afterSave()};
      *
-     * In the above step 1, 2, 3 and 5, events [[EVENT_BEFORE_VALIDATE]],
-     * [[EVENT_BEFORE_INSERT]], [[EVENT_AFTER_INSERT]] and [[EVENT_AFTER_VALIDATE]]
+     * In the above step 1, 2, 3 and 5, events {@see \rock\base\Model::EVENT_BEFORE_VALIDATE},
+     * {@see \rock\db\BaseActiveRecord::EVENT_BEFORE_INSERT}, {@see \rock\db\BaseActiveRecord::EVENT_AFTER_INSERT} and {@see \rock\base\Model::EVENT_AFTER_VALIDATE}
      * will be raised by the corresponding methods.
      *
-     * Only the [[changedAttributes|changed attribute values]] will be inserted.
+     * Only the {@see \rock\db\BaseActiveRecord::$dirtyAttributes}(changed attribute values) will be inserted.
      *
      * For example, to insert an article record:
      *
-     * ~~~
+     * ```php
      * $article = new Article;
      * $article->id = $id;
      * $article->genre_id = $genreId;
      * $article->content = $content;
      * $article->insert();
-     * ~~~
+     * ```
      *
      * @param boolean $runValidation whether to perform validation before saving the record.
      * If the validation fails, the record will not be inserted.
@@ -405,48 +406,48 @@ abstract class ActiveRecord extends BaseActiveRecord
      *
      * This method performs the following steps in order:
      *
-     * 1. call [[beforeValidate()]] when `$runValidation` is true. If validation
+     * 1. call {@see \rock\base\Model::beforeValidate()} when `$runValidation` is true. If validation
      *    fails, it will skip the rest of the steps;
-     * 2. call [[afterValidate()]] when `$runValidation` is true.
-     * 3. call [[beforeSave()]]. If the method returns false, it will skip the
+     * 2. call {@see \rock\base\Model::afterValidate()} when `$runValidation` is true.
+     * 3. call {@see \rock\db\BaseActiveRecord::beforeSave()}. If the method returns false, it will skip the
      *    rest of the steps;
      * 4. save the record into index. If this fails, it will skip the rest of the steps;
-     * 5. call [[afterSave()]];
+     * 5. call {@see \rock\db\BaseActiveRecord::afterSave()};
      *
-     * In the above step 1, 2, 3 and 5, events [[EVENT_BEFORE_VALIDATE]],
-     * [[EVENT_BEFORE_UPDATE]], [[EVENT_AFTER_UPDATE]] and [[EVENT_AFTER_VALIDATE]]
+     * In the above step 1, 2, 3 and 5, events {@see \rock\base\Model::EVENT_BEFORE_VALIDATE},
+     * {@see \rock\db\BaseActiveRecord::EVENT_BEFORE_UPDATE}, {@see \rock\db\BaseActiveRecord::EVENT_AFTER_UPDATE} and {@see \rock\base\Model::EVENT_AFTER_VALIDATE}
      * will be raised by the corresponding methods.
      *
-     * Only the [[changedAttributes|changed attribute values]] will be saved into database.
+     * Only the {@see \rock\db\BaseActiveRecord::$dirtyAttributes}(changed attribute values) will be saved into database.
      *
      * For example, to update an article record:
      *
-     * ~~~
+     * ```php
      * $article = Article::findOne($id);
      * $article->genre_id = $genreId;
      * $article->group_id = $groupId;
      * $article->update();
-     * ~~~
+     * ```
      *
      * Note that it is possible the update does not affect any row in the table.
      * In this case, this method will return 0. For this reason, you should use the following
      * code to check if update() is successful or not:
      *
-     * ~~~
+     * ```php
      * if ($this->update() !== false) {
      *     // update successful
      * } else {
      *     // update failed
      * }
-     * ~~~
+     * ```
      *
      * @param boolean $runValidation whether to perform validation before saving the record.
      * If the validation fails, the record will not be inserted into the database.
      * @param array $attributeNames list of attributes that need to be saved. Defaults to null,
      * meaning all attributes that are loaded from DB will be saved.
      * @return integer|boolean the number of rows affected, or false if validation fails
-     * or [[beforeSave()]] stops the updating process.
-     * @throws Exception if [[optimisticLock|optimistic locking]] is enabled and the data
+     * or {@see \rock\db\BaseActiveRecord::beforeSave()} stops the updating process.
+     * @throws Exception if {@see \rock\db\BaseActiveRecord::optimisticLock()}(optimistic locking) is enabled and the data
      * being updated is outdated.
      * @throws \Exception in case update failed.
      */
@@ -544,17 +545,17 @@ abstract class ActiveRecord extends BaseActiveRecord
      *
      * This method performs the following steps in order:
      *
-     * 1. call [[beforeDelete()]]. If the method returns false, it will skip the
+     * 1. call {@see \rock\db\BaseActiveRecord::beforeDelete()}. If the method returns false, it will skip the
      *    rest of the steps;
      * 2. delete the record from the index;
-     * 3. call [[afterDelete()]].
+     * 3. call {@see \rock\db\BaseActiveRecord::afterDelete()}.
      *
-     * In the above step 1 and 3, events named [[EVENT_BEFORE_DELETE]] and [[EVENT_AFTER_DELETE]]
+     * In the above step 1 and 3, events named {@see \rock\db\BaseActiveRecord::EVENT_BEFORE_DELETE} and {@see \rock\db\BaseActiveRecord::EVENT_AFTER_DELETE}
      * will be raised by the corresponding methods.
      *
      * @return integer|boolean the number of rows deleted, or false if the deletion is unsuccessful for some reason.
      * Note that it is possible the number of rows deleted is 0, even though the deletion execution is successful.
-     * @throws Exception if [[optimisticLock|optimistic locking]] is enabled and the data
+     * @throws Exception if {@see \rock\db\BaseActiveRecord::optimisticLock()}(optimistic locking) is enabled and the data
      * being deleted is outdated.
      * @throws \Exception in case delete failed.
      */
@@ -599,7 +600,7 @@ abstract class ActiveRecord extends BaseActiveRecord
     /**
      * Returns a value indicating whether the given active record is the same as the current one.
      * The comparison is made by comparing the index names and the primary key values of the two active records.
-     * If one of the records [[isNewRecord|is new]] they are also considered not equal.
+     * If one of the records {@see \rock\db\BaseActiveRecord::$isNewRecord}(is new) they are also considered not equal.
      * @param ActiveRecord $record record to compare to
      * @return boolean whether the two active records refer to the same row in the same index.
      */
@@ -622,7 +623,7 @@ abstract class ActiveRecord extends BaseActiveRecord
             if (isset($columns[$name])) {
                 if ($columns[$name]->isMva) {
                     $mvaValue = explode(',', $value);
-                    $row[$name] = array_map(array($columns[$name], 'phpTypecast'), $mvaValue);
+                    $row[$name] = array_map([$columns[$name], 'phpTypecast'], $mvaValue);
                 } else {
                     $row[$name] = $columns[$name]->phpTypecast($value);
                 }
@@ -632,9 +633,9 @@ abstract class ActiveRecord extends BaseActiveRecord
     }
 
     /**
-     * Returns a value indicating whether the specified operation is transactional in the current [[scenario]].
-     * @param integer $operation the operation to check. Possible values are [[OP_INSERT]], [[OP_UPDATE]] and [[OP_DELETE]].
-     * @return boolean whether the specified operation is transactional in the current [[scenario]].
+     * Returns a value indicating whether the specified operation is transactional in the current {@see \rock\base\Model::$scenario}.
+     * @param integer $operation the operation to check. Possible values are {@see \rock\sphinx\ActiveRecord::OP_INSERT}, {@see \rock\sphinx\ActiveRecord::OP_UPDATE} and {@see \rock\sphinx\ActiveRecord::OP_DELETE}.
+     * @return boolean whether the specified operation is transactional in the current {@see \rock\base\Model::$scenario}.
      */
     public function isTransactional($operation)
     {

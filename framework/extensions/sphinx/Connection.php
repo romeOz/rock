@@ -8,13 +8,13 @@ namespace rock\sphinx;
  * Note: although PDO supports numerous database drivers, this class supports only MySQL.
  *
  * In order to setup Sphinx "searchd" to support MySQL protocol following configuration should be added:
- * ~~~
+ * ```php
  * searchd
  * {
  *     listen = localhost:9306:mysql41
  *     ...
  * }
- * ~~~
+ * ```
  *
  * The following example shows how to create a Connection instance and establish
  * the Sphinx connection:
@@ -36,11 +36,11 @@ namespace rock\sphinx;
  * $command->execute();
  * ```
  *
- * For more information about how to perform various DB queries, please refer to [[Command]].
+ * For more information about how to perform various DB queries, please refer to {@see \rock\sphinx\Command}.
  *
- * This class supports transactions exactly as "rock\db\Connection".
+ * This class supports transactions exactly as {@see rock\db\Connection}.
  *
- * Note: while this class extends "rock\db\Connection" some of its methods are not supported.
+ * Note: while this class extends {@see rock\db\Connection} some of its methods are not supported.
  *
  * @method Schema getSchema() The schema information for this Sphinx connection
  * @method QueryBuilder getQueryBuilder() the query builder for this Sphinx connection
@@ -83,7 +83,7 @@ class Connection extends \rock\db\Connection
     }
 
     /**
-     * Alias of [[quoteIndexName()]].
+     * Alias of {@see \rock\sphinx\Connection::quoteIndexName()}.
      * @param string $name table name
      * @return string the properly quoted table name
      */
@@ -100,7 +100,7 @@ class Connection extends \rock\db\Connection
      */
     public function createCommand($sql = null, $params = [])
     {
-        $this->open();
+        //$this->open();
         $command = new Command([
             'db' => $this,
             'sql' => $sql,

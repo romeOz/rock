@@ -58,7 +58,6 @@ class ActiveRecordTest extends SphinxTestCase
         parent::tearDown();
     }
 
-
     public function testFind()
     {
         // find one
@@ -96,6 +95,11 @@ class ActiveRecordTest extends SphinxTestCase
         // find by attributes
         /** @var  ArticleIndex $article */
         $article = ArticleIndex::find()->where(['author_id' => 2])->one();
+        $this->assertTrue($article instanceof ArticleIndex);
+        $this->assertEquals(2, $article->id);
+
+        // find by comparison
+        $article = ArticleIndex::find()->where(['>', 'author_id', 1])->one();
         $this->assertTrue($article instanceof ArticleIndex);
         $this->assertEquals(2, $article->id);
 
@@ -160,7 +164,6 @@ class ActiveRecordTest extends SphinxTestCase
         $this->assertEquals(2, $article->author_id);
     }
 
-
     public function testInsert()
     {
         $record = new RuntimeIndex;
@@ -177,7 +180,6 @@ class ActiveRecordTest extends SphinxTestCase
         $this->assertEquals(15, $record->id);
         $this->assertFalse($record->isNewRecord);
     }
-
 
     /**
      * @depends testInsert
@@ -246,6 +248,7 @@ class ActiveRecordTest extends SphinxTestCase
         $record->id = 2;
         $record->title = 'test title';
         $record->content = 'test content';
+        $record->type_id = 7;
         $record->category = [1, 2];
         $record->save();
 
@@ -254,7 +257,6 @@ class ActiveRecordTest extends SphinxTestCase
         $records = RuntimeIndex::find()->all();
         $this->assertEquals(0, count($records));
     }
-
 
     public function testCallSnippets()
     {
@@ -656,9 +658,9 @@ class ActiveRecordTest extends SphinxTestCase
         $result = ArticleIndex::find()->andWhere(['author_id' => 1]);
         $this->assertTrue($result->one() instanceof ArticleIndex);
         $this->assertTrue($result->one() instanceof ArticleIndex);
+
         $result = ArticleIndex::find()->match('dogs');
         $this->assertTrue($result->one() instanceof ArticleIndex);
         $this->assertTrue($result->one() instanceof ArticleIndex);
     }
 }
- 

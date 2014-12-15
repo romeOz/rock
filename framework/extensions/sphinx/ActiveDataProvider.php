@@ -8,13 +8,14 @@ use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 
 /**
- * ActiveDataProvider implements a data provider based on [[\rock\db\Query]] and [[\rock\db\ActiveQuery]].
- * ActiveDataProvider provides data by performing DB queries using [[query]].
+ * ActiveDataProvider implements a data provider based on {@see \rock\sphinx\Query} and {@see \rock\sphinx\ActiveQuery}.
+ * ActiveDataProvider provides data by performing DB queries using {@see \rock\db\ActiveDataProvider::$query }.
  * And the following example shows how to use ActiveDataProvider without ActiveRecord:
  *
  * ```php
  * $config = [
  *      'query' => (new \rock\db\Query())->from('post'),
+ *      'model' => PostIndex::className(),
  *      'callSnippets' => [
  *          'content' => [
  *              'about', // query search

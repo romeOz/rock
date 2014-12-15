@@ -11,29 +11,29 @@ use rock\db\ActiveRelationTrait;
  *
  * An ActiveQuery can be a normal query or be used in a relational context.
  *
- * ActiveQuery instances are usually created by [[ActiveRecord::find()]] and [[ActiveRecord::findBySql()]].
- * Relational queries are created by [[ActiveRecord::hasOne()]] and [[ActiveRecord::hasMany()]].
+ * ActiveQuery instances are usually created by {@see \rock\sphinx\ActiveRecord::find()} and {@see \rock\sphinx\ActiveRecord::findBySql()}.
+ * Relational queries are created by {@see \rock\sphinx\ActiveRecord::hasOne()} and {@see \rock\sphinx\ActiveRecord::hasMany()}.
  *
  * Normal Query
  * ------------
  *
- * Because ActiveQuery extends from [[Query]], one can use query methods, such as [[where()]],
- * [[orderBy()]] to customize the query options.
+ * Because ActiveQuery extends from {@see \rock\sphinx\Query}, one can use query methods, such as {@see \rock\sphinx\Query::where()},
+ * {@see \rock\sphinx\Query::orderBy()} to customize the query options.
  *
  * ActiveQuery also provides the following additional query options:
  *
- * - [[with()]]: list of relations that this query should be performed with.
- * - [[indexBy()]]: the name of the column by which the query result should be indexed.
- * - [[asArray()]]: whether to return each record as an array.
+ * - {@see \rock\db\ActiveQueryInterface::with()}: list of relations that this query should be performed with.
+ * - {@see \rock\db\ActiveQueryInterface::indexBy()}: the name of the column by which the query result should be indexed.
+ * - {@see \rock\db\ActiveQueryInterface::asArray()}: whether to return each record as an array.
  *
  * These options can be configured using methods of the same name. For example:
  *
- * ~~~
+ * ```php
  * $articles = Article::find()->with('source')->asArray()->all();
- * ~~~
+ * ```
  *
  * ActiveQuery allows to build the snippets using sources provided by ActiveRecord.
- * You can use [[snippetByModel()]] method to enable this.
+ * You can use {@see \rock\sphinx\ActiveQuery::snippetByModel()} method to enable this.
  * For example:
  *
  * ```php
@@ -60,15 +60,15 @@ use rock\db\ActiveRelationTrait;
  *
  * In relational context ActiveQuery represents a relation between two Active Record classes.
  *
- * Relational ActiveQuery instances are usually created by calling [[ActiveRecord::hasOne()]] and
- * [[ActiveRecord::hasMany()]]. An Active Record class declares a relation by defining
+ * Relational ActiveQuery instances are usually created by calling {@see \rock\sphinx\ActiveRecord::hasOne()} and
+ * {@see \rock\sphinx\ActiveRecord::hasMany()}. An Active Record class declares a relation by defining
  * a getter method which calls one of the above methods and returns the created ActiveQuery object.
  *
- * A relation is specified by [[link]] which represents the association between columns
- * of different tables; and the multiplicity of the relation is indicated by [[multiple]].
+ * A relation is specified by {@see \rock\db\ActiveRelationTrait::$link} which represents the association between columns
+ * of different tables; and the multiplicity of the relation is indicated by {@see \rock\db\ActiveRelationTrait::$multiple}.
  *
- * If a relation involves a pivot table, it may be specified by [[via()]].
- * This methods may only be called in a relational context. Same is true for [[inverseOf()]], which
+ * If a relation involves a pivot table, it may be specified by {@see \rock\db\ActiveQueryInterface::via()}.
+ * This methods may only be called in a relational context. Same is true for {@see \rock\db\ActiveRelationTrait::inverseOf()}, which
  * marks a relation as inverse of another relation.
  */
 class ActiveQuery extends Query implements ActiveQueryInterface
@@ -77,8 +77,13 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     use ActiveRelationTrait;
 
     /**
+     * @event Event an event that is triggered when the query is initialized via {@see \rock\base\ObjectInterface::init()}.
+     */
+    const EVENT_INIT = 'init';
+
+    /**
      * @var string the SQL statement to be executed for retrieving AR records.
-     * This is set by [[ActiveRecord::findBySql()]].
+     * This is set by {@see \rock\sphinx\ActiveRecord::findBySql()}.
      */
     public $sql;
 
@@ -95,9 +100,20 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     }
 
     /**
-     * Sets the [[snippetCallback]] to [[fetchSnippetSourceFromModels()]], which allows to
+     * Initializes the object.
+     * This method is called at the end of the constructor. The default implementation will trigger
+     * an {@see \rock\sphinx\ActiveQuery::EVENT_INIT} event. If you override this method, make sure you call the parent implementation at the end
+     * to ensure triggering of the event.
+     */
+    public function init()
+    {
+        $this->trigger(self::EVENT_INIT);
+    }
+
+    /**
+     * Sets the {@see \rock\sphinx\Query::$snippetCallback} to {@see \rock\sphinx\ActiveQuery::fetchSnippetSourceFromModels()}, which allows to
      * fetch the snippet source strings from the Active Record models, using method
-     * [[ActiveRecord::getSnippetSource()]].
+     * {@see \rock\sphinx\ActiveRecord::getSnippetSource()}.
      * For example:
      *
      * ```php
@@ -112,7 +128,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
      * $articles = Article::find()->snippetByModel()->all();
      * ```
      *
-     * Warning: this option should NOT be used with [[asArray]] at the same time!
+     * Warning: this option should NOT be used with {@see \rock\db\ActiveQueryTrait::$asArray} at the same time!
      * @return static the query object itself
      */
     public function snippetByModel()
@@ -127,7 +143,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
      *
      * @param Connection $connection the DB connection used to create the DB command.
      * @param boolean       $subAttributes
-     * If null, the DB connection returned by [[modelClass]] will be used.
+     * If null, the DB connection returned by {@see \rock\db\ActiveQueryTrait::$modelClass} will be used.
      * @return array|ActiveRecord[] the query results. If the query results in nothing, an empty array will be returned.
      */
     public function all($connection = null, $subAttributes = false)
@@ -153,6 +169,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
                 $this->findWith($this->with, $models);
             }
             $models = $this->fillUpSnippets($models);
+            //$this->afterFind($models);
             if (!$this->asArray) {
 //                if (!$this->afterFind($models)) {
 //                    return [];
@@ -161,7 +178,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
                     $model->afterFind();
                 }
             } else {
-                $this->afterFind($models);
+
                 $activeRecord->afterFind($models);
             }
 
@@ -175,9 +192,9 @@ class ActiveQuery extends Query implements ActiveQueryInterface
      * Executes query and returns a single row of result.
      *
      * @param Connection $connection the DB connection used to create the DB command.
-     * If null, the DB connection returned by [[modelClass]] will be used.
+     * If null, the DB connection returned by {@see \rock\db\ActiveQueryTrait::$modelClass} will be used.
      * @param boolean       $subAttributes
-     * @return ActiveRecord|array|null a single row of query result. Depending on the setting of [[asArray]],
+     * @return ActiveRecord|array|null a single row of query result. Depending on the setting of {@see \rock\db\ActiveQueryTrait::$asArray},
      * the query result may be either an array or an ActiveRecord object. Null will be returned
      * if the query results in nothing.
      */
@@ -213,7 +230,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
                 $model = $models[0];
             }
             list ($model) = $this->fillUpSnippets([$model]);
-            $this->afterFind($model);
+            //$this->afterFind($model);
             $activeRecord->afterFind($model);
             return $model;
         } else {
@@ -228,7 +245,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
      * Creates a DB command that can be used to execute this query.
      *
      * @param Connection $connection the DB connection used to create the DB command.
-     * If null, the DB connection returned by [[modelClass]] will be used.
+     * If null, the DB connection returned by {@see \rock\db\ActiveQueryTrait::$modelClass} will be used.
      * @return Command the created DB command instance.
      */
     public function createCommand($connection = null)
@@ -295,9 +312,9 @@ class ActiveQuery extends Query implements ActiveQueryInterface
 
 
     /**
-     * Fetches the source for the snippets using [[ActiveRecord::getSnippetSource()]] method.
+     * Fetches the source for the snippets using {@see \rock\sphinx\ActiveRecord::getSnippetSource()} method.
      * @param ActiveRecord[] $models raw query result rows.
-     * @throws Exception if [[asArray]] enabled.
+     * @throws Exception if {@see \rock\db\ActiveQueryTrait::$asArray} enabled.
      * @return array snippet source strings
      */
     protected function fetchSnippetSourceFromModels($models)

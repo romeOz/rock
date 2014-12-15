@@ -3,6 +3,8 @@
 namespace rockunit\extensions\sphinx;
 
 use rock\db\Migration;
+use rock\di\Container;
+use rock\helpers\ArrayHelper;
 use rock\Rock;
 use rock\sphinx\Connection;
 
@@ -23,7 +25,7 @@ class SphinxTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @var Connection Sphinx connection instance.
      */
-    protected $sphinx;
+    protected $sphinx = 'sphinx';
     /**
      * @var array Database connection configuration.
      */
@@ -35,7 +37,7 @@ class SphinxTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @var \rock\db\Connection database connection instance.
      */
-    protected $connection;
+    protected $connection = 'db';
 
 //    public static function setUpBeforeClass()
 //    {
@@ -71,7 +73,7 @@ class SphinxTestCase extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        if ($this->sphinx) {
+        if ($this->sphinx instanceof Connection) {
             $this->sphinx->close();
         }
         //$this->destroyApplication();
@@ -100,18 +102,16 @@ class SphinxTestCase extends \PHPUnit_Framework_TestCase
      */
     public function getConnection($reset = false, $open = true)
     {
-        if (!$reset && $this->sphinx) {
+        if (!$reset && $this->sphinx instanceof Connection) {
             return $this->sphinx;
         }
-        $connection = new Connection;
-        $connection->dsn = $this->sphinxConfig['dsn'];
-        if (isset($this->sphinxConfig['username'])) {
-            $connection->username = $this->sphinxConfig['username'];
-            $connection->password = $this->sphinxConfig['password'];
+        $config = ArrayHelper::intersectByKeys($this->sphinxConfig, ['dsn', 'username', 'password', 'attributes']);
+        $config['class'] = Connection::className();
+        if (is_string($this->sphinx)) {
+            Container::add($this->sphinx, $config);
         }
-        if (isset($this->sphinxConfig['attributes'])) {
-            $connection->attributes = $this->sphinxConfig['attributes'];
-        }
+        /** @var Connection $connection */
+        $connection = Container::load($config);
         if ($open) {
             $connection->open();
         }
@@ -138,19 +138,17 @@ class SphinxTestCase extends \PHPUnit_Framework_TestCase
      */
     public function getDbConnection($reset = true, $open = true)
     {
-        if (!$reset && $this->connection) {
+        if (!$reset && $this->connection instanceof \rock\db\Connection) {
             return $this->connection;
         }
 
-        $connection = new \rock\db\Connection;
-        $connection->dsn = $this->dbConfig['dsn'];
-        if (isset($this->dbConfig['username'])) {
-            $connection->username = $this->dbConfig['username'];
-            $connection->password = $this->dbConfig['password'];
+        $config = ArrayHelper::intersectByKeys($this->dbConfig, ['dsn', 'username', 'password', 'attributes']);
+        $config['class'] = \rock\db\Connection::className();
+        if (is_string($this->connection)) {
+            Container::add($this->connection, $config);
         }
-        if (isset($this->dbConfig['attributes'])) {
-            $connection->attributes = $this->dbConfig['attributes'];
-        }
+        /** @var Connection $connection */
+        $connection = Container::load($config);
         if ($open) {
             $connection->open();
             if (!empty($this->dbConfig['fixture'])) {
@@ -169,7 +167,7 @@ class SphinxTestCase extends \PHPUnit_Framework_TestCase
                         $migration = new $migration;
                     }
                     $migration->connection = $connection;
-                    $migration->enableNote = false;
+                    $migration->enableVerbose = false;
                     $migration->up();
                 }
             }

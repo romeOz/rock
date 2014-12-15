@@ -11,7 +11,7 @@ use rock\Rock;
  *
  * @property string[] $indexNames All index names in the Sphinx. This property is read-only.
  * @property IndexSchema[] $indexSchemas The metadata for all indexes in the Sphinx. Each array element is an
- * instance of [[IndexSchema]] or its child class. This property is read-only.
+ * instance of {@see \rock\sphinx\IndexSchema} or its child class. This property is read-only.
  * @property array $indexTypes All index types in the Sphinx in format: index name => index type. This
  * property is read-only.
  * @property QueryBuilder $queryBuilder The query builder for this connection. This property is read-only.
@@ -172,7 +172,7 @@ class Schema
 
     /**
      * Returns the cache group name.
-     * This allows [[refresh()]] to invalidate all cached index schemas.
+     * This allows {@see \rock\sphinx\Schema::refresh()} to invalidate all cached index schemas.
      * @return string the cache group name
      */
     protected function getCacheGroup()
@@ -192,7 +192,7 @@ class Schema
      * @param boolean $refresh whether to fetch the latest available index schemas. If this is false,
      * cached data may be returned if available.
      * @return IndexSchema[] the metadata for all indexes in the Sphinx.
-     * Each array element is an instance of [[IndexSchema]] or its child class.
+     * Each array element is an instance of {@see \rock\sphinx\IndexSchema} or its child class.
      */
     public function getIndexSchemas($refresh = false)
     {
@@ -332,12 +332,11 @@ class Schema
      */
     public function quoteValue($str)
     {
-        if (!is_string($str)) {
+        if (is_string($str)) {
+            return $this->db->getSlavePdo()->quote($str);
+        } else {
             return $str;
         }
-        $this->db->open();
-
-        return $this->db->pdo->quote($str);
     }
 
     /**
@@ -407,7 +406,7 @@ class Schema
     /**
      * Returns the actual name of a given index name.
      * This method will strip off curly brackets from the given index name
-     * and replace the percentage character '%' with [[Connection::indexPrefix]].
+     * and replace the percentage character '%' with {@see \rock\sphinx\Connection::$tablePrefix}.
      * @param string $name the index name to be converted
      * @return string the real name of the given index name
      */
@@ -439,14 +438,13 @@ class Schema
             'timestamp' => 'integer',
         ];
         if (isset($typeMap[$column->type])) {
-//            if ($column->type === 'bigint') {
-//                return PHP_INT_SIZE == 8 ? 'integer' : 'string';
-////            } elseif ($column->type === 'integer' || $column->type === 'uint') {
-////                return PHP_INT_SIZE == 4 ? 'string' : 'integer';
-//            } else {
-//                return $typeMap[$column->type];
-//            }
-            return $typeMap[$column->type];
+            if ($column->type === 'bigint') {
+                return PHP_INT_SIZE == 8 ? 'integer' : 'string';
+            } elseif ($column->type === 'integer') {
+                return PHP_INT_SIZE == 4 ? 'string' : 'integer';
+            } else {
+                return $typeMap[$column->type];
+            }
         } else {
             return 'string';
         }
@@ -474,19 +472,26 @@ class Schema
             }
             throw $e;
         }
-        foreach ($columns as $info) {
-            $column = $this->loadColumnSchema($info);
-            $index->columns[$column->name] = $column;
-            if ($column->isPrimaryKey) {
-                $index->primaryKey = $column->name;
+
+        if (empty($columns[0]['Agent'])) {
+            foreach ($columns as $info) {
+                $column = $this->loadColumnSchema($info);
+                $index->columns[$column->name] = $column;
+                if ($column->isPrimaryKey) {
+                    $index->primaryKey = $column->name;
+                }
             }
+        } else {
+            // Distributed index :
+            $agent = $this->getIndexSchema($columns[0]['Agent']);
+            $index->columns = $agent->columns;
         }
 
         return true;
     }
 
     /**
-     * Loads the column information into a [[ColumnSchema]] object.
+     * Loads the column information into a {@see \rock\sphinx\ColumnSchema} object.
      * @param array $info column information
      * @return ColumnSchema the column schema object
      */
@@ -510,8 +515,19 @@ class Schema
         $column->isAttribute = !$column->isField;
 
         $column->isMva = ($type == 'mva');
+
         $column->phpType = $this->getColumnPhpType($column);
 
         return $column;
+    }
+    /**
+     * Returns a value indicating whether a SQL statement is for read purpose.
+     * @param string $sql the SQL statement
+     * @return boolean whether a SQL statement is for read purpose.
+     */
+    public function isReadQuery($sql)
+    {
+        $pattern = '/^\s*(SELECT|SHOW|DESCRIBE)\b/i';
+        return preg_match($pattern, $sql) > 0;
     }
 }
