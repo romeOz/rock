@@ -307,7 +307,8 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
         if ($this->hasErrors()) {
             return false;
         }
-        $this->setAttributes($attributes);
+
+        $this->setAttributes(array_filter($attributes, function($value){return isset($value);}));
         return true;
     }
 
