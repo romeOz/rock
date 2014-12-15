@@ -67,35 +67,53 @@ class DatabaseTestCase extends \PHPUnit_Framework_TestCase
         if (!$reset && $this->connection instanceof Connection) {
             return $this->connection;
         }
+        $config = $this->database;
+        $fixture = isset($config['fixture']) ? $config['fixture'] : null;
+        $migrations = isset($config['migrations']) ? $config['migrations'] : [];
+        $config = ArrayHelper::intersectByKeys($config, ['dsn', 'username', 'password', 'attributes']);
 
-        $config = ArrayHelper::intersectByKeys($this->database, ['dsn', 'username', 'password', 'attributes']);
-        $config['class'] = Connection::className();
+        try {
+            $this->connection = $this->prepareDatabase($config, $fixture, $open, $migrations);
+        } catch (\Exception $e) {
+            $this->markTestSkipped("Something wrong when preparing database: " . $e->getMessage());
+        }
+        return $this->connection;
+    }
+
+    public function prepareDatabase($config, $fixture, $open = true, array $migrations = [])
+    {
+        if (!isset($config['class'])) {
+            $config['class'] = Connection::className();
+        }
         if (is_string($this->connection)) {
             Container::add($this->connection, $config);
         }
+
         /** @var Connection $connection */
         $connection = Container::load($config);
-        if ($open) {
-            $connection->open();
-            $lines = explode(';', file_get_contents($this->database['fixture']));
+        if (!$open) {
+            return $connection;
+        }
+
+        $connection->open();
+        if ($fixture !== null) {
+            $lines = explode(';', file_get_contents($fixture));
             foreach ($lines as $line) {
                 if (trim($line) !== '') {
                     $connection->pdo->exec($line);
                 }
             }
-            if (isset($this->database['migrations'])) {
-                /** @var Migration $migration */
-                foreach ($this->database['migrations'] as $migration) {
-                    if (is_string($migration)) {
-                        $migration = new $migration;
-                    }
-                    $migration->connection = $connection;
-                    $migration->enableVerbose = false;
-                    $migration->up();
-                }
-            }
         }
-        $this->connection = $connection;
+
+        /** @var Migration $migration */
+        foreach ($migrations as $migration) {
+            if (is_string($migration)) {
+                $migration = new $migration;
+            }
+            $migration->connection = $connection;
+            $migration->enableVerbose = false;
+            $migration->up();
+        }
 
         return $connection;
     }
