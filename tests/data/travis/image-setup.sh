@@ -8,16 +8,15 @@ fi
 # this is helpful to compile extension
 sudo apt-get install autoconf
 
-
 ###
 # Install Imagick
 ###
-IMAGICK=3.1.2
+IMAGICK_VERSION=3.1.2
 
-wget http://pecl.php.net/get/imagick-${IMAGICK}.tgz
-tar zxvf imagick-${IMAGICK}.tgz
-cd "imagick-${IMAGICK}"
-phpize && ./configure && make install && echo "Installed ext/imagick-${IMAGICK}"
+wget http://pecl.php.net/get/imagick-${IMAGICK_VERSION}.tgz
+tar zxvf imagick-${IMAGICK_VERSION}.tgz
+cd "imagick-${IMAGICK_VERSION}"
+phpize && ./configure && make install && echo "Installed ext/imagick-${IMAGICK_VERSION}"
 
 echo "extension = imagick.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 

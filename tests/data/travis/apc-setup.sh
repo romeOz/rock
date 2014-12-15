@@ -9,13 +9,13 @@ fi
 sudo apt-get install autoconf
 
 # install this version
-APCU=4.0.6
+APCU_VERSION=4.0.6
 
 # compile manually, because `pecl install apcu-beta` keep asking questions
-wget http://pecl.php.net/get/apcu-$APCU.tgz
-tar zxvf apcu-$APCU.tgz
-cd "apcu-${APCU}"
-phpize && ./configure && make install && echo "Installed ext/apcu-${APCU}"
+wget http://pecl.php.net/get/apcu-${APCU_VERSION}.tgz
+tar zxvf apcu-${APCU_VERSION}.tgz
+cd "apcu-${APCU_VERSION}"
+phpize && ./configure && make install && echo "Installed ext/apcu-${APCU_VERSION}"
 
 echo "extension = apcu.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 echo "apc.enable_cli = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini

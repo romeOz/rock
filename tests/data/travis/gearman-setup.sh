@@ -4,6 +4,8 @@ echo "Skipping Gearman on HHVM"
 exit 0
 fi
 
+GEARMAND_VERSION=1.1.12
+
 sudo add-apt-repository -y ppa:ondrej/php5
 sudo apt-get update
 # Install Gearman
@@ -11,9 +13,9 @@ sudo apt-get install -y libboost-all-dev
 sudo apt-get install -y gperf uuid-dev
 #sudo apt-get install -y gperf libevent-dev uuid-dev libcloog-ppl-dev
 sudo apt-get install -y libgearman-dev
-wget https://launchpad.net/gearmand/1.2/1.1.12/+download/gearmand-1.1.12.tar.gz
-tar xf gearmand-1.1.12.tar.gz
-cd gearmand-1.1.12
+wget https://launchpad.net/gearmand/1.2/${GEARMAND_VERSION}/+download/gearmand-${GEARMAND_VERSION}.tar.gz
+tar xf gearmand-${GEARMAND_VERSION}.tar.gz
+cd gearmand-${GEARMAND_VERSION}
 ./configure
 make
 sudo make install
