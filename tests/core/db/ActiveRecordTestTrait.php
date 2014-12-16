@@ -1150,10 +1150,28 @@ trait ActiveRecordTestTrait
                                 [$customerClass, true, null, false],
                             ], $afterFindCalls);
 
+        unset($_POST['_method']);
+    }
+
+    public function testAfterFindViaJoinWith()
+    {
+        /* @var $customerClass ActiveRecordInterface */
+        $customerClass = $this->getCustomerClass();
+        /* @var $orderClass BaseActiveRecord */
+        $orderClass = $this->getOrderClass();
+        /* @var $this \PHPUnit_Framework_TestCase|ActiveRecordTestTrait */
+
+        $afterFindCalls = [];
+        Event::on(BaseActiveRecord::className(), BaseActiveRecord::EVENT_AFTER_FIND, function (Event $event) use (&$afterFindCalls) {
+            /* @var $ar BaseActiveRecord */
+            $ar = $event->owner;
+            $afterFindCalls[] = [get_class($ar), $ar->getIsNewRecord(), $ar->getPrimaryKey(), $ar->isRelationPopulated('orders')];
+        });
+
         // joinWith
         $afterFindCalls = [];
         $selectBuilder = new SelectBuilder([
-                                               $customerClass::find()->select('*'),
+                                               $customerClass::find()->select(['id']),
                                                [$orderClass::find()->select(['id']), true]
                                            ]);
         $customer = $customerClass::find()->select($selectBuilder)->where(['customer.id' => 1])->joinWith('orders', false)->asArray()->one(null, true);
@@ -1165,7 +1183,7 @@ trait ActiveRecordTestTrait
 
         $afterFindCalls = [];
         $selectBuilder = new SelectBuilder([
-                                               $customerClass::find()->select('*'),
+                                               $customerClass::find()->select(['id']),
                                                [$orderClass::find()->select(['id']), true]
                                            ]);
         $customer = $customerClass::find()->select($selectBuilder)->where(['customer.id' => 1])->joinWith('orders', false)->asArray()->all(null, true);
