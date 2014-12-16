@@ -10,4 +10,14 @@ use rockunit\core\db\ActiveRecordTest;
 class CubridActiveRecordTest extends ActiveRecordTest
 {
     public $driverName = 'cubrid';
+
+    public function testAfterFind()
+    {
+        $this->markTestSkipped('Skipped: '. __METHOD__);
+    }
+
+    public function testCache()
+    {
+        $this->markTestSkipped('Skipped: '. __METHOD__);
+    }
 }
