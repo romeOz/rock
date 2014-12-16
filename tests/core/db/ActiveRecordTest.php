@@ -6,7 +6,6 @@ namespace rockunit\core\db;
 use rock\db\ActiveQuery;
 use rock\helpers\Trace;
 use rockunit\common\CommonTrait;
-use rockunit\core\db\cubrid\CubridActiveRecordTest;
 use rockunit\core\db\models\ActiveRecord;
 use rockunit\core\db\models\Category;
 use rockunit\core\db\models\Customer;
@@ -20,6 +19,7 @@ use rockunit\core\db\models\OrderItemWithNullFK;
 use rockunit\core\db\models\OrderWithNullFK;
 use rockunit\core\db\models\Profile;
 use rockunit\core\db\models\Type;
+use rockunit\core\db\pgsql\PostgreSQLActiveRecordTest;
 
 /**
  * @group db
@@ -602,8 +602,8 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertEquals(33.22, $model->numeric_col);
         $this->assertEquals(true, $model->bool_col2);
 
-        if ($this instanceof CubridActiveRecordTest) {
-            // cubrid has non-standard timestamp representation
+        if ($this instanceof PostgreSQLActiveRecordTest) {
+            // PostgreSQL has non-standard timestamp representation
             $this->assertEquals('12:00:00 AM 01/01/2002', $model->time);
         } else {
             $this->assertEquals('2002-01-01 00:00:00', $model->time);
