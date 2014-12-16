@@ -21,9 +21,9 @@ else
     wget http://ftp.cubrid.org/CUBRID_Engine/${CUBRID_VERSION}-linux.x86_64.tar.gz -O ${CUBRID_VERSION}-linux.x86_64.tar.gz
 fi
 
-    cd ${CUBRID_VERSION}
-    tar xzf ../../${CUBRID_VERSION}-linux.x86_64.tar.gz
-    cd ../..
+cd ${CUBRID_VERSION}
+tar xzf ../../${CUBRID_VERSION}-linux.x86_64.tar.gz
+cd ../..
 
 
 # setting cubrid env
