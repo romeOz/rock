@@ -2,7 +2,7 @@
 
 namespace rockunit\core\db\cubrid;
 
-use rock\db\sqlite\Schema;
+use rock\db\cubrid\Schema;
 use rockunit\core\db\QueryBuilderTest;
 
 /**
