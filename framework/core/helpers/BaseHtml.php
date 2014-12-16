@@ -322,7 +322,7 @@ class BaseHtml
      */
     public static function beginForm($name = null, $action = null, $method = 'post', $options = [])
     {
-        $urlBuilder = Url::set($url);
+        $urlBuilder = Url::set($action);
         $action = $urlBuilder->getAbsoluteUrl();
         $hiddenInputs = [];
         $request = Rock::$app->request;
