@@ -36,7 +36,7 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
      * Current locale.
      * @var  string
      */
-    public $locale = self::EN;
+    public $locale;
     /**
      * Locales.
      * @var array
@@ -106,7 +106,10 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
      */
     public static function set($time = 'now', $timezone = null, array $config = [])
     {
-        $config['class'] = static::className();
+        if (!isset($time)) {
+            $time = 'now';
+        }
+        $config['class'] = self::className();
         return Container::load($time, $timezone, $config);
     }
 
