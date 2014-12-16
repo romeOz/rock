@@ -562,6 +562,19 @@ class Request implements RequestInterface, ComponentsInterface
         return $requestUri;
     }
 
+    /**
+     * Returns host + path.
+     *
+     * ```
+     * http://site.com/foo/
+     * ```
+     *
+     * @return string
+     */
+    public function getUrlWithoutArgs()
+    {
+        return $this->getHostInfo() . '/' . $this->getPathInfo();
+    }
 
 
     private $_hostInfo;
