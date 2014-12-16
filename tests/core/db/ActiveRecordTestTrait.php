@@ -1171,7 +1171,7 @@ trait ActiveRecordTestTrait
         // joinWith
         $afterFindCalls = [];
         $selectBuilder = new SelectBuilder([
-                                               $customerClass::find()->select(['id']),
+                                               $customerClass::find()->select('*'),
                                                [$orderClass::find()->select(['id']), true]
                                            ]);
         $customer = $customerClass::find()->select($selectBuilder)->where(['customer.id' => 1])->joinWith('orders', false)->asArray()->one(null, true);
@@ -1183,7 +1183,7 @@ trait ActiveRecordTestTrait
 
         $afterFindCalls = [];
         $selectBuilder = new SelectBuilder([
-                                               $customerClass::find()->select(['id']),
+                                               $customerClass::find()->select('*'),
                                                [$orderClass::find()->select(['id']), true]
                                            ]);
         $customer = $customerClass::find()->select($selectBuilder)->where(['customer.id' => 1])->joinWith('orders', false)->asArray()->all(null, true);
