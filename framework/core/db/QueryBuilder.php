@@ -624,7 +624,8 @@ class QueryBuilder
                 list($sql, $params) = $this->build($column, $params);
                 $columns[$i] = "($sql) AS " . $this->db->quoteColumnName($i);
             } elseif ($column instanceof SelectBuilder) {
-                $columns[$i] = $column->build($this->db, $params);
+                $column->connection = $this->db;
+                $columns[$i] = $column->build($params);
             } elseif (is_string($i)) {
                 if (strpos($column, '(') === false) {
                     $column = $this->db->quoteColumnName($column);

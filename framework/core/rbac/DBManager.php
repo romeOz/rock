@@ -56,7 +56,7 @@ class DBManager extends RBAC
         }
         static::$items = $dataItems;
         if (!$dataRolesItems = RolesItems::find()
-            ->select(new SelectBuilder([Roles::find()->fields(), [Items::find()->fields(), 'items']]))
+            ->select(SelectBuilder::selects([Roles::find()->fields(), [Items::find()->fields(), 'items']]))
             ->innerJoinWith(
                 ['items', 'roles'],
                 false

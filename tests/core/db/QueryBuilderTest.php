@@ -7,10 +7,13 @@ use rock\db\mysql\QueryBuilder as MysqlQueryBuilder;
 use rock\db\Query;
 use rock\db\QueryBuilder;
 use rock\db\Schema;
+use rock\db\SelectBuilder;
 use rock\db\sqlite\QueryBuilder as SqliteQueryBuilder;
 use rock\db\mssql\QueryBuilder as MssqlQueryBuilder;
 use rock\db\pgsql\QueryBuilder as PgsqlQueryBuilder;
 use rock\db\cubrid\QueryBuilder as CubridQueryBuilder;
+use rockunit\core\db\models\Customer;
+use rockunit\core\db\models\Order;
 
 /**
  * @group db
@@ -432,4 +435,35 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertEquals($expected, $sql);
         $this->assertEmpty($params);
     }
+
+    public function testSelectBuilder()
+    {
+        $query = new Query();
+        $query->select(
+            [
+                SelectBuilder::selects(
+                    [
+                        ['customer' => ['id', 'name'], true],
+                        ['order' => ['id', 'total'], 'orders', '+']
+                    ])
+            ]
+        )
+            ->from(['customer'])
+            ->innerJoin('order', 'customer.id=order.customer_id');
+        $sql = $this->replaceQuotes(
+            "SELECT `customer`.`id` AS `customer__id`, `customer`.`name` AS `customer__name`, `order`.`id` AS `orders+id`, `order`.`total` AS `orders+total` FROM `customer` INNER JOIN `order` ON customer.id=order.customer_id");
+        $this->assertSame($query->getRawSql(), $sql);
+
+        $query = new Query();
+        $query->select(
+                SelectBuilder::select(['customer' => ['id', 'name']], true)
+                    ->select(['order' => ['id', 'total']], 'orders', '+')
+            )
+            ->from(['customer'])
+            ->innerJoin('order', 'customer.id=order.customer_id');
+
+        $this->assertSame($query->getRawSql(), $sql);
+    }
+
+
 }

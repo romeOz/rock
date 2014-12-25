@@ -243,26 +243,6 @@ class QueryTest extends DatabaseTestCase
         $this->assertFalse($result);
     }
 
-    public function testSelectBuilder()
-    {
-        $connection = $this->getConnection();
-        $query = new Query();
-        $query->select(
-            [
-                new SelectBuilder(
-                    [
-                        ['customer' => ['id', 'name'], true],
-                        ['order' => ['id', 'total'], 'orders', '+']
-                    ])
-            ]
-        )
-            ->from(['customer'])
-            ->innerJoin('order', 'customer.id=order.customer_id');
-        $sql = $this->replaceQuotes(
-            "SELECT `customer`.`id` AS `customer__id`, `customer`.`name` AS `customer__name`, `order`.`id` AS `orders+id`, `order`.`total` AS `orders+total` FROM `customer` INNER JOIN `order` ON customer.id=order.customer_id");
-        $this->assertSame($query->getRawSql($connection), $sql);
-    }
-
     public function testCache()
     {
         $cache = static::getCache();
@@ -275,7 +255,7 @@ class QueryTest extends DatabaseTestCase
         $query = new Query();
         $query->select(
             [
-                new SelectBuilder(
+                SelectBuilder::selects(
                     [
                         ['customer' => ['id', 'name']],
                         ['order' => ['id', 'total'], 'orders']

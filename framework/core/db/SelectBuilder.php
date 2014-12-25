@@ -3,52 +3,68 @@
 namespace rock\db;
 
 
-use rock\base\ClassName;
+use rock\base\ObjectTrait;
+use rock\di\Container;
 use rock\helpers\Helper;
 
 /**
  * Builder SELECT
  *
+ * @method static SelectBuilder selects(array $selects)
+ * @method static SelectBuilder select($fields, $alias = false, string $separator = null)
+ *
  * ```php
- * new SelectBuilder([Articles::find()->fields()]);
+ * SelectBuilder::selects([Articles::find()->fields()]);
  * //sql: SELECT `articles`.`id`, `articles`.`name`
  *
- * new SelectBuilder(['articles'=>['id', 'name']];
- * //sql: SELECT `articles`.`id`, `articles`.`name`
- *
- * new SelectBuilder([[Articles::find()->fields(), true, '__']]);
- * //sql: SELECT `articles`.`id` AS `articles__id`, `articles`.`name` AS `articles__id`
- *
- * new SelectBuilder([['articles'=>['id', 'name'], true, '__']]);
+ * SelectBuilder::select(Articles::find()->fields(), true, '__');
  * //sql: SELECT `articles`.`id` AS `articles__id`, `articles`.`name` AS `articles__id`
  * ```
  */
 class SelectBuilder
 {
-    use ClassName;
+    use ObjectTrait {
+        ObjectTrait::__call as parentCall;
+    }
+
+    /** @var string|Connection  */
+    public $connection = 'db';
 
     /**
      * @var array
      */
-    private $_selects = [];
+    public $selects = [];
 
-    public function __construct(array $selects)
+    public static function __callStatic($name, $arguments)
     {
-        $this->_selects = $selects;
+        /** @var static $self */
+        $self = Container::load(static::className());
+        return call_user_func_array([$self, $name], $arguments);
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function __call($name, $arguments)
+    {
+        $method = "{$name}Internal";
+        if (!method_exists($this, $method)) {
+            $this->parentCall($name, $arguments);
+        }
+        return call_user_func_array([$this, "{$name}Internal"], $arguments);
+    }
 
     /**
-     *
-     * @param Connection $db
      * @param array      $params
      * @throws Exception
      * @return array
      */
-    public function build(Connection $db, &$params = [])
+    public function build(&$params = [])
     {
+        /** @var Connection $connection */
+        $connection = is_string($this->connection) ? Container::load($this->connection) : $this->connection;
         $result = [];
-        foreach ($this->_selects as $key =>  $select) {
+        foreach ($this->selects as $key => $select) {
 
             $alias = false;
             $aliasSeparator = null;
@@ -71,7 +87,7 @@ class SelectBuilder
                     $tableAlias = $alias;
                     $alias = true;
                 }
-                $db = $class::getDb();
+                $connection = $class::getDb();
 
                 if (!$columns = $select->select) {
                     continue;
@@ -97,7 +113,7 @@ class SelectBuilder
             } else {
                 throw new Exception(Exception::WRONG_TYPE, ['name' => json_encode($select)]);
             }
-            $aliasSeparator = Helper::getValue($aliasSeparator, $db->aliasSeparator);
+            $aliasSeparator = Helper::getValue($aliasSeparator, $connection->aliasSeparator);
 
             foreach ($columns as $i => $column) {
                 if ($column instanceof Expression) {
@@ -105,23 +121,23 @@ class SelectBuilder
                     $params = array_merge($params, $column->params);
                 } elseif (is_string($i)) {
                     if (strpos($column, '(') === false) {
-                        $column = $db->quoteColumnName($column);
+                        $column = $connection->quoteColumnName($column);
                     }
-                    $columns[$i] = "$column AS " . $db->quoteColumnName($i);
+                    $columns[$i] = "$column AS " . $connection->quoteColumnName($i);
                 } elseif (strpos($column, '(') === false) {
                     if (preg_match('/^(.*?)(?i:\s+as\s+|\s+)([\w\-_\.]+)$/', $column, $matches)) {
-                        $matches[2] = $alias === true ? $db->quoteColumnName($tableAlias . $aliasSeparator . $matches[2]) : $db->quoteColumnName($matches[2]);
+                        $matches[2] = $alias === true ? $connection->quoteColumnName($tableAlias . $aliasSeparator . $matches[2]) : $connection->quoteColumnName($matches[2]);
                         $columns[$i]
-                            = $db->quoteTableName($table) .'.'. $db->quoteColumnName($matches[1]) . ' AS ' . $matches[2];
+                            = $connection->quoteTableName($table) .'.'. $connection->quoteColumnName($matches[1]) . ' AS ' . $matches[2];
                     } else {
-                        $columns[$i] = $db->quoteTableName($table) .'.'. $db->quoteColumnName($column) . ($alias === true ? ' AS ' . $db->quoteColumnName($tableAlias . $aliasSeparator . $column) : null);
+                        $columns[$i] = $connection->quoteTableName($table) .'.'. $connection->quoteColumnName($column) . ($alias === true ? ' AS ' . $connection->quoteColumnName($tableAlias . $aliasSeparator . $column) : null);
                     }
                 } elseif (stripos($column, 'CONCAT') !== false) {
                     if (preg_match('/^(.*?)(?i:\s+as\s+|\s+)([\w\-_\.]+)$/', $column, $matches)) {
-                        $matches[2] = $alias === true ? $db->quoteColumnName($tableAlias . $aliasSeparator . $matches[2]) : $db->quoteColumnName($matches[2]);
-                        $columns[$i] = $db->quoteColumnName($matches[1]) . ' AS ' . $matches[2];
+                        $matches[2] = $alias === true ? $connection->quoteColumnName($tableAlias . $aliasSeparator . $matches[2]) : $connection->quoteColumnName($matches[2]);
+                        $columns[$i] = $connection->quoteColumnName($matches[1]) . ' AS ' . $matches[2];
                     } else {
-                        $columns[$i] = $db->quoteTableName($table) .'.'. $db->quoteColumnName($column) . ($alias === true ? ' AS ' . $db->quoteColumnName($tableAlias . $aliasSeparator . $column) : null);
+                        $columns[$i] = $connection->quoteTableName($table) .'.'. $connection->quoteColumnName($column) . ($alias === true ? ' AS ' . $connection->quoteColumnName($tableAlias . $aliasSeparator . $column) : null);
                     }
                 }
             }
@@ -130,5 +146,39 @@ class SelectBuilder
         }
 
         return implode(', ', $result);
+    }
+
+    protected function selectInternal($fields, $alias = false, $separator = null)
+    {
+        $this->selects[] = is_array($fields) && is_string(key($fields))
+            ? [key($fields) => current($fields), $alias, $separator]
+            : [$fields, $alias, $separator];
+        return $this;
+    }
+
+    /**
+     * Adds selects.
+     *
+     * ```php
+     * SelectBuilder::selects([Articles::find()->fields()]);
+     * //sql: SELECT `articles`.`id`, `articles`.`name`
+     *
+     * SelectBuilder::selects(['articles'=>['id', 'name']]);
+     * //sql: SELECT `articles`.`id`, `articles`.`name`
+     *
+     * SelectBuilder::selects([[Articles::find()->fields(), true, '__']]);
+     * //sql: SELECT `articles`.`id` AS `articles__id`, `articles`.`name` AS `articles__id`
+     *
+     * SelectBuilder::selects([['articles'=>['id', 'name'], true, '__']]);
+     * //sql: SELECT `articles`.`id` AS `articles__id`, `articles`.`name` AS `articles__id`
+     * ```
+     *
+     * @param array $selects
+     * @return $this
+     */
+    protected function selectsInternal(array $selects)
+    {
+        $this->selects = $selects;
+        return $this;
     }
 } 

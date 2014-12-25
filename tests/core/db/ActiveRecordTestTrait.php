@@ -1170,7 +1170,7 @@ trait ActiveRecordTestTrait
 
         // joinWith
         $afterFindCalls = [];
-        $selectBuilder = new SelectBuilder([
+        $selectBuilder = SelectBuilder::selects([
                                                $customerClass::find()->select('*'),
                                                [$orderClass::find()->select(['id']), true]
                                            ]);
@@ -1182,7 +1182,7 @@ trait ActiveRecordTestTrait
                             ], $afterFindCalls);
 
         $afterFindCalls = [];
-        $selectBuilder = new SelectBuilder([
+        $selectBuilder = SelectBuilder::selects([
                                                $customerClass::find()->select('*'),
                                                [$orderClass::find()->select(['id']), true]
                                            ]);
@@ -1280,7 +1280,7 @@ trait ActiveRecordTestTrait
         $connection->enableQueryCache = true;
         $connection->queryCache = $cache;
 
-        $selectBuilder = new SelectBuilder([
+        $selectBuilder = SelectBuilder::selects([
                                                $customerClass::find()->select('*'),
                                                [$orderClass::find()->select(['id']), true]
                                            ]);
@@ -1553,5 +1553,23 @@ trait ActiveRecordTestTrait
         static::$afterSaveNewRecord = null;
         static::$afterSaveInsert = null;
         $this->assertTrue($customer->save());
+    }
+
+    public function testSelectBuilder()
+    {
+        /* @var $customerClass ActiveRecordInterface|Customer */
+        $customerClass = $this->getCustomerClass();
+        /* @var $orderClass BaseActiveRecord */
+        $orderClass = $this->getOrderClass();
+        $query = $customerClass::find()
+            ->select(
+                SelectBuilder::select($customerClass::find()->select(['id', 'name']), true)
+                    ->select($orderClass::find()->select(['id', 'total']), 'orders', '+')
+            );
+
+        $sql = $this->replaceQuotes(
+            "SELECT `customer`.`id` AS `customer__id`, `customer`.`name` AS `customer__name`, `order`.`id` AS `orders+id`, `order`.`total` AS `orders+total` FROM `customer`");
+        $this->assertSame($query->getRawSql(), $sql);
+
     }
 }
