@@ -102,7 +102,7 @@ class Connection extends \rock\db\Connection
     {
         //$this->open();
         $command = new Command([
-            'db' => $this,
+            'connection' => $this,
             'sql' => $sql,
         ]);
 

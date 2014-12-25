@@ -353,9 +353,9 @@ abstract class ActiveRecord extends BaseActiveRecord
         if ($runValidation && !$this->validate($attributes)) {
             return false;
         }
-        $db = static::getConnection();
-        if ($this->isTransactional(self::OP_INSERT) && $db->getTransaction() === null) {
-            $transaction = $db->beginTransaction();
+        $connection = static::getConnection();
+        if ($this->isTransactional(self::OP_INSERT) && $connection->getTransaction() === null) {
+            $transaction = $connection->beginTransaction();
             try {
                 $result = $this->insertInternal($attributes);
                 if ($result === false) {
@@ -388,8 +388,8 @@ abstract class ActiveRecord extends BaseActiveRecord
                 $values[$key] = $value;
             }
         }
-        $db = static::getConnection();
-        $command = $db->createCommand()->insert($this->indexName(), $values);
+        $connection = static::getConnection();
+        $command = $connection->createCommand()->insert($this->indexName(), $values);
         if (!$command->execute()) {
             return false;
         }
@@ -456,9 +456,9 @@ abstract class ActiveRecord extends BaseActiveRecord
         if ($runValidation && !$this->validate($attributeNames)) {
             return false;
         }
-        $db = static::getConnection();
-        if ($this->isTransactional(self::OP_UPDATE) && $db->getTransaction() === null) {
-            $transaction = $db->beginTransaction();
+        $connection = static::getConnection();
+        if ($this->isTransactional(self::OP_UPDATE) && $connection->getTransaction() === null) {
+            $transaction = $connection->beginTransaction();
             try {
                 $result = $this->updateInternal($attributeNames);
                 if ($result === false) {
@@ -561,8 +561,8 @@ abstract class ActiveRecord extends BaseActiveRecord
      */
     public function delete()
     {
-        $db = static::getConnection();
-        $transaction = $this->isTransactional(self::OP_DELETE) && $db->getTransaction() === null ? $db->beginTransaction() : null;
+        $connection = static::getConnection();
+        $transaction = $this->isTransactional(self::OP_DELETE) && $connection->getTransaction() === null ? $connection->beginTransaction() : null;
         try {
             $result = false;
             if ($this->beforeDelete()) {

@@ -23,7 +23,7 @@ class QueryBuilder
     /**
      * @var Connection the Sphinx connection.
      */
-    public $db;
+    public $connection;
     /**
      * @var string the separator between different fragments of a SQL statement.
      * Defaults to an empty space. This is mainly used by {@see \rock\sphinx\QueryBuilder::build()} when generating a SQL statement.
@@ -56,7 +56,7 @@ class QueryBuilder
      */
     public function __construct($connection, $config = [])
     {
-        $this->db = $connection;
+        $this->connection = $connection;
         $this->parentConstruct($config);
     }
 
@@ -162,7 +162,7 @@ class QueryBuilder
      */
     protected function generateInsertReplace($statement, $index, $columns, &$params)
     {
-        if (($indexSchema = $this->db->getIndexSchema($index)) !== null) {
+        if (($indexSchema = $this->connection->getIndexSchema($index)) !== null) {
             $indexSchemas = [$indexSchema];
         } else {
             $indexSchemas = [];
@@ -170,11 +170,11 @@ class QueryBuilder
         $names = [];
         $placeholders = [];
         foreach ($columns as $name => $value) {
-            $names[] = $this->db->quoteColumnName($name);
+            $names[] = $this->connection->quoteColumnName($name);
             $placeholders[] = $this->composeColumnValue($indexSchemas, $name, $value, $params);
         }
 
-        return $statement . ' INTO ' . $this->db->quoteIndexName($index)
+        return $statement . ' INTO ' . $this->connection->quoteIndexName($index)
             . ' (' . implode(', ', $names) . ') VALUES ('
             . implode(', ', $placeholders) . ')';
     }
@@ -242,14 +242,14 @@ class QueryBuilder
      */
     protected function generateBatchInsertReplace($statement, $index, $columns, $rows, &$params)
     {
-        if (($indexSchema = $this->db->getIndexSchema($index)) !== null) {
+        if (($indexSchema = $this->connection->getIndexSchema($index)) !== null) {
             $indexSchemas = [$indexSchema];
         } else {
             $indexSchemas = [];
         }
 
         foreach ($columns as $i => $name) {
-            $columns[$i] = $this->db->quoteColumnName($name);
+            $columns[$i] = $this->connection->quoteColumnName($name);
         }
 
         $values = [];
@@ -261,7 +261,7 @@ class QueryBuilder
             $values[] = '(' . implode(', ', $vs) . ')';
         }
 
-        return $statement . ' INTO ' . $this->db->quoteIndexName($index)
+        return $statement . ' INTO ' . $this->connection->quoteIndexName($index)
             . ' (' . implode(', ', $columns) . ') VALUES ' . implode(', ', $values);
     }
 
@@ -287,7 +287,7 @@ class QueryBuilder
      */
     public function update($index, $columns, $condition, &$params, $options)
     {
-        if (($indexSchema = $this->db->getIndexSchema($index)) !== null) {
+        if (($indexSchema = $this->connection->getIndexSchema($index)) !== null) {
             $indexSchemas = [$indexSchema];
         } else {
             $indexSchemas = [];
@@ -295,10 +295,10 @@ class QueryBuilder
 
         $lines = [];
         foreach ($columns as $name => $value) {
-            $lines[] = $this->db->quoteColumnName($name) . '=' . $this->composeColumnValue($indexSchemas, $name, $value, $params);
+            $lines[] = $this->connection->quoteColumnName($name) . '=' . $this->composeColumnValue($indexSchemas, $name, $value, $params);
         }
 
-        $sql = 'UPDATE ' . $this->db->quoteIndexName($index) . ' SET ' . implode(', ', $lines);
+        $sql = 'UPDATE ' . $this->connection->quoteIndexName($index) . ' SET ' . implode(', ', $lines);
         $where = $this->buildWhere([$index], $condition, $params);
         if ($where !== '') {
             $sql = $sql . ' ' . $where;
@@ -330,7 +330,7 @@ class QueryBuilder
      */
     public function delete($index, $condition, &$params)
     {
-        $sql = 'DELETE FROM ' . $this->db->quoteIndexName($index);
+        $sql = 'DELETE FROM ' . $this->connection->quoteIndexName($index);
         $where = $this->buildWhere([$index], $condition, $params);
 
         return $where === '' ? $sql : $sql . ' ' . $where;
@@ -343,7 +343,7 @@ class QueryBuilder
      */
     public function truncateIndex($index)
     {
-        return 'TRUNCATE RTINDEX ' . $this->db->quoteIndexName($index);
+        return 'TRUNCATE RTINDEX ' . $this->connection->quoteIndexName($index);
     }
 
     /**
@@ -439,17 +439,17 @@ class QueryBuilder
                 $params = array_merge($params, $column->params);
             } elseif ($column instanceof Query) {
                 list($sql, $params) = $this->build($column, $params);
-                $columns[$i] = "($sql) AS " . $this->db->quoteColumnName($i);
+                $columns[$i] = "($sql) AS " . $this->connection->quoteColumnName($i);
             } elseif (is_string($i)) {
                 if (strpos($column, '(') === false) {
-                    $column = $this->db->quoteColumnName($column);
+                    $column = $this->connection->quoteColumnName($column);
                 }
-                $columns[$i] = "$column AS " . $this->db->quoteColumnName($i);
+                $columns[$i] = "$column AS " . $this->connection->quoteColumnName($i);
             } elseif (strpos($column, '(') === false) {
                 if (preg_match('/^(.*?)(?i:\s+as\s+|\s+)([\w\-_\.]+)$/', $column, $matches)) {
-                    $columns[$i] = $this->db->quoteColumnName($matches[1]) . ' AS ' . $this->db->quoteColumnName($matches[2]);
+                    $columns[$i] = $this->connection->quoteColumnName($matches[1]) . ' AS ' . $this->connection->quoteColumnName($matches[2]);
                 } else {
-                    $columns[$i] = $this->db->quoteColumnName($column);
+                    $columns[$i] = $this->connection->quoteColumnName($column);
                 }
             }
         }
@@ -476,17 +476,17 @@ class QueryBuilder
         foreach ($indexes as $i => $index) {
             if ($index instanceof Query) {
                 list($sql, $params) = $this->build($index, $params);
-                $indexes[$i] = "($sql) " . $this->db->quoteIndexName($i);
+                $indexes[$i] = "($sql) " . $this->connection->quoteIndexName($i);
             } elseif (is_string($i)) {
                 if (strpos($index, '(') === false) {
-                    $index = $this->db->quoteIndexName($index);
+                    $index = $this->connection->quoteIndexName($index);
                 }
-                $indexes[$i] = "$index " . $this->db->quoteIndexName($i);
+                $indexes[$i] = "$index " . $this->connection->quoteIndexName($i);
             } elseif (strpos($index, '(') === false) {
                 if (preg_match('/^(.*?)(?i:\s+as|)\s+([^ ]+)$/', $index, $matches)) { // with alias
-                    $indexes[$i] = $this->db->quoteIndexName($matches[1]) . ' ' . $this->db->quoteIndexName($matches[2]);
+                    $indexes[$i] = $this->connection->quoteIndexName($matches[1]) . ' ' . $this->connection->quoteIndexName($matches[2]);
                 } else {
-                    $indexes[$i] = $this->db->quoteIndexName($index);
+                    $indexes[$i] = $this->connection->quoteIndexName($index);
                 }
             }
         }
@@ -513,7 +513,7 @@ class QueryBuilder
                 $params = array_merge($params, $match->params);
             } else {
                 $phName = self::PARAM_PREFIX . count($params);
-                $params[$phName] = $this->db->escapeMatchValue($match);
+                $params[$phName] = $this->connection->escapeMatchValue($match);
                 $matchWhere = 'MATCH(' . $phName . ')';
             }
 
@@ -595,7 +595,7 @@ class QueryBuilder
             if ($direction instanceof Expression) {
                 $orders[] = $direction->expression;
             } else {
-                $orders[] = $this->db->quoteColumnName($name) . ($direction === SORT_DESC ? ' DESC' : 'ASC');
+                $orders[] = $this->connection->quoteColumnName($name) . ($direction === SORT_DESC ? ' DESC' : 'ASC');
             }
         }
 
@@ -641,7 +641,7 @@ class QueryBuilder
             if ($column instanceof Expression) {
                 $columns[$i] = $column->expression;
             } elseif (strpos($column, '(') === false) {
-                $columns[$i] = $this->db->quoteColumnName($column);
+                $columns[$i] = $this->connection->quoteColumnName($column);
             }
         }
 
@@ -694,7 +694,7 @@ class QueryBuilder
                 $parts[] = $this->buildInCondition($indexes, 'IN', [$column, $value], $params);
             } else {
                 if (strpos($column, '(') === false) {
-                    $quotedColumn = $this->db->quoteColumnName($column);
+                    $quotedColumn = $this->connection->quoteColumnName($column);
                 } else {
                     $quotedColumn = $column;
                 }
@@ -780,7 +780,7 @@ class QueryBuilder
         list($column, $value1, $value2) = $operands;
 
         if (strpos($column, '(') === false) {
-            $quotedColumn = $this->db->quoteColumnName($column);
+            $quotedColumn = $this->connection->quoteColumnName($column);
         } else {
             $quotedColumn = $column;
         }
@@ -822,13 +822,13 @@ class QueryBuilder
             if (is_array($column)) {
                 foreach ($column as $i => $col) {
                     if (strpos($col, '(') === false) {
-                        $column[$i] = $this->db->quoteColumnName($col);
+                        $column[$i] = $this->connection->quoteColumnName($col);
                     }
                 }
                 return '(' . implode(', ', $column) . ") $operator ($sql)";
             } else {
                 if (strpos($column, '(') === false) {
-                    $column = $this->db->quoteColumnName($column);
+                    $column = $this->connection->quoteColumnName($column);
                 }
                 return "$column $operator ($sql)";
             }
@@ -849,7 +849,7 @@ class QueryBuilder
             $values[$i] = $this->composeColumnValue($indexes, $column, $value, $params);
         }
         if (strpos($column, '(') === false) {
-            $column = $this->db->quoteColumnName($column);
+            $column = $this->connection->quoteColumnName($column);
         }
 
         if (count($values) > 1) {
@@ -885,7 +885,7 @@ class QueryBuilder
         }
         foreach ($columns as $i => $column) {
             if (strpos($column, '(') === false) {
-                $columns[$i] = $this->db->quoteColumnName($column);
+                $columns[$i] = $this->connection->quoteColumnName($column);
             }
         }
 
@@ -940,7 +940,7 @@ class QueryBuilder
         }
 
         if (strpos($column, '(') === false) {
-            $column = $this->db->quoteColumnName($column);
+            $column = $this->connection->quoteColumnName($column);
         }
 
         $parts = [];
@@ -978,7 +978,7 @@ class QueryBuilder
         list($column, $value) = $operands;
 
         if (strpos($column, '(') === false) {
-            $column = $this->db->quoteColumnName($column);
+            $column = $this->connection->quoteColumnName($column);
         }
 
         if ($value === null) {
@@ -1009,7 +1009,7 @@ class QueryBuilder
             if ($direction instanceof Expression) {
                 $orders[] = $direction->expression;
             } else {
-                $orders[] = $this->db->quoteColumnName($name) . ($direction === SORT_DESC ? ' DESC' : '');
+                $orders[] = $this->connection->quoteColumnName($name) . ($direction === SORT_DESC ? ' DESC' : '');
             }
         }
 
@@ -1115,7 +1115,7 @@ class QueryBuilder
         $indexSchemas = [];
         if (!empty($indexes)) {
             foreach ($indexes as $indexName) {
-                $index = $this->db->getIndexSchema($indexName);
+                $index = $this->connection->getIndexSchema($indexName);
                 if ($index !== null) {
                     $indexSchemas[] = $index;
                 }

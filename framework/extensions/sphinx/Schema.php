@@ -33,7 +33,7 @@ class Schema
     /**
      * @var Connection the Sphinx connection
      */
-    public $db;
+    public $connection;
     /**
      * @var array list of ALL index names in the Sphinx
      */
@@ -120,12 +120,12 @@ class Schema
             return self::$_indexes[$name];
         }
 
-        $db = $this->db;
+        $connection = $this->connection;
         $realName = $this->getRawIndexName($name);
 
-        if ($db->enableSchemaCache === true && !in_array($name, $db->schemaCacheExclude, true)) {
+        if ($connection->enableSchemaCache === true && !in_array($name, $connection->schemaCacheExclude, true)) {
             /** @var CacheInterface $cache */
-            $cache = is_string($db->schemaCache) ? Rock::factory($db->schemaCache) : $db->schemaCache;
+            $cache = is_string($connection->schemaCache) ? Rock::factory($connection->schemaCache) : $connection->schemaCache;
 
             if ($cache instanceof CacheInterface) {
                 $cacheKey = serialize($this->getCacheKey($name));
@@ -133,7 +133,7 @@ class Schema
                     $table = $this->loadIndexSchema($realName);
                     self::$_indexes[$name] = $table;
                     if ($table !== null) {
-                        $cache->set($cacheKey, $table, $db->schemaCacheExpire, [$this->getCacheGroup()]);
+                        $cache->set($cacheKey, $table, $connection->schemaCacheExpire, [$this->getCacheGroup()]);
                     }
                 } else {
                     self::$_indexes[$name] = $table;
@@ -164,8 +164,8 @@ class Schema
     {
         return [
             __CLASS__,
-            $this->db->dsn,
-            $this->db->username,
+            $this->connection->dsn,
+            $this->connection->username,
             $name,
         ];
     }
@@ -180,8 +180,8 @@ class Schema
         return Helper::hash(
             [
                 __CLASS__,
-                $this->db->dsn,
-                $this->db->username,
+                $this->connection->dsn,
+                $this->connection->username,
             ],
             Helper::SERIALIZE_JSON
         );
@@ -258,10 +258,10 @@ class Schema
     protected function findIndexes()
     {
         $sql = 'SHOW TABLES';
-        $enableQueryCache = $this->db->enableQueryCache;
-        $this->db->enableQueryCache = false;
-        $result = $this->db->createCommand($sql)->queryAll();
-        $this->db->enableQueryCache = $enableQueryCache;
+        $enableQueryCache = $this->connection->enableQueryCache;
+        $this->connection->enableQueryCache = false;
+        $result = $this->connection->createCommand($sql)->queryAll();
+        $this->connection->enableQueryCache = $enableQueryCache;
         return $result;
     }
 
@@ -306,8 +306,8 @@ class Schema
     public function refresh()
     {
         /** @var CacheInterface $cache */
-        $cache = is_string($this->db->schemaCache) ? Rock::factory($this->db->schemaCache) : $this->db->schemaCache;
-        if ($this->db->enableSchemaCache && $cache instanceof CacheInterface) {
+        $cache = is_string($this->connection->schemaCache) ? Rock::factory($this->connection->schemaCache) : $this->connection->schemaCache;
+        if ($this->connection->enableSchemaCache && $cache instanceof CacheInterface) {
             $cache->removeTag($this->getCacheGroup());
         }
         self::$_indexNames = [];
@@ -320,7 +320,7 @@ class Schema
      */
     public function createQueryBuilder()
     {
-        return new QueryBuilder($this->db);
+        return new QueryBuilder($this->connection);
     }
 
     /**
@@ -333,7 +333,7 @@ class Schema
     public function quoteValue($str)
     {
         if (is_string($str)) {
-            return $this->db->getSlavePdo()->quote($str);
+            return $this->connection->getSlavePdo()->quote($str);
         } else {
             return $str;
         }
@@ -415,7 +415,7 @@ class Schema
         if (strpos($name, '{{') !== false) {
             $name = preg_replace('/\\{\\{(.*?)\\}\\}/', '\1', $name);
 
-            return str_replace('%', $this->db->tablePrefix, $name);
+            return str_replace('%', $this->connection->tablePrefix, $name);
         } else {
             return $name;
         }
@@ -460,10 +460,10 @@ class Schema
     {
         $sql = 'DESCRIBE ' . $this->quoteSimpleIndexName($index->name);
         try {
-            $enableQueryCache = $this->db->enableQueryCache;
-            $this->db->enableQueryCache = false;
-            $columns = $this->db->createCommand($sql)->queryAll();
-            $this->db->enableQueryCache = $enableQueryCache;
+            $enableQueryCache = $this->connection->enableQueryCache;
+            $this->connection->enableQueryCache = false;
+            $columns = $this->connection->createCommand($sql)->queryAll();
+            $this->connection->enableQueryCache = $enableQueryCache;
         } catch (\Exception $e) {
             if (($e instanceof Exception || $e instanceof \rock\db\Exception) && strpos($e->getMessage(), 'SQLSTATE[42S02') !== false) {
                 // index does not exist
