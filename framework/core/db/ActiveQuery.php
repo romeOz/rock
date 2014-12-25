@@ -88,7 +88,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
 
     /**
      * Constructor.
-     * @param array $modelClass the model class associated with this query
+     * @param string $modelClass the model class associated with this query
      * @param array $config configurations to be applied to the newly created query object
      */
     public function __construct($modelClass, $config = [])
@@ -394,48 +394,6 @@ class ActiveQuery extends Query implements ActiveQueryInterface
         }
         $command = $connection->createCommand($sql, $params);
         $command->entities = $entities;
-
-        return $command;
-    }
-
-    /**
-     * Creates a command for lazy loading of a relation.
-     *
-     * @param Connection|null $connection the DB connection used to create the DB command.
-     * @return Command the created DB command instance.
-     */
-    private function createRelationalCommand($connection = null)
-    {
-        $where = $this->where;
-
-        if ($this->via instanceof self) {
-            // via pivot table
-            $viaModels = $this->via->findPivotRows([$this->primaryModel]);
-            $this->filterByModels($viaModels);
-        } elseif (is_array($this->via)) {
-            // via relation
-            /** @var ActiveQuery $viaQuery */
-            list($viaName, $viaQuery) = $this->via;
-            if ($viaQuery->multiple) {
-                $viaModels = $viaQuery->all();
-                $this->primaryModel->populateRelation($viaName, $viaModels);
-            } else {
-                $model = $viaQuery->one();
-                $this->primaryModel->populateRelation($viaName, $model);
-                $viaModels = $model === null ? [] : [$model];
-            }
-            $this->filterByModels($viaModels);
-        } else {
-            $this->filterByModels([$this->primaryModel]);
-        }
-
-        if (!empty($this->on)) {
-            $this->andWhere($this->on);
-        }
-
-        $command = $this->createCommandInternal($connection);
-
-        $this->where = $where;
 
         return $command;
     }
