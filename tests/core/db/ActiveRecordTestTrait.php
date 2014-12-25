@@ -1070,6 +1070,9 @@ trait ActiveRecordTestTrait
         $this->assertEquals(1, count($customers));
     }
 
+    /**
+     * @group php
+     */
     public function testAfterFind()
     {
         /* @var $customerClass ActiveRecordInterface */
@@ -1153,6 +1156,9 @@ trait ActiveRecordTestTrait
         unset($_POST['_method']);
     }
 
+    /**
+     * @group php
+     */
     public function testAfterFindViaJoinWith()
     {
         /* @var $customerClass ActiveRecordInterface */
