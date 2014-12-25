@@ -9,7 +9,7 @@ class ActiveRecord extends \rock\sphinx\ActiveRecord
 {
     public static $db;
 
-    public static function getDb()
+    public static function getConnection()
     {
         return self::$db;
     }

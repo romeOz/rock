@@ -24,7 +24,7 @@ class QueryBuilder
     /**
      * @var Connection the database connection.
      */
-    public $db;
+    public $connection;
     /**
      * @var string the separator between different fragments of a SQL statement.
      * Defaults to an empty space. This is mainly used by {@see \rock\db\QueryBuilder::build()} when generating a SQL statement.
@@ -64,7 +64,7 @@ class QueryBuilder
      */
     public function __construct($connection, $config = [])
     {
-        $this->db = $connection;
+        $this->connection = $connection;
         $this->parentConstruct($config);
     }
 
@@ -120,7 +120,7 @@ class QueryBuilder
      */
     public function insert($table, $columns, &$params)
     {
-        $schema = $this->db->getSchema();
+        $schema = $this->connection->getSchema();
         if (($tableSchema = $schema->getTableSchema($table)) !== null) {
             $columnSchemas = $tableSchema->columns;
         } else {
@@ -168,7 +168,7 @@ class QueryBuilder
      */
     public function batchInsert($table, $columns, $rows)
     {
-        $schema = $this->db->getSchema();
+        $schema = $this->connection->getSchema();
         if (($tableSchema = $schema->getTableSchema($table)) !== null) {
             $columnSchemas = $tableSchema->columns;
         } else {
@@ -223,7 +223,7 @@ class QueryBuilder
      */
     public function update($table, $columns, $condition, &$params)
     {
-        if (($tableSchema = $this->db->getTableSchema($table)) !== null) {
+        if (($tableSchema = $this->connection->getTableSchema($table)) !== null) {
             $columnSchemas = $tableSchema->columns;
         } else {
             $columnSchemas = [];
@@ -232,18 +232,18 @@ class QueryBuilder
         $lines = [];
         foreach ($columns as $name => $value) {
             if ($value instanceof Expression) {
-                $lines[] = $this->db->quoteColumnName($name) . '=' . $value->expression;
+                $lines[] = $this->connection->quoteColumnName($name) . '=' . $value->expression;
                 foreach ($value->params as $n => $v) {
                     $params[$n] = $v;
                 }
             } else {
                 $phName = self::PARAM_PREFIX . count($params);
-                $lines[] = $this->db->quoteColumnName($name) . '=' . $phName;
+                $lines[] = $this->connection->quoteColumnName($name) . '=' . $phName;
                 $params[$phName] = !is_array($value) && isset($columnSchemas[$name]) ? $columnSchemas[$name]->dbTypecast($value) : $value;
             }
         }
 
-        $sql = 'UPDATE ' . $this->db->quoteTableName($table) . ' SET ' . implode(', ', $lines);
+        $sql = 'UPDATE ' . $this->connection->quoteTableName($table) . ' SET ' . implode(', ', $lines);
         $where = $this->buildWhere($condition, $params);
 
         return $where === '' ? $sql : $sql . ' ' . $where;
@@ -268,7 +268,7 @@ class QueryBuilder
      */
     public function delete($table, $condition, &$params)
     {
-        $sql = 'DELETE FROM ' . $this->db->quoteTableName($table);
+        $sql = 'DELETE FROM ' . $this->connection->quoteTableName($table);
         $where = $this->buildWhere($condition, $params);
 
         return $where === '' ? $sql : $sql . ' ' . $where;
@@ -306,13 +306,13 @@ class QueryBuilder
         $cols = [];
         foreach ($columns as $name => $type) {
             if (is_string($name)) {
-                $cols[] = "\t" . $this->db->quoteColumnName($name) . ' ' . $this->getColumnType($type);
+                $cols[] = "\t" . $this->connection->quoteColumnName($name) . ' ' . $this->getColumnType($type);
             } else {
                 $cols[] = "\t" . $type;
             }
         }
         $exists = $exists === true ? ' IF NOT EXISTS ' : null;
-        $sql = "CREATE TABLE {$exists}" . $this->db->quoteTableName($table) . " (\n" . implode(",\n", $cols) . "\n)";
+        $sql = "CREATE TABLE {$exists}" . $this->connection->quoteTableName($table) . " (\n" . implode(",\n", $cols) . "\n)";
 
         return $options === null ? $sql : $sql . ' ' . $options;
     }
@@ -325,7 +325,7 @@ class QueryBuilder
      */
     public function renameTable($oldName, $newName)
     {
-        return 'RENAME TABLE ' . $this->db->quoteTableName($oldName) . ' TO ' . $this->db->quoteTableName($newName);
+        return 'RENAME TABLE ' . $this->connection->quoteTableName($oldName) . ' TO ' . $this->connection->quoteTableName($newName);
     }
 
     /**
@@ -337,7 +337,7 @@ class QueryBuilder
     public function dropTable($table, $exists = false)
     {
         $exists = $exists === true ? ' IF EXISTS ' : null;
-        return "DROP TABLE {$exists}" . $this->db->quoteTableName($table);
+        return "DROP TABLE {$exists}" . $this->connection->quoteTableName($table);
     }
 
     /**
@@ -354,11 +354,11 @@ class QueryBuilder
         }
 
         foreach ($columns as $i => $col) {
-            $columns[$i] = $this->db->quoteColumnName($col);
+            $columns[$i] = $this->connection->quoteColumnName($col);
         }
 
-        return 'ALTER TABLE ' . $this->db->quoteTableName($table) . ' ADD CONSTRAINT '
-            . $this->db->quoteColumnName($name) . '  PRIMARY KEY ('
+        return 'ALTER TABLE ' . $this->connection->quoteTableName($table) . ' ADD CONSTRAINT '
+            . $this->connection->quoteColumnName($name) . '  PRIMARY KEY ('
             . implode(', ', $columns). ' )';
     }
 
@@ -370,8 +370,8 @@ class QueryBuilder
      */
     public function dropPrimaryKey($name, $table)
     {
-        return 'ALTER TABLE ' . $this->db->quoteTableName($table)
-            . ' DROP CONSTRAINT ' . $this->db->quoteColumnName($name);
+        return 'ALTER TABLE ' . $this->connection->quoteTableName($table)
+            . ' DROP CONSTRAINT ' . $this->connection->quoteColumnName($name);
     }
 
     /**
@@ -381,7 +381,7 @@ class QueryBuilder
      */
     public function truncateTable($table)
     {
-        return "TRUNCATE TABLE " . $this->db->quoteTableName($table);
+        return "TRUNCATE TABLE " . $this->connection->quoteTableName($table);
     }
 
     /**
@@ -395,8 +395,8 @@ class QueryBuilder
      */
     public function addColumn($table, $column, $type)
     {
-        return 'ALTER TABLE ' . $this->db->quoteTableName($table)
-            . ' ADD ' . $this->db->quoteColumnName($column) . ' '
+        return 'ALTER TABLE ' . $this->connection->quoteTableName($table)
+            . ' ADD ' . $this->connection->quoteColumnName($column) . ' '
             . $this->getColumnType($type);
     }
 
@@ -408,8 +408,8 @@ class QueryBuilder
      */
     public function dropColumn($table, $column)
     {
-        return "ALTER TABLE " . $this->db->quoteTableName($table)
-            . " DROP COLUMN " . $this->db->quoteColumnName($column);
+        return "ALTER TABLE " . $this->connection->quoteTableName($table)
+            . " DROP COLUMN " . $this->connection->quoteColumnName($column);
     }
 
     /**
@@ -421,9 +421,9 @@ class QueryBuilder
      */
     public function renameColumn($table, $oldName, $newName)
     {
-        return "ALTER TABLE " . $this->db->quoteTableName($table)
-            . " RENAME COLUMN " . $this->db->quoteColumnName($oldName)
-            . " TO " . $this->db->quoteColumnName($newName);
+        return "ALTER TABLE " . $this->connection->quoteTableName($table)
+            . " RENAME COLUMN " . $this->connection->quoteColumnName($oldName)
+            . " TO " . $this->connection->quoteColumnName($newName);
     }
 
     /**
@@ -438,9 +438,9 @@ class QueryBuilder
      */
     public function alterColumn($table, $column, $type)
     {
-        return 'ALTER TABLE ' . $this->db->quoteTableName($table) . ' CHANGE '
-            . $this->db->quoteColumnName($column) . ' '
-            . $this->db->quoteColumnName($column) . ' '
+        return 'ALTER TABLE ' . $this->connection->quoteTableName($table) . ' CHANGE '
+            . $this->connection->quoteColumnName($column) . ' '
+            . $this->connection->quoteColumnName($column) . ' '
             . $this->getColumnType($type);
     }
 
@@ -460,10 +460,10 @@ class QueryBuilder
      */
     public function addForeignKey($name, $table, $columns, $refTable, $refColumns, $delete = null, $update = null)
     {
-        $sql = 'ALTER TABLE ' . $this->db->quoteTableName($table)
-            . ' ADD CONSTRAINT ' . $this->db->quoteColumnName($name)
+        $sql = 'ALTER TABLE ' . $this->connection->quoteTableName($table)
+            . ' ADD CONSTRAINT ' . $this->connection->quoteColumnName($name)
             . ' FOREIGN KEY (' . $this->buildColumns($columns) . ')'
-            . ' REFERENCES ' . $this->db->quoteTableName($refTable)
+            . ' REFERENCES ' . $this->connection->quoteTableName($refTable)
             . ' (' . $this->buildColumns($refColumns) . ')';
         if ($delete !== null) {
             $sql .= ' ON DELETE ' . $delete;
@@ -483,8 +483,8 @@ class QueryBuilder
      */
     public function dropForeignKey($name, $table)
     {
-        return 'ALTER TABLE ' . $this->db->quoteTableName($table)
-            . ' DROP CONSTRAINT ' . $this->db->quoteColumnName($name);
+        return 'ALTER TABLE ' . $this->connection->quoteTableName($table)
+            . ' DROP CONSTRAINT ' . $this->connection->quoteColumnName($name);
     }
 
     /**
@@ -500,8 +500,8 @@ class QueryBuilder
     public function createIndex($name, $table, $columns, $unique = false)
     {
         return ($unique ? 'CREATE UNIQUE INDEX ' : 'CREATE INDEX ')
-            . $this->db->quoteTableName($name) . ' ON '
-            . $this->db->quoteTableName($table)
+            . $this->connection->quoteTableName($name) . ' ON '
+            . $this->connection->quoteTableName($table)
             . ' (' . $this->buildColumns($columns) . ')';
     }
 
@@ -513,7 +513,7 @@ class QueryBuilder
      */
     public function dropIndex($name, $table)
     {
-        return 'DROP INDEX ' . $this->db->quoteTableName($name) . ' ON ' . $this->db->quoteTableName($table);
+        return 'DROP INDEX ' . $this->connection->quoteTableName($name) . ' ON ' . $this->connection->quoteTableName($table);
     }
 
     /**
@@ -528,7 +528,7 @@ class QueryBuilder
      */
     public function resetSequence($table, $value = null)
     {
-        throw new Exception(Exception::NOT_SUPPORT_RESETTING, ['driver' => $this->db->getDriverName()]);
+        throw new Exception(Exception::NOT_SUPPORT_RESETTING, ['driver' => $this->connection->getDriverName()]);
     }
 
     /**
@@ -541,7 +541,7 @@ class QueryBuilder
      */
     public function checkIntegrity($check = true, $schema = '', $table = '')
     {
-        throw new Exception(Exception::NOT_SUPPORT_INTEGRITY_CHECK, ['driver' => $this->db->getDriverName()]);
+        throw new Exception(Exception::NOT_SUPPORT_INTEGRITY_CHECK, ['driver' => $this->connection->getDriverName()]);
     }
 
     /**
@@ -622,20 +622,20 @@ class QueryBuilder
                 $params = array_merge($params, $column->params);
             } elseif ($column instanceof Query) {
                 list($sql, $params) = $this->build($column, $params);
-                $columns[$i] = "($sql) AS " . $this->db->quoteColumnName($i);
+                $columns[$i] = "($sql) AS " . $this->connection->quoteColumnName($i);
             } elseif ($column instanceof SelectBuilder) {
-                $column->connection = $this->db;
+                $column->connection = $this->connection;
                 $columns[$i] = $column->build($params);
             } elseif (is_string($i)) {
                 if (strpos($column, '(') === false) {
-                    $column = $this->db->quoteColumnName($column);
+                    $column = $this->connection->quoteColumnName($column);
                 }
-                $columns[$i] = "$column AS " . $this->db->quoteColumnName($i);
+                $columns[$i] = "$column AS " . $this->connection->quoteColumnName($i);
             } elseif (strpos($column, '(') === false) {
                 if (preg_match('/^(.*?)(?i:\s+as\s+|\s+)([\w\-_\.]+)$/', $column, $matches)) {
-                    $columns[$i] = $this->db->quoteColumnName($matches[1]) . ' AS ' . $this->db->quoteColumnName($matches[2]);
+                    $columns[$i] = $this->connection->quoteColumnName($matches[1]) . ' AS ' . $this->connection->quoteColumnName($matches[2]);
                 } else {
-                    $columns[$i] = $this->db->quoteColumnName($column);
+                    $columns[$i] = $this->connection->quoteColumnName($column);
                 }
             }
         }
@@ -710,17 +710,17 @@ class QueryBuilder
         foreach ($tables as $i => $table) {
             if ($table instanceof Query) {
                 list($sql, $params) = $this->build($table, $params);
-                $tables[$i] = "($sql) " . $this->db->quoteTableName($i);
+                $tables[$i] = "($sql) " . $this->connection->quoteTableName($i);
             } elseif (is_string($i)) {
                 if (strpos($table, '(') === false) {
-                    $table = $this->db->quoteTableName($table);
+                    $table = $this->connection->quoteTableName($table);
                 }
-                $tables[$i] = "$table " . $this->db->quoteTableName($i);
+                $tables[$i] = "$table " . $this->connection->quoteTableName($i);
             } elseif (strpos($table, '(') === false) {
                 if (preg_match('/^(.*?)(?i:\s+as|)\s+([^ ]+)$/', $table, $matches)) { // with alias
-                    $tables[$i] = $this->db->quoteTableName($matches[1]) . ' ' . $this->db->quoteTableName($matches[2]);
+                    $tables[$i] = $this->connection->quoteTableName($matches[1]) . ' ' . $this->connection->quoteTableName($matches[2]);
                 } else {
-                    $tables[$i] = $this->db->quoteTableName($table);
+                    $tables[$i] = $this->connection->quoteTableName($table);
                 }
             }
         }
@@ -795,7 +795,7 @@ class QueryBuilder
             if ($direction instanceof Expression) {
                 $orders[] = $direction->expression;
             } else {
-                $orders[] = $this->db->quoteColumnName($name) . ($direction === SORT_DESC ? ' DESC' : '');
+                $orders[] = $this->connection->quoteColumnName($name) . ($direction === SORT_DESC ? ' DESC' : '');
             }
         }
 
@@ -904,7 +904,7 @@ class QueryBuilder
             if ($column instanceof Expression) {
                 $columns[$i] = $column->expression;
             } elseif (strpos($column, '(') === false) {
-                $columns[$i] = $this->db->quoteColumnName($column);
+                $columns[$i] = $this->connection->quoteColumnName($column);
             }
         }
 
@@ -955,7 +955,7 @@ class QueryBuilder
                 $parts[] = $this->buildInCondition('IN', [$column, $value], $params);
             } else {
                 if (strpos($column, '(') === false) {
-                    $column = $this->db->quoteColumnName($column);
+                    $column = $this->connection->quoteColumnName($column);
                 }
                 if ($value === null) {
                     $parts[] = "$column IS NULL";
@@ -1044,7 +1044,7 @@ class QueryBuilder
         list($column, $value1, $value2) = $operands;
 
         if (strpos($column, '(') === false) {
-            $column = $this->db->quoteColumnName($column);
+            $column = $this->connection->quoteColumnName($column);
         }
         if ($value1 instanceof Expression) {
             foreach ($value1->params as $n => $v) {
@@ -1100,13 +1100,13 @@ class QueryBuilder
             if (is_array($column)) {
                 foreach ($column as $i => $col) {
                     if (strpos($col, '(') === false) {
-                        $column[$i] = $this->db->quoteColumnName($col);
+                        $column[$i] = $this->connection->quoteColumnName($col);
                     }
                 }
                 return '(' . implode(', ', $column) . ") $operator ($sql)";
             } else {
                 if (strpos($column, '(') === false) {
-                    $column = $this->db->quoteColumnName($column);
+                    $column = $this->connection->quoteColumnName($column);
                 }
                 return "$column $operator ($sql)";
             }
@@ -1139,7 +1139,7 @@ class QueryBuilder
             }
         }
         if (strpos($column, '(') === false) {
-            $column = $this->db->quoteColumnName($column);
+            $column = $this->connection->quoteColumnName($column);
         }
 
         if (count($values) > 1) {
@@ -1177,7 +1177,7 @@ class QueryBuilder
         }
         foreach ($columns as $i => $column) {
             if (strpos($column, '(') === false) {
-                $columns[$i] = $this->db->quoteColumnName($column);
+                $columns[$i] = $this->connection->quoteColumnName($column);
             }
         }
 
@@ -1232,7 +1232,7 @@ class QueryBuilder
         }
 
         if (strpos($column, '(') === false) {
-            $column = $this->db->quoteColumnName($column);
+            $column = $this->connection->quoteColumnName($column);
         }
 
         $parts = [];
@@ -1287,7 +1287,7 @@ class QueryBuilder
         list($column, $value) = $operands;
 
         if (strpos($column, '(') === false) {
-            $column = $this->db->quoteColumnName($column);
+            $column = $this->connection->quoteColumnName($column);
         }
 
         if ($value === null) {

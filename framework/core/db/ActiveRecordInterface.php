@@ -386,7 +386,7 @@ interface ActiveRecordInterface
      * Returns the connection used by this AR class.
      * @return Connection the database connection used by this AR class.
      */
-    public static function getDb();
+    public static function getConnection();
 
     /**
      * Repopulates this active record with the latest data.

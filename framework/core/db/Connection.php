@@ -405,9 +405,9 @@ class Connection implements ObjectInterface
         }
 
         if (!empty($this->masters)) {
-            $db = $this->openFromPool($this->masters, $this->masterConfig);
-            if ($db !== null) {
-                $this->pdo = $db->pdo;
+            $connection = $this->openFromPool($this->masters, $this->masterConfig);
+            if ($connection !== null) {
+                $this->pdo = $connection->pdo;
                 return;
             } else {
                 throw new Exception('None of the master DB servers is available.');
@@ -505,7 +505,7 @@ class Connection implements ObjectInterface
     {
         //$this->open();
         $command = new Command([
-            'db' => $this,
+            'connection' => $this,
             'sql' => $sql,
         ]);
 
@@ -578,7 +578,7 @@ class Connection implements ObjectInterface
             $driver = $this->getDriverName();
             if (isset($this->schemaMap[$driver])) {
                 $this->_schema = is_array($this->schemaMap[$driver]) ? $this->schemaMap[$driver]['class'] : $this->schemaMap[$driver];
-                return $this->_schema = new $this->_schema(['db'=>$this]);
+                return $this->_schema = new $this->_schema(['connection'=>$this]);
             } else {
                 throw new Exception("Connection does not support reading schema information for '$driver' DBMS.");
             }
@@ -722,11 +722,11 @@ class Connection implements ObjectInterface
      */
     public function getSlavePdo($fallbackToMaster = true)
     {
-        $db = $this->getSlave(false);
-        if ($db === null) {
+        $connection = $this->getSlave(false);
+        if ($connection === null) {
             return $fallbackToMaster ? $this->getMasterPdo() : null;
         } else {
-            return $db->pdo;
+            return $connection->pdo;
         }
     }
 
@@ -823,12 +823,12 @@ class Connection implements ObjectInterface
                 continue;
             }
 
-            /* @var $db Connection */
-            $db = Container::load($config);
+            /* @var $connection Connection */
+            $connection = Container::load($config);
 
             try {
-                $db->open();
-                return $db;
+                $connection->open();
+                return $connection;
             } catch (\Exception $e) {
                 Rock::warning("Connection ({$config['dsn']}) failed: " . $e->getMessage(), __METHOD__);
                 if ($cache instanceof CacheInterface) {

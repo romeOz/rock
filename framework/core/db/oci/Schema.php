@@ -20,7 +20,7 @@ class Schema extends \rock\db\Schema
     {
         parent::init();
         if ($this->defaultSchema === null) {
-            $this->defaultSchema = $this->db->username;
+            $this->defaultSchema = $this->connection->username;
         }
     }
 
@@ -45,7 +45,7 @@ class Schema extends \rock\db\Schema
      */
     public function createQueryBuilder()
     {
-        return new QueryBuilder($this->db);
+        return new QueryBuilder($this->connection);
     }
 
     /**
@@ -126,7 +126,7 @@ ORDER by a.column_id
 EOD;
 
         try {
-            $columns = $this->db->createCommand($sql)->queryAll();
+            $columns = $this->connection->createCommand($sql)->queryAll();
         } catch (\Exception $e) {
             return false;
         }
@@ -162,7 +162,7 @@ EOD;
                         where ut.table_name='{$tablename}'
                               and ud.type='TRIGGER'
                               and ud.referenced_type='SEQUENCE'";
-        return $this->db->createCommand($seq_name_sql)->queryScalar();
+        return $this->connection->createCommand($seq_name_sql)->queryScalar();
     }
 
     /**
@@ -176,10 +176,10 @@ EOD;
      */
     public function getLastInsertID($sequenceName = '')
     {
-        if ($this->db->isActive) {
+        if ($this->connection->isActive) {
             // get the last insert id from the master connection
-            return $this->db->useMaster(function (Connection $db) use ($sequenceName) {
-                return $db->createCommand("SELECT {$sequenceName}.CURRVAL FROM DUAL")->queryScalar();
+            return $this->connection->useMaster(function (Connection $connection) use ($sequenceName) {
+                return $connection->createCommand("SELECT {$sequenceName}.CURRVAL FROM DUAL")->queryScalar();
             });
         } else {
             throw new Exception('DB Connection is not active.');
@@ -233,7 +233,7 @@ EOD;
            and D.constraint_type <> 'P'
         order by d.constraint_name, c.position
 EOD;
-        $command = $this->db->createCommand($sql);
+        $command = $this->connection->createCommand($sql);
         foreach ($command->queryAll() as $row) {
             if ($row['CONSTRAINT_TYPE'] === 'R') {
                 $name = $row["COLUMN_NAME"];
@@ -251,13 +251,13 @@ EOD;
             $sql = <<<EOD
 SELECT table_name, '{$schema}' as table_schema FROM user_tables
 EOD;
-            $command = $this->db->createCommand($sql);
+            $command = $this->connection->createCommand($sql);
         } else {
             $sql = <<<EOD
 SELECT object_name as table_name, owner as table_schema FROM all_objects
 WHERE object_type = 'TABLE' AND owner=:schema
 EOD;
-            $command = $this->db->createCommand($sql);
+            $command = $this->connection->createCommand($sql);
             $command->bindParam(':schema', $schema);
         }
 

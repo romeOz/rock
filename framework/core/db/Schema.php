@@ -51,7 +51,7 @@ abstract class Schema
     /**
      * @var Connection the database connection
      */
-    public $db;
+    public $connection;
     /**
      * @var string the default schema name used for the current session.
      */
@@ -98,19 +98,19 @@ abstract class Schema
             return self::$_tables[$name];
         }
 
-        $db = $this->db;
+        $connection = $this->connection;
         $realName = $this->getRawTableName($name);
 
-        if ($db->enableSchemaCache === true && !in_array($name, $db->schemaCacheExclude, true)) {
+        if ($connection->enableSchemaCache === true && !in_array($name, $connection->schemaCacheExclude, true)) {
             /** @var CacheInterface $cache */
-            $cache = is_string($db->schemaCache) ? Container::load($db->schemaCache) : $db->schemaCache;
+            $cache = is_string($connection->schemaCache) ? Container::load($connection->schemaCache) : $connection->schemaCache;
             if ($cache instanceof CacheInterface) {
                 $cacheKey = serialize($this->getCacheKey($name));
                 if ($refresh || ($table = $cache->get($cacheKey)) === false) {
                     $table = $this->loadTableSchema($realName);
                     self::$_tables[$name] = $table;
                     if ($table !== null) {
-                        $cache->set($cacheKey, $table, $db->schemaCacheExpire, [$this->getCacheGroup()]);
+                        $cache->set($cacheKey, $table, $connection->schemaCacheExpire, [$this->getCacheGroup()]);
                     }
                 } else {
                     self::$_tables[$name] = $table;
@@ -141,8 +141,8 @@ abstract class Schema
     {
         return [
             __CLASS__,
-            $this->db->dsn,
-            $this->db->username,
+            $this->connection->dsn,
+            $this->connection->username,
             $name,
         ];
     }
@@ -156,8 +156,8 @@ abstract class Schema
     {
         return Helper::hash([
             __CLASS__,
-            $this->db->dsn,
-            $this->db->username,
+            $this->connection->dsn,
+            $this->connection->username,
         ], Helper::SERIALIZE_JSON);
     }
 
@@ -241,9 +241,9 @@ abstract class Schema
      */
     public function refresh()
     {
-        if ($this->db->enableSchemaCache === true && isset($this->db->schemaCache)) {
+        if ($this->connection->enableSchemaCache === true && isset($this->connection->schemaCache)) {
             /** @var CacheInterface $cache */
-            $cache = is_string($this->db->schemaCache) ? Rock::factory($this->db->schemaCache) : $this->db->schemaCache;
+            $cache = is_string($this->connection->schemaCache) ? Rock::factory($this->connection->schemaCache) : $this->connection->schemaCache;
             if ($cache instanceof CacheInterface) {
                 $cache->removeTag($this->getCacheGroup());
             }
@@ -259,7 +259,7 @@ abstract class Schema
      */
     public function createQueryBuilder()
     {
-        return new QueryBuilder($this->db);
+        return new QueryBuilder($this->connection);
     }
 
     /**
@@ -306,8 +306,8 @@ abstract class Schema
      */
     public function getLastInsertID($sequenceName = '')
     {
-        if ($this->db->isActive) {
-            return $this->db->pdo->lastInsertId($sequenceName);
+        if ($this->connection->isActive) {
+            return $this->connection->pdo->lastInsertId($sequenceName);
         } else {
             throw new Exception('DB Connection is not active.');
         }
@@ -318,7 +318,7 @@ abstract class Schema
      */
     public function supportsSavepoint()
     {
-        return $this->db->enableSavepoint;
+        return $this->connection->enableSavepoint;
     }
 
     /**
@@ -327,7 +327,7 @@ abstract class Schema
      */
     public function createSavepoint($name)
     {
-        $this->db->createCommand("SAVEPOINT $name")->execute();
+        $this->connection->createCommand("SAVEPOINT $name")->execute();
     }
 
     /**
@@ -336,7 +336,7 @@ abstract class Schema
      */
     public function releaseSavepoint($name)
     {
-        $this->db->createCommand("RELEASE SAVEPOINT $name")->execute();
+        $this->connection->createCommand("RELEASE SAVEPOINT $name")->execute();
     }
 
     /**
@@ -345,7 +345,7 @@ abstract class Schema
      */
     public function rollBackSavepoint($name)
     {
-        $this->db->createCommand("ROLLBACK TO SAVEPOINT $name")->execute();
+        $this->connection->createCommand("ROLLBACK TO SAVEPOINT $name")->execute();
     }
 
     /**
@@ -358,7 +358,7 @@ abstract class Schema
      */
     public function setTransactionIsolationLevel($level)
     {
-        $this->db->createCommand("SET TRANSACTION ISOLATION LEVEL $level;")->execute();
+        $this->connection->createCommand("SET TRANSACTION ISOLATION LEVEL $level;")->execute();
     }
 
     /**
@@ -374,7 +374,7 @@ abstract class Schema
             return $str;
         }
 
-        if (($value = $this->db->getSlavePdo()->quote($str)) !== false) {
+        if (($value = $this->connection->getSlavePdo()->quote($str)) !== false) {
             return $value;
         } else {
             // the driver doesn't support quote (e.g. oci)
@@ -468,7 +468,7 @@ abstract class Schema
         if (strpos($name, '{{') !== false) {
             $name = preg_replace('/\\{\\{(.*?)\\}\\}/', '\1', $name);
 
-            return str_replace('%', $this->db->tablePrefix, $name);
+            return str_replace('%', $this->connection->tablePrefix, $name);
         } else {
             return $name;
         }

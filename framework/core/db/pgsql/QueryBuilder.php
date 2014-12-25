@@ -63,7 +63,7 @@ class QueryBuilder extends \rock\db\QueryBuilder
      */
     public function dropIndex($name, $table)
     {
-        return 'DROP INDEX ' . $this->db->quoteTableName($name);
+        return 'DROP INDEX ' . $this->connection->quoteTableName($name);
     }
 
     /**
@@ -74,7 +74,7 @@ class QueryBuilder extends \rock\db\QueryBuilder
      */
     public function renameTable($oldName, $newName)
     {
-        return 'ALTER TABLE ' . $this->db->quoteTableName($oldName) . ' RENAME TO ' . $this->db->quoteTableName($newName);
+        return 'ALTER TABLE ' . $this->connection->quoteTableName($oldName) . ' RENAME TO ' . $this->connection->quoteTableName($newName);
     }
 
     /**
@@ -89,11 +89,11 @@ class QueryBuilder extends \rock\db\QueryBuilder
      */
     public function resetSequence($tableName, $value = null)
     {
-        $table = $this->db->getTableSchema($tableName);
+        $table = $this->connection->getTableSchema($tableName);
         if ($table !== null && $table->sequenceName !== null) {
             // c.f. http://www.postgresql.org/docs/8.1/static/functions-sequence.html
-            $sequence = $this->db->quoteTableName($table->sequenceName);
-            $tableName = $this->db->quoteTableName($tableName);
+            $sequence = $this->connection->quoteTableName($table->sequenceName);
+            $tableName = $this->connection->quoteTableName($tableName);
             if ($value === null) {
                 $key = reset($table->primaryKey);
                 $value = "(SELECT COALESCE(MAX(\"{$key}\"),0) FROM {$tableName})+1";
@@ -119,8 +119,8 @@ class QueryBuilder extends \rock\db\QueryBuilder
     public function checkIntegrity($check = true, $schema = '', $table = '')
     {
         $enable = $check ? 'ENABLE' : 'DISABLE';
-        $schema = $schema ? $schema : $this->db->getSchema()->defaultSchema;
-        $tableNames = $table ? [$table] : $this->db->getSchema()->getTableNames($schema);
+        $schema = $schema ? $schema : $this->connection->getSchema()->defaultSchema;
+        $tableNames = $table ? [$table] : $this->connection->getSchema()->getTableNames($schema);
         $command = '';
 
         foreach ($tableNames as $tableName) {
@@ -129,7 +129,7 @@ class QueryBuilder extends \rock\db\QueryBuilder
         }
 
         // enable to have ability to alter several tables
-        $this->db->getMasterPdo()->setAttribute(\PDO::ATTR_EMULATE_PREPARES, true);
+        $this->connection->getMasterPdo()->setAttribute(\PDO::ATTR_EMULATE_PREPARES, true);
 
         return $command;
     }
@@ -152,8 +152,8 @@ class QueryBuilder extends \rock\db\QueryBuilder
         if (!preg_match('/^(DROP|SET|RESET)\s+/i', $type)) {
             $type = 'TYPE ' . $this->getColumnType($type);
         }
-        return 'ALTER TABLE ' . $this->db->quoteTableName($table) . ' ALTER COLUMN '
-            . $this->db->quoteColumnName($column) . ' ' . $type;
+        return 'ALTER TABLE ' . $this->connection->quoteTableName($table) . ' ALTER COLUMN '
+            . $this->connection->quoteColumnName($column) . ' ' . $type;
     }
 
     /**
@@ -161,7 +161,7 @@ class QueryBuilder extends \rock\db\QueryBuilder
      */
     public function batchInsert($table, $columns, $rows)
     {
-        $schema = $this->db->getSchema();
+        $schema = $this->connection->getSchema();
         if (($tableSchema = $schema->getTableSchema($table)) !== null) {
             $columnSchemas = $tableSchema->columns;
         } else {

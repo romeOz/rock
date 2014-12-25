@@ -87,7 +87,7 @@ class SelectBuilder
                     $tableAlias = $alias;
                     $alias = true;
                 }
-                $connection = $class::getDb();
+                $connection = $class::getConnection();
 
                 if (!$columns = $select->select) {
                     continue;

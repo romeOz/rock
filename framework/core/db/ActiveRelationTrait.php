@@ -533,6 +533,6 @@ trait ActiveRelationTrait
             $primaryModel = new $this->modelClass;
         }
 
-        return $this->asArray()->all($primaryModel->getDb());
+        return $this->asArray()->all($primaryModel->getConnection());
     }
 }

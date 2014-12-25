@@ -64,7 +64,7 @@ class Schema extends \rock\db\Schema
      */
     public function createSavepoint($name)
     {
-        $this->db->createCommand("SAVE TRANSACTION $name")->execute();
+        $this->connection->createCommand("SAVE TRANSACTION $name")->execute();
     }
 
     /**
@@ -80,7 +80,7 @@ class Schema extends \rock\db\Schema
      */
     public function rollBackSavepoint($name)
     {
-        $this->db->createCommand("ROLLBACK TRANSACTION $name")->execute();
+        $this->connection->createCommand("ROLLBACK TRANSACTION $name")->execute();
     }
 
     /**
@@ -111,7 +111,7 @@ class Schema extends \rock\db\Schema
      */
     public function createQueryBuilder()
     {
-        return new QueryBuilder($this->db);
+        return new QueryBuilder($this->connection);
     }
 
     /**
@@ -248,7 +248,7 @@ WHERE {$whereSql}
 SQL;
 
         try {
-            $columns = $this->db->createCommand($sql)->queryAll();
+            $columns = $this->connection->createCommand($sql)->queryAll();
             if (empty($columns)) {
                 return false;
             }
@@ -300,7 +300,7 @@ WHERE
     [kcu].[table_schema] = :schemaName
 SQL;
 
-        $table->primaryKey = $this->db
+        $table->primaryKey = $this->connection
             ->createCommand($sql, [':tableName' => $table->name, ':schemaName' => $table->schemaName])
             ->queryColumn();
     }
@@ -340,7 +340,7 @@ JOIN {$keyColumnUsageTableName} AS [kcu2] ON
 WHERE [kcu1].[table_name] = :tableName
 SQL;
 
-        $rows = $this->db->createCommand($sql, [':tableName' => $table->name])->queryAll();
+        $rows = $this->connection->createCommand($sql, [':tableName' => $table->name])->queryAll();
         $table->foreignKeys = [];
         foreach ($rows as $row) {
             $table->foreignKeys[] = [$row['uq_table_name'], $row['fk_column_name'] => $row['uq_column_name']];
@@ -364,6 +364,6 @@ FROM [INFORMATION_SCHEMA].[TABLES] AS [t]
 WHERE [t].[table_schema] = :schema AND [t].[table_type] = 'BASE TABLE'
 SQL;
 
-        return $this->db->createCommand($sql, [':schema' => $schema])->queryColumn();
+        return $this->connection->createCommand($sql, [':schema' => $schema])->queryColumn();
     }
 }

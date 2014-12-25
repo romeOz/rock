@@ -49,11 +49,11 @@ use rock\Rock;
 class Command
 {
     use ObjectTrait;
-    //use ComponentsTrait;
+
     /**
      * @var Connection the DB connection that this command is associated with
      */
-    public $db;
+    public $connection;
     /**
      * @var \PDOStatement the PDOStatement object that this command is associated with
      */
@@ -102,7 +102,7 @@ class Command
     {
         if ($sql !== $this->_sql) {
             $this->cancel();
-            $this->_sql = $this->db->quoteSql($sql);
+            $this->_sql = $this->connection->quoteSql($sql);
             $this->_pendingParams = [];
             $this->params = [];
         }
@@ -124,7 +124,7 @@ class Command
             $params = [];
             foreach ($this->params as $name => $value) {
                 if (is_string($value)) {
-                    $params[$name] = $this->db->quoteValue($value);
+                    $params[$name] = $this->connection->quoteValue($value);
                 } elseif ($value === null) {
                     $params[$name] = 'NULL';
                 } else {
@@ -163,14 +163,14 @@ class Command
 
         $sql = $this->getSql();
 
-        if ($this->db->getTransaction()) {
+        if ($this->connection->getTransaction()) {
             // master is in a transaction. use the same connection.
             $forRead = false;
         }
-        if ($forRead || $forRead === null && $this->db->getSchema()->isReadQuery($sql)) {
-            $pdo = $this->db->getSlavePdo();
+        if ($forRead || $forRead === null && $this->connection->getSchema()->isReadQuery($sql)) {
+            $pdo = $this->connection->getSlavePdo();
         } else {
-            $pdo = $this->db->getMasterPdo();
+            $pdo = $this->connection->getMasterPdo();
         }
 
         try {
@@ -209,7 +209,7 @@ class Command
         $this->prepare();
 
         if ($dataType === null) {
-            $dataType = $this->db->getSchema()->getPdoType($value);
+            $dataType = $this->connection->getSchema()->getPdoType($value);
         }
         if ($length === null) {
             $this->pdoStatement->bindParam($name, $value, $dataType);
@@ -249,7 +249,7 @@ class Command
     public function bindValue($name, $value, $dataType = null)
     {
         if ($dataType === null) {
-            $dataType = $this->db->getSchema()->getPdoType($value);
+            $dataType = $this->connection->getSchema()->getPdoType($value);
         }
         $this->_pendingParams[$name] = [$value, $dataType];
         $this->params[$name] = $value;
@@ -279,7 +279,7 @@ class Command
                 $this->_pendingParams[$name] = $value;
                 $this->params[$name] = $value[0];
             } else {
-                $type = $this->db->getSchema()->getPdoType($value);
+                $type = $this->connection->getSchema()->getPdoType($value);
                 $this->_pendingParams[$name] = [$value, $type];
                 $this->params[$name] = $value;
             }
@@ -361,9 +361,9 @@ class Command
     {
         if (!empty($result) && $subAttributes === true) {
             if ($fetchMode & \PDO::FETCH_ASSOC) {
-                return ArrayHelper::toMulti($result, $this->db->aliasSeparator, true);
+                return ArrayHelper::toMulti($result, $this->connection->aliasSeparator, true);
             } elseif ($fetchMode & \PDO::FETCH_OBJ) {
-                return ObjectHelper::toMulti((array)$result, $this->db->aliasSeparator);
+                return ObjectHelper::toMulti((array)$result, $this->connection->aliasSeparator);
             }
         }
         return $result;
@@ -429,7 +429,7 @@ class Command
     public function insert($table, $columns)
     {
         $params = [];
-        $sql = $this->db->getQueryBuilder()->insert($table, $columns, $params);
+        $sql = $this->connection->getQueryBuilder()->insert($table, $columns, $params);
 
         return $this->setSql($sql)->bindValues($params);
     }
@@ -455,7 +455,7 @@ class Command
      */
     public function batchInsert($table, $columns, $rows)
     {
-        $sql = $this->db->getQueryBuilder()->batchInsert($table, $columns, $rows);
+        $sql = $this->connection->getQueryBuilder()->batchInsert($table, $columns, $rows);
 
         return $this->setSql($sql);
     }
@@ -481,7 +481,7 @@ class Command
      */
     public function update($table, $columns, $condition = '', $params = [])
     {
-        $sql = $this->db->getQueryBuilder()->update($table, $columns, $condition, $params);
+        $sql = $this->connection->getQueryBuilder()->update($table, $columns, $condition, $params);
 
         return $this->setSql($sql)->bindValues($params);
     }
@@ -506,7 +506,7 @@ class Command
      */
     public function delete($table, $condition = '', $params = [])
     {
-        $sql = $this->db->getQueryBuilder()->delete($table, $condition, $params);
+        $sql = $this->connection->getQueryBuilder()->delete($table, $condition, $params);
 
         return $this->setSql($sql)->bindValues($params);
     }
@@ -532,7 +532,7 @@ class Command
      */
     public function createTable($table, $columns, $options = null, $exists = false)
     {
-        $sql = $this->db->getQueryBuilder()->createTable($table, $columns, $options, $exists);
+        $sql = $this->connection->getQueryBuilder()->createTable($table, $columns, $options, $exists);
 
         return $this->setSql($sql);
     }
@@ -545,7 +545,7 @@ class Command
      */
     public function renameTable($table, $newName)
     {
-        $sql = $this->db->getQueryBuilder()->renameTable($table, $newName);
+        $sql = $this->connection->getQueryBuilder()->renameTable($table, $newName);
 
         return $this->setSql($sql);
     }
@@ -558,7 +558,7 @@ class Command
      */
     public function dropTable($table, $exists = false)
     {
-        $sql = $this->db->getQueryBuilder()->dropTable($table, $exists);
+        $sql = $this->connection->getQueryBuilder()->dropTable($table, $exists);
 
         return $this->setSql($sql);
     }
@@ -570,7 +570,7 @@ class Command
      */
     public function truncateTable($table)
     {
-        $sql = $this->db->getQueryBuilder()->truncateTable($table);
+        $sql = $this->connection->getQueryBuilder()->truncateTable($table);
 
         return $this->setSql($sql);
     }
@@ -586,7 +586,7 @@ class Command
      */
     public function addColumn($table, $column, $type)
     {
-        $sql = $this->db->getQueryBuilder()->addColumn($table, $column, $type);
+        $sql = $this->connection->getQueryBuilder()->addColumn($table, $column, $type);
 
         return $this->setSql($sql);
     }
@@ -599,7 +599,7 @@ class Command
      */
     public function dropColumn($table, $column)
     {
-        $sql = $this->db->getQueryBuilder()->dropColumn($table, $column);
+        $sql = $this->connection->getQueryBuilder()->dropColumn($table, $column);
 
         return $this->setSql($sql);
     }
@@ -613,7 +613,7 @@ class Command
      */
     public function renameColumn($table, $oldName, $newName)
     {
-        $sql = $this->db->getQueryBuilder()->renameColumn($table, $oldName, $newName);
+        $sql = $this->connection->getQueryBuilder()->renameColumn($table, $oldName, $newName);
 
         return $this->setSql($sql);
     }
@@ -631,7 +631,7 @@ class Command
      */
     public function alterColumn($table, $column, $type)
     {
-        $sql = $this->db->getQueryBuilder()->alterColumn($table, $column, $type);
+        $sql = $this->connection->getQueryBuilder()->alterColumn($table, $column, $type);
 
         return $this->setSql($sql);
     }
@@ -646,7 +646,7 @@ class Command
      */
     public function addPrimaryKey($name, $table, $columns)
     {
-        $sql = $this->db->getQueryBuilder()->addPrimaryKey($name, $table, $columns);
+        $sql = $this->connection->getQueryBuilder()->addPrimaryKey($name, $table, $columns);
 
         return $this->setSql($sql);
     }
@@ -659,7 +659,7 @@ class Command
      */
     public function dropPrimaryKey($name, $table)
     {
-        $sql = $this->db->getQueryBuilder()->dropPrimaryKey($name, $table);
+        $sql = $this->connection->getQueryBuilder()->dropPrimaryKey($name, $table);
 
         return $this->setSql($sql);
     }
@@ -678,7 +678,7 @@ class Command
      */
     public function addForeignKey($name, $table, $columns, $refTable, $refColumns, $delete = null, $update = null)
     {
-        $sql = $this->db->getQueryBuilder()->addForeignKey($name, $table, $columns, $refTable, $refColumns, $delete, $update);
+        $sql = $this->connection->getQueryBuilder()->addForeignKey($name, $table, $columns, $refTable, $refColumns, $delete, $update);
 
         return $this->setSql($sql);
     }
@@ -691,7 +691,7 @@ class Command
      */
     public function dropForeignKey($name, $table)
     {
-        $sql = $this->db->getQueryBuilder()->dropForeignKey($name, $table);
+        $sql = $this->connection->getQueryBuilder()->dropForeignKey($name, $table);
 
         return $this->setSql($sql);
     }
@@ -707,7 +707,7 @@ class Command
      */
     public function createIndex($name, $table, $columns, $unique = false)
     {
-        $sql = $this->db->getQueryBuilder()->createIndex($name, $table, $columns, $unique);
+        $sql = $this->connection->getQueryBuilder()->createIndex($name, $table, $columns, $unique);
 
         return $this->setSql($sql);
     }
@@ -720,7 +720,7 @@ class Command
      */
     public function dropIndex($name, $table)
     {
-        $sql = $this->db->getQueryBuilder()->dropIndex($name, $table);
+        $sql = $this->connection->getQueryBuilder()->dropIndex($name, $table);
 
         return $this->setSql($sql);
     }
@@ -738,7 +738,7 @@ class Command
      */
     public function resetSequence($table, $value = null)
     {
-        $sql = $this->db->getQueryBuilder()->resetSequence($table, $value);
+        $sql = $this->connection->getQueryBuilder()->resetSequence($table, $value);
 
         return $this->setSql($sql);
     }
@@ -754,7 +754,7 @@ class Command
      */
     public function checkIntegrity($check = true, $schema = '', $table = '')
     {
-        $sql = $this->db->getQueryBuilder()->checkIntegrity($check, $schema, $table);
+        $sql = $this->connection->getQueryBuilder()->checkIntegrity($check, $schema, $table);
 
         return $this->setSql($sql);
     }
@@ -774,7 +774,7 @@ class Command
         $rawSql = $this->getRawSql();
 
         $token = [
-            'dsn' => $this->db->dsn,
+            'dsn' => $this->connection->dsn,
             'sql' =>$rawSql,
             'valid' => true,
             'cache' => false,
@@ -816,7 +816,7 @@ class Command
      */
     protected function queryInternal($method, $fetchMode = null, $subAttributes = false)
     {
-        $connection = $this->db;
+        $connection = $this->connection;
         $rawSql = $this->getRawSql();
         $token = [
             'dsn' => $connection->dsn,

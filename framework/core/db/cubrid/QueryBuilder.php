@@ -42,17 +42,17 @@ class QueryBuilder extends \rock\db\QueryBuilder
      */
     public function resetSequence($tableName, $value = null)
     {
-        $table = $this->db->getTableSchema($tableName);
+        $table = $this->connection->getTableSchema($tableName);
         if ($table !== null && $table->sequenceName !== null) {
-            $tableName = $this->db->quoteTableName($tableName);
+            $tableName = $this->connection->quoteTableName($tableName);
             if ($value === null) {
                 $key = reset($table->primaryKey);
-                $value = (int) $this->db->createCommand("SELECT MAX(`$key`) FROM " . $this->db->schema->quoteTableName($tableName))->queryScalar() + 1;
+                $value = (int) $this->connection->createCommand("SELECT MAX(`$key`) FROM " . $this->connection->schema->quoteTableName($tableName))->queryScalar() + 1;
             } else {
                 $value = (int) $value;
             }
 
-            return "ALTER TABLE " . $this->db->schema->quoteTableName($tableName) . " AUTO_INCREMENT=$value;";
+            return "ALTER TABLE " . $this->connection->schema->quoteTableName($tableName) . " AUTO_INCREMENT=$value;";
         } elseif ($table === null) {
             throw new Exception("Table not found: $tableName");
         } else {

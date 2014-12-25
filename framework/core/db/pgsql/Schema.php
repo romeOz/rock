@@ -105,7 +105,7 @@ class Schema extends \rock\db\Schema
      */
     public function createQueryBuilder()
     {
-        return new QueryBuilder($this->db);
+        return new QueryBuilder($this->connection);
     }
 
     /**
@@ -171,7 +171,7 @@ class Schema extends \rock\db\Schema
 SELECT table_name, table_schema FROM information_schema.tables
 WHERE table_schema=:schema AND table_type='BASE TABLE'
 EOD;
-        $command = $this->db->createCommand($sql);
+        $command = $this->connection->createCommand($sql);
         $command->bindParam(':schema', $schema);
         $rows = $command->queryAll();
         $names = [];
@@ -214,7 +214,7 @@ where
     and ns.nspname={$tableSchema}
 SQL;
 
-        $constraints = $this->db->createCommand($sql)->queryAll();
+        $constraints = $this->connection->createCommand($sql)->queryAll();
         foreach ($constraints as $constraint) {
             $columns = explode(',', $constraint['columns']);
             $fcolumns = explode(',', $constraint['foreign_columns']);
@@ -261,7 +261,7 @@ AND ns.nspname = {$tableSchema}
 ;
 SQL;
 
-        return $this->db->createCommand($sql)->queryAll();
+        return $this->connection->createCommand($sql)->queryAll();
     }
 
     /**
@@ -307,8 +307,8 @@ SQL;
      */
     protected function findColumns($table)
     {
-        $tableName = $this->db->quoteValue($table->name);
-        $schemaName = $this->db->quoteValue($table->schemaName);
+        $tableName = $this->connection->quoteValue($table->name);
+        $schemaName = $this->connection->quoteValue($table->schemaName);
         $sql = <<<SQL
 SELECT
     d.nspname AS table_schema,
@@ -364,7 +364,7 @@ ORDER BY
     a.attnum;
 SQL;
 
-        $columns = $this->db->createCommand($sql)->queryAll();
+        $columns = $this->connection->createCommand($sql)->queryAll();
         if (empty($columns)) {
             return false;
         }

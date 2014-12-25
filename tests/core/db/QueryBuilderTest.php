@@ -122,7 +122,7 @@ class QueryBuilderTest extends DatabaseTestCase
     public function testCreateTableColumnTypes()
     {
         $qb = $this->getQueryBuilder();
-        if ($qb->db->getTableSchema('column_type_table', true) !== null) {
+        if ($qb->connection->getTableSchema('column_type_table', true) !== null) {
             $this->getConnection(false)->createCommand($qb->dropTable('column_type_table'))->execute();
         }
         $columns = [];
@@ -303,14 +303,14 @@ class QueryBuilderTest extends DatabaseTestCase
 
         // ADD
         $qb = $this->getQueryBuilder();
-        $qb->db->createCommand()->addPrimaryKey($pkeyName, $tableName, ['id'])->execute();
-        $tableSchema = $qb->db->getSchema()->getTableSchema($tableName, true);
+        $qb->connection->createCommand()->addPrimaryKey($pkeyName, $tableName, ['id'])->execute();
+        $tableSchema = $qb->connection->getSchema()->getTableSchema($tableName, true);
         $this->assertEquals(1, count($tableSchema->primaryKey));
 
         //DROP
-        $qb->db->createCommand()->dropPrimaryKey($pkeyName, $tableName)->execute();
+        $qb->connection->createCommand()->dropPrimaryKey($pkeyName, $tableName)->execute();
         $qb = $this->getQueryBuilder(); // resets the schema
-        $tableSchema = $qb->db->getSchema()->getTableSchema($tableName, true);
+        $tableSchema = $qb->connection->getSchema()->getTableSchema($tableName, true);
         $this->assertEquals(0, count($tableSchema->primaryKey));
     }
 

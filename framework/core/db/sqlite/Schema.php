@@ -79,7 +79,7 @@ class Schema extends \rock\db\Schema
      */
     public function createQueryBuilder()
     {
-        return new QueryBuilder($this->db);
+        return new QueryBuilder($this->connection);
     }
 
     /**
@@ -91,7 +91,7 @@ class Schema extends \rock\db\Schema
     {
         $sql = "SELECT DISTINCT tbl_name FROM sqlite_master WHERE tbl_name<>'sqlite_sequence'";
 
-        return $this->db->createCommand($sql)->queryColumn();
+        return $this->connection->createCommand($sql)->queryColumn();
     }
 
     /**
@@ -122,7 +122,7 @@ class Schema extends \rock\db\Schema
     protected function findColumns($table)
     {
         $sql = "PRAGMA table_info(" . $this->quoteSimpleTableName($table->name) . ')';
-        $columns = $this->db->createCommand($sql)->queryAll();
+        $columns = $this->connection->createCommand($sql)->queryAll();
         if (empty($columns)) {
             return false;
         }
@@ -149,7 +149,7 @@ class Schema extends \rock\db\Schema
     protected function findConstraints($table)
     {
         $sql = "PRAGMA foreign_key_list(" . $this->quoteSimpleTableName($table->name) . ')';
-        $keys = $this->db->createCommand($sql)->queryAll();
+        $keys = $this->connection->createCommand($sql)->queryAll();
         foreach ($keys as $key) {
             $id = (int) $key['id'];
             if (!isset($table->foreignKeys[$id])) {
@@ -178,12 +178,12 @@ class Schema extends \rock\db\Schema
     public function findUniqueIndexes($table)
     {
         $sql = "PRAGMA index_list(" . $this->quoteSimpleTableName($table->name) . ')';
-        $indexes = $this->db->createCommand($sql)->queryAll();
+        $indexes = $this->connection->createCommand($sql)->queryAll();
         $uniqueIndexes = [];
 
         foreach ($indexes as $index) {
             $indexName = $index['name'];
-            $indexInfo = $this->db->createCommand("PRAGMA index_info(" . $this->quoteValue($index['name']) . ")")->queryAll();
+            $indexInfo = $this->connection->createCommand("PRAGMA index_info(" . $this->quoteValue($index['name']) . ")")->queryAll();
 
             if ($index['unique']) {
                 $uniqueIndexes[$indexName] = [];
@@ -264,10 +264,10 @@ class Schema extends \rock\db\Schema
         switch($level)
         {
             case Transaction::SERIALIZABLE:
-                $this->db->createCommand("PRAGMA read_uncommitted = False;")->execute();
+                $this->connection->createCommand("PRAGMA read_uncommitted = False;")->execute();
             break;
             case Transaction::READ_UNCOMMITTED:
-                $this->db->createCommand("PRAGMA read_uncommitted = True;")->execute();
+                $this->connection->createCommand("PRAGMA read_uncommitted = True;")->execute();
             break;
             default:
                 throw new Exception(get_class($this) . ' only supports transaction isolation levels READ UNCOMMITTED and SERIALIZABLE.');

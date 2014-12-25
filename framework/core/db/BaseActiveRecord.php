@@ -1225,7 +1225,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
                 $record->insert(false);
             } else {
                 /** @var $viaTable string */
-                static::getDb()->createCommand()
+                static::getConnection()->createCommand()
                     ->insert($viaTable, $columns)->execute();
             }
         } else {
@@ -1311,7 +1311,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
             } else {
                 /** @var $viaTable string */
                 /** @var Command $command */
-                $command = static::getDb()->createCommand();
+                $command = static::getConnection()->createCommand();
                 if ($delete) {
                     $command->delete($viaTable, $columns)->execute();
                 } else {
@@ -1400,7 +1400,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
             } else {
                 /** @var $viaTable string */
                 /** @var Command $command */
-                $command = static::getDb()->createCommand();
+                $command = static::getConnection()->createCommand();
                 if ($delete) {
                     $command->delete($viaTable, $condition)->execute();
                 } else {

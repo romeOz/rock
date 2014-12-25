@@ -144,8 +144,8 @@ class QueryBuilder extends \rock\db\QueryBuilder
     public function alterColumn($table, $column, $type)
     {
         $type = $this->getColumnType($type);
-        $sql = 'ALTER TABLE ' . $this->db->quoteTableName($table) . ' ALTER COLUMN '
-            . $this->db->quoteColumnName($column) . ' '
+        $sql = 'ALTER TABLE ' . $this->connection->quoteTableName($table) . ' ALTER COLUMN '
+            . $this->connection->quoteColumnName($column) . ' '
             . $this->getColumnType($type);
 
         return $sql;
@@ -165,8 +165,8 @@ class QueryBuilder extends \rock\db\QueryBuilder
         if ($schema !== '') {
             $table = "{$schema}.{$table}";
         }
-        $table = $this->db->quoteTableName($table);
-        if ($this->db->getTableSchema($table) === null) {
+        $table = $this->connection->quoteTableName($table);
+        if ($this->connection->getTableSchema($table) === null) {
             throw new Exception("Table not found: {$table}.");
         }
         $enable = $check ? 'CHECK' : 'NOCHECK';
@@ -204,7 +204,7 @@ class QueryBuilder extends \rock\db\QueryBuilder
     protected function isOldMssql()
     {
         if ($this->_oldMssql === null) {
-            $pdo = $this->db->getSlavePdo();
+            $pdo = $this->connection->getSlavePdo();
             $version = preg_split("/\./", $pdo->getAttribute(\PDO::ATTR_SERVER_VERSION));
             $this->_oldMssql = $version[0] < 11;
         }

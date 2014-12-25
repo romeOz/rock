@@ -116,7 +116,7 @@ class ActiveRecord extends BaseActiveRecord
      * You may override this method if you want to use a different database connection.
      * @return Connection the database connection used by this AR class.
      */
-    public static function getDb()
+    public static function getConnection()
     {
         return Rock::$app->db;
     }
@@ -196,7 +196,7 @@ class ActiveRecord extends BaseActiveRecord
      */
     public static function updateAll($attributes, $condition = '', $params = [])
     {
-        $command = static::getDb()->createCommand();
+        $command = static::getConnection()->createCommand();
         $command->update(static::tableName(), $attributes, $condition, $params);
 
         return $command->execute();
@@ -225,7 +225,7 @@ class ActiveRecord extends BaseActiveRecord
             $counters[$name] = new Expression("[[$name]]+:bp{$n}", [":bp{$n}" => $value]);
             $n++;
         }
-        $command = static::getDb()->createCommand();
+        $command = static::getConnection()->createCommand();
         $command->update(static::tableName(), $counters, $condition, $params);
 
         return $command->execute();
@@ -248,7 +248,7 @@ class ActiveRecord extends BaseActiveRecord
      */
     public static function deleteAll($condition = '', $params = [])
     {
-        $command = static::getDb()->createCommand();
+        $command = static::getConnection()->createCommand();
         $command->delete(static::tableName(), $condition, $params);
 
         return $command->execute();
@@ -308,7 +308,7 @@ class ActiveRecord extends BaseActiveRecord
             $nameTable = $matches[1];
         }
         if (!isset($connection)) {
-            $connection = static::getDb();
+            $connection = static::getConnection();
         }
         $default = $connection->enableQueryCache;
         $connection->enableQueryCache = false;
@@ -447,9 +447,9 @@ class ActiveRecord extends BaseActiveRecord
             //Rock::info('Model not inserted due to validation error.', __METHOD__);
             return false;
         }
-        $db = static::getDb();
+        $connection = static::getConnection();
         if ($this->isTransactional(self::OP_INSERT)) {
-            $transaction = $db->beginTransaction();
+            $transaction = $connection->beginTransaction();
             try {
                 $result = $this->insertInternal($attributes);
                 if ($result === false) {
@@ -485,16 +485,16 @@ class ActiveRecord extends BaseActiveRecord
                 $values[$key] = $value;
             }
         }
-        $db = static::getDb();
-        $command = $db->createCommand()->insert($this->tableName(), $values);
+        $connection = static::getConnection();
+        $command = $connection->createCommand()->insert($this->tableName(), $values);
         if (!$command->execute()) {
             return false;
         }
-        $table = $this->getTableSchema($db);
+        $table = $this->getTableSchema($connection);
         if ($table->sequenceName !== null) {
             foreach ($table->primaryKey as $name) {
                 if ($this->getAttribute($name) === null) {
-                    $id = $table->columns[$name]->phpTypecast($db->getLastInsertID($table->sequenceName));
+                    $id = $table->columns[$name]->phpTypecast($connection->getLastInsertID($table->sequenceName));
                     $this->setAttribute($name, $id);
                     $values[$name] = $id;
                     break;
@@ -565,9 +565,9 @@ class ActiveRecord extends BaseActiveRecord
             //Rock::info('Model not updated due to validation error.', __METHOD__);
             return false;
         }
-        $db = static::getDb();
+        $connection = static::getConnection();
         if ($this->isTransactional(self::OP_UPDATE)) {
-            $transaction = $db->beginTransaction();
+            $transaction = $connection->beginTransaction();
             try {
                 $result = $this->updateInternal($attributeNames);
                 if ($result === false) {
@@ -607,9 +607,9 @@ class ActiveRecord extends BaseActiveRecord
      */
     public function delete()
     {
-        $db = static::getDb();
+        $connection = static::getConnection();
         if ($this->isTransactional(self::OP_DELETE)) {
-            $transaction = $db->beginTransaction();
+            $transaction = $connection->beginTransaction();
             try {
                 $result = $this->deleteInternal();
                 if ($result === false) {

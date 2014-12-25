@@ -43,8 +43,8 @@ class QueryBuilder extends \rock\db\QueryBuilder
      */
     public function renameColumn($table, $oldName, $newName)
     {
-        $quotedTable = $this->db->quoteTableName($table);
-        $row = $this->db->createCommand('SHOW CREATE TABLE ' . $quotedTable)->queryOne();
+        $quotedTable = $this->connection->quoteTableName($table);
+        $row = $this->connection->createCommand('SHOW CREATE TABLE ' . $quotedTable)->queryOne();
         if ($row === false) {
             throw new Exception("Unable to find column '$oldName' in table '$table'.");
         }
@@ -58,16 +58,16 @@ class QueryBuilder extends \rock\db\QueryBuilder
             foreach ($matches[1] as $i => $c) {
                 if ($c === $oldName) {
                     return "ALTER TABLE $quotedTable CHANGE "
-                        . $this->db->quoteColumnName($oldName) . ' '
-                        . $this->db->quoteColumnName($newName) . ' '
+                        . $this->connection->quoteColumnName($oldName) . ' '
+                        . $this->connection->quoteColumnName($newName) . ' '
                         . $matches[2][$i];
                 }
             }
         }
         // try to give back a SQL anyway
         return "ALTER TABLE $quotedTable CHANGE "
-            . $this->db->quoteColumnName($oldName) . ' '
-            . $this->db->quoteColumnName($newName);
+            . $this->connection->quoteColumnName($oldName) . ' '
+            . $this->connection->quoteColumnName($newName);
     }
 
     /**
@@ -78,8 +78,8 @@ class QueryBuilder extends \rock\db\QueryBuilder
      */
     public function dropForeignKey($name, $table)
     {
-        return 'ALTER TABLE ' . $this->db->quoteTableName($table)
-            . ' DROP FOREIGN KEY ' . $this->db->quoteColumnName($name);
+        return 'ALTER TABLE ' . $this->connection->quoteTableName($table)
+            . ' DROP FOREIGN KEY ' . $this->connection->quoteColumnName($name);
     }
 
     /**
@@ -90,7 +90,7 @@ class QueryBuilder extends \rock\db\QueryBuilder
      */
     public function dropPrimaryKey($name, $table)
     {
-        return 'ALTER TABLE ' . $this->db->quoteTableName($table) . ' DROP PRIMARY KEY';
+        return 'ALTER TABLE ' . $this->connection->quoteTableName($table) . ' DROP PRIMARY KEY';
     }
 
     /**
@@ -105,12 +105,12 @@ class QueryBuilder extends \rock\db\QueryBuilder
      */
     public function resetSequence($tableName, $value = null)
     {
-        $table = $this->db->getTableSchema($tableName);
+        $table = $this->connection->getTableSchema($tableName);
         if ($table !== null && $table->sequenceName !== null) {
-            $tableName = $this->db->quoteTableName($tableName);
+            $tableName = $this->connection->quoteTableName($tableName);
             if ($value === null) {
                 $key = reset($table->primaryKey);
-                $value = $this->db->createCommand("SELECT MAX(`$key`) FROM $tableName")->queryScalar() + 1;
+                $value = $this->connection->createCommand("SELECT MAX(`$key`) FROM $tableName")->queryScalar() + 1;
             } else {
                 $value = (int) $value;
             }

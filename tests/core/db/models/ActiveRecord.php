@@ -6,7 +6,7 @@ class ActiveRecord extends \rock\db\ActiveRecord
 {
     public static $db;
 
-    public static function getDb()
+    public static function getConnection()
     {
         return self::$db;
     }

@@ -60,7 +60,7 @@ class QueryBuilder extends \rock\db\QueryBuilder
             return parent::batchInsert($table, $columns, $rows);
         }
 
-        $schema = $this->db->getSchema();
+        $schema = $this->connection->getSchema();
         if (($tableSchema = $schema->getTableSchema($table)) !== null) {
             $columnSchemas = $tableSchema->columns;
         } else {
@@ -106,20 +106,20 @@ class QueryBuilder extends \rock\db\QueryBuilder
      */
     public function resetSequence($tableName, $value = null)
     {
-        $db = $this->db;
-        $table = $db->getTableSchema($tableName);
+        $connection = $this->connection;
+        $table = $connection->getTableSchema($tableName);
         if ($table !== null && $table->sequenceName !== null) {
             if ($value === null) {
                 $key = reset($table->primaryKey);
-                $tableName = $db->quoteTableName($tableName);
-                $value = $this->db->useMaster(function (Connection $db) use ($key, $tableName) {
-                    return $db->createCommand("SELECT MAX('$key') FROM $tableName")->queryScalar();
+                $tableName = $connection->quoteTableName($tableName);
+                $value = $this->connection->useMaster(function (Connection $conndction) use ($key, $tableName) {
+                    return $conndction->createCommand("SELECT MAX('$key') FROM $tableName")->queryScalar();
                 });
             } else {
                 $value = (int) $value - 1;
             }
             try {
-                $db->createCommand("UPDATE sqlite_sequence SET seq='$value' WHERE name='{$table->name}'")->execute();
+                $connection->createCommand("UPDATE sqlite_sequence SET seq='$value' WHERE name='{$table->name}'")->execute();
             } catch (\Exception $e) {
                 // it's possible that sqlite_sequence does not exist
             }
@@ -149,7 +149,7 @@ class QueryBuilder extends \rock\db\QueryBuilder
      */
     public function truncateTable($table)
     {
-        return "DELETE FROM " . $this->db->quoteTableName($table);
+        return "DELETE FROM " . $this->connection->quoteTableName($table);
     }
 
     /**
@@ -160,7 +160,7 @@ class QueryBuilder extends \rock\db\QueryBuilder
      */
     public function dropIndex($name, $table)
     {
-        return 'DROP INDEX ' . $this->db->quoteTableName($name);
+        return 'DROP INDEX ' . $this->connection->quoteTableName($name);
     }
 
     /**

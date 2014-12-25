@@ -92,7 +92,7 @@ class Schema extends \rock\db\Schema
      */
     public function createQueryBuilder()
     {
-        return new QueryBuilder($this->db);
+        return new QueryBuilder($this->connection);
     }
 
     /**
@@ -102,7 +102,7 @@ class Schema extends \rock\db\Schema
      */
     protected function loadTableSchema($name)
     {
-        $pdo = $this->db->getSlavePdo();
+        $pdo = $this->connection->getSlavePdo();
 
         $tableInfo = $pdo->cubrid_schema(\PDO::CUBRID_SCH_TABLE, $name);
 
@@ -114,7 +114,7 @@ class Schema extends \rock\db\Schema
         $table->fullName = $table->name = $tableInfo[0]['NAME'];
 
         $sql = 'SHOW FULL COLUMNS FROM ' . $this->quoteSimpleTableName($table->name);
-        $columns = $this->db->createCommand($sql)->queryAll();
+        $columns = $this->connection->createCommand($sql)->queryAll();
 
         foreach ($columns as $info) {
             $column = $this->loadColumnSchema($info);
@@ -225,7 +225,7 @@ class Schema extends \rock\db\Schema
      */
     protected function findTableNames($schema = '')
     {
-        $pdo = $this->db->getSlavePdo();
+        $pdo = $this->connection->getSlavePdo();
         $tables =$pdo->cubrid_schema(\PDO::CUBRID_SCH_TABLE);
         $tableNames = [];
         foreach ($tables as $table) {

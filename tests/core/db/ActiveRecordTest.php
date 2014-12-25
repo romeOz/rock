@@ -531,7 +531,7 @@ class ActiveRecordTest extends DatabaseTestCase
      */
     public function testJoinWithVia()
     {
-        Order::getDb()->getQueryBuilder()->separator = "\n";
+        Order::getConnection()->getQueryBuilder()->separator = "\n";
         Order::find()->joinWith('itemsInOrder1')->joinWith([
                                                                'items' => function ($q) {
                                                                    $q->orderBy('item.id');

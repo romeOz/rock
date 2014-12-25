@@ -72,7 +72,7 @@ EOD;
      */
     public function renameTable($table, $newName)
     {
-        return 'ALTER TABLE ' . $this->db->quoteTableName($table) . ' RENAME TO ' . $this->db->quoteTableName($newName);
+        return 'ALTER TABLE ' . $this->connection->quoteTableName($table) . ' RENAME TO ' . $this->connection->quoteTableName($newName);
     }
 
     /**
@@ -89,7 +89,7 @@ EOD;
     {
         $type = $this->getColumnType($type);
 
-        return 'ALTER TABLE ' . $this->db->quoteTableName($table) . ' MODIFY ' . $this->db->quoteColumnName($column) . ' ' . $this->getColumnType($type);
+        return 'ALTER TABLE ' . $this->connection->quoteTableName($table) . ' MODIFY ' . $this->connection->quoteColumnName($column) . ' ' . $this->getColumnType($type);
     }
 
     /**
@@ -101,7 +101,7 @@ EOD;
      */
     public function dropIndex($name, $table)
     {
-        return 'DROP INDEX ' . $this->db->quoteTableName($name);
+        return 'DROP INDEX ' . $this->connection->quoteTableName($name);
     }
 
     /**
@@ -109,7 +109,7 @@ EOD;
      */
     public function resetSequence($table, $value = null)
     {
-        $tableSchema = $this->db->getTableSchema($table);
+        $tableSchema = $this->connection->getTableSchema($table);
         if ($tableSchema === null) {
             throw new Exception("Unknown table: $table");
         }
@@ -121,8 +121,8 @@ EOD;
             $value = (int) $value;
         } else {
             // use master connection to get the biggest PK value
-            $value = $this->db->useMaster(function (Connection $db) use ($tableSchema) {
-                return $db->createCommand("SELECT MAX(\"{$tableSchema->primaryKey}\") FROM \"{$tableSchema->name}\"")->queryScalar();
+            $value = $this->connection->useMaster(function (Connection $connection) use ($tableSchema) {
+                return $connection->createCommand("SELECT MAX(\"{$tableSchema->primaryKey}\") FROM \"{$tableSchema->name}\"")->queryScalar();
             }) + 1;
         }
 
@@ -135,10 +135,10 @@ EOD;
      */
     public function addForeignKey($name, $table, $columns, $refTable, $refColumns, $delete = null, $update = null)
     {
-        $sql = 'ALTER TABLE ' . $this->db->quoteTableName($table)
-            . ' ADD CONSTRAINT ' . $this->db->quoteColumnName($name)
+        $sql = 'ALTER TABLE ' . $this->connection->quoteTableName($table)
+            . ' ADD CONSTRAINT ' . $this->connection->quoteColumnName($name)
             . ' FOREIGN KEY (' . $this->buildColumns($columns) . ')'
-            . ' REFERENCES ' . $this->db->quoteTableName($refTable)
+            . ' REFERENCES ' . $this->connection->quoteTableName($refTable)
             . ' (' . $this->buildColumns($refColumns) . ')';
         if ($delete !== null) {
             $sql .= ' ON DELETE ' . $delete;

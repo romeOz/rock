@@ -51,9 +51,9 @@ class SchemaTest extends SphinxTestCase
     {
         $schema = $this->getConnection()->schema;
 
-        $schema->db->enableSchemaCache = true;
+        $schema->connection->enableSchemaCache = true;
         $cache = static::getCache();
-        $schema->db->schemaCache = $cache;
+        $schema->connection->schemaCache = $cache;
         $noCacheIndex = $schema->getIndexSchema('rt_index', true);
         $cachedIndex = $schema->getIndexSchema('rt_index', true);
         $this->assertEquals($noCacheIndex, $cachedIndex);

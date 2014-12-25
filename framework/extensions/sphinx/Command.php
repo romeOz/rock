@@ -37,7 +37,7 @@ class Command extends \rock\db\Command
     /**
      * @var Connection the Sphinx connection that this command is associated with.
      */
-    public $db;
+    public $connection;
 
     /**
      * Creates a batch INSERT command.
@@ -61,7 +61,7 @@ class Command extends \rock\db\Command
     public function batchInsert($index, $columns, $rows)
     {
         $params = [];
-        $sql = $this->db->getQueryBuilder()->batchInsert($index, $columns, $rows, $params);
+        $sql = $this->connection->getQueryBuilder()->batchInsert($index, $columns, $rows, $params);
 
         return $this->setSql($sql)->bindValues($params);
     }
@@ -88,7 +88,7 @@ class Command extends \rock\db\Command
     public function replace($index, $columns)
     {
         $params = [];
-        $sql = $this->db->getQueryBuilder()->replace($index, $columns, $params);
+        $sql = $this->connection->getQueryBuilder()->replace($index, $columns, $params);
 
         return $this->setSql($sql)->bindValues($params);
     }
@@ -115,7 +115,7 @@ class Command extends \rock\db\Command
     public function batchReplace($index, $columns, $rows)
     {
         $params = [];
-        $sql = $this->db->getQueryBuilder()->batchReplace($index, $columns, $rows, $params);
+        $sql = $this->connection->getQueryBuilder()->batchReplace($index, $columns, $rows, $params);
 
         return $this->setSql($sql)->bindValues($params);
     }
@@ -142,7 +142,7 @@ class Command extends \rock\db\Command
      */
     public function update($index, $columns, $condition = '', $params = [], $options = [])
     {
-        $sql = $this->db->getQueryBuilder()->update($index, $columns, $condition, $params, $options);
+        $sql = $this->connection->getQueryBuilder()->update($index, $columns, $condition, $params, $options);
 
         return $this->setSql($sql)->bindValues($params);
     }
@@ -154,7 +154,7 @@ class Command extends \rock\db\Command
      */
     public function truncateIndex($index)
     {
-        $sql = $this->db->getQueryBuilder()->truncateIndex($index);
+        $sql = $this->connection->getQueryBuilder()->truncateIndex($index);
 
         return $this->setSql($sql);
     }
@@ -171,7 +171,7 @@ class Command extends \rock\db\Command
     public function callSnippets($index, $source, $match, $options = [])
     {
         $params = [];
-        $sql = $this->db->getQueryBuilder()->callSnippets($index, $source, $match, $options, $params);
+        $sql = $this->connection->getQueryBuilder()->callSnippets($index, $source, $match, $options, $params);
 
         return $this->setSql($sql)->bindValues($params);
     }
@@ -186,7 +186,7 @@ class Command extends \rock\db\Command
     public function callKeywords($index, $text, $fetchStatistic = false)
     {
         $params = [];
-        $sql = $this->db->getQueryBuilder()->callKeywords($index, $text, $fetchStatistic, $params);
+        $sql = $this->connection->getQueryBuilder()->callKeywords($index, $text, $fetchStatistic, $params);
 
         return $this->setSql($sql)->bindValues($params);
     }

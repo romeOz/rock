@@ -74,7 +74,7 @@ class Schema extends \rock\db\Schema
      */
     public function createQueryBuilder()
     {
-        return new QueryBuilder($this->db);
+        return new QueryBuilder($this->connection);
     }
 
     /**
@@ -188,7 +188,7 @@ class Schema extends \rock\db\Schema
     {
         $sql = 'SHOW FULL COLUMNS FROM ' . $this->quoteTableName($table->fullName);
         try {
-            $columns = $this->db->createCommand($sql)->queryAll();
+            $columns = $this->connection->createCommand($sql)->queryAll();
         } catch (\Exception $e) {
             if ($e instanceof Exception && strpos($e->getMessage(), 'SQLSTATE[42S02') !== false) {
                 // table does not exist
@@ -218,7 +218,7 @@ class Schema extends \rock\db\Schema
      */
     protected function getCreateTableSql($table)
     {
-        $row = $this->db->createCommand('SHOW CREATE TABLE ' . $this->quoteTableName($table->fullName))->queryOne();
+        $row = $this->connection->createCommand('SHOW CREATE TABLE ' . $this->quoteTableName($table->fullName))->queryOne();
         if (isset($row['Create Table'])) {
             $sql = $row['Create Table'];
         } else {
@@ -294,6 +294,6 @@ class Schema extends \rock\db\Schema
             $sql .= ' FROM ' . $this->quoteSimpleTableName($schema);
         }
 
-        return $this->db->createCommand($sql)->queryColumn();
+        return $this->connection->createCommand($sql)->queryColumn();
     }
 }

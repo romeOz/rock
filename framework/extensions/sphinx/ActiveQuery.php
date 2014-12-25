@@ -306,7 +306,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
         }
         /** @var ActiveRecord $modelClass */
         $modelClass = $this->modelClass;
-        $this->connection = $modelClass::getDb();
+        $this->connection = $modelClass::getConnection();
         return $this->calculateCacheParams($this->connection);
     }
 

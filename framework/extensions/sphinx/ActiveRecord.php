@@ -49,7 +49,7 @@ abstract class ActiveRecord extends BaseActiveRecord
      * You may override this method if you want to use a different Sphinx connection.
      * @return Connection the Sphinx connection used by this AR class.
      */
-    public static function getDb()
+    public static function getConnection()
     {
         return Container::load('sphinx');
     }
@@ -96,7 +96,7 @@ abstract class ActiveRecord extends BaseActiveRecord
      */
     public static function updateAll($attributes, $condition = '', $params = [])
     {
-        $command = static::getDb()->createCommand();
+        $command = static::getConnection()->createCommand();
         $command->update(static::indexName(), $attributes, $condition, $params);
 
         return $command->execute();
@@ -118,7 +118,7 @@ abstract class ActiveRecord extends BaseActiveRecord
      */
     public static function deleteAll($condition = '', $params = [])
     {
-        $command = static::getDb()->createCommand();
+        $command = static::getConnection()->createCommand();
         $command->delete(static::indexName(), $condition, $params);
 
         return $command->execute();
@@ -154,7 +154,7 @@ abstract class ActiveRecord extends BaseActiveRecord
     public static function getIndexSchema($connection = null)
     {
         if (!isset($connection)) {
-            $connection = static::getDb();
+            $connection = static::getConnection();
         }
         $default = $connection->enableQueryCache;
         $connection->enableQueryCache = false;
@@ -192,7 +192,7 @@ abstract class ActiveRecord extends BaseActiveRecord
      */
     public static function callSnippets($source, $match, $options = [])
     {
-        $command = static::getDb()->createCommand();
+        $command = static::getConnection()->createCommand();
         $command->callSnippets(static::indexName(), $source, $match, $options);
         if (is_array($source)) {
             return $command->queryColumn();
@@ -209,7 +209,7 @@ abstract class ActiveRecord extends BaseActiveRecord
      */
     public static function callKeywords($text, $fetchStatistic = false)
     {
-        $command = static::getDb()->createCommand();
+        $command = static::getConnection()->createCommand();
         $command->callKeywords(static::indexName(), $text, $fetchStatistic);
 
         return $command->queryAll();
@@ -353,7 +353,7 @@ abstract class ActiveRecord extends BaseActiveRecord
         if ($runValidation && !$this->validate($attributes)) {
             return false;
         }
-        $db = static::getDb();
+        $db = static::getConnection();
         if ($this->isTransactional(self::OP_INSERT) && $db->getTransaction() === null) {
             $transaction = $db->beginTransaction();
             try {
@@ -388,7 +388,7 @@ abstract class ActiveRecord extends BaseActiveRecord
                 $values[$key] = $value;
             }
         }
-        $db = static::getDb();
+        $db = static::getConnection();
         $command = $db->createCommand()->insert($this->indexName(), $values);
         if (!$command->execute()) {
             return false;
@@ -456,7 +456,7 @@ abstract class ActiveRecord extends BaseActiveRecord
         if ($runValidation && !$this->validate($attributeNames)) {
             return false;
         }
-        $db = static::getDb();
+        $db = static::getConnection();
         if ($this->isTransactional(self::OP_UPDATE) && $db->getTransaction() === null) {
             $transaction = $db->beginTransaction();
             try {
@@ -507,7 +507,7 @@ abstract class ActiveRecord extends BaseActiveRecord
 
         if ($useReplace) {
             $values = array_merge($values, $this->getOldPrimaryKey(true));
-            $command = static::getDb()->createCommand();
+            $command = static::getConnection()->createCommand();
             $command->replace(static::indexName(), $values);
             // We do not check the return value of replace because it's possible
             // that the REPLACE statement doesn't change anything and thus returns 0.
@@ -561,7 +561,7 @@ abstract class ActiveRecord extends BaseActiveRecord
      */
     public function delete()
     {
-        $db = static::getDb();
+        $db = static::getConnection();
         $transaction = $this->isTransactional(self::OP_DELETE) && $db->getTransaction() === null ? $db->beginTransaction() : null;
         try {
             $result = false;
