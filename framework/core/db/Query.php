@@ -421,10 +421,10 @@ class Query implements QueryInterface
      * Restores the value of select to make this query reusable.
      *
      * @param string|Expression $selectExpression
-     * @param Connection|null $connection
+     * @param Connection|\rock\sphinx\Connection|null $connection
      * @return bool|string
      */
-    private function queryScalar($selectExpression, $connection)
+    protected function queryScalar($selectExpression, $connection)
     {
         $select = $this->select;
         $limit = $this->limit;
@@ -444,7 +444,7 @@ class Query implements QueryInterface
         } else {
             return (new Query)->select([$selectExpression])
                 ->from(['c' => $this])
-                ->createCommand($connection)
+                ->createCommand($command->connection)
                 ->queryScalar();
         }
     }
