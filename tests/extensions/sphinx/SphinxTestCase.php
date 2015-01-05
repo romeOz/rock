@@ -39,17 +39,10 @@ class SphinxTestCase extends \PHPUnit_Framework_TestCase
      */
     protected $connection = 'db';
 
-//    public static function setUpBeforeClass()
-//    {
-//        static::loadClassMap();
-//    }
-
     protected function setUp()
     {
         parent::setUp();
         $this->up();
-        //$this->mockApplication();
-        //static::loadClassMap();
     }
 
     public function up()
@@ -76,24 +69,7 @@ class SphinxTestCase extends \PHPUnit_Framework_TestCase
         if ($this->sphinx instanceof Connection) {
             $this->sphinx->close();
         }
-        //$this->destroyApplication();
     }
-
-//    /**
-//     * Adds sphinx extension files to [[Rock::$classPath]],
-//     * avoiding the necessity of usage Composer autoloader.
-//     */
-//    protected static function loadClassMap()
-//    {
-//        $baseNameSpace = 'rock/sphinx';
-//        $basePath = realpath(__DIR__. '/../../../../extensions/sphinx');
-//        $files = FileHelper::findFiles($basePath);
-//        foreach ($files as $file) {
-//            $classRelativePath = str_replace($basePath, '', $file);
-//            $classFullName = str_replace(['/', '.php'], ['\\', ''], $baseNameSpace . $classRelativePath);
-//            Yii::$classMap[$classFullName] = $file;
-//        }
-//    }
 
     /**
      * @param  boolean                $reset whether to clean up the test database
