@@ -30,14 +30,16 @@ class ActiveDataProviderTest extends DatabaseTestCase
             ]
         );
 
-        $this->assertSame(count($provider->get()), 2);
+        $this->assertSame(2, count($provider->get()));
         $this->assertNotEmpty($provider->getPagination());
-        $this->assertSame($provider->getTotalCount(), 3);
+        $this->assertSame(3, $provider->getTotalCount());
+        $this->assertSame(2, count($provider->getKeys()));
         // to Array
         $result = $provider->toArray()[0];
         $this->assertArrayHasKey('id', $result);
         $this->assertArrayHasKey('name', $result);
-        $this->assertSame(count($result), 2);
+        $this->assertSame(2, count($result));
+        $this->assertSame(2, count($provider->getKeys()));
 
         // as ActiveRecord
         $provider = new ActiveDataProvider(
@@ -49,9 +51,10 @@ class ActiveDataProviderTest extends DatabaseTestCase
                 'pagination' => ['limit' => 2, 'sort' => SORT_DESC]
             ]
         );
-        $this->assertSame(count($provider->get()), 2);
+        $this->assertSame(2, count($provider->get()));
         $this->assertNotEmpty($provider->getPagination());
-        $this->assertSame($provider->getTotalCount(), 3);
+        $this->assertSame(3, $provider->getTotalCount());
+        $this->assertSame(2, count($provider->getKeys()));
 
         // to Array
         $result = $provider->toArray()[0];
@@ -59,7 +62,8 @@ class ActiveDataProviderTest extends DatabaseTestCase
         $this->assertArrayHasKey('name', $result);
         $this->assertArrayHasKey('profile', $result);
         $this->assertNotEmpty($result['profile']);
-        $this->assertSame(count($result), 2);
+        $this->assertSame(2, count($result));
+        $this->assertSame(2, count($provider->getKeys()));
 
         // one + ActiveRecord
         $provider = new ActiveDataProvider(
@@ -76,6 +80,7 @@ class ActiveDataProviderTest extends DatabaseTestCase
         $this->assertArrayHasKey('profile', $result);
         $this->assertNotEmpty($result['profile']);
         $this->assertSame(count($result), 2);
+        $this->assertEquals(['name', 'profile'], $provider->getKeys());
     }
 
 
@@ -90,15 +95,17 @@ class ActiveDataProviderTest extends DatabaseTestCase
         );
 
         // get
-        $this->assertSame(count($provider->get()), 2);
+        $this->assertSame(2, count($provider->get()));
         $this->assertNotEmpty($provider->getPagination());
-        $this->assertSame($provider->getTotalCount(), 3);
+        $this->assertSame(3, $provider->getTotalCount());
+        $this->assertSame(2, count($provider->getKeys()));
 
         // to Array
         $result = $provider->toArray()[0];
         $this->assertArrayHasKey('id', $result);
         $this->assertArrayHasKey('name', $result);
-        $this->assertSame(count($result), 2);
+        $this->assertSame(2, count($result));
+        $this->assertSame(2, count($provider->getKeys()));
     }
 
     public function testArray()
@@ -112,15 +119,17 @@ class ActiveDataProviderTest extends DatabaseTestCase
         );
 
         // get
-        $this->assertSame(count($provider->get()), 2);
+        $this->assertSame(2, count($provider->get()));
         $this->assertNotEmpty($provider->getPagination());
-        $this->assertSame($provider->getTotalCount(), 3);
+        $this->assertSame(3, $provider->getTotalCount());
+        $this->assertSame(2, count($provider->getKeys()));
 
         // to Array
         $result = $provider->toArray()[0];
         $this->assertArrayHasKey('id', $result);
         $this->assertArrayHasKey('name', $result);
-        $this->assertSame(count($result), 2);
+        $this->assertSame(2, count($result));
+        $this->assertSame(2, count($provider->getKeys()));
 
         $provider = new ActiveDataProvider(
             [
@@ -132,6 +141,8 @@ class ActiveDataProviderTest extends DatabaseTestCase
         $result = $provider->toArray();
         $this->assertArrayHasKey('id', $result);
         $this->assertArrayHasKey('name', $result);
-        $this->assertSame(count($result), 2);
+        $this->assertSame(2, count($result));
+        $this->assertContains('id', $provider->getKeys());
+        $this->assertContains('name', $provider->getKeys());
     }
 }

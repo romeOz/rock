@@ -78,6 +78,17 @@ class ActiveDataProvider
     public $only = [];
     public $exclude = [];
     public $expand = [];
+    /**
+     * @var string|callable the column that is used as the key of the data models.
+     * This can be either a column name, or a callable that returns the key value of a given data model.
+     *
+     * If this is not set, the following rules will be used to determine the keys of the data models:
+     *
+     * - If {@see \rock\db\ActiveDataProvider::$query} is an {@see \rock\db\ActiveQuery} instance, the primary keys of {@see \rock\db\ActiveQuery::$modelClass} will be used.
+     *
+     * @see getKeys()
+     */
+    public $key;
 
     /**
      * @var array
@@ -87,6 +98,7 @@ class ActiveDataProvider
      * @var int
      */
     protected $totalCount = 0;
+    private $_keys;
 
     public function init()
     {
@@ -146,7 +158,11 @@ class ActiveDataProvider
         } elseif ($this->query instanceof QueryInterface) {
             $data = $this->prepareModels($subAttributes);
         } elseif ($this->query instanceof ActiveRecordInterface) {
-            return $this->prepareDataWithCallback($this->query->toArray($this->only, $this->exclude, $this->expand));
+            $result = $this->prepareDataWithCallback($this->query->toArray($this->only, $this->exclude, $this->expand));
+            if ($this->_keys === null) {
+                $this->_keys = $this->prepareKeys($result);
+            }
+            return $result;
         } else {
             throw new Exception('Var must be of type array or instances ActiveRecord.');
         }
@@ -218,6 +234,16 @@ class ActiveDataProvider
     }
 
     /**
+     * Returns the key values associated with the data models.
+     * @return array the list of key values corresponding.
+     * is uniquely identified by the corresponding key value in this array.
+     */
+    public function getKeys()
+    {
+        return $this->_keys;
+    }
+
+    /**
      * @return array
      */
     protected function prepareArray()
@@ -231,7 +257,12 @@ class ActiveDataProvider
             return $this->query;
         }
         $this->calculatePagination();
-        return array_slice($this->query, $this->_pagination['offset'], $this->_pagination['limit'], true);
+
+        $result = array_slice($this->query, $this->_pagination['offset'], $this->_pagination['limit'], true);
+        if ($this->_keys === null) {
+            $this->_keys = $this->prepareKeys($result);
+        }
+        return $result;
     }
 
 
@@ -246,10 +277,15 @@ class ActiveDataProvider
         }
         $this->calculatePagination();
         $this->addHeaders($this->totalCount, $this->_pagination);
-        return $this->query
+
+        $result = $this->query
             ->limit($this->_pagination['limit'])
             ->offset($this->_pagination['offset'])
             ->all($this->connection, $subAttributes);
+        if ($this->_keys === null) {
+            $this->_keys = $this->prepareKeys($result);
+        }
+        return $result;
     }
 
     protected function calculatePagination()
@@ -325,5 +361,47 @@ class ActiveDataProvider
         }
 
         return $data;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function prepareKeys($models)
+    {
+        $keys = [];
+        if ($this->key !== null) {
+            foreach ($models as $model) {
+                if (is_string($this->key)) {
+                    $keys[] = $model[$this->key];
+                } else {
+                    $keys[] = call_user_func($this->key, $model);
+                }
+            }
+
+            return $keys;
+        } elseif ($this->query instanceof ActiveQueryInterface) {
+            /* @var $class \rock\db\ActiveRecord */
+            $class = $this->query->modelClass;
+            $pks = $class::primaryKey();
+            if (count($pks) === 1) {
+                $pk = $pks[0];
+                foreach ($models as $model) {
+                    $keys[] = $model[$pk];
+                }
+            } else {
+                foreach ($models as $model) {
+                    $kk = [];
+                    foreach ($pks as $pk) {
+                        $kk[$pk] = $model[$pk];
+                    }
+                    $keys[] = $kk;
+                }
+            }
+
+            return $keys;
+        } else {
+            return array_keys($models);
+        }
     }
 }
