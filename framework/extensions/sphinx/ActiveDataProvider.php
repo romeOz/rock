@@ -82,9 +82,9 @@ class ActiveDataProvider extends \rock\db\ActiveDataProvider
         return $this->prepareResult($query);
     }
 
-    protected function prepareModels(\rock\db\Connection $connection = null, $subAttributes = false)
+    protected function prepareModels($subAttributes = false)
     {
-        if (!$query = parent::prepareModels($connection, $subAttributes)) {
+        if (!$query = parent::prepareModels($subAttributes)) {
             return [];
         }
         return $this->prepareResult($query);

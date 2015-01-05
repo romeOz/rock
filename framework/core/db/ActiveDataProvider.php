@@ -57,6 +57,9 @@ class ActiveDataProvider
     use ComponentsTrait;
 
     const PAGE_VAR   = Pagination::PAGE_VAR;
+
+    /** @var  \rock\db\Connection|\rock\mongodb\Connection */
+    public $connection;
     /**
      * @var array|QueryInterface
      */
@@ -108,7 +111,7 @@ class ActiveDataProvider
     }
 
 
-    public function get(Connection $connection = null, $subAttributes = false)
+    public function get($subAttributes = false)
     {
         if (empty($this->query)) {
             return [];
@@ -118,7 +121,7 @@ class ActiveDataProvider
         if (is_array($this->query)) {
             $result = $this->prepareArray();
         } elseif ($this->query instanceof QueryInterface) {
-            $result = $this->prepareModels($connection, $subAttributes);
+            $result = $this->prepareModels($this->connection, $subAttributes);
         }
 
         return $this->prepareDataWithCallback($result);
@@ -131,7 +134,7 @@ class ActiveDataProvider
         return $this;
     }
 
-    public function toArray(Connection $connection = null, $subAttributes = false)
+    public function toArray($subAttributes = false)
     {
         if (empty($this->query)) {
             return [];
@@ -141,7 +144,7 @@ class ActiveDataProvider
         if (is_array($this->query)) {
             $data = $this->prepareArray();
         } elseif ($this->query instanceof QueryInterface) {
-            $data = $this->prepareModels($connection, $subAttributes);
+            $data = $this->prepareModels($subAttributes);
         } elseif ($this->query instanceof ActiveRecordInterface) {
             return $this->prepareDataWithCallback($this->query->toArray($this->only, $this->exclude, $this->expand));
         } else {
@@ -233,13 +236,12 @@ class ActiveDataProvider
 
 
     /**
-     * @param Connection $connection
      * @param bool       $subAttributes
      * @return ActiveRecord|\rock\sphinx\ActiveRecord
      */
-    protected function prepareModels(Connection $connection = null, $subAttributes = false)
+    protected function prepareModels($subAttributes = false)
     {
-        if (!$this->totalCount = $this->calculateTotalCount($connection)) {
+        if (!$this->totalCount = $this->calculateTotalCount()) {
             return [];
         }
         $this->calculatePagination();
@@ -247,7 +249,7 @@ class ActiveDataProvider
         return $this->query
             ->limit($this->_pagination['limit'])
             ->offset($this->_pagination['offset'])
-            ->all($connection, $subAttributes);
+            ->all($this->connection, $subAttributes);
     }
 
     protected function calculatePagination()
@@ -303,14 +305,14 @@ class ActiveDataProvider
     /**
      * @inheritdoc
      */
-    protected function calculateTotalCount(Connection $connection = null)
+    protected function calculateTotalCount()
     {
         $query = clone $this->query;
 
         return (int)$query->limit(-1)
                           ->offset(-1)
                           ->orderBy([])
-                          ->count('*', $connection);
+                          ->count('*', $this->connection);
     }
 
     protected function prepareDataWithCallback(array $data)

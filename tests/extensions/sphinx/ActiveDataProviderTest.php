@@ -31,6 +31,7 @@ class ActiveDataProviderTest extends SphinxTestCase
     {
 
         $config = [
+            'connection' => $this->getDbConnection(false),
             'query' => (new \rock\db\Query())->from('sphinx_article'),
             'model' => ArticleIndex::className(),
             'callSnippets' => [
@@ -45,7 +46,7 @@ class ActiveDataProviderTest extends SphinxTestCase
         ];
         $provider = (new ActiveDataProvider($config));
         $this->assertSame(
-            $provider->get($this->getDbConnection(false))[0]['content'],
+            $provider->get()[0]['content'],
             'This article is <span>about</span> cats'
         );
         $this->assertSame(count($provider->get()), 1);
