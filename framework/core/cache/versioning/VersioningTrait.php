@@ -108,7 +108,7 @@ trait VersioningTrait
         }
         $timestamp = microtime();
         foreach ($this->prepareTags($tags) as $tag) {
-            if ($timestampTag = static::$storage->get($tag)) {
+            if ($timestampTag = $this->storage->get($tag)) {
                 $value['tags'][$tag] = $timestampTag;
                 continue;
             }

@@ -42,7 +42,7 @@ trait CacheTrait
         }
 
         $key = $this->prepareKey($key);
-        if (($result = static::$storage->get($key)) === false) {
+        if (($result = $this->storage->get($key)) === false) {
             if ($this->lock === false || ($result = $this->getLock($key)) === false) {
                 return false;
             }

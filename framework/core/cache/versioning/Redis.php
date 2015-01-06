@@ -10,7 +10,7 @@ class Redis extends \rock\cache\Redis implements CacheInterface
     use VersioningTrait;
 
     /** @var  \Redis */
-    protected static $storage;
+    public $storage;
 
 
     /**
@@ -18,7 +18,7 @@ class Redis extends \rock\cache\Redis implements CacheInterface
      */
     public function getTag($tag)
     {
-        return static::$storage->get($this->prepareTag($tag));
+        return $this->storage->get($this->prepareTag($tag));
     }
 
     /**
@@ -39,10 +39,10 @@ class Redis extends \rock\cache\Redis implements CacheInterface
             return true;
         }
         foreach ($tagsByValue as $tag => $timestamp) {
-            if ((!$tagTimestamp = static::$storage->get($tag)) ||
+            if ((!$tagTimestamp = $this->storage->get($tag)) ||
                 DateTime::microtime($tagTimestamp) > DateTime::microtime($timestamp)
             ) {
-                static::$storage->delete($key);
+                $this->storage->delete($key);
 
                 return false;
             }

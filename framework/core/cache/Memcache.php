@@ -12,7 +12,7 @@ class Memcache extends Memcached
     public function __construct($config = [])
     {
         parent::__construct($config);
-        static::$storage = new \Memcache();
+        $this->storage = new \Memcache();
         foreach ($this->servers as $server) {
             if (!isset($server[1])) {
                 $server[1] = 11211;
@@ -24,7 +24,7 @@ class Memcache extends Memcached
                 $server[3] = 1;
             }
             list($host, $port, $persistent, $weight) = $server;
-            static::$storage->addserver($host, $port, $persistent, $weight);
+            $this->storage->addserver($host, $port, $persistent, $weight);
         }
     }
 
@@ -38,10 +38,10 @@ class Memcache extends Memcached
             if ($create === false) {
                 return false;
             }
-            static::$storage->add($hash, 0, MEMCACHE_COMPRESSED, $expire);
+            $this->storage->add($hash, 0, MEMCACHE_COMPRESSED, $expire);
         }
 
-        return static::$storage->increment($hash, $offset);
+        return $this->storage->increment($hash, $offset);
     }
 
     /**
@@ -54,10 +54,10 @@ class Memcache extends Memcached
             if ($create === false) {
                 return false;
             }
-            static::$storage->add($hash, 0, MEMCACHE_COMPRESSED, $expire);
+            $this->storage->add($hash, 0, MEMCACHE_COMPRESSED, $expire);
         }
 
-        return static::$storage->decrement($hash, $offset);
+        return $this->storage->decrement($hash, $offset);
     }
 
     /**
@@ -76,13 +76,13 @@ class Memcache extends Memcached
     public function removeTag($tag)
     {
         $tag = $this->prepareTag($tag);
-        if (($value = static::$storage->get($tag)) === false) {
+        if (($value = $this->storage->get($tag)) === false) {
             return false;
         }
         $value = $this->unserialize($value);
         $value[] = $tag;
         foreach ($value as $key) {
-            static::$storage->delete($key);
+            $this->storage->delete($key);
         }
 
         return true;
@@ -110,11 +110,11 @@ class Memcache extends Memcached
     protected function provideLock($key, $value, $expire, &$count = 0)
     {
         if ($this->lock === false) {
-            static::$storage->set($key, $value, MEMCACHE_COMPRESSED, $expire);
+            $this->storage->set($key, $value, MEMCACHE_COMPRESSED, $expire);
             return true;
         }
         if ($this->lock($key, $value)) {
-            static::$storage->set($key, $value, MEMCACHE_COMPRESSED, $expire);
+            $this->storage->set($key, $value, MEMCACHE_COMPRESSED, $expire);
             $this->unlock($key);
             return true;
         }
@@ -130,7 +130,7 @@ class Memcache extends Memcached
     {
         $iteration = 0;
 
-        while (!static::$storage->add(self::LOCK_PREFIX . $key, $value, MEMCACHE_COMPRESSED, 5)) {
+        while (!$this->storage->add(self::LOCK_PREFIX . $key, $value, MEMCACHE_COMPRESSED, 5)) {
             $iteration++;
             if ($iteration > $max) {
                 Rock::error(CacheException::INVALID_SAVE, ['key' => $key]);
@@ -152,7 +152,7 @@ class Memcache extends Memcached
         }
 
         foreach ($this->prepareTags($tags) as $tag) {
-            if (($value = static::$storage->get($tag)) !== false) {
+            if (($value = $this->storage->get($tag)) !== false) {
                 $value = $this->unserialize($value);
                 if (in_array($key, $value, true)) {
                     continue;

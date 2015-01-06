@@ -10,7 +10,7 @@ class Couchbase extends \rock\cache\Couchbase implements CacheInterface
     use VersioningTrait;
 
     /** @var  \Couchbase */
-    protected static $storage;
+    public $storage;
 
 
     /**
@@ -18,7 +18,7 @@ class Couchbase extends \rock\cache\Couchbase implements CacheInterface
      */
     public function getTag($tag)
     {
-        return static::$storage->get($this->prepareTag($tag));
+        return $this->storage->get($this->prepareTag($tag));
     }
 
     /**
@@ -26,7 +26,7 @@ class Couchbase extends \rock\cache\Couchbase implements CacheInterface
      */
     public function removeTag($tag)
     {
-        return is_string(static::$storage->replace($this->prepareTag($tag), microtime(), 0));
+        return is_string($this->storage->replace($this->prepareTag($tag), microtime(), 0));
     }
 
 
@@ -35,12 +35,12 @@ class Couchbase extends \rock\cache\Couchbase implements CacheInterface
         if (empty($tagsByValue)) {
             return true;
         }
-        $tags = static::$storage->getMulti(array_keys($tagsByValue));
+        $tags = $this->storage->getMulti(array_keys($tagsByValue));
         foreach ($tagsByValue as $tag => $timestamp) {
             if (!isset($tags[$tag]) ||
                 (isset($tags[$tag]) && DateTime::microtime($tags[$tag]) > DateTime::microtime($timestamp))
             ) {
-                static::$storage->delete($key);
+                $this->storage->delete($key);
 
                 return false;
             }
@@ -60,7 +60,7 @@ class Couchbase extends \rock\cache\Couchbase implements CacheInterface
         }
         $timestamp = microtime();
         $tags = $this->prepareTags($tags);
-        $data = static::$storage->getMulti($tags);
+        $data = $this->storage->getMulti($tags);
         foreach ($tags as $tag) {
             if (isset($data[$tag])) {
                 $value['tags'][$tag] = $data[$tag];

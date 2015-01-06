@@ -15,13 +15,13 @@ class Redis implements CacheInterface
     public $port = 6379;
 
     /** @var  \Redis */
-    protected static $storage;
+    public $storage;
 
     public function __construct($config = [])
     {
         $this->parentConstruct($config);
-        static::$storage = new \Redis();
-        static::$storage->connect($this->host, $this->port);
+        $this->storage = new \Redis();
+        $this->storage->connect($this->host, $this->port);
     }
 
     /**
@@ -31,7 +31,7 @@ class Redis implements CacheInterface
      */
     public function getStorage()
     {
-        return static::$storage;
+        return $this->storage;
     }
 
     /**
@@ -83,7 +83,7 @@ class Redis implements CacheInterface
      */
     public function touch($key, $expire = 0)
     {
-        return static::$storage->expire($this->prepareKey($key), $expire);
+        return $this->storage->expire($this->prepareKey($key), $expire);
     }
 
     /**
@@ -91,7 +91,7 @@ class Redis implements CacheInterface
      */
     public function exists($key)
     {
-        return static::$storage->exists($this->prepareKey($key));
+        return $this->storage->exists($this->prepareKey($key));
     }
 
     /**
@@ -104,10 +104,10 @@ class Redis implements CacheInterface
             if ($create === false) {
                 return false;
             }
-            $expire > 0 ? static::$storage->setex($hash, $expire, 0) : static::$storage->set($hash, 0);
+            $expire > 0 ? $this->storage->setex($hash, $expire, 0) : $this->storage->set($hash, 0);
         }
 
-        return static::$storage->incrBy($hash, $offset);
+        return $this->storage->incrBy($hash, $offset);
     }
 
     /**
@@ -120,10 +120,10 @@ class Redis implements CacheInterface
             if ($create === false) {
                 return false;
             }
-            $expire > 0 ? static::$storage->setex($hash, $expire, 0) : static::$storage->set($hash, 0);
+            $expire > 0 ? $this->storage->setex($hash, $expire, 0) : $this->storage->set($hash, 0);
         }
 
-        return static::$storage->decrBy($hash, $offset);
+        return $this->storage->decrBy($hash, $offset);
     }
 
     /**
@@ -131,7 +131,7 @@ class Redis implements CacheInterface
      */
     public function remove($key)
     {
-        return (bool)static::$storage->delete($this->prepareKey($key));
+        return (bool)$this->storage->delete($this->prepareKey($key));
     }
 
     /**
@@ -140,7 +140,7 @@ class Redis implements CacheInterface
     public function removeMulti(array $keys)
     {
         $keys = $this->prepareKeys($keys);
-        static::$storage->delete($keys);
+        $this->storage->delete($keys);
     }
 
     /**
@@ -148,7 +148,7 @@ class Redis implements CacheInterface
      */
     public function getTag($tag)
     {
-        return static::$storage->sMembers($this->prepareTag($tag)) ? : false;
+        return $this->storage->sMembers($this->prepareTag($tag)) ? : false;
     }
 
     /**
@@ -156,7 +156,7 @@ class Redis implements CacheInterface
      */
     public function existsTag($tag)
     {
-        return static::$storage->exists($this->prepareTag($tag));
+        return $this->storage->exists($this->prepareTag($tag));
     }
 
     /**
@@ -165,11 +165,11 @@ class Redis implements CacheInterface
     public function removeTag($tag)
     {
         $tag = $this->prepareTag($tag);
-        if (!$value = static::$storage->sMembers($tag)) {
+        if (!$value = $this->storage->sMembers($tag)) {
             return false;
         }
         $value[] = $tag;
-        static::$storage->delete($value);
+        $this->storage->delete($value);
         return true;
     }
 
@@ -178,7 +178,7 @@ class Redis implements CacheInterface
      */
     public function getAllKeys($pattern = '*')
     {
-        return static::$storage->keys($pattern);
+        return $this->storage->keys($pattern);
     }
 
     /**
@@ -194,7 +194,7 @@ class Redis implements CacheInterface
      */
     public function flush()
     {
-        return static::$storage->flushDB();
+        return $this->storage->flushDB();
     }
 
     /**
@@ -202,7 +202,7 @@ class Redis implements CacheInterface
      */
     public function status()
     {
-        return static::$storage->info();
+        return $this->storage->info();
     }
 
     /**
@@ -214,11 +214,11 @@ class Redis implements CacheInterface
     protected function provideLock($key, $value, $expire)
     {
         if ($this->lock === false) {
-            $expire > 0 ? static::$storage->setex($key, $expire, $value) : static::$storage->set($key, $value);
+            $expire > 0 ? $this->storage->setex($key, $expire, $value) : $this->storage->set($key, $value);
             return true;
         }
         if ($this->lock($key, $value)) {
-            $expire > 0 ? static::$storage->setex($key, $expire, $value) : static::$storage->set($key, $value);
+            $expire > 0 ? $this->storage->setex($key, $expire, $value) : $this->storage->set($key, $value);
             $this->unlock($key);
 
             return true;
@@ -241,7 +241,7 @@ class Redis implements CacheInterface
     {
         $iteration = 0;
 
-        while (!static::$storage->setnx(self::LOCK_PREFIX . $key, $value)) {
+        while (!$this->storage->setnx(self::LOCK_PREFIX . $key, $value)) {
             $iteration++;
             if ($iteration > $max) {
                 Rock::error(CacheException::INVALID_SAVE, ['key' => $key]);
@@ -260,7 +260,7 @@ class Redis implements CacheInterface
      */
     protected function unlock($key)
     {
-        static::$storage->delete(self::LOCK_PREFIX . $key);
+        $this->storage->delete(self::LOCK_PREFIX . $key);
     }
 
     /**
@@ -276,12 +276,12 @@ class Redis implements CacheInterface
         }
 
         foreach ($this->prepareTags($tags) as $tag) {
-            static::$storage->sAdd($tag, $key);
+            $this->storage->sAdd($tag, $key);
         }
     }
 
     protected function getLock($key)
     {
-        return static::$storage->get(self::LOCK_PREFIX . $key);
+        return $this->storage->get(self::LOCK_PREFIX . $key);
     }
 }
