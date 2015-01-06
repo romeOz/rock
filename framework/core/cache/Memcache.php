@@ -7,7 +7,7 @@ use rock\Rock;
 class Memcache extends Memcached
 {
     /** @var  \Memcache */
-    protected $storage;
+    public $storage;
 
     public function __construct($config = [])
     {
