@@ -89,13 +89,20 @@ class APCTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider providerCache
      */
+    public function testExistsByTouchFalse(CacheInterface $cache)
+    {
+        $this->markTestSkipped('Skipping: ' . __METHOD__);
+    }
+
+    /**
+     * @dataProvider providerCache
+     */
     public function testGetTag(CacheInterface $cache)
     {
         $this->assertTrue($cache->set('key1', ['one', 'two'], 0, ['foo', 'bar']));
         $this->assertTrue($cache->set('key2', 'three', 0, ['foo']));
         $this->assertInternalType('string', $cache->getTag('foo'), 'var should be type string');
     }
-
 
     /**
      * @dataProvider providerCache
