@@ -191,7 +191,7 @@ class Connection implements ObjectInterface
      * Defaults to null, meaning no dependency.
      * @see enableSchemaCache
      */
-    public $schemaCacheTags;
+    public $schemaCacheTags = [];
     /**
      * @var array list of tables whose metadata should NOT be cached. Defaults to empty array.
      * The table names may contain schema prefix, if any. Do not quote the table names.
@@ -230,7 +230,7 @@ class Connection implements ObjectInterface
      * Defaults to null, meaning no dependency.
      * @see enableQueryCache
      */
-    public $queryCacheTags;
+    public $queryCacheTags = [];
     /**
      * @var \rock\cache\CacheInterface|string the cache object or the ID of the cache application component
      * that is used for query caching.

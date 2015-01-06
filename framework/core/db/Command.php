@@ -404,7 +404,7 @@ class Command
      */
     protected function getRawEntityNames()
     {
-        return !empty($this->entities) ? $this->getCacheGroup(array_unique($this->entities)) : null;
+        return !empty($this->entities) ? $this->getCacheGroup(array_unique($this->entities)) : [];
     }
 
     /**

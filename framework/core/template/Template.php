@@ -203,7 +203,7 @@ class Template implements ComponentsInterface
         }
         $result = implode("\n", [$this->beginPage(), $this->beginBody(), $result, $this->endBody(), $this->endPage()]);
         // Set cache
-        $this->setCache($cacheKey, $result, $cacheExpire, $cacheTags);
+        $this->setCache($cacheKey, $result, $cacheExpire, $cacheTags ? : []);
         if ($this->after($path, $result) === false) {
             return null;
         }
@@ -220,7 +220,7 @@ class Template implements ComponentsInterface
         }
         $cacheKey = $params['cacheKey'];
         $cacheExpire = Helper::getValueIsset($params['cacheExpire'], 0);
-        $cacheTags = Helper::getValue($params['cacheTags']);
+        $cacheTags = Helper::getValue($params['cacheTags'], []);
         unset($params['cacheKey'], $params['cacheExpire'], $params['cacheTags']);
 
         return [$cacheKey, $cacheExpire, $cacheTags];
@@ -255,9 +255,9 @@ class Template implements ComponentsInterface
      * @param null $key
      * @param null $value
      * @param int  $expire
-     * @param null $tags
+     * @param array $tags
      */
-    protected function setCache($key = null, $value = null, $expire = 0, $tags = null)
+    protected function setCache($key = null, $value = null, $expire = 0, array $tags = [])
     {
         $this->cache = is_string($this->cache) ? Rock::factory($this->cache) : $this->cache;
         if ($this->cache instanceof CacheInterface && isset($key)) {
@@ -945,7 +945,7 @@ class Template implements ComponentsInterface
         }
         $result = $template->renderInternal($path, $placeholders);
         // Set cache
-        $template->setCache($cacheKey, $result, $cacheExpire, $cacheTags);
+        $template->setCache($cacheKey, $result, $cacheExpire, $cacheTags ? : []);
 
         return $result;
     }
@@ -1244,7 +1244,7 @@ class Template implements ComponentsInterface
             $cacheKey,
             $result,
             $cacheExpire,
-            $cacheTags
+            $cacheTags ? : []
         );
 
         return $result;
@@ -1567,7 +1567,7 @@ class Template implements ComponentsInterface
             )
             : $result;
         //  Set cache
-        $this->setCache($cacheKey, $result, $cacheExpire, $cacheTags);
+        $this->setCache($cacheKey, $result, $cacheExpire, $cacheTags ? : []);
         if (!$snippet->afterSnippet($snippet::className(), $result)) {
             return null;
         }
