@@ -42,15 +42,6 @@ return [
             'password' => 'postgres',
             'fixture' => __DIR__ . '/postgres.sql',
         ],
-        'elasticsearch' => [
-            'dsn' => 'elasticsearch://localhost:9200'
-        ],
-        'redis' => [
-            'hostname' => 'localhost',
-            'port' => 6379,
-            'database' => 0,
-            'password' => null,
-        ],
     ],
     'sphinx' => [
         'sphinx' => [
