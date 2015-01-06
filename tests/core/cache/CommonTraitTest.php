@@ -19,13 +19,13 @@ trait CommonTraitTest
         static::flush();
     }
 
-    abstract public function init($serialize);
+    abstract public function init($serialize, $lock);
 
     public function providerCache()
     {
         return array(
-            [$this->init(CacheInterface::SERIALIZE_PHP)],
-            [$this->init(CacheInterface::SERIALIZE_JSON)],
+            [$this->init(CacheInterface::SERIALIZE_PHP, true)],
+            [$this->init(CacheInterface::SERIALIZE_JSON, false)],
         );
     }
 

@@ -69,7 +69,7 @@ class CacheFileTest extends \PHPUnit_Framework_TestCase
         return static::$fileManager;
     }
 
-    public function init($serialize)
+    public function init($serialize, $lock = true)
     {
         return new CacheFile([
            'adapter' => static::getFileManager(),

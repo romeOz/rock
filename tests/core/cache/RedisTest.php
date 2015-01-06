@@ -18,14 +18,14 @@ class RedisTest extends \PHPUnit_Framework_TestCase
         (new Redis())->flush();
     }
 
-    public function init($serialize)
+    public function init($serialize, $lock = true)
     {
         if (!class_exists('\Redis')) {
             $this->markTestSkipped(
                 'The \Redis is not available.'
             );
         }
-        return new Redis(['serializer' => $serialize]);
+        return new Redis(['serializer' => $serialize, 'lock' => $lock]);
     }
 
     /**

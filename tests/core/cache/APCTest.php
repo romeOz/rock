@@ -18,14 +18,14 @@ class APCTest extends \PHPUnit_Framework_TestCase
         (new APC())->flush();
     }
 
-    public function init($serialize)
+    public function init($serialize, $lock = true)
     {
         if (!extension_loaded('apc')) {
             $this->markTestSkipped(
                 'The APC is not available.'
             );
         }
-        $cache = new APC(['serializer' => $serialize]);
+        $cache = new APC(['serializer' => $serialize, 'lock' => $lock]);
         return $cache;
     }
 

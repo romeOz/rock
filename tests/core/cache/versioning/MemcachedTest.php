@@ -19,14 +19,14 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
         (new Memcached())->flush();
     }
 
-    public function init($serialize)
+    public function init($serialize, $lock)
     {
         if (!class_exists('\Memcached')) {
             $this->markTestSkipped(
                 'The \Memcached is not available.'
             );
         }
-        return new Memcached(['serializer' => $serialize]);
+        return new Memcached(['serializer' => $serialize, 'lock' => $lock]);
     }
 
     /**

@@ -261,6 +261,10 @@ class Memcached implements CacheInterface
 
     protected function provideLock($key, $value, $expire)
     {
+        if ($this->lock === false) {
+            static::$storage->set($key, $value, $expire);
+            return true;
+        }
         if ($this->lock($key, $value)) {
             static::$storage->set($key, $value, $expire);
             $this->unlock($key);

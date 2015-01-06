@@ -17,14 +17,14 @@ class CouchbaseTest extends \PHPUnit_Framework_TestCase
         (new Couchbase())->flush();
     }
 
-    public function init($serialize)
+    public function init($serialize, $lock = true)
     {
         if (!class_exists('\Couchbase')) {
             $this->markTestSkipped(
                 'The Couchbase is not available.'
             );
         }
-        return new Couchbase(['serializer' => $serialize]);
+        return new Couchbase(['serializer' => $serialize, 'lock' => $lock]);
     }
 
     /**

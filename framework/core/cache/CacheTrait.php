@@ -10,6 +10,12 @@ trait CacheTrait
     use CommonTrait;
 
     /**
+     * Pessimistic locking.
+     * @var bool
+     */
+    public $lock = true;
+
+    /**
      * @inheritdoc
      */
     public function removeMulti(array $keys)
@@ -37,7 +43,7 @@ trait CacheTrait
 
         $key = $this->prepareKey($key);
         if (($result = static::$storage->get($key)) === false) {
-            if (($result = $this->getLock($key)) === false) {
+            if ($this->lock === false || ($result = $this->getLock($key)) === false) {
                 return false;
             }
         }

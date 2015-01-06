@@ -213,6 +213,10 @@ class Redis implements CacheInterface
      */
     protected function provideLock($key, $value, $expire)
     {
+        if ($this->lock === false) {
+            $expire > 0 ? static::$storage->setex($key, $expire, $value) : static::$storage->set($key, $value);
+            return true;
+        }
         if ($this->lock($key, $value)) {
             $expire > 0 ? static::$storage->setex($key, $expire, $value) : static::$storage->set($key, $value);
             $this->unlock($key);

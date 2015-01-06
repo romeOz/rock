@@ -109,6 +109,10 @@ class Memcache extends Memcached
      */
     protected function provideLock($key, $value, $expire, &$count = 0)
     {
+        if ($this->lock === false) {
+            static::$storage->set($key, $value, MEMCACHE_COMPRESSED, $expire);
+            return true;
+        }
         if ($this->lock($key, $value)) {
             static::$storage->set($key, $value, MEMCACHE_COMPRESSED, $expire);
             $this->unlock($key);

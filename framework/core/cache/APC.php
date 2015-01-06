@@ -207,6 +207,10 @@ class APC implements CacheInterface
      */
     protected function provideLock($key, $value, $expire)
     {
+        if ($this->lock === false) {
+            apc_store($key, $value, $expire);
+            return true;
+        }
         if ($this->lock($key, $value)) {
             apc_store($key, $value, $expire);
             $this->unlock($key);

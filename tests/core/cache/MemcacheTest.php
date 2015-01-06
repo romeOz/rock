@@ -17,14 +17,14 @@ class MemcacheTest extends \PHPUnit_Framework_TestCase
         (new Memcache())->flush();
     }
 
-    public function init($serialize)
+    public function init($serialize, $lock = true)
     {
         if (!class_exists('\Memcache')) {
             $this->markTestSkipped(
                 'The \Memcache is not available.'
             );
         }
-        return new Memcache(['serializer' => $serialize]);
+        return new Memcache(['serializer' => $serialize, 'lock' => $lock]);
     }
 
     /**
