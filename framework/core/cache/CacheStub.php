@@ -34,7 +34,7 @@ class CacheStub implements CacheInterface
     /**
      * @inheritdoc
      */
-    public function set($key, $value = null, $expire = 0, array $tags = null)
+    public function set($key, $value = null, $expire = 0, array $tags = [])
     {
         return false;
     }
@@ -42,14 +42,14 @@ class CacheStub implements CacheInterface
     /**
      * @inheritdoc
      */
-    public function setMulti($values, $expire = 0, array $tags = null)
+    public function setMulti($values, $expire = 0, array $tags = [])
     {
     }
 
     /**
      * @inheritdoc
      */
-    public function add($key, $value = null, $expire = 0, array $tags = null)
+    public function add($key, $value = null, $expire = 0, array $tags = [])
     {
         return false;
     }
@@ -80,7 +80,7 @@ class CacheStub implements CacheInterface
     /**
      * @inheritdoc
      */
-    public function increment($key, $offset = 1, $expire = 0)
+    public function increment($key, $offset = 1, $expire = 0, $create = true)
     {
         return false;
     }
@@ -88,7 +88,7 @@ class CacheStub implements CacheInterface
     /**
      * @inheritdoc
      */
-    public function decrement($key, $offset = 1, $expire = 0)
+    public function decrement($key, $offset = 1, $expire = 0, $create = true)
     {
         return false;
     }

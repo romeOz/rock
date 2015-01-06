@@ -52,15 +52,32 @@ trait CommonTrait
         return $this->prefix . $key;
     }
 
-
     /**
-     * @param array $tags - tags
+     * @param array $keys
      * @return string|null
      */
-    protected function prepareTags(array $tags = null)
+    protected function prepareKeys(array $keys = [])
+    {
+        if (empty($keys)) {
+            return null;
+        }
+
+        return array_map(
+            function($value){
+                return $this->prepareKey($value);
+            },
+            $keys
+        );
+    }
+
+    /**
+     * @param array $tags tags
+     * @return array|null
+     */
+    protected function prepareTags(array $tags = [])
     {
         if (empty($tags)) {
-            return $tags;
+            return null;
         }
         $tags = array_unique($tags);
         sort($tags);
@@ -113,7 +130,7 @@ trait CommonTrait
     /**
      * @inheritdoc
      */
-    public function setMulti($values, $expire = 0, array $tags = null)
+    public function setMulti($values, $expire = 0, array $tags = [])
     {
         /** @var $this CacheTrait|CacheInterface */
 
@@ -131,7 +148,9 @@ trait CommonTrait
 
         $result = [];
         foreach ($keys as $key) {
-            $result[$key] = $this->get($key);
+            if (($value = $this->get($key)) !== false) {
+                $result[$key] = $value;
+            }
         }
 
         return $result;

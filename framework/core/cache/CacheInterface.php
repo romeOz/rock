@@ -60,7 +60,7 @@ interface CacheInterface extends SerializeInterface
      * @param array $tags tags
      * @return bool
      */
-    public function set($key, $value = null, $expire = 0, array $tags = null);
+    public function set($key, $value = null, $expire = 0, array $tags = []);
 
     /**
      * Set multiple cache.
@@ -74,7 +74,7 @@ interface CacheInterface extends SerializeInterface
      * @param int $expire time to live (sec)
      * @param array $tags names tags
      */
-    public function setMulti($values, $expire = 0, array $tags = null);
+    public function setMulti($values, $expire = 0, array $tags = []);
 
     /**
      * Adding cache (return false, if already exists on the server).
@@ -85,7 +85,7 @@ interface CacheInterface extends SerializeInterface
      * @param array $tags tags
      * @return bool
      */
-    public function add($key, $value = null, $expire = 0, array $tags = null);
+    public function add($key, $value = null, $expire = 0, array $tags = []);
 
     /**
      * Checks existence cache by key.
@@ -109,18 +109,20 @@ interface CacheInterface extends SerializeInterface
      *
      * @param array $keys keys of cache
      * @param int $expire time to live (sec)
+     * @return bool
      */
     public function touchMulti(array $keys, $expire = 0);
 
     /**
      * Increment.
      *
-     * @param string $key key of cache
-     * @param int $offset
-     * @param int $expire time to live (sec)
-     * @return int|bool
+     * @param string $key    key of cache
+     * @param int    $offset
+     * @param int    $expire time to live (sec)
+     * @param bool   $create should the value be created if it doesn't exist
+     * @return bool|int
      */
-    public function increment($key, $offset = 1, $expire = 0);
+    public function increment($key, $offset = 1, $expire = 0, $create = true);
 
     /**
      * Decrement.
@@ -128,9 +130,10 @@ interface CacheInterface extends SerializeInterface
      * @param string $key key of cache.
      * @param int $offset
      * @param int $expire time to live (sec)
+     * @param bool   $create should the value be created if it doesn't exist
      * @return int|bool
      */
-    public function decrement($key, $offset = 1, $expire = 0);
+    public function decrement($key, $offset = 1, $expire = 0, $create = true);
 
     /**
      * Removes cache.

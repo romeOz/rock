@@ -29,7 +29,7 @@ class Memcache extends \rock\cache\Memcache implements CacheInterface
     }
 
 
-    protected function validTimestamp($key, array $tags = null)
+    protected function validTimestamp($key, array $tags = [])
     {
         if (empty($tags)) {
             return true;

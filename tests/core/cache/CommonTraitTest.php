@@ -5,7 +5,7 @@ namespace rockunit\core\cache;
 
 use rock\cache\CacheInterface;
 
-abstract class CommonTraitTest extends \PHPUnit_Framework_TestCase
+trait CommonTraitTest
 {
     public static function flush(){}
 
@@ -125,7 +125,7 @@ abstract class CommonTraitTest extends \PHPUnit_Framework_TestCase
         /** @var $this \PHPUnit_Framework_TestCase */
 
         $cache->setMulti(['foo' => 'text foo', 'bar' => 'text bar']);
-        $this->assertEquals($cache->getMulti(['foo', 'baz', 'bar']), ['foo' => 'text foo', 'baz' => false, 'bar' => 'text bar']);
+        $this->assertEquals($cache->getMulti(['foo', 'baz', 'bar']), ['foo' => 'text foo', /*'baz' => false, */'bar' => 'text bar']);
     }
 
     /**
@@ -227,7 +227,7 @@ abstract class CommonTraitTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider providerCache
      */
-    public function testHasTrue(CacheInterface $cache)
+    public function testExistsTrue(CacheInterface $cache)
     {
         /** @var $this \PHPUnit_Framework_TestCase */
 
@@ -238,7 +238,7 @@ abstract class CommonTraitTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider providerCache
      */
-    public function testHasFalse(CacheInterface $cache)
+    public function testExistsFalse(CacheInterface $cache)
     {
         /** @var $this \PHPUnit_Framework_TestCase */
 
@@ -248,7 +248,7 @@ abstract class CommonTraitTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider providerCache
      */
-    public function testHasByTouchFalse(CacheInterface $cache)
+    public function testExistsByTouchFalse(CacheInterface $cache)
     {
         /** @var $this \PHPUnit_Framework_TestCase */
 
@@ -261,7 +261,7 @@ abstract class CommonTraitTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider providerCache
      */
-    public function testHasByRemoveFalse(CacheInterface $cache)
+    public function testExistsByRemoveFalse(CacheInterface $cache)
     {
         /** @var $this \PHPUnit_Framework_TestCase */
 
@@ -277,11 +277,11 @@ abstract class CommonTraitTest extends \PHPUnit_Framework_TestCase
     {
         /** @var $this \PHPUnit_Framework_TestCase */
 
-        $this->assertEquals($cache->increment('key7', 5), 5, 'should be get: 5');
-        $this->assertEquals($cache->get('key7'), 5, 'should be get: 5');
+        $this->assertEquals(5, $cache->increment('key7', 5), 'should be get: 5');
+        $this->assertEquals(5, $cache->get('key7'), 'should be get: 5');
 
-        $this->assertEquals($cache->increment('key7'), 6, 'should be get: 6');
-        $this->assertEquals($cache->get('key7'), 6, 'should be get: 6');
+        $this->assertEquals(6, $cache->increment('key7'), 'should be get: 6');
+        $this->assertEquals(6, $cache->get('key7'), 'should be get: 6');
     }
 
     /**
@@ -291,9 +291,33 @@ abstract class CommonTraitTest extends \PHPUnit_Framework_TestCase
     {
         /** @var $this \PHPUnit_Framework_TestCase */
 
-        $this->assertEquals($cache->increment('key7', 5, 1), 5, 'should be get: 5');
+        $this->assertEquals(5,$cache->increment('key7', 5, 1), 'should be get: 5');
         sleep(3);
         $this->assertFalse($cache->get('key7'), 'should be get: false');
+    }
+
+    /**
+     * @dataProvider providerCache
+     */
+    public function testIncrementFalse(CacheInterface $cache)
+    {
+        /** @var $this \PHPUnit_Framework_TestCase */
+
+        $this->assertFalse($cache->increment('key7', 5, 0, false), 'should be get: false');
+    }
+
+    /**
+     * @dataProvider providerCache
+     */
+    public function testDecrement(CacheInterface $cache)
+    {
+        /** @var $this \PHPUnit_Framework_TestCase */
+
+        $this->assertEquals(5, $cache->increment('key7', 5), 'should be get: 5');
+        $this->assertEquals(3, $cache->decrement('key7', 2), 'should be get: 3');
+        $this->assertEquals(3, $cache->get('key7'), 'should be get: 3');
+
+        $this->assertEquals(-2, $cache->decrement('key17', 2), 'should be get: -2');
     }
 
     /**
@@ -303,20 +327,7 @@ abstract class CommonTraitTest extends \PHPUnit_Framework_TestCase
     {
         /** @var $this \PHPUnit_Framework_TestCase */
 
-        $this->assertFalse($cache->decrement('key7', 5), 'should be get: false');
-    }
-
-
-    /**
-     * @dataProvider providerCache
-     */
-    public function testDecrement(CacheInterface $cache)
-    {
-        /** @var $this \PHPUnit_Framework_TestCase */
-
-        $this->assertEquals($cache->increment('key7', 5), 5, 'should be get: 5');
-        $this->assertEquals($cache->decrement('key7', 2), 3, 'should be get: 3');
-        $this->assertEquals($cache->get('key7'), 3, 'should be get: 3');
+        $this->assertFalse($cache->decrement('key7', 5, 0, false), 'should be get: false');
     }
 
     /**

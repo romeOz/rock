@@ -9,8 +9,10 @@ use rock\cache\CacheInterface;
  * @group couchbase
  * @group cache
  */
-class CouchbaseTest extends CommonTraitTest
+class CouchbaseTest extends \PHPUnit_Framework_TestCase
 {
+    use CommonTraitTest;
+
     public static function flush()
     {
         (new Couchbase())->flush();

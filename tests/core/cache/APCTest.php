@@ -9,8 +9,10 @@ use rock\cache\CacheInterface;
  * @group cache
  * @group apc
  */
-class APCTest extends CommonTraitTest
+class APCTest extends \PHPUnit_Framework_TestCase
 {
+    use CommonTraitTest;
+
     public static function flush()
     {
         (new APC())->flush();
@@ -47,7 +49,7 @@ class APCTest extends CommonTraitTest
     /**
      * @dataProvider providerCache
      */
-    public function testHasByTouchFalse(CacheInterface $cache)
+    public function testExistsByTouchFalse(CacheInterface $cache)
     {
         $this->markTestSkipped('Skipping: ' . __METHOD__);
     }

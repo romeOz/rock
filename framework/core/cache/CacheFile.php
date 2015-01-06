@@ -94,7 +94,7 @@ class CacheFile implements CacheInterface
     /**
      * @inheritdoc
      */
-    public function set($key, $value = null, $expire = 0, array $tags = null)
+    public function set($key, $value = null, $expire = 0, array $tags = [])
     {
         if (empty($key)) {
             return false;
@@ -109,7 +109,7 @@ class CacheFile implements CacheInterface
     /**
      * @inheritdoc
      */
-    public function add($key, $value = null, $expire = 0, array $tags = null)
+    public function add($key, $value = null, $expire = 0, array $tags = [])
     {
         if (empty($key)) {
             return false;
@@ -153,7 +153,7 @@ class CacheFile implements CacheInterface
     /**
      * @inheritdoc
      */
-    public function increment($key, $offset = 1, $expire = 0)
+    public function increment($key, $offset = 1, $expire = 0, $create = true)
     {
         $hash = $this->prepareKey($key);
 
@@ -166,7 +166,7 @@ class CacheFile implements CacheInterface
             return $data['value'];
         }
 
-        if ($this->set($key, $offset, $expire) === false) {
+        if ($create === false || $this->set($key, $offset, $expire) === false) {
             return false;
         }
         return $offset;
@@ -175,7 +175,7 @@ class CacheFile implements CacheInterface
     /**
      * @inheritdoc
      */
-    public function decrement($key, $offset = 1, $expire = 0)
+    public function decrement($key, $offset = 1, $expire = 0, $create = true)
     {
         $hash = $this->prepareKey($key);
         if ($this->provideGet($hash, $file, $data) !== false) {
@@ -188,7 +188,10 @@ class CacheFile implements CacheInterface
             return $data['value'];
         }
 
-        return false;
+        if ($create === false || $this->set($key, $offset * -1, $expire) === false) {
+            return false;
+        }
+        return $offset * -1;
     }
 
     /**
@@ -289,7 +292,7 @@ class CacheFile implements CacheInterface
 
     /**
      * @param string $key
-     * @param string $tags - name of tag
+     * @param string $tags name of tag
      * @return void
      */
     protected function preparePaths($key, $tags = null)
@@ -299,9 +302,7 @@ class CacheFile implements CacheInterface
         if (!empty($tags)) {
             $pathname[] = $tags;
         }
-        /**
-         * max files
-         */
+        // max files
         $num = null;
         if (!empty($this->maxFiles)) {
             $num = floor(
@@ -325,10 +326,10 @@ class CacheFile implements CacheInterface
     }
 
     /**
-     * @param array $tags - tags
+     * @param array $tags tags
      * @return string|null
      */
-    protected function prepareTags(array $tags = null)
+    protected function prepareTags(array $tags = [])
     {
         if (!$tags = $this->parentPrepareTags($tags)) {
             return null;
@@ -358,9 +359,9 @@ class CacheFile implements CacheInterface
         return $this->getAdapter()->put(
             $this->pathFileCache,
             $this->serialize([
-                                 'expire' => $this->calculateExpire($expire),
-                                 'value' => $value
-                             ])
+                 'expire' => $this->calculateExpire($expire),
+                 'value' => $value
+            ])
         );
     }
 
@@ -409,7 +410,7 @@ class CacheFile implements CacheInterface
     /**
      * Validity expire
      *
-     * @param int $expire - expire
+     * @param int $expire expire
      * @return bool
      */
     protected function validExpire($expire)

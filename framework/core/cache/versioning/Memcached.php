@@ -28,7 +28,7 @@ class Memcached extends \rock\cache\Memcached implements CacheInterface
     }
 
 
-    protected function validTimestamp($key, array $tagsByValue = null)
+    protected function validTimestamp($key, array $tagsByValue = [])
     {
         if (empty($tagsByValue)) {
             return true;
@@ -45,5 +45,27 @@ class Memcached extends \rock\cache\Memcached implements CacheInterface
         }
 
         return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function setTags($key, array $tags = [], &$value = null)
+    {
+        $value = ['value' => $value, 'tags' => []];
+        if (empty($tags)) {
+            return;
+        }
+        $timestamp = microtime();
+        $tags = $this->prepareTags($tags);
+        $data = static::$storage->getMulti($tags);
+        foreach ($tags as $tag) {
+            if (isset($data[$tag])) {
+                $value['tags'][$tag] = $data[$tag];
+                continue;
+            }
+            $this->provideLock($tag, $timestamp, 0);
+            $value['tags'][$tag] = $timestamp;
+        }
     }
 }

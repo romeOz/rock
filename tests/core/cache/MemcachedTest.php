@@ -8,8 +8,10 @@ use rock\cache\Memcached;
  * @group cache
  * @group memcached
  */
-class MemcachedTest extends CommonTraitTest
+class MemcachedTest extends \PHPUnit_Framework_TestCase
 {
+    use CommonTraitTest;
+
     public static function flush()
     {
         (new Memcached())->flush();
@@ -53,5 +55,19 @@ class MemcachedTest extends CommonTraitTest
         $this->markTestSkipped(
             'Memcached::status() skipped. Changed behavior TravisCI.'
         );
+    }
+
+    /**
+     * @dataProvider providerCache
+     */
+    public function testDecrement(CacheInterface $cache)
+    {
+        /** @var $this \PHPUnit_Framework_TestCase */
+
+        $this->assertEquals(5, $cache->increment('key7', 5), 'should be get: 5');
+        $this->assertEquals(3, $cache->decrement('key7', 2), 'should be get: 3');
+        $this->assertEquals(3, $cache->get('key7'), 'should be get: 3');
+
+        $this->assertEquals(0, $cache->decrement('key17', 2), 'should be get: 0');
     }
 }

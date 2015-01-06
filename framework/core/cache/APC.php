@@ -37,7 +37,7 @@ class APC implements CacheInterface
     /**
      * @inheritdoc
      */
-    public function set($key, $value = null, $expire = 0, array $tags = null)
+    public function set($key, $value = null, $expire = 0, array $tags = [])
     {
         if (empty($key)) {
             return false;
@@ -51,7 +51,7 @@ class APC implements CacheInterface
     /**
      * @inheritdoc
      */
-    public function add($key, $value = null, $expire = 0, array $tags = null)
+    public function add($key, $value = null, $expire = 0, array $tags = [])
     {
         if (empty($key)) {
             return false;
@@ -87,11 +87,14 @@ class APC implements CacheInterface
     /**
      * @inheritdoc
      */
-    public function increment($key, $offset = 1, $expire = 0)
+    public function increment($key, $offset = 1, $expire = 0, $create = true)
     {
         $hash = $this->prepareKey($key);
-        if (apc_add($hash, $offset, $expire)) {
-            return $offset;
+        if ($this->exists($key) === false) {
+            if ($create === false) {
+                return false;
+            }
+            apc_add($hash, 0, $expire);
         }
 
         return apc_inc($hash, $offset);
@@ -100,11 +103,14 @@ class APC implements CacheInterface
     /**
      * @inheritdoc
      */
-    public function decrement($key, $offset = 1, $expire = 0)
+    public function decrement($key, $offset = 1, $expire = 0, $create = true)
     {
         $hash = $this->prepareKey($key);
         if ($this->exists($key) === false) {
-            return false;
+            if ($create === false) {
+                return false;
+            }
+            apc_add($hash, 0, $expire);
         }
 
         return apc_dec($hash, $offset);

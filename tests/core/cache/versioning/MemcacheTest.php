@@ -9,8 +9,10 @@ use rockunit\core\cache\CommonTraitTest;
  * @group cache
  * @group memcache
  */
-class MemcacheTest extends CommonTraitTest
+class MemcacheTest extends \PHPUnit_Framework_TestCase
 {
+    use CommonTraitTest;
+
     public static function flush()
     {
         (new Memcache())->flush();

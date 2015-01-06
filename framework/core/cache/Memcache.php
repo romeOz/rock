@@ -31,14 +31,33 @@ class Memcache extends Memcached
     /**
      * @inheritdoc
      */
-    public function increment($key, $offset = 1, $expire = 0)
+    public function increment($key, $offset = 1, $expire = 0, $create = true)
     {
         $hash = $this->prepareKey($key);
-        if (static::$storage->add($hash, $offset, MEMCACHE_COMPRESSED, $expire)) {
-            return $offset;
+        if ($this->exists($key) === false) {
+            if ($create === false) {
+                return false;
+            }
+            static::$storage->add($hash, 0, MEMCACHE_COMPRESSED, $expire);
         }
 
         return static::$storage->increment($hash, $offset);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function decrement($key, $offset = 1, $expire = 0, $create = true)
+    {
+        $hash = $this->prepareKey($key);
+        if ($this->exists($key) === false) {
+            if ($create === false) {
+                return false;
+            }
+            static::$storage->add($hash, 0, MEMCACHE_COMPRESSED, $expire);
+        }
+
+        return static::$storage->decrement($hash, $offset);
     }
 
     /**
@@ -122,7 +141,7 @@ class Memcache extends Memcached
     /**
      * @inheritdoc
      */
-    protected function setTags($key, array $tags = null)
+    protected function setTags($key, array $tags = [])
     {
         if (empty($tags)) {
             return;

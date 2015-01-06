@@ -28,15 +28,13 @@ class APC extends \rock\cache\APC implements CacheInterface
         return $this->provideLock($this->prepareTag($tag), microtime(), 0);
     }
 
-
-    protected function validTimestamp($key, array $tagsByValue = null)
+    protected function validTimestamp($key, array $tagsByValue = [])
     {
         if (empty($tagsByValue)) {
             return true;
         }
 
         foreach ($tagsByValue as $tag => $timestamp) {
-
             if ((!$tagTimestamp = apc_fetch($tag)) ||
                 DateTime::microtime($tagTimestamp) > DateTime::microtime($timestamp)) {
                 apc_delete($key);

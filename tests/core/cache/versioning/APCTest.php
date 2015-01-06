@@ -10,8 +10,10 @@ use rockunit\core\cache\CommonTraitTest;
  * @group cache
  * @group apc
  */
-class APCTest extends CommonTraitTest
+class APCTest extends \PHPUnit_Framework_TestCase
 {
+    use CommonTraitTest;
+
     public static function flush()
     {
         (new APC())->flush();

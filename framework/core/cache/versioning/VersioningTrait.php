@@ -7,7 +7,7 @@ trait VersioningTrait
     /**
      * @inheritdoc
      */
-    public function set($key, $value = null, $expire = 0, array $tags = null)
+    public function set($key, $value = null, $expire = 0, array $tags = [])
     {
         if (empty($key)) {
             return false;
@@ -31,7 +31,7 @@ trait VersioningTrait
             $result = (array)$result;
         }
 
-        if ($this->validTimestamp($this->prepareKey($key), $result['tags']) === false) {
+        if ($this->validTimestamp($this->prepareKey($key), $result['tags'] ? : []) === false) {
             return false;
         }
 
@@ -42,7 +42,7 @@ trait VersioningTrait
     /**
      * @inheritdoc
      */
-    public function has($key)
+    public function exists($key)
     {
         return (bool)$this->get($key);
     }
@@ -50,12 +50,11 @@ trait VersioningTrait
     /**
      * @inheritdoc
      */
-    public function increment($key, $offset = 1, $expire = 0)
+    public function increment($key, $offset = 1, $expire = 0, $create = true)
     {
         $hash = $this->prepareKey($key);
         if ($this->get($key, $result) === false) {
-
-            if ($this->provideLock($hash, $this->serialize(['value' => $offset, 'tags' => null]), $expire) === false) {
+            if ($create === false || $this->provideLock($hash, $this->serialize(['value' => $offset, 'tags' => []]), $expire) === false) {
                 return false;
             }
             return $offset;
@@ -64,8 +63,7 @@ trait VersioningTrait
         if ($this->provideLock(
                  $hash,
                  $this->serialize(['value' => $result['value'] + $offset, 'tags' => $result['tags']]),
-                 $expire) === false
-        ) {
+                 $expire) === false) {
             return false;
         }
         return $result['value'] + $offset;
@@ -74,11 +72,14 @@ trait VersioningTrait
     /**
      * @inheritdoc
      */
-    public function decrement($key, $offset = 1, $expire = 0)
+    public function decrement($key, $offset = 1, $expire = 0, $create = true)
     {
         $hash = $this->prepareKey($key);
-        if (($timestamp = $this->get($key, $result)) === false) {
-            return false;
+        if ($this->get($key, $result) === false) {
+            if ($create === false || $this->provideLock($hash, $this->serialize(['value' => $offset * -1, 'tags' => []]), $expire) === false) {
+                return false;
+            }
+            return $offset * -1;
         }
 
         if ($this->provideLock(
@@ -99,7 +100,7 @@ trait VersioningTrait
      * @param array  $tags
      * @param        $value
      */
-    protected function setTags($key, array $tags = null, &$value = null)
+    protected function setTags($key, array $tags = [], &$value = null)
     {
         $value = ['value' => $value, 'tags' => []];
         if (empty($tags)) {

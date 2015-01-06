@@ -33,7 +33,7 @@ class Redis extends \rock\cache\Redis implements CacheInterface
         return $this->provideLock($this->prepareTag($tag), microtime(), 0);
     }
 
-    protected function validTimestamp($key, array $tagsByValue = null)
+    protected function validTimestamp($key, array $tagsByValue = [])
     {
         if (empty($tagsByValue)) {
             return true;

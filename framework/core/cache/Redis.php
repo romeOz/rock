@@ -51,7 +51,7 @@ class Redis implements CacheInterface
     /**
      * @inheritdoc
      */
-    public function set($key, $value = null, $expire = 0, array $tags = null)
+    public function set($key, $value = null, $expire = 0, array $tags = [])
     {
         if (empty($key)) {
             return false;
@@ -65,7 +65,7 @@ class Redis implements CacheInterface
     /**
      * @inheritdoc
      */
-    public function add($key, $value = null, $expire = 0, array $tags = null)
+    public function add($key, $value = null, $expire = 0, array $tags = [])
     {
         if (empty($key)) {
             return false;
@@ -97,10 +97,13 @@ class Redis implements CacheInterface
     /**
      * @inheritdoc
      */
-    public function increment($key, $offset = 1, $expire = 0)
+    public function increment($key, $offset = 1, $expire = 0, $create = true)
     {
         $hash = $this->prepareKey($key);
         if ($this->exists($key) === false) {
+            if ($create === false) {
+                return false;
+            }
             $expire > 0 ? static::$storage->setex($hash, $expire, 0) : static::$storage->set($hash, 0);
         }
 
@@ -110,11 +113,14 @@ class Redis implements CacheInterface
     /**
      * @inheritdoc
      */
-    public function decrement($key, $offset = 1, $expire = 0)
+    public function decrement($key, $offset = 1, $expire = 0, $create = true)
     {
         $hash = $this->prepareKey($key);
         if ($this->exists($key) === false) {
-            return false;
+            if ($create === false) {
+                return false;
+            }
+            $expire > 0 ? static::$storage->setex($hash, $expire, 0) : static::$storage->set($hash, 0);
         }
 
         return static::$storage->decrBy($hash, $offset);
@@ -133,12 +139,7 @@ class Redis implements CacheInterface
      */
     public function removeMulti(array $keys)
     {
-        $keys = array_map(
-            function($value){
-                return $this->prepareKey($value);
-            },
-            $keys
-        );
+        $keys = $this->prepareKeys($keys);
         static::$storage->delete($keys);
     }
 
@@ -247,7 +248,6 @@ class Redis implements CacheInterface
 
         return true;
     }
-
 
     /**
      * Delete lock
