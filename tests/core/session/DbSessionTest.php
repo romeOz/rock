@@ -20,7 +20,7 @@ class DbSessionTest extends DatabaseTestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->handlerSession = new DbSession(['db' => $this->getConnection()]);
+        $this->handlerSession = new DbSession(['connection' => $this->getConnection()]);
         $this->handlerSession->removeAll();
     }
 
