@@ -10,7 +10,7 @@ use rock\file\FileManager;
 use rock\helpers\File;
 use rock\Rock;
 
-trait CommonTrait
+trait CommonTestTrait
 {
     protected static $session = [];
     protected static $cookie = [];
