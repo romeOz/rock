@@ -35,6 +35,10 @@ return array_merge(
         'BatchQueryResult' => [
             'class' => BatchQueryResult::className(),
         ],
+        'mongodb' => [
+            'class' => \rock\mongodb\Connection::className(),
+            'dsn' => 'mongodb://developer:password@localhost:27017/mydatabase',
+        ],
         'cache' => [
             'class' => \rock\cache\CacheStub::className(),
         ],
@@ -306,7 +310,7 @@ return array_merge(
         ],
         'session' => [
             'class' => \rock\session\Session::className(),
-            'singleton' => true,
+            //'singleton' => true,
             'cookieParams' => [
                 'httponly' => true,
                 'lifetime' => 60 * 60 * 24 * 60,
@@ -315,7 +319,7 @@ return array_merge(
         ],
         'cookie' => [
             'class' => \rock\cookie\Cookie::className(),
-            'singleton' => true,
+            //'singleton' => true,
         ],
 
         'dataImage' => [

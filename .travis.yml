@@ -17,6 +17,7 @@ services:
   - redis-server
   - memcached
   - rabbitmq
+  - mongodb
 
 # try running against postgres 9.3
 addons:
@@ -27,6 +28,7 @@ install:
   - composer install --prefer-dist
   - composer require satooshi/php-coveralls:*@dev
   - chmod -R +x tests/data/travis/
+  - tests/data/travis/mongodb-setup.sh
   - tests/data/travis/apc-setup.sh
   - tests/data/travis/memcache-setup.sh
   - tests/data/travis/redis-setup.sh
@@ -42,6 +44,7 @@ before_script:
   - mysql -e 'CREATE DATABASE rocktest;';
   - psql -U postgres -c 'CREATE DATABASE rocktest;';
   - tests/data/travis/sphinx-setup.sh
+  - mongo rocktest --eval 'db.addUser("travis", "test");'
 
 script:
   - mkdir -p build/logs
