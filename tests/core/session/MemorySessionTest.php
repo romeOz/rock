@@ -32,11 +32,11 @@ class MemorySessionTest extends \PHPUnit_Framework_TestCase
         return new Memcached();
     }
 
-//    public static function setUpBeforeClass()
-//    {
-//        parent::setUpBeforeClass();
-//        static::flush();
-//    }
+    public static function setUpBeforeClass()
+    {
+        parent::setUpBeforeClass();
+        static::flush();
+    }
 
 
     public function tearDown()
