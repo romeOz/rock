@@ -8,7 +8,7 @@ use rock\cache\CacheFile;
 use rock\cache\CacheInterface;
 use rock\file\FileManager;
 use rock\Rock;
-use rockunit\common\CommonTrait;
+use rockunit\common\CommonTestTrait;
 
 /**
  * @group cache
@@ -16,7 +16,7 @@ use rockunit\common\CommonTrait;
  */
 class CacheFileTest extends \PHPUnit_Framework_TestCase
 {
-    use CommonTrait;
+    use CommonTestTrait;
     use CommonTraitTest;
 
     /** @var FileManager */

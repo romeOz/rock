@@ -7,7 +7,7 @@ use rock\db\Expression;
 use rock\event\Event;
 use rock\helpers\Trace;
 use rock\sphinx\Query;
-use rockunit\common\CommonTrait;
+use rockunit\common\CommonTestTrait;
 
 /**
  * @group search
@@ -16,7 +16,7 @@ use rockunit\common\CommonTrait;
  */
 class QueryTest extends SphinxTestCase
 {
-    use CommonTrait;
+    use CommonTestTrait;
 
     public static function tearDownAfterClass()
     {

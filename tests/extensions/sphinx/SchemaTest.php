@@ -4,7 +4,7 @@ namespace rockunit\extensions\sphinx;
 
 use rock\Rock;
 use rock\sphinx\IndexSchema;
-use rockunit\common\CommonTrait;
+use rockunit\common\CommonTestTrait;
 
 /**
  * @group search
@@ -13,7 +13,7 @@ use rockunit\common\CommonTrait;
  */
 class SchemaTest extends SphinxTestCase
 {
-    use CommonTrait;
+    use CommonTestTrait;
 
     public static function tearDownAfterClass()
     {

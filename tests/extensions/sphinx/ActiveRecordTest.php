@@ -12,7 +12,7 @@ use rock\helpers\Trace;
 use rock\Rock;
 use rock\sphinx\ActiveQuery;
 use rock\sphinx\Connection;
-use rockunit\common\CommonTrait;
+use rockunit\common\CommonTestTrait;
 use rockunit\extensions\sphinx\models\ActiveRecord;
 use rockunit\extensions\sphinx\models\ArticleFilterIndex;
 use rockunit\extensions\sphinx\models\ArticleIndex;
@@ -26,7 +26,7 @@ use rockunit\extensions\sphinx\models\RuntimeRulesIndex;
  */
 class ActiveRecordTest extends SphinxTestCase
 {
-    use CommonTrait;
+    use CommonTestTrait;
 
     public static function setUpBeforeClass()
     {

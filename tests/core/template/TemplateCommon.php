@@ -5,11 +5,11 @@ namespace rockunit\core\template;
 
 use rock\Rock;
 use rock\template\Template;
-use rockunit\common\CommonTrait;
+use rockunit\common\CommonTestTrait;
 
 abstract class TemplateCommon extends \PHPUnit_Framework_TestCase
 {
-    use CommonTrait;
+    use CommonTestTrait;
 
     protected $path;
 

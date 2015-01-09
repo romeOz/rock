@@ -6,7 +6,7 @@ use League\Flysystem\Adapter\Local;
 use League\Flysystem\Cache\Adapter;
 use rock\file\FileManager;
 use rock\Rock;
-use rockunit\common\CommonTrait;
+use rockunit\common\CommonTestTrait;
 
 
 /**
@@ -14,7 +14,7 @@ use rockunit\common\CommonTrait;
  */
 class FileManagerTest extends \PHPUnit_Framework_TestCase
 {
-    use CommonTrait;
+    use CommonTestTrait;
 
     public static function setUpBeforeClass()
     {

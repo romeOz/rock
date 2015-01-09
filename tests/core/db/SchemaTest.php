@@ -4,7 +4,7 @@ namespace rockunit\core\db;
 use rock\db\Expression;
 use rock\db\Schema;
 use rock\db\TableSchema;
-use rockunit\common\CommonTrait;
+use rockunit\common\CommonTestTrait;
 
 /**
  * @group db
@@ -12,7 +12,7 @@ use rockunit\common\CommonTrait;
  */
 class SchemaTest extends DatabaseTestCase
 {
-    use CommonTrait;
+    use CommonTestTrait;
 
     protected function setUp()
     {

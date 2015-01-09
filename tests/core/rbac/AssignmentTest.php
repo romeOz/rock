@@ -8,7 +8,7 @@ use rock\rbac\PhpManager;
 use rock\rbac\RBAC;
 use rock\rbac\Role;
 use rock\Rock;
-use rockunit\common\CommonTrait;
+use rockunit\common\CommonTestTrait;
 use rockunit\core\db\DatabaseTestCase;
 
 class NotGuestPermission extends Permission
@@ -34,7 +34,7 @@ class TestParams extends Role
  */
 class AssignmentTest extends DatabaseTestCase
 {
-    use CommonTrait;
+    use CommonTestTrait;
 
     public function setUp()
     {

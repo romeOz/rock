@@ -5,7 +5,7 @@ namespace rockunit\core\user;
 use rock\rbac\PhpManager;
 use rock\rbac\RBAC;
 use rock\Rock;
-use rockunit\common\CommonTrait;
+use rockunit\common\CommonTestTrait;
 
 /**
  * @group base
@@ -13,7 +13,7 @@ use rockunit\common\CommonTrait;
  */
 class UserTest extends \PHPUnit_Framework_TestCase
 {
-    use CommonTrait;
+    use CommonTestTrait;
 
     public function setUp()
     {

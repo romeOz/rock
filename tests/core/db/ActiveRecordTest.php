@@ -5,7 +5,7 @@ namespace rockunit\core\db;
 
 use rock\db\ActiveQuery;
 use rock\helpers\Trace;
-use rockunit\common\CommonTrait;
+use rockunit\common\CommonTestTrait;
 use rockunit\core\db\models\ActiveRecord;
 use rockunit\core\db\models\Category;
 use rockunit\core\db\models\Customer;
@@ -27,7 +27,7 @@ use rockunit\core\db\pgsql\PostgreSQLActiveRecordTest;
  */
 class ActiveRecordTest extends DatabaseTestCase
 {
-    use CommonTrait;
+    use CommonTestTrait;
     use ActiveRecordTestTrait;
 
     public function getCustomerClass()

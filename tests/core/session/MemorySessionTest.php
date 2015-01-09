@@ -4,7 +4,6 @@ namespace rockunit\core\session;
 
 use rock\cache\Memcached;
 use rock\session\MemorySession;
-use rockunit\common\CommonTrait;
 
 /**
  * @group base

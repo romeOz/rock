@@ -5,7 +5,7 @@ namespace rockunit\core\db;
 use rock\db\DataReader;
 use rock\db\Exception;
 use rock\helpers\Trace;
-use rockunit\common\CommonTrait;
+use rockunit\common\CommonTestTrait;
 
 /**
  * @group db
@@ -13,7 +13,7 @@ use rockunit\common\CommonTrait;
  */
 class CommandTest extends DatabaseTestCase
 {
-    use CommonTrait;
+    use CommonTestTrait;
 
     public function testConstruct()
     {

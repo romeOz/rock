@@ -8,7 +8,7 @@ use rock\db\Query;
 use rock\db\SelectBuilder;
 use rock\event\Event;
 use rock\helpers\Trace;
-use rockunit\common\CommonTrait;
+use rockunit\common\CommonTestTrait;
 
 /**
  * @group db
@@ -16,7 +16,7 @@ use rockunit\common\CommonTrait;
  */
 class QueryTest extends DatabaseTestCase
 {
-    use CommonTrait;
+    use CommonTestTrait;
 
     public static function tearDownAfterClass()
     {

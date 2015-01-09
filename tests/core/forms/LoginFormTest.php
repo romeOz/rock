@@ -4,7 +4,7 @@ namespace rockunit\core\forms;
 
 use rock\i18n\i18n;
 use rock\Rock;
-use rockunit\common\CommonTrait;
+use rockunit\common\CommonTestTrait;
 use rockunit\core\db\DatabaseTestCase;
 use rockunit\core\db\models\ActiveRecord;
 use rockunit\core\forms\models\LoginForm;
@@ -15,7 +15,7 @@ use rockunit\core\forms\models\LoginForm;
  */
 class LoginFormTest extends DatabaseTestCase
 {
-    use CommonTrait;
+    use CommonTestTrait;
 
     public static $post = [];
 

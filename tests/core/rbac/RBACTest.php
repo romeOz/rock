@@ -7,7 +7,7 @@ use rock\rbac\PhpManager;
 use rock\rbac\RBAC;
 use rock\rbac\Role;
 use rock\Rock;
-use rockunit\common\CommonTrait;
+use rockunit\common\CommonTestTrait;
 use rockunit\core\db\DatabaseTestCase;
 
 class NotGuestPermissionRBAC extends Permission
@@ -33,7 +33,7 @@ class TestParamsRBAC extends Role
  */
 class RBACTest extends DatabaseTestCase
 {
-    use CommonTrait;
+    use CommonTestTrait;
 
     /** @var  RBAC */
     protected $rbac;
