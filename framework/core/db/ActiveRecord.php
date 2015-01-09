@@ -1,8 +1,8 @@
 <?php
 namespace rock\db;
 
+use rock\di\Container;
 use rock\helpers\ArrayHelper;
-use rock\Rock;
 use rock\helpers\Helper;
 use rock\helpers\Inflector;
 use rock\helpers\ObjectHelper;
@@ -118,7 +118,7 @@ class ActiveRecord extends BaseActiveRecord
      */
     public static function getConnection()
     {
-        return Rock::$app->db;
+        return Container::load('db');
     }
 
     /**

@@ -11,14 +11,14 @@ use rock\Rock;
 /**
  * UploadedFile represents the information for an uploaded file.
  *
- * You can call [[getInstance()]] to retrieve the instance of an uploaded file,
- * and then use [[saveAs()]] to save it on the server.
- * You may also query other information about the file, including [[name]],
- * [[tempName]], [[type]], [[size]] and [[error]].
+ * You can call {@see \rock\file\UploadedFile::getInstance()} to retrieve the instance of an uploaded file,
+ * and then use {@see \rock\file\UploadedFile::saveAs()} to save it on the server.
+ * You may also query other information about the file, including {@see \rock\file\UploadedFile::$name},
+ * {@see \rock\file\UploadedFile::$tempName}, {@see \rock\file\UploadedFile::$type}, {@see \rock\file\UploadedFile::$size} and {@see \rock\file\UploadedFile::$error}.
  *
  * @property string $baseName Original file base name. This property is read-only.
  * @property string $extension File extension. This property is read-only.
- * @property boolean $hasError Whether there is an error with the uploaded file. Check [[error]] for detailed
+ * @property boolean $hasError Whether there is an error with the uploaded file. Check {@see \rock\file\UploadedFile::$error} for detailed
  * error code information. This property is read-only.
  *
  * ```php
@@ -115,7 +115,7 @@ class UploadedFile implements ComponentsInterface
 
     /**
      * Returns an uploaded file for the given model attribute.
-     * The file should be uploaded using [[ActiveField::fileInput()]].
+     * The file should be uploaded using {@see \rock\widgets\ActiveField::fileInput()}.
      * @param Model $model the data model
      * @param string $attribute the attribute name. The attribute name may contain array indexes.
      * For example, '[1]file' for tabular file uploading; and 'file[1]' for an element in a file array.
@@ -186,7 +186,7 @@ class UploadedFile implements ComponentsInterface
      *
      * - 'upload_max_filesize' in php.ini
      * - 'MAX_FILE_SIZE' hidden field
-     * - [[maxSize]]
+     * - `maxSize`
      *
      * @param int|null $maxSize
      * @return integer the size limit for uploaded files.
@@ -269,7 +269,7 @@ class UploadedFile implements ComponentsInterface
 
     /**
      * @return boolean whether there is an error with the uploaded file.
-     * Check [[error]] for detailed error code information.
+     * Check {@see \rock\file\UploadedFile::$error} for detailed error code information.
      */
     public function getHasError()
     {

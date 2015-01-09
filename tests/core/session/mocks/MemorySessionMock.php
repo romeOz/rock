@@ -13,7 +13,6 @@ class MemorySessionMock extends MemorySession
     {
         $array = $this->readSession(session_id()) ? : [];
         if (is_string($array)) {
-            var_dump('ffs');
             $array = Serialize::unserialize($array);
         }
         return ArrayHelper::getValue($array, $keys, $default);
@@ -24,7 +23,6 @@ class MemorySessionMock extends MemorySession
     {
         $array = $this->readSession(session_id()) ? : [];
         if (is_string($array)) {
-            var_dump('ffsggg');
             $array = Serialize::unserialize($array);
         }
         ArrayHelper::setValue($array, $keys, $value);
@@ -35,7 +33,6 @@ class MemorySessionMock extends MemorySession
     {
         $array = $this->readSession(session_id()) ? : [];
         if (is_string($array)) {
-            var_dump('ffsgggjj');
             $array = Serialize::unserialize($array);
         }
         $array = array_merge($array, $data);
@@ -46,7 +43,6 @@ class MemorySessionMock extends MemorySession
     {
         $array = $this->readSession(session_id()) ? : [];
         if (is_string($array)) {
-            var_dump('ffhjhsgggjj');
             $array = Serialize::unserialize($array);
         }
 

@@ -6,8 +6,8 @@ namespace rock\db;
  *
  * An ActiveQuery can be a normal query or be used in a relational context.
  *
- * ActiveQuery instances are usually created by {@see \rock\db\ActiveRecord::find()} and {@see \rock\db\ActiveRecord::findBySql()}.
- * Relational queries are created by {@see \rock\db\ActiveRecord::hasOne()} and {@see \rock\db\ActiveRecord::hasMany()}.
+ * ActiveQuery instances are usually created by {@see \rock\db\ActiveRecordInterface::find()} and {@see \rock\db\ActiveRecord::findBySql()}.
+ * Relational queries are created by {@see \rock\db\BaseActiveRecord::hasOne()} and {@see \rock\db\BaseActiveRecord::hasMany()}.
  *
  * Normal Query
  * ------------
@@ -26,13 +26,13 @@ namespace rock\db;
  * - {@see \rock\db\ActiveQuery::exists()}: returns a value indicating whether the query result has data or not.
  *
  * Because ActiveQuery extends from {@see \rock\db\Query}, one can use query methods, such as {@see \rock\db\Query::where()},
- * {@see \rock\db\Query::orderBy()} to customize the query options.
+ * {@see \rock\db\QueryInterface::orderBy()} to customize the query options.
  *
  * ActiveQuery also provides the following additional query options:
  *
  * - {@see \rock\db\ActiveQuery::with()}: list of relations that this query should be performed with.
  * - {@see \rock\db\ActiveQuery::indexBy()}: the name of the column by which the query result should be indexed.
- * - {@see \rock\db\ActiveQuery::asArray()}: whether to return each record as an array.
+ * - {@see \rock\db\ActiveQueryInterface::asArray()}: whether to return each record as an array.
  *
  * These options can be configured using methods of the same name. For example:
  *
@@ -45,8 +45,8 @@ namespace rock\db;
  *
  * In relational context ActiveQuery represents a relation between two Active Record classes.
  *
- * Relational ActiveQuery instances are usually created by calling {@see \rock\db\ActiveRecord::hasOne()} and
- * {@see \rock\db\ActiveRecord::hasMany()}. An Active Record class declares a relation by defining
+ * Relational ActiveQuery instances are usually created by calling {@see \rock\db\BaseActiveRecord::hasOne()} and
+ * {@see \rock\db\BaseActiveRecord::hasMany()}. An Active Record class declares a relation by defining
  * a getter method which calls one of the above methods and returns the created ActiveQuery object.
  *
  * A relation is specified by {@see \rock\db\ActiveRelationTrait::$link} which represents the association between columns
@@ -118,12 +118,14 @@ class ActiveQuery extends Query implements ActiveQueryInterface
      */
     public function all($connection = null, $subAttributes = false)
     {
+        // before
         /** @var ActiveRecord $class */
         $class = $this->modelClass;
         $activeRecord = $class::instantiate([]);
         if (!$activeRecord->beforeFind()) {
             return [];
         }
+
         return parent::all($connection, $subAttributes);
     }
 
@@ -303,7 +305,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
         /** @var ActiveRecord $class */
         $class = $this->modelClass;
         /** @var ActiveRecord $activeRecord */
-        $model  = $activeRecord = $class::instantiate([]);
+        $model  = $class::instantiate([]);
 //        if (!$this->beforeFind()) {
 //            return null;
 //        }
@@ -406,17 +408,17 @@ class ActiveQuery extends Query implements ActiveQueryInterface
      * JOIN statements to the current query.
      *
      * If the `$eagerLoading` parameter is true, the method will also eager loading the specified relations,
-     * which is equivalent to calling {@see \rock\db\ActiveQueryTrait::with()} using the specified relations.
+     * which is equivalent to calling {@see \rock\db\ActiveQueryInterface::with()} using the specified relations.
      *
      * Note that because a JOIN query will be performed, you are responsible to disambiguate column names.
      *
-     * This method differs from {@see \rock\db\ActiveQueryTrait::with()} in that it will build up and execute a JOIN SQL statement
-     * for the primary table. And when `$eagerLoading` is true, it will call {@see \rock\db\ActiveQueryTrait::with()} in addition with the specified relations.
+     * This method differs from {@see \rock\db\ActiveQueryInterface::with()} in that it will build up and execute a JOIN SQL statement
+     * for the primary table. And when `$eagerLoading` is true, it will call {@see \rock\db\ActiveQueryInterface::with()} in addition with the specified relations.
      *
      * @param array $with the relations to be joined. Each array element represents a single relation.
      * The array keys are relation names, and the array values are the corresponding anonymous functions that
      * can be used to modify the relation queries on-the-fly. If a relation query does not need modification,
-     * you may use the relation name as the array value. Sub-relations can also be specified (see {@see \rock\db\ActiveQueryTrait::with()}).
+     * you may use the relation name as the array value. Sub-relations can also be specified (see {@see \rock\db\ActiveQueryInterface::with()}).
      * For example,
      *
      * ```php

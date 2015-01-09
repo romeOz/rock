@@ -15,56 +15,23 @@ use rock\base\ComponentsInterface;
 interface QueryInterface extends ComponentsInterface
 {
     /**
-     * Sets the SELECT part of the query.
-     * @param string|array|SelectBuilder $columns the columns to be selected.
-     * Columns can be specified in either a string (e.g. "id, name") or an array (e.g. ['id', 'name']).
-     * Columns can be prefixed with table names (e.g. "user.id") and/or contain column aliases (e.g. "user.id AS user_id").
-     * The method will automatically quote the column names unless a column contains some parenthesis
-     * (which means the column contains a DB expression).
-     *
-     * Note that if you are selecting an expression like `CONCAT(first_name, ' ', last_name)`, you should
-     * use an array to specify the columns. Otherwise, the expression may be incorrectly split into several parts.
-     *
-     * When the columns are specified as an array, you may also use array keys as the column aliases (if a column
-     * does not need alias, do not use a string key).
-     *
-     * @param string $option additional option that should be appended to the 'SELECT' keyword. For example,
-     * in MySQL, the option 'SQL_CALC_FOUND_ROWS' can be used.
-     * @return static the query object itself
-     */
-    public function select($columns, $option = null);
-
-    /**
      * Executes the query and returns all results as an array.
      *
      * @param Connection $connection the database connection used to execute the query.
      * If this parameter is not given, the `db` application component will be used.
-     * @param boolean       $subAttributes
      * @return array the query results. If the query results in nothing, an empty array will be returned.
      */
-    public function all($connection = null, $subAttributes = false);
+    public function all($connection = null);
 
     /**
      * Executes the query and returns a single row of result.
      *
      * @param Connection $connection the database connection used to execute the query.
      * If this parameter is not given, the `db` application component will be used.
-     * @param boolean       $subAttributes
      * @return array|boolean the first row (in terms of an array) of the query result. False is returned if the query
      * results in nothing.
      */
-    public function one($connection = null, $subAttributes = false);
-
-    /**
-     * Returns the query result as a scalar value.
-     * The value returned will be the first column in the first row of the query results.
-     *
-     * @param Connection $connection the database connection used to generate the SQL statement.
-     * If this parameter is not given, the `db` application component will be used.
-     * @return string|boolean the value of the first column in the first row of the query result.
-     * False is returned if the query result is empty.
-     */
-    public function scalar($connection = null);
+    public function one($connection = null);
 
     /**
      * Returns the number of records.
@@ -84,15 +51,6 @@ interface QueryInterface extends ComponentsInterface
      * @return boolean whether the query result contains any row of data.
      */
     public function exists($connection = null);
-
-    /**
-     * Executes the query and returns the first column of the result.
-     *
-     * @param Connection $connection the database connection used to generate the SQL statement.
-     * If this parameter is not given, the `db` application component will be used.
-     * @return array the first column of the query result. An empty array is returned if the query results in nothing.
-     */
-    public function column($connection = null);
 
     /**
      * Sets the {@see \rock\db\QueryTrait::$indexBy} property.
@@ -293,19 +251,4 @@ interface QueryInterface extends ComponentsInterface
      * @return static the query object itself
      */
     public function offset($offset);
-
-
-    /**
-     * @param int  $expire
-     * @param string[]|null $tags
-     * @return static
-     */
-    public function beginCache($expire = 0, array $tags = null);
-
-    /**
-     * @return static
-     */
-    public function endCache();
-
-    public function getRawSql($connection = null);
 }
