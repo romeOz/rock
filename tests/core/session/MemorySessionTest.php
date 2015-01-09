@@ -3,17 +3,17 @@
 namespace rockunit\core\session;
 
 use rock\cache\Memcached;
-use rock\session\MemorySession;
+use rockunit\core\session\mocks\MemorySessionMock;
 
 /**
  * @group base
  * @group cache
  * @group memcached
  */
-class MemorySessionTest extends DbSessionTest
+class MemorySessionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var  MemorySession */
-    protected $handlerSession;
+    use CommonSessionTrait;
+
     protected function setUp()
     {
         if (!class_exists('\Memcached')) {
@@ -23,21 +23,28 @@ class MemorySessionTest extends DbSessionTest
         }
 
         parent::setUp();
-        $this->handlerSession = new MemorySession(['cache' => new Memcached()]);
+        $this->handlerSession = new MemorySessionMock(['cache' => static::getStorage()]);
         $this->handlerSession->removeAll();
     }
 
-    public static function setUpBeforeClass()
+    protected static function getStorage()
     {
-        parent::setUpBeforeClass();
-        static::flush();
+        return new Memcached();
     }
+
+//    public static function setUpBeforeClass()
+//    {
+//        parent::setUpBeforeClass();
+//        static::flush();
+//    }
 
 
     public function tearDown()
     {
         parent::tearDown();
-        $this->handlerSession->removeAll();
+        if (isset($this->handlerSession)) {
+            $this->handlerSession->destroy();
+        }
     }
 
     public static function tearDownAfterClass()
@@ -48,7 +55,16 @@ class MemorySessionTest extends DbSessionTest
 
     public static function flush()
     {
-        (new Memcached())->flush();
+        static::getStorage()->flush();
+    }
+
+    public function testExpire()
+    {
+        $this->handlerSession->setTimeout(2);
+        $this->handlerSession->add('ttl', 'test');
+        $this->assertTrue($this->handlerSession->has('ttl'));
+        sleep(4);
+        $this->assertNull($this->handlerSession->get('ttl'));
     }
 }
  
