@@ -129,7 +129,6 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
             if (!$this->handler instanceof \SessionHandlerInterface) {
                 throw new SessionException('"' . get_class($this) . '::handler" must implement the SessionHandlerInterface.');
             }
-            /** @noinspection PhpParamsInspection */
             @session_set_save_handler($this->handler, false);
         } elseif ($this->getUseCustomStorage()) {
             @session_set_save_handler(
@@ -567,7 +566,10 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
      */
     public function add($keys, $value)
     {
-        $array = (array)$_SESSION;
+        if (!isset($_SESSION)) {
+            $_SESSION = [];
+        }
+        $array = $_SESSION;
         $_SESSION = ArrayHelper::setValue($array, $keys, $value);
     }
 
@@ -635,10 +637,10 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
     /**
      * @inheritdoc
      */
-    public function removeMulti(array $names)
+    public function removeMulti(array $keys)
     {
-        foreach ($names as $keys) {
-            $this->remove($keys);
+        foreach ($keys as $key) {
+            $this->remove($key);
         }
     }
 
