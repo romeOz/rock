@@ -39,7 +39,7 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
      */
     public function getIsActive()
     {
-        return static::$storage->has("{$this->container}.id");
+        return static::$storage->exists("{$this->container}.id");
     }
 
     /**
@@ -154,7 +154,7 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
     /**
      * @inheritdoc
      */
-    public function has($keys)
+    public function exists($keys)
     {
         return (bool)$this->get($keys);
     }
@@ -164,12 +164,12 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
      */
     public function offsetExists($keys)
     {
-        return $this->has($keys);
+        return $this->exists($keys);
     }
 
     public function __isset($name)
     {
-        return $this->has($name);
+        return $this->exists($name);
     }
 
     /**

@@ -3,7 +3,6 @@ namespace rock\sphinx;
 
 use rock\base\ModelEvent;
 use rock\db\AfterFindEvent;
-use rock\db\CacheTrait;
 use rock\db\Expression;
 
 /**

@@ -43,7 +43,7 @@ interface CollectionInterface extends \IteratorAggregate
      * @param string $name
      * @return bool
      */
-    public function has($name);
+    public function exists($name);
 
     /**
      * @param string $name

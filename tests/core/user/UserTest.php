@@ -77,9 +77,9 @@ class UserTest extends \PHPUnit_Framework_TestCase
     public function testHasTrue()
     {
         Rock::$app->user->addMulti(['id' => 1,'name' => 'Smith', 'age' => 21, 'gender' => 'male', 'groups' => ['group_1', 'group_2']]);
-        $this->assertTrue(Rock::$app->user->has('age'));
-        $this->assertTrue(Rock::$app->user->has(['groups', 1]));
-        $this->assertTrue(Rock::$app->user->has('groups.1'));
+        $this->assertTrue(Rock::$app->user->exists('age'));
+        $this->assertTrue(Rock::$app->user->exists(['groups', 1]));
+        $this->assertTrue(Rock::$app->user->exists('groups.1'));
     }
 
 
@@ -87,9 +87,9 @@ class UserTest extends \PHPUnit_Framework_TestCase
     {
         Rock::$app->user->addMulti(['id' => 1,'name' => 'Smith', 'age' => 21, 'gender' => 'male']);
         Rock::$app->user->remove('age');
-        $this->assertFalse(Rock::$app->user->has('age'));
-        $this->assertFalse(Rock::$app->user->has(['groups', 77]));
-        $this->assertFalse(Rock::$app->user->has('groups.77'));
+        $this->assertFalse(Rock::$app->user->exists('age'));
+        $this->assertFalse(Rock::$app->user->exists(['groups', 77]));
+        $this->assertFalse(Rock::$app->user->exists('groups.77'));
     }
 
 

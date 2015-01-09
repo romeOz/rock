@@ -81,12 +81,12 @@ class RequestCollection implements \ArrayAccess, CollectionInterface
      */
     public function offsetExists($name)
     {
-        return $this->has($name);
+        return $this->exists($name);
     }
 
     public function __isset($name)
     {
-        return $this->has($name);
+        return $this->exists($name);
     }
 
 
@@ -96,7 +96,7 @@ class RequestCollection implements \ArrayAccess, CollectionInterface
      * @param string $name the global var name
      * @return boolean whether the named global var exists
      */
-    public function has($name)
+    public function exists($name)
     {
         return isset($this->data[$name]);
     }

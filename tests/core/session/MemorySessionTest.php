@@ -62,7 +62,7 @@ class MemorySessionTest extends \PHPUnit_Framework_TestCase
     {
         $this->handlerSession->setTimeout(2);
         $this->handlerSession->add('ttl', 'test');
-        $this->assertTrue($this->handlerSession->has('ttl'));
+        $this->assertTrue($this->handlerSession->exists('ttl'));
         sleep(4);
         $this->assertNull($this->handlerSession->get('ttl'));
     }

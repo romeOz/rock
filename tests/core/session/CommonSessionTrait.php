@@ -99,17 +99,17 @@ trait CommonSessionTrait
     public function testHasTrue()
     {
         $this->handlerSession->addMulti(['id' => 1, 'title' => 'text3', 'params' => ['param_1', 'param_2']]);
-        $this->assertTrue($this->handlerSession->has('id'));
-        $this->assertTrue($this->handlerSession->has('params.1'));
-        $this->assertTrue($this->handlerSession->has(['params', 1]));
+        $this->assertTrue($this->handlerSession->exists('id'));
+        $this->assertTrue($this->handlerSession->exists('params.1'));
+        $this->assertTrue($this->handlerSession->exists(['params', 1]));
     }
 
     public function testHasFalse()
     {
         $this->handlerSession->addMulti(['id' => 1, 'title' => 'text3', 'params' => ['param_1', 'param_2']]);
-        $this->assertFalse($this->handlerSession->has('test'));
-        $this->assertFalse($this->handlerSession->has('params.77'));
-        $this->assertFalse($this->handlerSession->has(['params', 77]));
+        $this->assertFalse($this->handlerSession->exists('test'));
+        $this->assertFalse($this->handlerSession->exists('params.77'));
+        $this->assertFalse($this->handlerSession->exists(['params', 77]));
     }
 
     public function testAdd()

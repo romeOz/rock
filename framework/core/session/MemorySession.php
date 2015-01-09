@@ -49,8 +49,6 @@ class MemorySession extends Session
         }
     }
 
-
-
     /**
      * Returns a value indicating whether to use custom session storage.
      *
@@ -85,7 +83,7 @@ class MemorySession extends Session
      */
     public function writeSession($id, $data)
     {
-        return $this->cache->set($this->calculateKey($id), $data);
+        return $this->cache->set($this->calculateKey($id), $data, $this->getTimeout());
     }
 
     /**

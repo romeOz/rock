@@ -174,7 +174,7 @@ class Cookie extends SessionFlash implements \ArrayAccess, CollectionInterface, 
     /**
      * @inheritdoc
      */
-    public function has($keys)
+    public function exists($keys)
     {
         return (bool)$this->get($keys);
     }
@@ -184,7 +184,7 @@ class Cookie extends SessionFlash implements \ArrayAccess, CollectionInterface, 
      */
     public function offsetExists($name)
     {
-        return $this->has($name);
+        return $this->exists($name);
     }
 
     /**

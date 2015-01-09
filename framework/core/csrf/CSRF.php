@@ -122,7 +122,7 @@ class CSRF implements ComponentsInterface, RequestInterface, StorageInterface
      */
     public function has()
     {
-        return static::$storage->has($this->csrfParam);
+        return static::$storage->exists($this->csrfParam);
     }
 
     /**

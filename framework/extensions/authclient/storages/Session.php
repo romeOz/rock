@@ -59,7 +59,7 @@ class Session implements TokenStorageInterface
     {
         $serializedToken = serialize($token);
 
-        if ($this->session->has($this->sessionVariableName)
+        if ($this->session->exists($this->sessionVariableName)
             && is_array($this->session->get($this->sessionVariableName))
         ) {
             $this->session->add([$this->sessionVariableName, $service], $serializedToken);
@@ -76,7 +76,7 @@ class Session implements TokenStorageInterface
      */
     public function hasAccessToken($service)
     {
-        return $this->session->has($this->sessionVariableName) && $this->session->has([$this->sessionVariableName, $service]);
+        return $this->session->exists($this->sessionVariableName) && $this->session->exists([$this->sessionVariableName, $service]);
     }
 
     /**
@@ -108,7 +108,7 @@ class Session implements TokenStorageInterface
      */
     public function storeAuthorizationState($service, $state)
     {
-        if ($this->session->has($this->stateVariableName)
+        if ($this->session->exists($this->stateVariableName)
             && is_array($this->session->get($this->stateVariableName))
         ) {
             $this->session->add([$this->stateVariableName, $service], $state);
@@ -125,7 +125,7 @@ class Session implements TokenStorageInterface
      */
     public function hasAuthorizationState($service)
     {
-        return $this->session->has($this->stateVariableName) && $this->session->has([$this->stateVariableName, $service]);
+        return $this->session->exists($this->stateVariableName) && $this->session->exists([$this->stateVariableName, $service]);
     }
 
     /**

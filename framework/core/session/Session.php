@@ -597,7 +597,7 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
     /**
      * @inheritdoc
      */
-    public function has($keys)
+    public function exists($keys)
     {
         return (bool)$this->get($keys);
     }
@@ -607,7 +607,7 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
      */
     public function offsetExists($keys)
     {
-        return $this->has($keys);
+        return $this->exists($keys);
     }
 
     /**

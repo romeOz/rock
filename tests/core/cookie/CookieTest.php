@@ -129,17 +129,17 @@ class CookieTest extends \PHPUnit_Framework_TestCase
     public function testHasTrue()
     {
         $_COOKIE = ['id' => 1, 'title' => 'text3', 'params' => ['param_1', 'param_2']];
-        $this->assertTrue(Rock::$app->cookie->has('id'));
-        $this->assertTrue(Rock::$app->cookie->has('params.1'));
-        $this->assertTrue(Rock::$app->cookie->has(['params', 1]));
+        $this->assertTrue(Rock::$app->cookie->exists('id'));
+        $this->assertTrue(Rock::$app->cookie->exists('params.1'));
+        $this->assertTrue(Rock::$app->cookie->exists(['params', 1]));
     }
 
     public function testHasFalse()
     {
         $_COOKIE = ['id' => 1, 'title' => 'text3', 'params' => ['param_1', 'param_2']];
-        $this->assertFalse(Rock::$app->cookie->has('test'));
-        $this->assertFalse(Rock::$app->cookie->has('params.77'));
-        $this->assertFalse(Rock::$app->cookie->has(['params', 77]));
+        $this->assertFalse(Rock::$app->cookie->exists('test'));
+        $this->assertFalse(Rock::$app->cookie->exists('params.77'));
+        $this->assertFalse(Rock::$app->cookie->exists(['params', 77]));
     }
 
     public function testAdd()
