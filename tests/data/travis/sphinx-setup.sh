@@ -4,24 +4,24 @@ SCRIPT=$(readlink -f "$0")
 CWD=$(dirname "$SCRIPT")
 
 # Install Sphinx
-add-apt-repository -y ppa:builds/sphinxsearch-rel22
-apt-get update
-apt-get install sphinxsearch
-service sphinxsearch stop
+sudo add-apt-repository -y ppa:builds/sphinxsearch-rel22
+sudo apt-get update
+sudo apt-get install sphinxsearch
+sudo service sphinxsearch stop
 
 # log files
-mkdir /var/log/sphinx
-touch /var/log/sphinx/searchd.log
-touch /var/log/sphinx/query.log
-chmod -R 777 /var/log/sphinx # ugly (for travis)
+sudo mkdir /var/log/sphinx
+sudo touch /var/log/sphinx/searchd.log
+sudo touch /var/log/sphinx/query.log
+sudo chmod -R 777 /var/log/sphinx # ugly (for travis)
 
 # spl dir
-mkdir /var/lib/sphinx
-chmod 777 /var/lib/sphinx # ugly (for travis)
+sudo mkdir /var/lib/sphinx
+sudo chmod 777 /var/lib/sphinx # ugly (for travis)
 
 # run dir pid
-mkdir /var/run/sphinx
-chmod 777 /var/run/sphinx # ugly (for travis)
+sudo mkdir /var/run/sphinx
+sudo chmod 777 /var/run/sphinx # ugly (for travis)
 
 # Setup source database
 mysql -D rocktest -u travis < ${CWD}/../sphinx/source.sql
