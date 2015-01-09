@@ -3,8 +3,8 @@ use rock\execute\CacheExecute;
 use rock\log\Log;
 use rock\rbac\PhpManager;
 use rock\Rock;
+use rockunit\core\session\mocks\SessionMock;
 use rockunit\mocks\CookieMock;
-use rockunit\mocks\SessionMock;
 
 $composerAutoload = dirname(__DIR__) . '/vendor/autoload.php';
 if (is_file($composerAutoload)) {
@@ -51,12 +51,12 @@ Rock::$app->di['cache'] = [
 
 Rock::$app->di['session'] = [
     'class' => SessionMock::className(),
-    'singleton' => true
+    //'singleton' => true
 ];
 Rock::$app->session->open();
 Rock::$app->di['cookie'] = [
     'class' => CookieMock::className(),
-    'singleton' => true
+    //'singleton' => true
 ];
 
 
