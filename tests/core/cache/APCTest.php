@@ -11,7 +11,7 @@ use rock\cache\CacheInterface;
  */
 class APCTest extends \PHPUnit_Framework_TestCase
 {
-    use CommonTraitTest;
+    use CommonCacheTrait;
 
     public static function flush()
     {

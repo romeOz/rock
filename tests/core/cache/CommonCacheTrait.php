@@ -5,7 +5,7 @@ namespace rockunit\core\cache;
 
 use rock\cache\CacheInterface;
 
-trait CommonTraitTest
+trait CommonCacheTrait
 {
     public static function flush(){}
 

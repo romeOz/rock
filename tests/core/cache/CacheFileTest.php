@@ -17,7 +17,7 @@ use rockunit\common\CommonTestTrait;
 class CacheFileTest extends \PHPUnit_Framework_TestCase
 {
     use CommonTestTrait;
-    use CommonTraitTest;
+    use CommonCacheTrait;
 
     /** @var FileManager */
     protected static $fileManager;
