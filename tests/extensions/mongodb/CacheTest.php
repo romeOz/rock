@@ -6,6 +6,9 @@ namespace rockunit\extensions\mongodb;
 use rock\di\Container;
 use rock\mongodb\Cache;
 
+/**
+ * @group mongodb
+ */
 class CacheTest extends MongoDbTestCase
 {
     /**

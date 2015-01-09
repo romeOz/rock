@@ -9,6 +9,9 @@ use rock\di\Container;
 use rock\mongodb\Cache;
 use rockunit\core\cache\CommonCacheTrait;
 
+/**
+ * @group mongodb
+ */
 class CacheAdvancedTest extends MongoDbTestCase
 {
     use CommonCacheTrait;

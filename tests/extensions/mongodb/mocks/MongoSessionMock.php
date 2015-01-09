@@ -18,7 +18,6 @@ class MongoSessionMock extends Session
         return ArrayHelper::getValue($array, $keys, $default);
     }
 
-
     public function add($keys, $value)
     {
         $array = $this->readSession(session_id()) ? : [];

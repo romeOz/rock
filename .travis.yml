@@ -50,7 +50,7 @@ script:
   - mkdir -p build/logs
   - |
     if (php --version | grep -i HipHop > /dev/null); then
-      vendor/bin/phpunit --verbose --exclude-group php,mssql,couchbase,memcache,memcached,redis,apc,mq
+      vendor/bin/phpunit --verbose --exclude-group php,mssql,mongodb,couchbase,memcache,memcached,redis,apc,mq
     else
       vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml --exclude-group hhvm,mssql
     fi

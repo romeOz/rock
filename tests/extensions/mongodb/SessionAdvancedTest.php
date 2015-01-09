@@ -6,6 +6,9 @@ namespace rockunit\extensions\mongodb;
 use rockunit\core\session\CommonSessionTrait;
 use rockunit\extensions\mongodb\mocks\MongoSessionMock;
 
+/**
+ * @group mongodb
+ */
 class SessionAdvancedTest extends MongoDbTestCase
 {
     use CommonSessionTrait;

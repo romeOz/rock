@@ -5,6 +5,9 @@ namespace rockunit\extensions\mongodb;
 use rock\di\Container;
 use rock\mongodb\Session;
 
+/**
+ * @group mongodb
+ */
 class SessionTest extends MongoDbTestCase
 {
     /**
