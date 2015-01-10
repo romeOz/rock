@@ -39,9 +39,6 @@ use rock\base\ObjectTrait;
  * @property integer $fetchMode Fetch mode. This property is write-only.
  * @property boolean $isClosed Whether the reader is closed or not. This property is read-only.
  * @property integer $rowCount Number of rows contained in the result. This property is read-only.
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 class DataReader implements \Iterator, \Countable
 {

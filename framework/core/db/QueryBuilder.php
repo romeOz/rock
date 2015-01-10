@@ -14,7 +14,6 @@ class QueryBuilder
     use ObjectTrait {
         ObjectTrait::__construct as parentConstruct;
     }
-    //use ComponentsTrait;
 
     /**
      * The prefix for automatically generated query binding parameters.

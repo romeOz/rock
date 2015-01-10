@@ -126,7 +126,7 @@ class Query extends \rock\db\Query
     public function one($connection = null, $subAttributes = false)
     {
         $row = parent::one($connection, $subAttributes);
-        if ($row !== false) {
+        if ($row !== null) {
             list ($row) = $this->fillUpSnippets([$row]);
         }
 
