@@ -861,6 +861,9 @@ class Command
                     $fetchMode = $this->fetchMode;
                 }
                 $result = call_user_func_array([$this->pdoStatement, $method], (array)$fetchMode);
+                if ($result === false) {
+                    $result = null;
+                }
                 $result = $this->prepareResult($result, $subAttributes, $fetchMode);
                 $this->pdoStatement->closeCursor();
             }
