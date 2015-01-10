@@ -102,43 +102,4 @@ class CacheTest extends MongoDbTestCase
         $rows = $this->findAll($collection);
         $this->assertCount(0, $rows, 'Unable to flush records!');
     }
-
-    /**
-     * @depends testSet
-     */
-    public function testGc()
-    {
-        $cache = $this->createCache();
-
-        $cache->set('key1', 'value1');
-        $cache->set('key2', 'value2');
-
-        $collection = $cache->getStorage()->getCollection($cache->cacheCollection);
-
-        list($row) = $this->findAll($collection);
-        $collection->update(['_id' => $row['_id']], ['expire' => time() - 10]);
-
-        $cache->gc(true);
-
-        $rows = $this->findAll($collection);
-        $this->assertCount(1, $rows, 'Unable to collect garbage!');
-    }
-
-    /**
-     * @depends testSet
-     */
-    public function testGetExpired()
-    {
-        $cache = $this->createCache();
-
-        $key = 'test_key';
-        $value = 'test_value';
-        $cache->set($key, $value);
-
-        $collection = $cache->getStorage()->getCollection($cache->cacheCollection);
-        list($row) = $this->findAll($collection);
-        $collection->update(['_id' => $row['_id']], ['expire' => time() - 10]);
-
-        $this->assertEquals(false, $cache->get($key), 'Expired key value returned!');
-    }
 }

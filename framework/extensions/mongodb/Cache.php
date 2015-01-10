@@ -59,8 +59,9 @@ class Cache implements CacheInterface
             $this->storage = Container::load($this->storage);
         }
 
-        $this->storage->getCollection($this->cacheCollection)->createIndex('id', ['unique' => true]);
-
+        $collection = $this->storage->getCollection($this->cacheCollection);
+        $collection->createIndex('id', ['unique' => true]);
+        $collection->createIndex('expire', ['expireAfterSeconds' => 0]);
     }
 
     /**
@@ -85,15 +86,13 @@ class Cache implements CacheInterface
         $result = $this->updateInternal(
             $this->prepareKey($key),
             [
-                'expire' => $expire > 0 ? $expire + time() : 0,
+                'expire' => $expire > 0 ? new \MongoDate($expire + time()) : null,
                 'value' => $value,
                 'tags' => $this->prepareTags($tags)
             ]
         );
 
         if ($result) {
-            $this->gc();
-
             return true;
         } else {
             return $this->add($key, $value, $expire, $tags);
@@ -114,12 +113,11 @@ class Cache implements CacheInterface
         if (empty($key)) {
             return false;
         }
-        $this->gc();
 
         return $this->insertInternal(
             [
                 'id' => $this->prepareKey($key),
-                'expire' => $expire > 0 ? $expire + time() : 0,
+                'expire' =>  $expire > 0 ? new \MongoDate($expire + time()) : null,
                 'value' => $value,
                 'tags' => $this->prepareTags($tags)
             ]
@@ -141,23 +139,23 @@ class Cache implements CacheInterface
     /**
      * @inheritdoc
      */
-    public function get($key/*, &$result = null*/)
+    public function get($key)
     {
         $key = $this->prepareKey($key);
         $query = new Query;
         $row = $query->select(['value'])
             ->from($this->cacheCollection)
             ->where([
-                'id' => $key,
-                '$or' => [
-                    [
-                        'expire' => 0
-                    ],
-                    [
-                        'expire' => ['$gt' => time()]
-                    ],
-                ],
-            ])
+                        'id' => $key,
+                        '$or' => [
+                            [
+                                'expire' => null
+                            ],
+                            [
+                                'expire' => ['$gt' => new \MongoDate()]
+                            ],
+                        ],
+                    ])
             ->one($this->storage);
 
         if (empty($row)) {
@@ -166,7 +164,6 @@ class Cache implements CacheInterface
 
         return $row['value'] === '' ? null : $row['value'];
     }
-
 
     /**
      * @inheritdoc
@@ -180,10 +177,10 @@ class Cache implements CacheInterface
                         'id' => $this->prepareKey($key),
                         '$or' => [
                             [
-                                'expire' => 0
+                                'expire' => null
                             ],
                             [
-                                'expire' => ['$gt' => time()]
+                                'expire' => ['$gt' => new \MongoDate()]
                             ],
                         ],
                     ])
@@ -199,17 +196,16 @@ class Cache implements CacheInterface
             'id' => $this->prepareKey($key),
             '$or' => [
                 [
-                    'expire' => 0
+                    'expire' => null
                 ],
                 [
-                    'expire' => ['$gt' => time()]
+                    'expire' => ['$gt' => new \MongoDate()]
                 ],
-            ]
+            ],
         ];
         $update = [
-            //'expire' => $expire > 0 ? $expire + time() : 0,
             '$inc' => ['value' => $offset],
-            '$set' => ['expire' => $expire > 0 ? $expire + time() : 0]
+            '$set' => ['expire' =>  $expire > 0 ? new \MongoDate($expire + time()) : null]
         ];
         $fields = ['value' => 1];
         $options = $create === true ? ['new' => true, 'upsert' => true] : ['new' => true];
@@ -230,16 +226,16 @@ class Cache implements CacheInterface
             'id' => $this->prepareKey($key),
             '$or' => [
                 [
-                    'expire' => 0
+                    'expire' => null
                 ],
                 [
-                    'expire' => ['$gt' => time()]
+                    'expire' => ['$gt' => new \MongoDate()]
                 ],
-            ]
+            ],
         ];
         $update = [
             '$inc' => ['value' => -1 * $offset],
-            '$set' => ['expire' => $expire > 0 ? $expire + time() : 0]
+            '$set' => ['expire' =>  $expire > 0 ? new \MongoDate($expire + time()) : null]
         ];
         $fields = ['value' => 1];
         $options = $create === true ? ['new' => true, 'upsert' => true] : ['new' => true];
@@ -250,7 +246,6 @@ class Cache implements CacheInterface
 
         return $row['value'];
     }
-
 
     /**
      * @inheritdoc
@@ -282,10 +277,10 @@ class Cache implements CacheInterface
                         'id' => ['$in' => $keys],
                         '$or' => [
                             [
-                                'expire' => 0
+                                'expire' => null
                             ],
                             [
-                                'expire' => ['$gt' => time()]
+                                'expire' => ['$gt' => new \MongoDate()]
                             ],
                         ],
                     ])
@@ -311,13 +306,11 @@ class Cache implements CacheInterface
         $result = $this->updateInternal(
             $this->prepareKey($key),
             [
-                'expire' => $expire > 0 ? $expire + time() : 0,
+                'expire' => $expire > 0 ? new \MongoDate($expire + time()) : null,
             ]
         );
 
         if ($result) {
-            $this->gc();
-
             return true;
         }
         return false;
@@ -333,14 +326,14 @@ class Cache implements CacheInterface
                 ['id' => ['$in' => $this->prepareKeys($keys)],
                     '$or' => [
                         [
-                            'expire' => 0
+                            'expire' => null
                         ],
                         [
-                            'expire' => ['$gt' => time()]
+                            'expire' => ['$gt' => new \MongoDate()]
                         ],
                     ],
                 ],
-                ['expire' => $expire > 0 ? $expire + time() : 0]
+                ['expire' => $expire > 0 ? new \MongoDate($expire + time()) : null]
             );
     }
 
@@ -409,7 +402,6 @@ class Cache implements CacheInterface
         return $result;
     }
 
-
     /**
      * @inheritdoc
      */
@@ -427,24 +419,5 @@ class Cache implements CacheInterface
     public function status()
     {
         throw new CacheException(CacheException::UNKNOWN_METHOD, ['method' => __METHOD__]);
-    }
-
-    /**
-     * Removes the expired data values.
-     *
-     * @param boolean $force whether to enforce the garbage collection regardless of {@see \rock\mongodb\Cache::$gcProbability}.
-     * Defaults to false, meaning the actual deletion happens with the probability as specified by {@see \rock\mongodb\Cache::$gcProbability}.
-     */
-    public function gc($force = false)
-    {
-        if ($force || mt_rand(0, 1000000) < $this->gcProbability) {
-            $this->storage->getCollection($this->cacheCollection)
-                ->remove([
-                             'expire' => [
-                                 '$gt' => 0,
-                                 '$lt' => time(),
-                             ]
-                         ]);
-        }
     }
 }

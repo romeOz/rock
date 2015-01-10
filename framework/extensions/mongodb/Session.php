@@ -52,6 +52,10 @@ class Session extends \rock\session\Session
         if (is_string($this->connection)) {
             $this->connection = Container::load($this->connection);
         }
+
+        $this->connection
+            ->getCollection($this->sessionCollection)
+            ->createIndex('expire', ['expireAfterSeconds' => 0]);
     }
 
     /**
@@ -94,9 +98,9 @@ class Session extends \rock\session\Session
         } else {
             // shouldn't reach here normally
             $collection->insert([
-                'id' => $newID,
-                'expire' => time() + $this->getTimeout()
-            ]);
+                                    'id' => $newID,
+                                    'expire' => new \MongoDate(time() + $this->getTimeout())
+                                ]);
         }
     }
 
@@ -112,7 +116,7 @@ class Session extends \rock\session\Session
         $doc = $collection->findOne(
             [
                 'id' => $id,
-                'expire' => ['$gt' => time()],
+                'expire' => ['$gt' => new \MongoDate()],
             ],
             ['data' => 1, '_id' => 0]
         );
@@ -137,7 +141,7 @@ class Session extends \rock\session\Session
                 [
                     'id' => $id,
                     'data' => $data,
-                    'expire' => time() + $this->getTimeout(),
+                    'expire' => new \MongoDate(time() + $this->getTimeout()),
                 ],
                 ['upsert' => true]
             );
@@ -162,20 +166,6 @@ class Session extends \rock\session\Session
             ['id' => $id],
             ['justOne' => true]
         );
-
-        return true;
-    }
-
-    /**
-     * Session GC (garbage collection) handler.
-     * Do not call this method directly.
-     * @param integer $maxLifetime the number of seconds after which data will be seen as 'garbage' and cleaned up.
-     * @return boolean whether session is GCed successfully
-     */
-    public function gcSession($maxLifetime)
-    {
-        $this->connection->getCollection($this->sessionCollection)
-            ->remove(['expire' => ['$lt' => time()]]);
 
         return true;
     }
