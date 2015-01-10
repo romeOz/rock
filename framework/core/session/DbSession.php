@@ -103,7 +103,7 @@ class DbSession extends Session
             ->where(['id' => $oldID])
             ->createCommand($this->connection)
             ->queryOne();
-        if ($row !== false) {
+        if ($row !== null) {
             if ($deleteOldSession) {
                 $this->connection->createCommand()
                     ->update($this->sessionTable, ['id' => $newID], ['id' => $oldID])
@@ -140,7 +140,7 @@ class DbSession extends Session
             ->createCommand($this->connection)
             ->queryScalar();
 
-        return $data === false ? '' : $data;
+        return $data === null ? '' : $data;
     }
 
     /**
