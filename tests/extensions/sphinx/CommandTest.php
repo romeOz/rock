@@ -119,7 +119,7 @@ class CommandTest extends SphinxTestCase
 
         $sql = 'SELECT * FROM article_index WHERE id=10';
         $command = $db->createCommand($sql);
-        $this->assertFalse($command->queryOne());
+        $this->assertNull($command->queryOne());
 
         // queryColumn
         $sql = 'SELECT * FROM article_index';
@@ -139,7 +139,7 @@ class CommandTest extends SphinxTestCase
         $this->assertEquals(1, $command->queryScalar());
 
         $command = $db->createCommand('SELECT id FROM article_index WHERE id=10');
-        $this->assertFalse($command->queryScalar());
+        $this->assertNull($command->queryScalar());
 
         $command = $db->createCommand('bad SQL');
         $this->setExpectedException(Exception::className());

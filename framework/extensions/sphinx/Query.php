@@ -120,13 +120,13 @@ class Query extends \rock\db\Query
      * @param Connection $connection the Sphinx connection used to generate the SQL statement.
      * If this parameter is not given, the `sphinx` application component will be used.
      * @param boolean       $subAttributes
-     * @return array|boolean the first row (in terms of an array) of the query result. False is returned if the query
+     * @return array|null the first row (in terms of an array) of the query result. False is returned if the query
      * results in nothing.
      */
     public function one($connection = null, $subAttributes = false)
     {
         $row = parent::one($connection, $subAttributes);
-        if ($row !== false) {
+        if ($row !== null) {
             list ($row) = $this->fillUpSnippets([$row]);
         }
 

@@ -214,7 +214,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
         $command = $this->createCommand($connection);
         $row = $command->queryOne(null, $subAttributes);
 
-        if ($row !== false) {
+        if ($row !== null) {
             if ($this->asArray) {
                 $model = $this->typeCast($row, $connection);
                 //$model = $this->typeCast($row, $class::getIndexSchema($connection)->columns);

@@ -319,7 +319,7 @@ class Command
      * @param integer $fetchMode the result fetch mode. Please refer to [PHP manual](http://www.php.net/manual/en/function.PDOStatement-setFetchMode.php)
      * for valid fetch modes. If this parameter is null, the value set in {@see \rock\db\Command::$fetchMode} will be used.
      * @param bool    $subAttributes
-     * @return array|boolean the first row (in terms of an array) of the query result. False is returned if the query
+     * @return array|null the first row (in terms of an array) of the query result. False is returned if the query
      * results in nothing.
      * @throws Exception execution failed
      */
@@ -331,7 +331,7 @@ class Command
     /**
      * Executes the SQL statement and returns the value of the first column in the first row of data.
      * This method is best used when only a single value is needed for a query.
-     * @return string|null|boolean the value of the first column in the first row of the query result.
+     * @return string|null the value of the first column in the first row of the query result.
      * False is returned if there is no value.
      * @throws Exception execution failed
      */
@@ -861,6 +861,9 @@ class Command
                     $fetchMode = $this->fetchMode;
                 }
                 $result = call_user_func_array([$this->pdoStatement, $method], (array)$fetchMode);
+                if ($result === false) {
+                    $result = null;
+                }
                 $result = $this->prepareResult($result, $subAttributes, $fetchMode);
                 $this->pdoStatement->closeCursor();
             }

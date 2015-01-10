@@ -240,7 +240,7 @@ class QueryTest extends DatabaseTestCase
         $result = (new Query)->from('customer')->where(['status' => 2])->one($connection);
         $this->assertEquals('user3', $result['name']);
         $result = (new Query)->from('customer')->where(['status' => 3])->one($connection);
-        $this->assertFalse($result);
+        $this->assertNull($result);
     }
 
     public function testCache()
