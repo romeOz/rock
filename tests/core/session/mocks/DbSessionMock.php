@@ -3,8 +3,8 @@
 namespace rockunit\core\session\mocks;
 
 
+use rock\db\DbSession;
 use rock\helpers\ArrayHelper;
-use rock\session\DbSession;
 
 class DbSessionMock extends DbSession
 {

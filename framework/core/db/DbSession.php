@@ -1,11 +1,11 @@
 <?php
 
-namespace rock\session;
+namespace rock\db;
 
-use rock\db\Connection;
-use rock\db\Query;
 use rock\exception\BaseException;
 use rock\Rock;
+use rock\session\Session;
+use rock\session\SessionException;
 
 /**
  * DbSession extends {@see \rock\session\Session} by using database as session data storage.
