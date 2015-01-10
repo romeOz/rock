@@ -313,7 +313,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
             return null;
         }
         $row = parent::one($connection, $subAttributes);
-        if ($row !== null) {
+        if ($row !== false) {
             $models = $this->prepareResult([$row], $connection);
             return reset($models) ?: null;
         } else {
