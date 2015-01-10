@@ -1,18 +1,18 @@
 <?php
 
-namespace rockunit\core\session;
+namespace rockunit\core\db;
 
 
 use rock\db\Query;
 use rockunit\common\CommonTestTrait;
-use rockunit\core\db\DatabaseTestCase;
-use rockunit\core\session\mocks\DbSessionMock;
+use rockunit\core\db\mocks\SessionMock;
+use rockunit\core\session\CommonSessionTrait;
 
 /**
  * @group base
  * @group db
  */
-class DbSessionTest extends DatabaseTestCase
+class SessionTest extends DatabaseTestCase
 {
     use CommonTestTrait;
     use CommonSessionTrait;
@@ -20,7 +20,7 @@ class DbSessionTest extends DatabaseTestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->handlerSession = new DbSessionMock(['connection' => $this->getConnection()]);
+        $this->handlerSession = new SessionMock(['connection' => $this->getConnection()]);
         $this->handlerSession->open();
         $this->handlerSession->removeAll();
     }

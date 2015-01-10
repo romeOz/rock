@@ -4,7 +4,6 @@ namespace rock\db;
 
 use rock\exception\BaseException;
 use rock\Rock;
-use rock\session\Session;
 use rock\session\SessionException;
 
 /**
@@ -24,7 +23,7 @@ use rock\session\SessionException;
  * ]
  * ```
  */
-class DbSession extends Session
+class Session extends \rock\session\Session
 {
     /**
      * @var Connection|string the DB connection object or the application component ID of the DB connection.

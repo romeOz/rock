@@ -1,12 +1,12 @@
 <?php
 
-namespace rockunit\core\session\mocks;
+namespace rockunit\core\db\mocks;
 
 
-use rock\db\DbSession;
+use rock\db\Session;
 use rock\helpers\ArrayHelper;
 
-class DbSessionMock extends DbSession
+class SessionMock extends Session
 {
     public function get($keys, $default = null)
     {
@@ -16,7 +16,6 @@ class DbSessionMock extends DbSession
         }
         return ArrayHelper::getValue($array, $keys, $default);
     }
-
 
     public function add($keys, $value)
     {

@@ -4,7 +4,7 @@ namespace rockunit\core\session;
 
 
 use rockunit\common\CommonTestTrait;
-use rockunit\core\session\mocks\SessionMock;
+use rockunit\core\db\mocks\SessionMock;
 
 /**
  * @group base

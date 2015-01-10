@@ -3,7 +3,7 @@ use rock\execute\CacheExecute;
 use rock\log\Log;
 use rock\rbac\PhpManager;
 use rock\Rock;
-use rockunit\core\session\mocks\SessionMock;
+use rockunit\core\db\mocks\SessionMock;
 use rockunit\mocks\CookieMock;
 
 $composerAutoload = dirname(__DIR__) . '/vendor/autoload.php';
