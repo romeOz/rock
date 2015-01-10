@@ -163,7 +163,7 @@ class Session extends \rock\session\Session
                 ->where(['id' => $id])
                 ->createCommand($this->connection)
                 ->queryScalar();
-            if ($exists === false) {
+            if ($exists === null) {
                 $this->connection
                     ->createCommand()
                     ->insert(
