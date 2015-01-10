@@ -276,13 +276,13 @@ class Query implements QueryInterface
      * @param Connection $connection the database connection used to generate the SQL statement.
      * If this parameter is not given, the `db` application component will be used.
      * @param boolean       $subAttributes
-     * @return array|  the first row (in terms of an array) of the query result. False is returned if the query
+     * @return array|boolean the first row (in terms of an array) of the query result. False is returned if the query
      * results in nothing.
      */
     public function one($connection = null, $subAttributes = false)
     {
         if (!$this->beforeFind()) {
-            return null;
+            return false;
         }
         $command = $this->createCommand($connection);
         $row = $command->queryOne(null, $subAttributes);
@@ -299,13 +299,13 @@ class Query implements QueryInterface
      *
      * @param Connection $connection the database connection used to generate the SQL statement.
      * If this parameter is not given, the `db` application component will be used.
-     * @return string|null the value of the first column in the first row of the query result.
+     * @return string|boolean the value of the first column in the first row of the query result.
      * False is returned if the query result is empty.
      */
     public function scalar($connection = null)
     {
         if (!$this->beforeFind()) {
-            return null;
+            return false;
         }
 
         $result = $this->typeCast($this->createCommand($connection)->queryScalar(), $connection);
