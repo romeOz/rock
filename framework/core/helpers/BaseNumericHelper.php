@@ -2,7 +2,7 @@
 namespace rock\helpers;
 
 
-class BaseNumeric
+class BaseNumericHelper
 {
     /**
      * Check is parity.

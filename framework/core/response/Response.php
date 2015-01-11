@@ -5,8 +5,8 @@ use rock\base\ComponentsTrait;
 use rock\csrf\CSRF;
 use rock\event\Event;
 use rock\exception\BaseException;
-use rock\helpers\File;
-use rock\helpers\String;
+use rock\helpers\FileHelper;
+use rock\helpers\StringHelper;
 use rock\Rock;
 use rock\url\Url;
 
@@ -454,7 +454,7 @@ class Response
      */
     public function sendFile($filePath, $attachmentName = null, $mimeType = null)
     {
-        if ($mimeType === null && ($mimeType = File::getMimeTypeByExtension($filePath)) === null) {
+        if ($mimeType === null && ($mimeType = FileHelper::getMimeTypeByExtension($filePath)) === null) {
             $mimeType = 'application/octet-stream';
         }
         if ($attachmentName === null) {
@@ -482,7 +482,7 @@ class Response
     public function sendContentAsFile($content, $attachmentName, $mimeType = 'application/octet-stream')
     {
         $headers = $this->getHeaders();
-        $contentLength = String::byteLength($content);
+        $contentLength = StringHelper::byteLength($content);
         $range = $this->getHttpRange($contentLength);
         if ($range === false) {
             $headers->set('Content-Range', "bytes */$contentLength");
@@ -495,14 +495,14 @@ class Response
             ->setDefault('Content-Type', $mimeType)
             ->setDefault('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
             ->setDefault('Content-Transfer-Encoding', 'binary')
-            ->setDefault('Content-Length', String::byteLength($content))
+            ->setDefault('Content-Length', StringHelper::byteLength($content))
             ->setDefault('Content-Disposition', "attachment; filename=\"$attachmentName\"");
 
         list($begin, $end) = $range;
         if ($begin !=0 || $end != $contentLength - 1) {
             $this->setStatusCode(206);
             $headers->set('Content-Range', "bytes $begin-$end/$contentLength");
-            $this->content = String::byteSubstr($content, $begin, $end - $begin + 1);
+            $this->content = StringHelper::byteSubstr($content, $begin, $end - $begin + 1);
         } else {
             $this->setStatusCode(200);
             $this->content = $content;
@@ -648,7 +648,7 @@ class Response
      */
     public function xSendFile($filePath, $attachmentName = null, $mimeType = null, $xHeader = 'X-Sendfile')
     {
-        if ($mimeType === null && ($mimeType = File::getMimeTypeByExtension($filePath)) === null) {
+        if ($mimeType === null && ($mimeType = FileHelper::getMimeTypeByExtension($filePath)) === null) {
             $mimeType = 'application/octet-stream';
         }
         if ($attachmentName === null) {

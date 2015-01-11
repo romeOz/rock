@@ -35,7 +35,7 @@ class BaseHelper implements SerializeInterface
         if ($value === 'null') {
             $value = null;
         } elseif (is_numeric($value)) {
-            $value = Numeric::toNumeric($value);
+            $value = NumericHelper::toNumeric($value);
         } elseif ($value === 'false') {
             $value = false;
         } elseif ($value === 'true') {

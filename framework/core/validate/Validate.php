@@ -3,7 +3,7 @@
 namespace rock\validate;
 
 use rock\base\ObjectTrait;
-use rock\helpers\String;
+use rock\helpers\StringHelper;
 use rock\i18n\i18nInterface;
 use rock\Rock;
 use rock\validate\locale\Locale;
@@ -69,10 +69,10 @@ use rock\validate\rules\Writable;
  * @method static Validate notOf(Validate $validate)
  * @method static Validate oneOf(Validate $validate)
  * @method static Validate when(Validate $if, Validate $then, Validate $else = null)
- * @method static Validate locale(string $locale)
+ * @method static Validate locale(StringHelper $locale)
  *
- * @method static Validate alnum(string $additionalChars = null)
- * @method static Validate alpha(string $additionalChars = null)
+ * @method static Validate alnum(StringHelper $additionalChars = null)
+ * @method static Validate alpha(StringHelper $additionalChars = null)
  * @method static Validate arr()
  * @method static Validate between(mixed $min = null, mixed $max = null, bool $inclusive = false)
  * @method static Validate bool()
@@ -83,8 +83,8 @@ use rock\validate\rules\Writable;
  * @method static Validate contains(mixed $containsValue, bool $identical = false)
  * @method static Validate confirm(mixed $compareTo)
  * @method static Validate csrf()
- * @method static Validate date(string $format = null)
- * @method static Validate digit(string $additionalChars = null)
+ * @method static Validate date(StringHelper $format = null)
+ * @method static Validate digit(StringHelper $additionalChars = null)
  * @method static Validate directory()
  * @method static Validate domain()
  * @method static Validate email()
@@ -98,7 +98,7 @@ use rock\validate\rules\Writable;
  * @method static Validate fileSizeMin(int $minValue, bool $inclusive = false)
  * @method static Validate fileSizeBetween(int $min = null, int $max = null, bool $inclusive = false)
  * @method static Validate float()
- * @method static Validate graph(string $additionalChars = null)
+ * @method static Validate graph(StringHelper $additionalChars = null)
  * @method static Validate in(array $haystack, bool $compareIdentical = false)
  * @method static Validate int()
  * @method static Validate ip(array $ipOptions = null)
@@ -117,7 +117,7 @@ use rock\validate\rules\Writable;
  * @method static Validate positive()
  * @method static Validate readable()
  * @method static Validate regex($regex)
- * @method static Validate space(string $additionalChars = null)
+ * @method static Validate space(StringHelper $additionalChars = null)
  * @method static Validate startsWith(mixed $startValue, bool $identical = false)
  * @method static Validate string()
  * @method static Validate symbolicLink()
@@ -458,7 +458,7 @@ class Validate implements i18nInterface
         if (empty($this->placeholders)) {
             return $message;
         }
-        return String::replace($message, $this->placeholders);
+        return StringHelper::replace($message, $this->placeholders);
     }
 
     protected function localeInternal($locale)

@@ -4,7 +4,7 @@ namespace rock\template\filters;
 
 
 use rock\base\ClassName;
-use rock\helpers\Numeric;
+use rock\helpers\NumericHelper;
 use rock\template\TemplateException;
 use rock\template\Template;
 
@@ -35,7 +35,7 @@ class NumericFilter
         $placeholders = [];
         $placeholders['output'] = $value;
 
-        return Numeric::isParity($value)
+        return NumericHelper::isParity($value)
             ? $template->replace($params['then'], $placeholders)
             : $template->replace($params['else'], $placeholders);
     }
@@ -48,7 +48,7 @@ class NumericFilter
      */
     public static function positive($value)
     {
-        return Numeric::toPositive($value);
+        return NumericHelper::toPositive($value);
     }
 
     /**

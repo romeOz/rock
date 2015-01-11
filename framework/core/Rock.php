@@ -10,7 +10,7 @@ use rock\di\Container;
 use rock\event\Event;
 use rock\exception\BaseException;
 use rock\helpers\ObjectHelper;
-use rock\helpers\String;
+use rock\helpers\StringHelper;
 use rock\helpers\Trace;
 use rock\i18n\i18nInterface;
 use rock\log\Log;
@@ -189,7 +189,7 @@ class Rock
      */
     public static function getAlias($alias, array $placeholders = [],  $throwException = true)
     {
-        $alias = String::replace($alias, $placeholders);
+        $alias = StringHelper::replace($alias, $placeholders);
         if (strncmp($alias, '@', 1)) {
             // not an alias
             return $alias;

@@ -2,11 +2,11 @@
 namespace rock\helpers;
 
 /**
- * Helper "File"
+ * Helper "String"
  *
  * @package rock\helpers
  */
-class File extends BaseFile
+class StringHelper extends BaseString
 {
 
 }

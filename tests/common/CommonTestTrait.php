@@ -7,7 +7,7 @@ use League\Flysystem\Adapter\Local;
 use rock\cache\CacheFile;
 use rock\cache\CacheStub;
 use rock\file\FileManager;
-use rock\helpers\File;
+use rock\helpers\FileHelper;
 use rock\Rock;
 
 trait CommonTestTrait
@@ -34,8 +34,8 @@ trait CommonTestTrait
         $runtime = Rock::getAlias('@runtime');
 //        @rmdir("{$runtime}/cache");
 //        @rmdir("{$runtime}/filesystem");
-        File::deleteDirectory("{$runtime}/cache");
-        File::deleteDirectory("{$runtime}/filesystem");
+        FileHelper::deleteDirectory("{$runtime}/cache");
+        FileHelper::deleteDirectory("{$runtime}/filesystem");
         @unlink("{$runtime}/cache.tmp");
         @unlink("{$runtime}/filesystem.tmp");
     }

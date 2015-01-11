@@ -2,8 +2,8 @@
 namespace rock\base;
 
 use rock\helpers\ArrayHelper;
-use rock\helpers\File;
-use rock\helpers\String;
+use rock\helpers\FileHelper;
+use rock\helpers\StringHelper;
 use rock\Rock;
 use rock\template\Template;
 
@@ -62,7 +62,7 @@ abstract class Controller implements ComponentsInterface
      */
     public function render($layout, array $placeholders = [],$defaultPathLayout = '@views'){
 
-        $layout = File::normalizePath(Rock::getAlias($layout));
+        $layout = FileHelper::normalizePath(Rock::getAlias($layout));
         if (!strstr($layout, DS)) {
             $class = explode('\\', get_class($this));
             $layout = Rock::getAlias($defaultPathLayout). DS . 'layouts' . DS .
@@ -88,7 +88,7 @@ abstract class Controller implements ComponentsInterface
     public function notPage($layout = null)
     {
         $this->Rock->response->status404();
-        $this->template->title = String::upperFirst( Rock::t('notPage'));
+        $this->template->title = StringHelper::upperFirst( Rock::t('notPage'));
         if (!isset($layout)) {
             $layout = '@common.views/layouts/notPage';
         }

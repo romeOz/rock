@@ -3,7 +3,7 @@ namespace rock\exception;
 
 use rock\base\ClassName;
 use rock\helpers\Helper;
-use rock\helpers\String;
+use rock\helpers\StringHelper;
 use rock\log\Log;
 use rock\response\Response;
 use rock\Rock;
@@ -184,7 +184,7 @@ class BaseException extends \Exception implements ExceptionInterface
         }
 
         $traces['message'] = $message;
-        return String::replace(static::$format, $traces, false);
+        return StringHelper::replace(static::$format, $traces, false);
     }
 
     /**
@@ -222,7 +222,7 @@ class BaseException extends \Exception implements ExceptionInterface
     protected function prepareMsg($msg = null, array $placeholders = [])
     {
         if (isset($msg)) {
-            return String::replace($msg, $placeholders);
+            return StringHelper::replace($msg, $placeholders);
         }
 
         return $msg;

@@ -3,7 +3,7 @@
 namespace rockunit\extensions\mongodb\file;
 
 
-use rock\helpers\File;
+use rock\helpers\FileHelper;
 use rock\Rock;
 use rockunit\extensions\mongodb\MongoDbTestCase;
 use rock\mongodb\file\ActiveQuery;
@@ -27,7 +27,7 @@ class ActiveRecordTest extends MongoDbTestCase
         $this->setUpTestRows();
         $filePath = $this->getTestFilePath();
         if (!file_exists($filePath)) {
-            File::createDirectory($filePath);
+            FileHelper::createDirectory($filePath);
         }
     }
 
@@ -35,7 +35,7 @@ class ActiveRecordTest extends MongoDbTestCase
     {
         $filePath = $this->getTestFilePath();
         if (file_exists($filePath)) {
-            File::deleteDirectory($filePath);
+            FileHelper::deleteDirectory($filePath);
         }
         $this->dropFileCollection(CustomerFile::collectionName());
         parent::tearDown();

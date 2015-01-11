@@ -4,7 +4,7 @@ namespace rock\file;
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
 use rock\base\Model;
-use rock\helpers\File;
+use rock\helpers\FileHelper;
 use rock\helpers\Html;
 use rock\Rock;
 
@@ -193,7 +193,7 @@ class UploadedFile implements ComponentsInterface
      */
     public static  function getSizeLimit($maxSize = null)
     {
-        $limit = File::sizeToBytes(ini_get('upload_max_filesize'));
+        $limit = FileHelper::sizeToBytes(ini_get('upload_max_filesize'));
         if ($maxSize !== null && $limit > 0 && $maxSize < $limit) {
             $limit = $maxSize;
         }
@@ -315,7 +315,7 @@ class UploadedFile implements ComponentsInterface
                 'name' => $names,
                 'tempName' => $tempNames,
                 'type' => $types,
-                'size' => File::fixedIntegerOverflow($sizes),
+                'size' => FileHelper::fixedIntegerOverflow($sizes),
                 'error' => $errors,
             ]);
             self::$_files[$key] = $self;

@@ -3,7 +3,7 @@ namespace rock\snippets;
 
 use rock\base\Snippet;
 use rock\helpers\Helper;
-use rock\helpers\String;
+use rock\helpers\StringHelper;
 use rock\Rock;
 
 /**
@@ -146,7 +146,7 @@ class Pagination extends Snippet
         }
         if (is_string($this->pageArgs)) {
             parse_str(
-                String::removeSpaces($this->pageArgs),
+                StringHelper::removeSpaces($this->pageArgs),
                 $this->pageArgs
             );
         }

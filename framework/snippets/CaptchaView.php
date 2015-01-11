@@ -4,7 +4,7 @@ namespace rock\snippets;
 
 
 use rock\base\Snippet;
-use rock\helpers\File;
+use rock\helpers\FileHelper;
 use rock\Rock;
 
 /**
@@ -30,7 +30,7 @@ class CaptchaView extends Snippet
         $uniq = uniqid();
         $path = Rock::getAlias('@assets') . DS . 'cache' . DS . 'captcha' . DS . $uniq . $ext;
 
-        if (File::create($path, $dataImage['image'])) {
+        if (FileHelper::create($path, $dataImage['image'])) {
             return Rock::getAlias('@web') . '/cache/captcha/' . $uniq . $ext;
         }
 

@@ -2,7 +2,7 @@
 namespace rock\snippets;
 use rock\base\Snippet;
 use rock\helpers\Helper;
-use rock\helpers\String;
+use rock\helpers\StringHelper;
 
 /**
  * Snippet "Formula"
@@ -41,7 +41,7 @@ class Formula extends Snippet
         }
 
         return $this->Rock->eval->get(
-            String::removeSpaces('return ' . preg_replace('/:([\\w]+)/', '$data[\'$1\']', $this->subject) . ';'),
+            StringHelper::removeSpaces('return ' . preg_replace('/:([\\w]+)/', '$data[\'$1\']', $this->subject) . ';'),
             [
                 'subject'   => $this->subject,
                 'operands'    => $this->operands

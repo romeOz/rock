@@ -8,13 +8,13 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\PluginInterface;
 use rock\base\ComponentsTrait;
 use rock\helpers\ArrayHelper;
-use rock\helpers\String;
+use rock\helpers\StringHelper;
 
 /**
- * @method bool deleteDir(string $dirname)
- * @method bool put(string $path, $contents, $config = null)
- * @method bool createDir(string $dirname)
- * @method bool putStream(string $path, $resource, $config = null)
+ * @method bool deleteDir(StringHelper $dirname)
+ * @method bool put(StringHelper $path, $contents, $config = null)
+ * @method bool createDir(StringHelper $dirname)
+ * @method bool putStream(StringHelper $path, $resource, $config = null)
  * @method false|resource readStream($path)
  * @method flushCache();
  * @method addPlugin(PluginInterface $plugin)
@@ -84,7 +84,7 @@ class FileManager
      */
     public function has($path, $is = null)
     {
-        if (String::isRegexp($path) && (!$path = $this->searchByPattern($path, false, $is))) {
+        if (StringHelper::isRegexp($path) && (!$path = $this->searchByPattern($path, false, $is))) {
             return false;
         }
 
@@ -107,14 +107,14 @@ class FileManager
      */
     public function read($path)
     {
-        if (String::isRegexp($path) && (!$path = $this->searchByPattern($path))) {
+        if (StringHelper::isRegexp($path) && (!$path = $this->searchByPattern($path))) {
             return false;
         }
 
         try {
             return $this->getFilesystem()->read($path);
         } catch (\Exception $e) {
-            $this->errors[] = String::replace(FileException::UNKNOWN_FILE, ['path' => $path]);
+            $this->errors[] = StringHelper::replace(FileException::UNKNOWN_FILE, ['path' => $path]);
         }
         return false;
     }
@@ -127,14 +127,14 @@ class FileManager
      */
     public function readAndDelete($path)
     {
-        if (String::isRegexp($path) && (!$path = $this->searchByPattern($path))) {
+        if (StringHelper::isRegexp($path) && (!$path = $this->searchByPattern($path))) {
             return false;
         }
 
         try {
             return $this->getFilesystem()->readAndDelete($path);
         } catch (\Exception $e) {
-            $this->errors[] = String::replace(FileException::UNKNOWN_FILE, ['path' => $path]);
+            $this->errors[] = StringHelper::replace(FileException::UNKNOWN_FILE, ['path' => $path]);
         }
         return false;
     }
@@ -152,7 +152,7 @@ class FileManager
         try {
             return $this->getFilesystem()->write($path, $contents, $config);
         } catch (\Exception $e) {
-            $this->errors[] = String::replace(FileException::FILE_EXISTS, ['path' => $path]);
+            $this->errors[] = StringHelper::replace(FileException::FILE_EXISTS, ['path' => $path]);
         }
         return false;
     }
@@ -180,7 +180,7 @@ class FileManager
         try {
             return $this->getFilesystem()->update($path, $contents, $config);
         } catch (\Exception $e) {
-            $this->errors[] = String::replace(FileException::FILE_EXISTS, ['path' => $path]);
+            $this->errors[] = StringHelper::replace(FileException::FILE_EXISTS, ['path' => $path]);
         }
         return false;
     }
@@ -233,7 +233,7 @@ class FileManager
             return false;
         }
 
-        return $this->rename($path, String::replace($newpath, array_merge($metadata, $dataReplace)));
+        return $this->rename($path, StringHelper::replace($newpath, array_merge($metadata, $dataReplace)));
     }
 
     /**
@@ -267,7 +267,7 @@ class FileManager
      */
     public function getMetadata($path)
     {
-        if (String::isRegexp($path) && (!$path = $this->searchByPattern($path))) {
+        if (StringHelper::isRegexp($path) && (!$path = $this->searchByPattern($path))) {
             return false;
         }
 
@@ -293,7 +293,7 @@ class FileManager
      */
     public function getWithMetadata($path, array $metadata)
     {
-        if (String::isRegexp($path) && (!$path = $this->searchByPattern($path))) {
+        if (StringHelper::isRegexp($path) && (!$path = $this->searchByPattern($path))) {
             return false;
         }
 
@@ -319,7 +319,7 @@ class FileManager
      */
     public function getVisibility($path)
     {
-        if (String::isRegexp($path) && (!$path = $this->searchByPattern($path))) {
+        if (StringHelper::isRegexp($path) && (!$path = $this->searchByPattern($path))) {
             return false;
         }
 
@@ -345,7 +345,7 @@ class FileManager
      */
     public function getTimestamp($path)
     {
-        if (String::isRegexp($path) && (!$path = $this->searchByPattern($path))) {
+        if (StringHelper::isRegexp($path) && (!$path = $this->searchByPattern($path))) {
             return false;
         }
 
@@ -371,7 +371,7 @@ class FileManager
      */
     public function getMimetype($path)
     {
-        if (String::isRegexp($path) && (!$path = $this->searchByPattern($path))) {
+        if (StringHelper::isRegexp($path) && (!$path = $this->searchByPattern($path))) {
             return false;
         }
 
@@ -397,7 +397,7 @@ class FileManager
      */
     public function getSize($path)
     {
-        if (String::isRegexp($path) && (!$path = $this->searchByPattern($path))) {
+        if (StringHelper::isRegexp($path) && (!$path = $this->searchByPattern($path))) {
             return false;
         }
 
@@ -422,14 +422,14 @@ class FileManager
      */
     public function delete($path)
     {
-        if (String::isRegexp($path) && (!$path = $this->searchByPattern($path))) {
+        if (StringHelper::isRegexp($path) && (!$path = $this->searchByPattern($path))) {
             return false;
         }
 
         try {
             return $this->getFilesystem()->delete($path);
         } catch (\Exception $e) {
-            $this->errors[] = String::replace(FileException::UNKNOWN_FILE, ['path' => $path]);
+            $this->errors[] = StringHelper::replace(FileException::UNKNOWN_FILE, ['path' => $path]);
         }
         return false;
     }
@@ -466,7 +466,7 @@ class FileManager
     public function listContents($directory = '', $recursive = false, $is = null)
     {
         if (!empty($directory)) {
-            if (String::isRegexp($directory)) {
+            if (StringHelper::isRegexp($directory)) {
                 return $this->searchDirByPattern($directory, $recursive, $is);
             }
         }
@@ -494,7 +494,7 @@ class FileManager
     public function listPaths($directory = '', $recursive = false, $is = null)
     {
         if (!empty($directory)) {
-            if (String::isRegexp($directory)) {
+            if (StringHelper::isRegexp($directory)) {
                 return ArrayHelper::getColumn($this->searchDirByPattern($directory, $recursive, $is), 'path');
             }
         }
@@ -525,7 +525,7 @@ class FileManager
     public function listWith(array $keys = [], $directory = '', $recursive = false, $is = null)
     {
         if (!empty($directory)) {
-            if (String::isRegexp($directory)) {
+            if (StringHelper::isRegexp($directory)) {
                 return $this->searchFilesWithByPattern($keys, $directory, $recursive, $is = null);
             }
         }
@@ -572,7 +572,7 @@ class FileManager
             }
         }
         if ($error === true) {
-            $this->errors[] = String::replace(FileException::UNKNOWN_FILE, ['path' => $pattern]);
+            $this->errors[] = StringHelper::replace(FileException::UNKNOWN_FILE, ['path' => $pattern]);
         }
         return null;
     }

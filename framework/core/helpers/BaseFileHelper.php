@@ -10,7 +10,7 @@ use rock\Rock;
  *
  * @package rock\helpers
  */
-class BaseFile extends Util
+class BaseFileHelper extends Util
 {
     const PATTERN_NODIR = 1;
     const PATTERN_ENDSWITH = 4;
@@ -381,11 +381,11 @@ class BaseFile extends Util
         }
         if ($pattern[0] == '!') {
             $result['flags'] |= self::PATTERN_NEGATIVE;
-            $pattern = String::byteSubstr($pattern, 1, String::byteLength($pattern));
+            $pattern = StringHelper::byteSubstr($pattern, 1, StringHelper::byteLength($pattern));
         }
-        $len = String::byteLength($pattern);
-        if ($len && String::byteSubstr($pattern, -1, 1) == '/') {
-            $pattern = String::byteSubstr($pattern, 0, -1);
+        $len = StringHelper::byteLength($pattern);
+        if ($len && StringHelper::byteSubstr($pattern, -1, 1) == '/') {
+            $pattern = StringHelper::byteSubstr($pattern, 0, -1);
             $len--;
             $result['flags'] |= self::PATTERN_MUSTBEDIR;
         }
@@ -394,7 +394,7 @@ class BaseFile extends Util
         }
         $result['firstWildcard'] = self::firstWildcardInPattern($pattern);
         if ($pattern[0] == '*' &&
-            self::firstWildcardInPattern(String::byteSubstr($pattern, 1, String::byteLength($pattern))) === false
+            self::firstWildcardInPattern(StringHelper::byteSubstr($pattern, 1, StringHelper::byteLength($pattern))) === false
         ) {
             $result['flags'] |= self::PATTERN_ENDSWITH;
         }
@@ -440,8 +440,8 @@ class BaseFile extends Util
             }
         } else if ($flags & self::PATTERN_ENDSWITH) {
             /* "*literal" matching against "fooliteral" */
-            $n = String::byteLength($pattern);
-            if (String::byteSubstr($pattern, 1, $n) === String::byteSubstr($baseName, -$n, $n)) {
+            $n = StringHelper::byteLength($pattern);
+            if (StringHelper::byteSubstr($pattern, 1, $n) === StringHelper::byteSubstr($baseName, -$n, $n)) {
                 return true;
             }
         }
@@ -465,16 +465,16 @@ class BaseFile extends Util
     {
         // match with FNM_PATHNAME; the pattern has base implicitly in front of it.
         if (isset($pattern[0]) && $pattern[0] == '/') {
-            $pattern = String::byteSubstr($pattern, 1, String::byteLength($pattern));
+            $pattern = StringHelper::byteSubstr($pattern, 1, StringHelper::byteLength($pattern));
             if ($firstWildcard !== false && $firstWildcard !== 0) {
                 $firstWildcard--;
             }
         }
-        $namelen = String::byteLength($path) - (empty($basePath) ? 0 : String::byteLength($basePath) + 1);
-        $name = String::byteSubstr($path, -$namelen, $namelen);
+        $namelen = StringHelper::byteLength($path) - (empty($basePath) ? 0 : StringHelper::byteLength($basePath) + 1);
+        $name = StringHelper::byteSubstr($path, -$namelen, $namelen);
         if ($firstWildcard !== 0) {
             if ($firstWildcard === false) {
-                $firstWildcard = String::byteLength($pattern);
+                $firstWildcard = StringHelper::byteLength($pattern);
             }
             // if the non-wildcard part is longer than the remaining pathname, surely it cannot match.
             if ($firstWildcard > $namelen) {
@@ -483,8 +483,8 @@ class BaseFile extends Util
             if (strncmp($pattern, $name, $firstWildcard)) {
                 return false;
             }
-            $pattern = String::byteSubstr($pattern, $firstWildcard, String::byteLength($pattern));
-            $name = String::byteSubstr($name, $firstWildcard, $namelen);
+            $pattern = StringHelper::byteSubstr($pattern, $firstWildcard, StringHelper::byteLength($pattern));
+            $name = StringHelper::byteSubstr($name, $firstWildcard, $namelen);
             // If the whole pattern did not have a wildcard, then our prefix match is all we need; we do not need to call fnmatch at all.
             if (empty($pattern) && empty($name)) {
                 return true;

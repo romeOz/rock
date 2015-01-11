@@ -3,7 +3,7 @@ namespace rock\snippets;
 
 use rock\base\Snippet;
 use rock\helpers\Helper;
-use rock\helpers\String;
+use rock\helpers\StringHelper;
 
 /**
  * Snippet "IfSnippet"
@@ -75,6 +75,6 @@ class IfSnippet extends Snippet
                 : null
             );
 
-        return $this->Rock->eval->get(String::removeSpaces($value), $paramsTpl, $data);
+        return $this->Rock->eval->get(StringHelper::removeSpaces($value), $paramsTpl, $data);
     }
 }

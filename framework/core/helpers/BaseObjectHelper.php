@@ -174,7 +174,7 @@ class BaseObjectHelper
     {
         $class = static::getClass($class);
 
-        return String::basename($class);
+        return StringHelper::basename($class);
     }
 
     /**

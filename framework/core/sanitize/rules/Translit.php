@@ -9,6 +9,6 @@ class Translit extends Rule
      */
     public function sanitize($input)
     {
-        return is_string($input) ? \rock\helpers\String::translit($input) : $input;
+        return is_string($input) ? \rock\helpers\StringHelper::translit($input) : $input;
     }
 } 

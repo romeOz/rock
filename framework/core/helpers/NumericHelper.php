@@ -1,12 +1,13 @@
 <?php
+
 namespace rock\helpers;
 
 /**
- * Helper "String"
+ * Helper "Numeric"
  *
  * @package rock\helpers
  */
-class String extends BaseString
+class NumericHelper extends BaseNumericHelper
 {
 
 }

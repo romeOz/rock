@@ -75,7 +75,7 @@ class BaseHtml
      */
     public static function decode($content)
     {
-        return String::decode($content);
+        return StringHelper::decode($content);
     }
 
     /**
@@ -204,7 +204,7 @@ class BaseHtml
      */
     public static function encode($content, $doubleEncode = true)
     {
-        return String::encode($content, $doubleEncode);
+        return StringHelper::encode($content, $doubleEncode);
     }
 
     /**

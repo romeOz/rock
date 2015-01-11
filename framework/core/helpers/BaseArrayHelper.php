@@ -736,7 +736,7 @@ class BaseArrayHelper
             $result[] =
                 $key . ((isset($value) && $value !== 'null')
                     ? $separator . ($const & static::ESCAPE
-                        ? String::doubleQuotes($value)
+                        ? StringHelper::doubleQuotes($value)
                         : $value)
                     : null);
         }

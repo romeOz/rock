@@ -9,7 +9,7 @@ class FileSizeMin extends Rule
     public function __construct($minValue, $inclusive = false, $config = [])
     {
         $this->parentConstruct($config);
-        $this->params['minValue'] = \rock\helpers\File::sizeToBytes($minValue);
+        $this->params['minValue'] = \rock\helpers\FileHelper::sizeToBytes($minValue);
         $this->params['inclusive'] = $inclusive;
     }
 

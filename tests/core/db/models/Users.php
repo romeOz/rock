@@ -9,7 +9,7 @@ use apps\frontend\models\geo\Regions;
 use apps\frontend\models\templates\Templates;
 use apps\frontend\models\users\ImagesUsers;
 use rock\db\SelectBuilder;
-use rock\helpers\String;
+use rock\helpers\StringHelper;
 
 
 class Users extends BaseUsers

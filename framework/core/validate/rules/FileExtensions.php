@@ -38,12 +38,12 @@ class FileExtensions extends Rule
         }
 
         if ($this->params['checkExtensionByMimeType']) {
-            $mimeType = \rock\helpers\File::getMimeType($input);
+            $mimeType = \rock\helpers\FileHelper::getMimeType($input);
             if ($mimeType === null) {
                 $this->params['extensions'] = $this->toString($this->params['extensions']);
                 return false;
             }
-            $extensionsByMimeType = \rock\helpers\File::getExtensionsByMimeType($mimeType);
+            $extensionsByMimeType = \rock\helpers\FileHelper::getExtensionsByMimeType($mimeType);
             if (!in_array($extension, $extensionsByMimeType, true)) {
                 $this->params['extensions'] = $this->toString($this->params['extensions']);
                 return false;

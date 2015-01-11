@@ -4,8 +4,8 @@ namespace rockunit\migrations;
 
 use rock\db\Migration;
 use rock\db\Schema;
-use rock\helpers\Numeric;
-use rock\helpers\String;
+use rock\helpers\NumericHelper;
+use rock\helpers\StringHelper;
 use rock\Rock;
 
 class UsersMigration extends Migration
@@ -71,7 +71,7 @@ class UsersMigration extends Migration
 
     protected function hash($value)
     {
-        return Numeric::hexToBin(md5($value. static::$table));
+        return NumericHelper::hexToBin(md5($value. static::$table));
     }
 
     protected function prepareUrl($username)
@@ -88,7 +88,7 @@ class UsersMigration extends Migration
     protected function translitUsername($username)
     {
         return strtolower(
-            String::translit(
+            StringHelper::translit(
                 preg_replace(
                     [
                         '/[^\\w\\s\-]+/iu',

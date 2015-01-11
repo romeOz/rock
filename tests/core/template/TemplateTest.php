@@ -7,7 +7,7 @@ use League\Flysystem\Adapter\Local;
 use League\Flysystem\Cache\Adapter;
 use rock\cache\CacheFile;
 use rock\file\FileManager;
-use rock\helpers\String;
+use rock\helpers\StringHelper;
 use rock\i18n\i18nInterface;
 use rock\Rock;
 use rock\template\TemplateException;
@@ -353,7 +353,7 @@ class TemplateTest extends TemplateCommon
         $this->template->removeAllPlaceholders();
 
         // encode
-        $this->assertSame($this->template->replace('[[!+title:encode]]', ['title'=> '<b>Hello World</b>']), String::encode('<b>Hello World</b>'));
+        $this->assertSame($this->template->replace('[[!+title:encode]]', ['title'=> '<b>Hello World</b>']), StringHelper::encode('<b>Hello World</b>'));
         $this->template->removeAllPlaceholders();
 
         // decode
@@ -554,9 +554,9 @@ class TemplateTest extends TemplateCommon
     public function testSnippet()
     {
         $className = TestSnippet::className();
-        $this->assertSame($this->template->getSnippet($className, ['param' => '<b>test snippet</b>']), String::encode('<b>test snippet</b>'));
-        $this->assertSame($this->template->getSnippet(new TestSnippet(), ['param' => '<b>test snippet</b>']), String::encode('<b>test snippet</b>'));
-        $this->assertSame($this->template->replace('[['.$className.'?param=`<b>test snippet</b>`]]'), String::encode('<b>test snippet</b>'));
+        $this->assertSame($this->template->getSnippet($className, ['param' => '<b>test snippet</b>']), StringHelper::encode('<b>test snippet</b>'));
+        $this->assertSame($this->template->getSnippet(new TestSnippet(), ['param' => '<b>test snippet</b>']), StringHelper::encode('<b>test snippet</b>'));
+        $this->assertSame($this->template->replace('[['.$className.'?param=`<b>test snippet</b>`]]'), StringHelper::encode('<b>test snippet</b>'));
         $this->assertSame($this->template->replace('[[!'.$className.'?param=`<b>test snippet</b>`]]'), '<b>test snippet</b>');
     }
 
@@ -588,7 +588,7 @@ class TemplateTest extends TemplateCommon
             },
         ];
 
-        $this->assertSame($this->template->replace('[[#extension.get?param=`<b>test extension</b>`]]'), String::encode('<b>test extension</b>'));
+        $this->assertSame($this->template->replace('[[#extension.get?param=`<b>test extension</b>`]]'), StringHelper::encode('<b>test extension</b>'));
         $this->assertSame($this->template->replace('[[!#extension.get?param=`<b>test extension</b>`]]'), '<b>test extension</b>');
     }
 

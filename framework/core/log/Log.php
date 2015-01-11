@@ -7,8 +7,8 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use rock\base\ObjectTrait;
-use rock\helpers\File;
-use rock\helpers\String;
+use rock\helpers\FileHelper;
+use rock\helpers\StringHelper;
 use rock\Rock;
 
 class Log implements LoggerInterface
@@ -29,7 +29,7 @@ class Log implements LoggerInterface
         static::$logger = new Logger('Rock');
 
         $path = Rock::getAlias(static::$path);
-        File::createDirectory($path);
+        FileHelper::createDirectory($path);
         $formatter = new LineFormatter("[%datetime%]\t%level_name%\t%extra.hash%\t%message%\t%extra.user_id%\t%extra.user_ip%\t%extra.user_agent%\n");
         static::$logger->pushProcessor(function ($record) {
                 $record['extra']['hash'] = substr(md5($record['message']), -6);
@@ -65,7 +65,7 @@ class Log implements LoggerInterface
      */
     public function log($level, $message, array $placeholders = [])
     {
-        return static::$logger->log($level, String::replace($message, $placeholders, false), $placeholders);
+        return static::$logger->log($level, StringHelper::replace($message, $placeholders, false), $placeholders);
     }
 
     /**
@@ -79,7 +79,7 @@ class Log implements LoggerInterface
      */
     public function debug($message, array $placeholders = [])
     {
-        return static::$logger->debug(String::replace($message, $placeholders, false), $placeholders);
+        return static::$logger->debug(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
 
     /**
@@ -93,7 +93,7 @@ class Log implements LoggerInterface
      */
     public function info($message, array $placeholders = [])
     {
-        return static::$logger->info(String::replace($message, $placeholders, false), $placeholders);
+        return static::$logger->info(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
 
     /**
@@ -107,7 +107,7 @@ class Log implements LoggerInterface
      */
     public function notice($message, array $placeholders = [])
     {
-        return static::$logger->notice(String::replace($message, $placeholders, false), $placeholders);
+        return static::$logger->notice(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
 
     /**
@@ -121,7 +121,7 @@ class Log implements LoggerInterface
      */
     public function warn($message, array $placeholders = [])
     {
-        return static::$logger->warn(String::replace($message, $placeholders, false), $placeholders);
+        return static::$logger->warn(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
 
     /**
@@ -135,7 +135,7 @@ class Log implements LoggerInterface
      */
     public function warning($message, array $placeholders = [])
     {
-        return static::$logger->warn(String::replace($message, $placeholders, false), $placeholders);
+        return static::$logger->warn(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
 
     /**
@@ -150,7 +150,7 @@ class Log implements LoggerInterface
     public function err($message, array $placeholders = [])
     {
 
-        return static::$logger->err(String::replace($message, $placeholders, false), $placeholders);
+        return static::$logger->err(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
 
     /**
@@ -164,7 +164,7 @@ class Log implements LoggerInterface
      */
     public function error($message, array $dataReplace = [])
     {
-        return static::$logger->err(String::replace($message, $dataReplace, false), $dataReplace);
+        return static::$logger->err(StringHelper::replace($message, $dataReplace, false), $dataReplace);
     }
 
     /**
@@ -178,7 +178,7 @@ class Log implements LoggerInterface
      */
     public function crit($message, array $placeholders = [])
     {
-        return static::$logger->crit(String::replace($message, $placeholders, false), $placeholders);
+        return static::$logger->crit(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
 
     /**
@@ -192,7 +192,7 @@ class Log implements LoggerInterface
      */
     public function critical($message, array $placeholders = [])
     {
-        return static::$logger->crit(String::replace($message, $placeholders, false), $placeholders);
+        return static::$logger->crit(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
 
     /**
@@ -206,7 +206,7 @@ class Log implements LoggerInterface
      */
     public function alert($message, array $placeholders = [])
     {
-        return static::$logger->alert(String::replace($message, $placeholders, false), $placeholders);
+        return static::$logger->alert(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
 
     /**
@@ -220,7 +220,7 @@ class Log implements LoggerInterface
      */
     public function emerg($message, array $placeholders = [])
     {
-        return static::$logger->emerg(String::replace($message, $placeholders, false), $placeholders);
+        return static::$logger->emerg(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
 
     /**
@@ -234,6 +234,6 @@ class Log implements LoggerInterface
      */
     public function emergency($message, array $placeholders = [])
     {
-        return static::$logger->emerg(String::replace($message, $placeholders, false), $placeholders);
+        return static::$logger->emerg(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
 }

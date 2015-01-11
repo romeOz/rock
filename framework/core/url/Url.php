@@ -5,7 +5,7 @@ namespace rock\url;
 use rock\base\ObjectTrait;
 use rock\di\Container;
 use rock\helpers\Helper;
-use rock\helpers\String;
+use rock\helpers\StringHelper;
 use rock\Rock;
 
 /**
@@ -216,11 +216,11 @@ class Url implements UrlInterface
 
     protected function build(array $data)
     {
-        $url = String::rconcat($data['scheme'], '://');
+        $url = StringHelper::rconcat($data['scheme'], '://');
 
         if (isset($data['user']) && isset($data['pass'])) {
-            $url .= String::rconcat($data['user'], ':');
-            $url .= String::rconcat($data['pass'], '@');
+            $url .= StringHelper::rconcat($data['user'], ':');
+            $url .= StringHelper::rconcat($data['pass'], '@');
         }
         $url .= Helper::getValue($data['host']);
         if (isset($data['path'])) {
@@ -233,7 +233,7 @@ class Url implements UrlInterface
             // @see http://php.net/manual/ru/function.http-build-query.php#111819
             $url .= '?' . preg_replace('/%5B[0-9]+%5D/i', '%5B%5D', http_build_query($data['query']));
         }
-        $url .= String::lconcat($data['fragment'], '#');
+        $url .= StringHelper::lconcat($data['fragment'], '#');
 
         return $url;
     }

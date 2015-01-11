@@ -9,7 +9,7 @@ use rock\di\Container;
 use rock\event\Event;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
-use rock\helpers\String;
+use rock\helpers\StringHelper;
 use rock\request\RequestInterface;
 use rock\Rock;
 use rock\sanitize\Sanitize;
@@ -330,7 +330,7 @@ class Route implements RequestInterface, ErrorsInterface
     protected function validPattern($pattern, $url)
     {
         if ($pattern === '*' || $pattern === $url ||
-            (String::isRegexp($pattern) && $this->match($pattern, $url))
+            (StringHelper::isRegexp($pattern) && $this->match($pattern, $url))
         ) {
             return true;
         }
@@ -456,7 +456,7 @@ class Route implements RequestInterface, ErrorsInterface
             list ($verbs, $pattern, $handler, $_filters) = $value;
             $filters = !empty($filters['filters']) ? $filters['filters'] : $_filters ;
 
-            if (String::isRegexp($pattern)) {
+            if (StringHelper::isRegexp($pattern)) {
                 $url = preg_quote($url, '/');
                 $pattern = "~{$pattern}";
             }

@@ -5,7 +5,7 @@ use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
-use rock\helpers\String;
+use rock\helpers\StringHelper;
 use rock\Rock;
 
 class i18n implements ObjectInterface, i18nInterface
@@ -192,7 +192,7 @@ class i18n implements ObjectInterface, i18nInterface
             throw new i18nException(i18nException::UNKNOWN_I18N, ['name' => "{$this->category}[{$keys}]"]);
         }
 
-        return String::replace($result, $placeholders, $this->removeBraces);
+        return StringHelper::replace($result, $placeholders, $this->removeBraces);
     }
 
     public static function getLanguage($locale)

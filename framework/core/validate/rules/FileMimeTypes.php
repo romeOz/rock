@@ -24,7 +24,7 @@ class FileMimeTypes extends Rule
             }
             $input =  $input->tempName;
         }
-        if (in_array(\rock\helpers\File::getMimeType($input), $this->toArray($this->params['mimeTypes']), true)) {
+        if (in_array(\rock\helpers\FileHelper::getMimeType($input), $this->toArray($this->params['mimeTypes']), true)) {
             return true;
         }
         if (is_array($this->params['mimeTypes'])) {

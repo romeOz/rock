@@ -8,13 +8,13 @@ use rock\base\Snippet;
 use rock\cache\CacheInterface;
 use rock\event\Event;
 use rock\helpers\ArrayHelper;
-use rock\helpers\File;
+use rock\helpers\FileHelper;
 use rock\helpers\Helper;
 use rock\helpers\Html;
 use rock\helpers\Json;
-use rock\helpers\Numeric;
+use rock\helpers\NumericHelper;
 use rock\helpers\Serialize;
-use rock\helpers\String;
+use rock\helpers\StringHelper;
 use rock\Rock;
 use rock\template\filters\ConditionFilter;
 
@@ -306,7 +306,7 @@ class Template implements ComponentsInterface
         if (!pathinfo($path, PATHINFO_EXTENSION)) {
             $path .= '.' . $this->engines[$this->defaultEngine];
         }
-        $path = File::normalizePath($path);
+        $path = FileHelper::normalizePath($path);
         // Current path
         if (strpos($path, DIRECTORY_SEPARATOR) === false && $this->path) {
             $path = dirname($this->path) . DIRECTORY_SEPARATOR . $path;
@@ -639,7 +639,7 @@ class Template implements ComponentsInterface
             $value = strip_tags($value);
         }
         if ($const & self::ESCAPE) {
-            $value = String::encode($value);
+            $value = StringHelper::encode($value);
         }
 
         return $value;
@@ -1135,7 +1135,7 @@ class Template implements ComponentsInterface
             return trim($matches[0], '{!} ');
         }
         // Validate: if count quotes does not parity
-        if (!Numeric::isParity(mb_substr_count($matches[0], '`', 'UTF-8'))) {
+        if (!NumericHelper::isParity(mb_substr_count($matches[0], '`', 'UTF-8'))) {
             return $matches[0];
         }
         $matches[0] = preg_replace_callback(

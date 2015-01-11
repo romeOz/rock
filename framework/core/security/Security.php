@@ -5,7 +5,7 @@ namespace rock\security;
 
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
-use rock\helpers\String;
+use rock\helpers\StringHelper;
 use rock\Rock;
 
 /**
@@ -134,12 +134,12 @@ class Security implements ComponentsInterface
         }
         $module = $this->openCryptModule();
         $ivSize = mcrypt_enc_get_iv_size($module);
-        $iv = String::byteSubstr($data, 0, $ivSize);
+        $iv = StringHelper::byteSubstr($data, 0, $ivSize);
         $keySalt = $iv;
-        $encrypted = String::byteSubstr($data, $ivSize, String::byteLength($data));
+        $encrypted = StringHelper::byteSubstr($data, $ivSize, StringHelper::byteLength($data));
         if ($this->useDeriveKeyUniqueSalt) {
-            $iv = String::byteSubstr($encrypted, 0, $ivSize);
-            $encrypted = String::byteSubstr($encrypted, $ivSize, String::byteLength($encrypted));
+            $iv = StringHelper::byteSubstr($encrypted, 0, $ivSize);
+            $encrypted = StringHelper::byteSubstr($encrypted, $ivSize, StringHelper::byteLength($encrypted));
         }
         $key = $this->deriveKey($password, $keySalt);
         mcrypt_generic_init($module, $key, $iv);
@@ -158,7 +158,7 @@ class Security implements ComponentsInterface
      */
     protected function addPadding($data)
     {
-        $pad = $this->cryptBlockSize - (String::byteLength($data) % $this->cryptBlockSize);
+        $pad = $this->cryptBlockSize - (StringHelper::byteLength($data) % $this->cryptBlockSize);
 
         return $data . str_repeat(chr($pad), $pad);
     }
@@ -171,11 +171,11 @@ class Security implements ComponentsInterface
      */
     protected function stripPadding($data)
     {
-        $end = String::byteSubstr($data, -1, null);
+        $end = StringHelper::byteSubstr($data, -1, null);
         $last = ord($end);
-        $n = String::byteLength($data) - $last;
-        if (String::byteSubstr($data, $n, null) === str_repeat($end, $last)) {
-            return String::byteSubstr($data, 0, $n);
+        $n = StringHelper::byteLength($data) - $last;
+        if (StringHelper::byteSubstr($data, $n, null) === str_repeat($end, $last)) {
+            return StringHelper::byteSubstr($data, 0, $n);
         }
 
         return false;
@@ -266,11 +266,11 @@ class Security implements ComponentsInterface
      */
     public function validateData($data, $key, $algorithm = 'sha256')
     {
-        $hashSize = String::byteLength(hash_hmac($algorithm, 'test', $key));
-        $n = String::byteLength($data);
+        $hashSize = StringHelper::byteLength(hash_hmac($algorithm, 'test', $key));
+        $n = StringHelper::byteLength($data);
         if ($n >= $hashSize) {
-            $hash = String::byteSubstr($data, 0, $hashSize);
-            $pureData = String::byteSubstr($data, $hashSize, $n - $hashSize);
+            $hash = StringHelper::byteSubstr($data, 0, $hashSize);
+            $pureData = StringHelper::byteSubstr($data, $hashSize, $n - $hashSize);
 
             $calculatedHash = hash_hmac($algorithm, $pureData, $key);
 
@@ -345,7 +345,7 @@ class Security implements ComponentsInterface
     public function generateRandomKey($length = 32)
     {
         $bytes = $this->generateRandomBytes($length);
-        return strtr(String::byteSubstr(base64_encode($bytes), 0, $length), '+/=', '_-.');
+        return strtr(StringHelper::byteSubstr(base64_encode($bytes), 0, $length), '+/=', '_-.');
     }
 
     /**
@@ -508,7 +508,7 @@ class Security implements ComponentsInterface
     {
         // timing attack resistant approach:
         $diff = 0;
-        for ($i = 0; $i < String::byteLength($actual); $i++) {
+        for ($i = 0; $i < StringHelper::byteLength($actual); $i++) {
             $diff |= (ord($actual[$i]) ^ ord($expected[$i]));
         }
         return $diff === 0;

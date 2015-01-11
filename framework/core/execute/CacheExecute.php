@@ -3,7 +3,7 @@
 namespace rock\execute;
 
 
-use rock\helpers\File;
+use rock\helpers\FileHelper;
 use rock\Rock;
 
 class CacheExecute extends Execute
@@ -19,7 +19,7 @@ class CacheExecute extends Execute
      */
     protected function createFile($path, $value)
     {
-        return File::create($path, "<?php\n" . $value, LOCK_EX);
+        return FileHelper::create($path, "<?php\n" . $value, LOCK_EX);
     }
 
     /**

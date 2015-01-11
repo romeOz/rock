@@ -3,7 +3,7 @@ namespace rock\template\filters;
 
 use rock\base\ClassName;
 use rock\helpers\Helper;
-use rock\helpers\String;
+use rock\helpers\StringHelper;
 use rock\Rock;
 use rock\template\TemplateException;
 use rock\template\Template;
@@ -49,7 +49,7 @@ class StringFilter
             return $value;
         }
         $params['limit'] = Helper::getValue($params['limit'], -1);
-        return String::trimPattern($value, $params['pattern'], $params['limit']);
+        return StringHelper::trimPattern($value, $params['pattern'], $params['limit']);
     }
 
     /**
@@ -76,7 +76,7 @@ class StringFilter
         $placeholders = [];
         $placeholders['output'] = $value;
 
-        return String::contains($value, $template->replace($params['is']))
+        return StringHelper::contains($value, $template->replace($params['is']))
             ? $template->replace($params['then'], $placeholders)
             : $template->replace($params['else'], $placeholders);
     }
@@ -97,7 +97,7 @@ class StringFilter
             $params['length'] = 4;
         }
 
-        return String::truncate($value, (int)$params['length']);
+        return StringHelper::truncate($value, (int)$params['length']);
     }
 
     /**
@@ -116,7 +116,7 @@ class StringFilter
             $params['length'] = 100;
         }
 
-        return String::truncateWords($value, (int)$params['length']);
+        return StringHelper::truncateWords($value, (int)$params['length']);
     }
 
     /**
@@ -127,7 +127,7 @@ class StringFilter
      */
     public static function upper($value)
     {
-        return String::upper($value);
+        return StringHelper::upper($value);
     }
 
     /**
@@ -138,7 +138,7 @@ class StringFilter
      */
     public static function lower($value)
     {
-        return String::lower($value);
+        return StringHelper::lower($value);
     }
 
     /**
@@ -149,7 +149,7 @@ class StringFilter
      */
     public static function upperFirst($value)
     {
-        return String::upperFirst($value);
+        return StringHelper::upperFirst($value);
     }
 
     /**
@@ -160,7 +160,7 @@ class StringFilter
      */
     public static function encode($value)
     {
-        return String::encode($value);
+        return StringHelper::encode($value);
     }
 
     /**
@@ -171,7 +171,7 @@ class StringFilter
      */
     public static function decode($value)
     {
-        return String::decode($value);
+        return StringHelper::decode($value);
     }
 
     public static function markdown($value, array $params = [])

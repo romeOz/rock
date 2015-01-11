@@ -13,8 +13,8 @@ class FileSizeBetween extends Rule
         if (!is_null($min) && !is_null($max) && $min > $max) {
             throw new ValidateException(sprintf('%s cannot be less than  %s for validation', $min, $max));
         }
-        $this->params['minValue'] = \rock\helpers\File::sizeToBytes($min);;
-        $this->params['maxValue'] = \rock\helpers\File::sizeToBytes($max);
+        $this->params['minValue'] = \rock\helpers\FileHelper::sizeToBytes($min);;
+        $this->params['maxValue'] = \rock\helpers\FileHelper::sizeToBytes($max);
         $this->params['inclusive'] = $inclusive;
     }
 
