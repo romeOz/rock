@@ -31,7 +31,7 @@ use rock\sanitize\rules\RemoveScript;
 use rock\sanitize\rules\RemoveTags;
 use rock\sanitize\rules\String;
 use rock\sanitize\rules\ToType;
-use rock\sanitize\rules\Translit;
+use rock\sanitize\rules\Slug;
 use rock\sanitize\rules\Trim;
 use rock\sanitize\rules\Truncate;
 use rock\sanitize\rules\TruncateWords;
@@ -71,7 +71,7 @@ use rock\sanitize\rules\UpperFirst;
  * @method static Sanitize rtrimWords(array $words)
  * @method static Sanitize string()
  * @method static Sanitize toType()
- * @method static Sanitize translit()
+ * @method static Sanitize slug(string $replacement = '-', bool $lowercase = true)
  * @method static Sanitize trim()
  * @method static Sanitize truncate(int $length = 4, string $suffix = '...')
  * @method static Sanitize truncateWords(int $length = 100, string $suffix = '...')
@@ -233,7 +233,7 @@ class Sanitize
             'rtrimWords' => RtrimWords::className(),
             'string' => String::className(),
             'toType' => ToType::className(),
-            'translit' => Translit::className(),
+            'slug' => Slug::className(),
             'trim' => Trim::className(),
             'truncate' => Truncate::className(),
             'truncateWords' => TruncateWords::className(),
