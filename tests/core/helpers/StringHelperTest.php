@@ -81,12 +81,6 @@ class StringHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('Hell...', StringHelper::truncate('Hello', 4));
     }
 
-    public function testTranslit()
-    {
-        $this->assertSame('foo', StringHelper::translit('foo'));
-        $this->assertSame('AbV', StringHelper::translit('АбВ'));
-    }
-
     public function testStristr()
     {
         $this->assertSame('fOo', StringHelper::stritr('fOo', []));

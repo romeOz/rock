@@ -191,6 +191,9 @@ class InflectorTest extends \PHPUnit_Framework_TestCase
         $data = [
             'we have недвижимость' => 'we-have-nedvizhimost',
             'Привет Мир' => 'privet-mir',
+            'Привет-Мир' => 'privet-mir',
+            'Привет  Мир' => 'privet-mir',
+            'Привет_Мир' => 'privetmir'
         ];
 
         foreach ($data as $source => $expected) {
