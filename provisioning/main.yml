@@ -8,11 +8,14 @@
     - nginx
     - php
     - composer
-    - mysql
-#    - redis
-#    - memcached
-#    - couchbase
+    #- postgres
+    #- sqlite
+    #- mysql
+    #- mongodb
+    - redis
+    - memcached
+    #- couchbase
 #    - zeromq
 #    - rabbitmq
 #    - gearmanmq
-    - demo
+    #- demo

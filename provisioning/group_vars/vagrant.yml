@@ -8,13 +8,23 @@ php_display_errors: On
 php_upload_max_filesize: 20M
 php_post_max_size: 25M
 
-mysql_root_user: root
-mysql_root_pass: root
-mysql_user: rock
-mysql_pass: rock
-mysql_db: rockdemo
-mysql_bind_address: 0.0.0.0  # Allows all connections, for Production it should be 127.0.0.1
-mysql_key_buffer: 64M
+mysql: {
+  user_root: 'root',
+  pass_root: 'root',
+  user: 'rock',
+  pass: 'rock',
+  db: 'rockdemo',
+  db_test: 'rocktest',
+  bind_address: '0.0.0.0',  #Allows all connections, for Production it should be 127.0.0.1
+  key_buffer: '64M'
+}
+
+psg: {
+  user: 'postgres',
+  pass: 'postgres',
+  db: 'rockdemo',
+  db_test: 'rocktest'
+}
 
 vhosts:
   [

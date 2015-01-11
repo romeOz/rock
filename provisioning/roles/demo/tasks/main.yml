@@ -1,3 +1,3 @@
 - name: Create apps
-  shell: /var/www/framework/rock.sh -u {{ mysql_root_user }} -p {{ mysql_root_pass }}
+  shell: /var/www/framework/rock.sh -u {{ mysql.user_root }} -p {{ mysql.pass_root }}
   tags: demo
