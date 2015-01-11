@@ -26,5 +26,8 @@ return [
     'notConfirm' => 'values must not be equals',
 
     'call' => '{{name}} must be valid',
+
+    'unique' => '{{value}} has already been taken',
+    'notUnique' => '{{value}} not already been taken.'
 ];
  
