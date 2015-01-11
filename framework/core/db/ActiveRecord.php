@@ -6,6 +6,7 @@ use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\Inflector;
 use rock\helpers\ObjectHelper;
+use rock\Rock;
 
 /**
  * ActiveRecord is the base class for classes representing relational data in terms of objects.
@@ -444,28 +445,26 @@ class ActiveRecord extends BaseActiveRecord
     public function insert($runValidation = true, $attributes = null)
     {
         if ($runValidation && !$this->validate($attributes)) {
-            //Rock::info('Model not inserted due to validation error.', __METHOD__);
+            Rock::info('Model not inserted due to validation error.');
             return false;
         }
-        $connection = static::getConnection();
-        if ($this->isTransactional(self::OP_INSERT)) {
-            $transaction = $connection->beginTransaction();
-            try {
-                $result = $this->insertInternal($attributes);
-                if ($result === false) {
-                    $transaction->rollBack();
-                } else {
-                    $transaction->commit();
-                }
-            } catch (\Exception $e) {
-                $transaction->rollBack();
-                throw $e;
-            }
-        } else {
-            $result = $this->insertInternal($attributes);
+        if (!$this->isTransactional(self::OP_INSERT)) {
+            return $this->insertInternal($attributes);
         }
 
-        return $result;
+        $transaction = static::getConnection()->beginTransaction();
+        try {
+            $result = $this->insertInternal($attributes);
+            if ($result === false) {
+                $transaction->rollBack();
+            } else {
+                $transaction->commit();
+            }
+            return $result;
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            throw $e;
+        }
     }
 
     /**
@@ -562,28 +561,27 @@ class ActiveRecord extends BaseActiveRecord
     public function update($runValidation = true, $attributeNames = null)
     {
         if ($runValidation && !$this->validate($attributeNames)) {
-            //Rock::info('Model not updated due to validation error.', __METHOD__);
+            Rock::info('Model not updated due to validation error.');
             return false;
         }
-        $connection = static::getConnection();
-        if ($this->isTransactional(self::OP_UPDATE)) {
-            $transaction = $connection->beginTransaction();
-            try {
-                $result = $this->updateInternal($attributeNames);
-                if ($result === false) {
-                    $transaction->rollBack();
-                } else {
-                    $transaction->commit();
-                }
-            } catch (\Exception $e) {
-                $transaction->rollBack();
-                throw $e;
-            }
-        } else {
-            $result = $this->updateInternal($attributeNames);
+
+        if (!$this->isTransactional(self::OP_UPDATE)) {
+            return $this->updateInternal($attributeNames);
         }
 
-        return $result;
+        $transaction = static::getConnection()->beginTransaction();
+        try {
+            $result = $this->updateInternal($attributeNames);
+            if ($result === false) {
+                $transaction->rollBack();
+            } else {
+                $transaction->commit();
+            }
+            return $result;
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            throw $e;
+        }
     }
 
     /**
@@ -607,25 +605,23 @@ class ActiveRecord extends BaseActiveRecord
      */
     public function delete()
     {
-        $connection = static::getConnection();
-        if ($this->isTransactional(self::OP_DELETE)) {
-            $transaction = $connection->beginTransaction();
-            try {
-                $result = $this->deleteInternal();
-                if ($result === false) {
-                    $transaction->rollBack();
-                } else {
-                    $transaction->commit();
-                }
-            } catch (\Exception $e) {
-                $transaction->rollBack();
-                throw $e;
-            }
-        } else {
-            $result = $this->deleteInternal();
+        if (!$this->isTransactional(self::OP_DELETE)) {
+            return $this->deleteInternal();
         }
 
-        return $result;
+        $transaction = static::getConnection()->beginTransaction();
+        try {
+            $result = $this->deleteInternal();
+            if ($result === false) {
+                $transaction->rollBack();
+            } else {
+                $transaction->commit();
+            }
+            return $result;
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            throw $e;
+        }
     }
 
     /**
