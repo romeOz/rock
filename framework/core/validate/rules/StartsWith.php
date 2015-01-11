@@ -16,7 +16,7 @@ class StartsWith extends Rule
      */
     public function validate($input)
     {
-        if ($this->params['identical'] ) {
+        if ($this->params['identical']) {
             return $this->validateIdentical($input);
         }
         return $this->validateEquals($input);

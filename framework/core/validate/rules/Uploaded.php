@@ -6,7 +6,7 @@ use rock\file\UploadedFile;
 use rock\Rock;
 
 /**
- * Class Uploaded
+ * Uploaded rule.
  *
  * @codeCoverageIgnore
  * @package rock\validate\rules
