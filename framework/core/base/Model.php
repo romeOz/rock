@@ -244,9 +244,9 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
     public function validate(array $attributes = null, $clearErrors = true)
     {
         $rules = $this->rules();
-        if (empty($rules)) {
-            return true;
-        }
+//        if (empty($rules)) {
+//            return true;
+//        }
 
         if ($clearErrors) {
             $this->clearErrors();
