@@ -277,7 +277,7 @@ class BaseInflector
         'ế' => 'e', 'ề' => 'e', 'ể' => 'e', 'ễ' => 'e', 'ệ' => 'e'
     ];
     /**
-     * @var mixed Either a [[Transliterator]] or a string from which a [[Transliterator]]
+     * @var mixed Either a {@see \Transliterator} or a string from which a {@see \Transliterator}
      * can be built for transliteration used by {@see \rock\helpers\Inflector} when intl is available.
      * @see http://php.net/manual/en/transliterator.transliterate.php
      */
