@@ -215,8 +215,8 @@ class StringHelper
      * @return string
      *
      * ```php
-     * String::ltrimWord('foo text', ['foo', 'bar']); // ' text'
-     * String::ltrimWord('bar text', ['foo', 'bar']); // ' text'
+     * StringHelper::ltrimWord('foo text', ['foo', 'bar']); // ' text'
+     * StringHelper::ltrimWord('bar text', ['foo', 'bar']); // ' text'
      * ```
      */
     public static function ltrimWords($string, array $words)
@@ -393,8 +393,8 @@ class StringHelper
      * @return null|string
      *
      * ```php
-     * String::lconcat('world', 'hello '); // hello world
-     * String::lconcat(null, ' hello '); // null
+     * StringHelper::lconcat('world', 'hello '); // hello world
+     * StringHelper::lconcat(null, ' hello '); // null
      * ```
      */
     public static function lconcat(&$value, $concat, $default = null)
@@ -410,8 +410,8 @@ class StringHelper
      * @return null|string
      *
      * ```php
-     * String::rconcat('hello', ' world'); // hello world
-     * String::rconcat(null, ' world'); // null
+     * StringHelper::rconcat('hello', ' world'); // hello world
+     * StringHelper::rconcat(null, ' world'); // null
      * ```
      */
     public static function rconcat(&$value, $concat, $default = null)
