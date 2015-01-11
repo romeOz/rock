@@ -200,7 +200,7 @@ class InflectorTest extends \PHPUnit_Framework_TestCase
 
     public function testSlugTransliterate()
     {
-
+        $this->assertEquals('Privet Mir', InflectorMock::slug('Привет Мир', ' ', false));
     }
 
     public function testClassify()
