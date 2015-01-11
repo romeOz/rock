@@ -174,29 +174,29 @@ INSERT INTO `order_item_with_null_fk` (order_id, item_id, quantity, subtotal) VA
  * (MySQL-)Database Schema for validator tests
  */
 
-# DROP TABLE IF EXISTS `validator_main` CASCADE;
-# DROP TABLE IF EXISTS `validator_ref` CASCADE;
-#
-# CREATE TABLE `validator_main` (
-#   `id`     INT(11) NOT NULL AUTO_INCREMENT,
-#   `field1` VARCHAR(255),
-#   PRIMARY KEY (`id`)
-# ) ENGINE =InnoDB  DEFAULT CHARSET =utf8;
-#
-# CREATE TABLE `validator_ref` (
-#   `id`      INT(11) NOT NULL AUTO_INCREMENT,
-#   `a_field` VARCHAR(255),
-#   `ref`     INT(11),
-#   PRIMARY KEY (`id`)
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-#
-# INSERT INTO `validator_main` (id, field1) VALUES (1, 'just a string1');
-# INSERT INTO `validator_main` (id, field1) VALUES (2, 'just a string2');
-# INSERT INTO `validator_main` (id, field1) VALUES (3, 'just a string3');
-# INSERT INTO `validator_main` (id, field1) VALUES (4, 'just a string4');
-# INSERT INTO `validator_ref` (a_field, ref) VALUES ('ref_to_2', 2);
-# INSERT INTO `validator_ref` (a_field, ref) VALUES ('ref_to_2', 2);
-# INSERT INTO `validator_ref` (a_field, ref) VALUES ('ref_to_3', 3);
-# INSERT INTO `validator_ref` (a_field, ref) VALUES ('ref_to_4', 4);
-# INSERT INTO `validator_ref` (a_field, ref) VALUES ('ref_to_4', 4);
-# INSERT INTO `validator_ref` (a_field, ref) VALUES ('ref_to_5', 5);
+DROP TABLE IF EXISTS `validator_main` CASCADE;
+DROP TABLE IF EXISTS `validator_ref` CASCADE;
+
+CREATE TABLE `validator_main` (
+  `id`     INT(11) NOT NULL AUTO_INCREMENT,
+  `field1` VARCHAR(255),
+  PRIMARY KEY (`id`)
+) ENGINE =InnoDB  DEFAULT CHARSET =utf8;
+
+CREATE TABLE `validator_ref` (
+  `id`      INT(11) NOT NULL AUTO_INCREMENT,
+  `a_field` VARCHAR(255),
+  `ref`     INT(11),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `validator_main` (id, field1) VALUES (1, 'just a string1');
+INSERT INTO `validator_main` (id, field1) VALUES (2, 'just a string2');
+INSERT INTO `validator_main` (id, field1) VALUES (3, 'just a string3');
+INSERT INTO `validator_main` (id, field1) VALUES (4, 'just a string4');
+INSERT INTO `validator_ref` (a_field, ref) VALUES ('ref_to_2', 2);
+INSERT INTO `validator_ref` (a_field, ref) VALUES ('ref_to_2', 2);
+INSERT INTO `validator_ref` (a_field, ref) VALUES ('ref_to_3', 3);
+INSERT INTO `validator_ref` (a_field, ref) VALUES ('ref_to_4', 4);
+INSERT INTO `validator_ref` (a_field, ref) VALUES ('ref_to_4', 4);
+INSERT INTO `validator_ref` (a_field, ref) VALUES ('ref_to_5', 5);

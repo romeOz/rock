@@ -3,7 +3,7 @@ namespace rock\base;
 
 use rock\helpers\Inflector;
 use rock\Rock;
-use rock\validate\Validate;
+use rock\validate\ValidateModel;
 
 /**
  * Model is the base class for data models.
@@ -423,8 +423,8 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
                     continue;
                 }
 
-                /** @var Validate $validate */
-                $validate = Rock::factory(Validate::className());
+                /** @var ValidateModel $validate */
+                $validate = Rock::factory(ValidateModel::className());
                 // function
                 if (function_exists($ruleName) && !$validate->existsRule($ruleName)) {
                     if ($attributes[$name] === '') {
@@ -443,13 +443,22 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
                 }
 
                 // rule
-                /** @var Validate $validate */
+                if ($validate->existsModelRule($ruleName)) {
+                    array_unshift($args, $this);
+                }
                 $validate = call_user_func_array([$validate, $ruleName], $args);
                 if ($placeholders) {
                     $validate->placeholders($placeholders);
                 }
                 if ($messages) {
                     $validate->messages($messages);
+                }
+                if ($validate->existsModelRule($ruleName)) {
+                    if (!$validate->validate($name)) {
+                        $valid = false;
+                        $this->addError($name, $validate->getFirstError());
+                    }
+                    continue;
                 }
                 if (!$validate->validate($attributes[$name])) {
                     $valid = false;
