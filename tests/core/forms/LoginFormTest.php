@@ -34,7 +34,7 @@ class LoginFormTest extends DatabaseTestCase
     public function setUp()
     {
         parent::setUp();
-        ActiveRecord::$db = $this->getConnection();
+        ActiveRecord::$connection = $this->getConnection();
         $_POST = static::$post;
         static::sessionUp();
         Rock::$app->template->removeAllPlaceholders();

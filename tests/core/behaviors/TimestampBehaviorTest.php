@@ -16,7 +16,7 @@ class TimestampBehaviorTest extends DatabaseTestCase
     protected function setUp()
     {
         parent::setUp();
-        ActiveRecord::$db = $this->getConnection();
+        ActiveRecord::$connection = $this->getConnection();
     }
 
     public function testInsert()

@@ -90,7 +90,7 @@ class SqliteConnectionTest extends ConnectionTest
             $this->assertEquals('test', $result);
 
             // test ActiveRecord read/write split
-            ActiveRecord::$db = $db = $this->prepareMasterSlave($masterCount, $slaveCount);
+            ActiveRecord::$connection = $db = $this->prepareMasterSlave($masterCount, $slaveCount);
             $this->assertFalse($db->isActive);
 
             $customer = Customer::findOne(1);

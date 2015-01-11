@@ -196,7 +196,7 @@ Test</p>',
 
     public function testUsernameLinkSuccess()
     {
-        ActiveRecord::$db = $this->getConnection();
+        ActiveRecord::$connection = $this->getConnection();
         $markdown = Rock::$app->markdown;
         $markdown->handlerLinkByUsername = function($username){
             return Users::findUrlByUsername($username);
@@ -210,7 +210,7 @@ Test</p>',
 
     public function testUsernameLinkFail()
     {
-        ActiveRecord::$db = $this->getConnection();
+        ActiveRecord::$connection = $this->getConnection();
         $markdown = Rock::$app->markdown;
         $markdown->handlerLinkByUsername = function($username){
             return Users::findUrlByUsername($username);

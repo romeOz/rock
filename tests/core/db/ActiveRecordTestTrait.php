@@ -1305,7 +1305,7 @@ trait ActiveRecordTestTrait
 
         $connection->enableQueryCache = false;
         $connection->queryCache = $cache;
-        \rockunit\core\db\models\ActiveRecord::$db = $connection;
+        \rockunit\core\db\models\ActiveRecord::$connection = $connection;
         $customerClass::find()->with(['orders'])->asArray()->beginCache()->all();
         $customerClass::find()->with(['orders'=>function(ActiveQuery $query){$query->endCache();}])->asArray()->beginCache()->all();
         $trace = Trace::getIterator('db.query');
@@ -1320,7 +1320,7 @@ trait ActiveRecordTestTrait
         $connection->queryCacheExpire = 1;
         $connection->enableQueryCache = true;
         $connection->queryCache = $cache;
-        \rockunit\core\db\models\ActiveRecord::$db = $connection;
+        \rockunit\core\db\models\ActiveRecord::$connection = $connection;
         $customerClass::find()->with(['orders'])->asArray()->all();
         sleep(3);
         $customerClass::find()->with(['orders'])->asArray()->all();

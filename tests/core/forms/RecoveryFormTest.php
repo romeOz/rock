@@ -36,7 +36,7 @@ class RecoveryFormTest extends DatabaseTestCase
     public function setUp()
     {
         parent::setUp();
-        ActiveRecord::$db = $this->getConnection();
+        ActiveRecord::$connection = $this->getConnection();
         $_SESSION = static::$session;
         $_COOKIE = static::$cookie;
         $_POST = static::$post;

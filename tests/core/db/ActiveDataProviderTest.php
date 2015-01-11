@@ -16,7 +16,7 @@ class ActiveDataProviderTest extends DatabaseTestCase
     protected function setUp()
     {
         parent::setUp();
-        ActiveRecord::$db = $this->getConnection(false);
+        ActiveRecord::$connection = $this->getConnection(false);
     }
 
     public function testActiveQuery()

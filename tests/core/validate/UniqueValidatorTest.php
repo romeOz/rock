@@ -21,7 +21,7 @@ class UniqueValidatorTest extends DatabaseTestCase
     public function setUp()
     {
         parent::setUp();
-        ActiveRecord::$db = $this->getConnection();
+        ActiveRecord::$connection = $this->getConnection();
     }
 
     public function testValidateAttributeDefault()

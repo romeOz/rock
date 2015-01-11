@@ -307,7 +307,7 @@ class ArrayHelperTest extends DatabaseTestCase
      */
     public function testToArrayWithDb($expected, $actual, $only = [], $exclude = [])
     {
-        ActiveRecord::$db = $this->getConnection(false);
+        ActiveRecord::$connection = $this->getConnection(false);
         $expected = call_user_func($expected);
         $this->assertSame(ArrayHelper::toArray($expected, $only, $exclude, true), $actual);
     }

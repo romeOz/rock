@@ -19,7 +19,7 @@ class ExternalActiveRelationTest extends SphinxTestCase
     {
         parent::setUp();
         ActiveRecord::$db = $this->getConnection();
-        ActiveRecordDb::$db = $this->getDbConnection();
+        ActiveRecordDb::$connection = $this->getDbConnection();
     }
 
     // Tests :

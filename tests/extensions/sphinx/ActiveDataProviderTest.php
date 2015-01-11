@@ -56,7 +56,7 @@ class ActiveDataProviderTest extends SphinxTestCase
 
     public function testActiveQuery()
     {
-        ArticleDb::$db = $this->getDbConnection(false);
+        ArticleDb::$connection = $this->getDbConnection(false);
         $provider = new ActiveDataProvider([
             'query' => ArticleDb::find()->orderBy('id ASC')->asArray(),
             'model' => ArticleIndex::className(),
@@ -127,7 +127,7 @@ class ActiveDataProviderTest extends SphinxTestCase
 
     public function testArray()
     {
-        ArticleDb::$db = $this->getDbConnection(false);
+        ArticleDb::$connection = $this->getDbConnection(false);
         $provider = new ActiveDataProvider([
            'query' => ArticleIndex::find()->match('about')->with('sourceCompositeLink')->indexBy('id')->asArray()->all(),
            'model' => ArticleIndex::className(),
