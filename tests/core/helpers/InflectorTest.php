@@ -193,7 +193,8 @@ class InflectorTest extends \PHPUnit_Framework_TestCase
             'Привет Мир' => 'privet-mir',
             'Привет-Мир' => 'privet-mir',
             'Привет  Мир' => 'privet-mir',
-            'Привет_Мир' => 'privetmir'
+            'Привет_Мир' => 'privetmir',
+            'remo_ve.!?[]{}…@$sym bo     ls' => 'removesym-bo-ls'
         ];
 
         foreach ($data as $source => $expected) {

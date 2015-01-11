@@ -3,7 +3,12 @@
 namespace rock\helpers;
 
 
-class Closure extends BaseClosure
-{
+use Jeremeamia\SuperClosure\SerializableClosure;
 
+class Closure
+{
+    public static function serialize(\Closure $callback)
+    {
+        return serialize(new SerializableClosure($callback));
+    }
 } 

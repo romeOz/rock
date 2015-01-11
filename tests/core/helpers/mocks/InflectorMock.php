@@ -3,12 +3,10 @@
 
 namespace rockunit\core\helpers\mocks;
 
-use rock\helpers\BaseInflector;
-
 /**
  * Forces Inflector::slug to use PHP even if intl is available
  */
-class InflectorMock extends BaseInflector
+class InflectorMock extends \rock\helpers\Inflector
 {
     /**
      * @inheritdoc

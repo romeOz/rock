@@ -6,7 +6,6 @@ use rock\db\Migration;
 use rock\db\Schema;
 use rock\helpers\Inflector;
 use rock\helpers\NumericHelper;
-use rock\helpers\StringHelper;
 use rock\Rock;
 
 class UsersMigration extends Migration
@@ -88,18 +87,6 @@ class UsersMigration extends Migration
      */
     protected function translitUsername($username)
     {
-        return strtolower(
-            Inflector::slug(
-                preg_replace(
-                    [
-                        '/[^\\w\\s\-]+/iu',
-                        '/\\s+/iu',
-                        '/[\_\-]+/iu'
-                    ],
-                    ['', '-', '-'],
-                    $username
-                )
-            )
-        );
+        return Inflector::slug(preg_replace('/[\_\-]+/iu','-', $username));
     }
 } 

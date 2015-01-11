@@ -4,7 +4,7 @@ namespace apps\common\migrations;
 
 use rock\db\Migration;
 use rock\db\Schema;
-use rock\helpers\Numeric;
+use rock\helpers\NumericHelper;
 use rock\security\Security;
 
 class UsersMigration extends Migration
@@ -58,7 +58,7 @@ class UsersMigration extends Migration
 
     protected function hash($value)
     {
-        return Numeric::hexToBin(md5($value. $this->table));
+        return NumericHelper::hexToBin(md5($value. $this->table));
     }
     
     public function down()

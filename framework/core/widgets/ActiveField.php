@@ -190,7 +190,7 @@ class ActiveField
         } catch (\Exception $e) {
             Rock::error($e->getMessage(), [], BaseException::getTracesByException($e));
 
-            //ErrorHandler::convertExceptionToError($e);
+            //BaseException::convertExceptionToError($e);
             return '';
         }
     }
