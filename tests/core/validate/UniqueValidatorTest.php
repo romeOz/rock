@@ -4,7 +4,6 @@ namespace rockunit\core\validate;
 
 
 use rock\base\Model;
-use rock\validate\ValidateException;
 use rock\validate\ValidateModel;
 use rockunit\core\db\DatabaseTestCase;
 use rockunit\core\db\models\ActiveRecord;
@@ -129,22 +128,6 @@ class UniqueValidatorTest extends DatabaseTestCase
         $m->rules = $rules;
         $m->id = 9;
         $this->assertTrue($m->save());
-    }
-
-    public function testTargetAttributesThrowException()
-    {
-        $this->setExpectedException(ValidateException::className());
-        $rules = [
-            [
-                Model::RULE_VALIDATE, 'ref', 'unique' => [['id', 'ref']],
-            ],
-        ];
-        $m = new ValidatorTestRefRulesModel();
-        $m->rules = $rules;
-        $m->ref = 5;
-        $this->assertFalse($m->save());
-        $this->assertNotEmpty($m->getErrors('ref'));
-        $this->assertTrue($m->save(false));
     }
 
     public function testValidateAttributeOfNonARModel()
