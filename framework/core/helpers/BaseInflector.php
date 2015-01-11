@@ -8,7 +8,6 @@ namespace rock\helpers;
  */
 class BaseInflector
 {
-
     /**
      * @var array the rules for converting a word into its plural form.
      * The keys are the regular expressions and the values are the corresponding replacements.
@@ -205,9 +204,8 @@ class BaseInflector
         'wildebeest' => 'wildebeest',
         'Yengeese' => 'Yengeese',
     ];
-
     /**
-     * @var array fallback map for transliteration used by {@see BaseInflector::slug()} when intl isn't available.
+     * @var array fallback map for transliteration used by {@see \rock\helpers\Inflector} when intl isn't available.
      */
     public static $transliteration = [
         // Latin
@@ -278,156 +276,18 @@ class BaseInflector
         'ớ' => 'o', 'ờ' => 'o', 'ở' => 'o', 'ỡ' => 'o', 'ợ' => 'o',
         'ế' => 'e', 'ề' => 'e', 'ể' => 'e', 'ễ' => 'e', 'ệ' => 'e'
     ];
-
     /**
-     * Converts an underscored or CamelCase word into a English sentence.
-     *
-     * @param string  $words
-     * @param boolean $ucAll whether to set all words to uppercase
-     * @return string
+     * @var mixed Either a [[Transliterator]] or a string from which a [[Transliterator]]
+     * can be built for transliteration used by {@see \rock\helpers\Inflector} when intl is available.
+     * @see http://php.net/manual/en/transliterator.transliterate.php
      */
-    public static function titleize($words, $ucAll = false)
-    {
-        $words = static::humanize(static::underscore($words), $ucAll);
+    public static $transliterator = 'Any-Latin; NFKD';
 
-        return $ucAll ? ucwords($words) : ucfirst($words);
-    }
-
-    /**
-     * Returns a human-readable string from $word.
-     *
-     * @param string  $word  the string to humanize
-     * @param boolean $ucAll whether to set all words to uppercase or not
-     * @return string
-     */
-    public static function humanize($word, $ucAll = false)
-    {
-        $word = str_replace('_', ' ', preg_replace('/_id$/', '', $word));
-
-        return $ucAll ? ucwords($word) : ucfirst($word);
-    }
-
-    /**
-     * Converts any "CamelCased" into an "underscored_word".
-     *
-     * @param string $words the word(s) to underscore
-     * @return string
-     */
-    public static function underscore($words)
-    {
-        return strtolower(preg_replace('/(?<=\\w)([A-Z])/', '_\\1', $words));
-    }
-
-    /**
-     * Converts a CamelCase name into space-separated words.
-     * For example, 'PostTag' will be converted to 'Post Tag'.
-     *
-     * @param string  $name    the string to be converted
-     * @param boolean $ucwords whether to capitalize the first letter in each word
-     * @return string the resulting words
-     */
-    public static function camel2words($name, $ucwords = true)
-    {
-        $label = trim(
-            strtolower(
-                str_replace(
-                    [
-                        '-',
-                        '_',
-                        '.'
-                    ],
-                    ' ',
-                    preg_replace('/(?<![A-Z])[A-Z]/', ' \0', $name))));
-
-        return $ucwords ? ucwords($label) : $label;
-    }
-
-    /**
-     * Converts a CamelCase name into an ID in lowercase.
-     *
-     * Words in the ID may be concatenated using the specified character (defaults to '-').
-     * For example, 'PostTag' will be converted to 'post-tag'.
-     *
-     * @param string $name      the string to be converted
-     * @param string $separator the character used to concatenate the words in the ID
-     * @return string the resulting ID
-     */
-    public static function camel2id($name, $separator = '-')
-    {
-        if ($separator === '_') {
-            return trim(strtolower(preg_replace('/(?<![A-Z])[A-Z]/', '_\0', $name)), '_');
-        } else {
-            return trim(
-                strtolower(str_replace('_', $separator, preg_replace('/(?<![A-Z])[A-Z]/', $separator . '\0', $name))),
-                $separator);
-        }
-    }
-
-    /**
-     * Converts an ID into a CamelCase name.
-     *
-     * Words in the ID separated by `$separator` (defaults to '-') will be concatenated into a CamelCase name.
-     * For example, 'post-tag' is converted to 'PostTag'.
-     *
-     * @param string $id        the ID to be converted
-     * @param string $separator the character used to separate the words in the ID
-     * @return string the resulting CamelCase name
-     */
-    public static function id2camel($id, $separator = '-')
-    {
-        return str_replace(' ', '', ucwords(implode(' ', explode($separator, $id))));
-    }
-
-    /**
-     * Same as camelize but first char is in lowercase.
-     *
-     * Converts a word like "send_email" to "sendEmail". It
-     * will remove non alphanumeric character from the word, so
-     * "who's online" will be converted to "whoSOnline"
-     *
-     * @param string $word to lowerCamelCase
-     * @return string
-     */
-    public static function variablize($word)
-    {
-        $word = static::camelize($word);
-
-        return strtolower($word[0]) . substr($word, 1);
-    }
-
-    /**
-     * Returns given word as CamelCased
-     * Converts a word like "send_email" to "SendEmail". It
-     * will remove non alphanumeric character from the word, so
-     * "who's online" will be converted to "WhoSOnline"
-     *
-     * @see variablize()
-     * @param string $word the word to CamelCase
-     * @return string
-     */
-    public static function camelize($word)
-    {
-        return str_replace(' ', '', ucwords(preg_replace('/[^A-Za-z0-9]+/', ' ', $word)));
-    }
-
-    /**
-     * Converts a class name to its table name (pluralized)
-     * naming conventions. For example, converts "Person" to "people"
-     *
-     * @param string $className the class name for getting related table_name
-     * @return string
-     */
-    public static function tableize($className)
-    {
-        return static::pluralize(static::underscore($className));
-    }
 
     /**
      * Converts a word to its plural form.
-     *
      * Note that this is for English only!
      * For example, 'apple' will become 'apples', and 'child' will become 'children'.
-     *
      * @param string $word the word to be pluralized
      * @return string the pluralized word
      */
@@ -446,69 +306,7 @@ class BaseInflector
     }
 
     /**
-     * Returns a string with all spaces converted to given replacement,
-     * non word characters removed and the rest of characters transliterated.
-     *
-     * If intl extension isn't available uses fallback that converts latin characters only
-     * and removes the rest. You may customize characters map via $transliteration property
-     * of the helper.
-     *
-     * @param string  $string      An arbitrary string to convert
-     * @param string  $replacement The replacement to use for spaces
-     * @param boolean $lowercase   whether to return the string in lowercase or not. Defaults to `true`.
-     * @return string The converted string.
-     */
-    public static function slug($string, $replacement = '-', $lowercase = true)
-    {
-        $string = static::transliterate($string);
-        $string = preg_replace('/[^a-zA-Z=\s—–-]+/u', '', $string);
-        $string = preg_replace('/[=\s—–-]+/u', $replacement, $string);
-        $string = trim($string, $replacement);
-
-        return $lowercase ? strtolower($string) : $string;
-    }
-
-    /**
-     * Returns transliterated version of a string.
-     *
-     * If intl extension isn't available uses fallback that converts latin characters only
-     * and removes the rest. You may customize characters map via $transliteration property
-     * of the helper.
-     *
-     * @param string $string input string
-     * @return string
-     */
-    protected static function transliterate($string)
-    {
-        if (static::hasIntl()) {
-            return transliterator_transliterate('Any-Latin; NFKD', $string);
-        } else {
-            return str_replace(array_keys(static::$transliteration), static::$transliteration, $string);
-        }
-    }
-
-    /**
-     * @return boolean if intl extension is loaded
-     */
-    protected static function hasIntl()
-    {
-        return extension_loaded('intl');
-    }
-
-    /**
-     * Converts a table name to its class name. For example, converts "people" to "Person"
-     *
-     * @param string $tableName
-     * @return string
-     */
-    public static function classify($tableName)
-    {
-        return static::camelize(static::singularize($tableName));
-    }
-
-    /**
-     * Returns the singular of the `$word`.
-     *
+     * Returns the singular of the $word
      * @param string $word the english word to singularize
      * @return string Singular noun.
      */
@@ -528,8 +326,194 @@ class BaseInflector
     }
 
     /**
-     * Converts number to its ordinal English form. For example, converts 13 to 13th, 2 to 2nd ...
+     * Converts an underscored or CamelCase word into a English
+     * sentence.
+     * @param string $words
+     * @param boolean $ucAll whether to set all words to uppercase
+     * @return string
+     */
+    public static function titleize($words, $ucAll = false)
+    {
+        $words = static::humanize(static::underscore($words), $ucAll);
+
+        return $ucAll ? ucwords($words) : ucfirst($words);
+    }
+
+    /**
+     * Returns given word as CamelCased
+     * Converts a word like "send_email" to "SendEmail". It
+     * will remove non alphanumeric character from the word, so
+     * "who's online" will be converted to "WhoSOnline"
+     * @see variablize()
+     * @param string $word the word to CamelCase
+     * @return string
+     */
+    public static function camelize($word)
+    {
+        return str_replace(' ', '', ucwords(preg_replace('/[^A-Za-z0-9]+/', ' ', $word)));
+    }
+
+    /**
+     * Converts a CamelCase name into space-separated words.
+     * For example, 'PostTag' will be converted to 'Post Tag'.
+     * @param string $name the string to be converted
+     * @param boolean $ucwords whether to capitalize the first letter in each word
+     * @return string the resulting words
+     */
+    public static function camel2words($name, $ucwords = true)
+    {
+        $label = trim(strtolower(str_replace([
+                                                 '-',
+                                                 '_',
+                                                 '.'
+                                             ], ' ', preg_replace('/(?<![A-Z])[A-Z]/', ' \0', $name))));
+
+        return $ucwords ? ucwords($label) : $label;
+    }
+
+    /**
+     * Converts a CamelCase name into an ID in lowercase.
+     * Words in the ID may be concatenated using the specified character (defaults to '-').
+     * For example, 'PostTag' will be converted to 'post-tag'.
+     * @param string $name the string to be converted
+     * @param string $separator the character used to concatenate the words in the ID
+     * @param boolean|string $strict whether to insert a separator between two consecutive uppercase chars, defaults to false
+     * @return string the resulting ID
+     */
+    public static function camel2id($name, $separator = '-', $strict = false)
+    {
+        $regex = $strict ? '/[A-Z]/' : '/(?<![A-Z])[A-Z]/';
+        if ($separator === '_') {
+            return trim(strtolower(preg_replace($regex, '_\0', $name)), '_');
+        } else {
+            return trim(strtolower(str_replace('_', $separator, preg_replace($regex, $separator . '\0', $name))), $separator);
+        }
+    }
+
+    /**
+     * Converts an ID into a CamelCase name.
+     * Words in the ID separated by `$separator` (defaults to '-') will be concatenated into a CamelCase name.
+     * For example, 'post-tag' is converted to 'PostTag'.
+     * @param string $id the ID to be converted
+     * @param string $separator the character used to separate the words in the ID
+     * @return string the resulting CamelCase name
+     */
+    public static function id2camel($id, $separator = '-')
+    {
+        return str_replace(' ', '', ucwords(implode(' ', explode($separator, $id))));
+    }
+
+    /**
+     * Converts any "CamelCased" into an "underscored_word".
+     * @param string $words the word(s) to underscore
+     * @return string
+     */
+    public static function underscore($words)
+    {
+        return strtolower(preg_replace('/(?<=\\w)([A-Z])/', '_\\1', $words));
+    }
+
+    /**
+     * Returns a human-readable string from $word
+     * @param string $word the string to humanize
+     * @param boolean $ucAll whether to set all words to uppercase or not
+     * @return string
+     */
+    public static function humanize($word, $ucAll = false)
+    {
+        $word = str_replace('_', ' ', preg_replace('/_id$/', '', $word));
+
+        return $ucAll ? ucwords($word) : ucfirst($word);
+    }
+
+    /**
+     * Same as camelize but first char is in lowercase.
+     * Converts a word like "send_email" to "sendEmail". It
+     * will remove non alphanumeric character from the word, so
+     * "who's online" will be converted to "whoSOnline"
+     * @param string $word to lowerCamelCase
+     * @return string
+     */
+    public static function variablize($word)
+    {
+        $word = static::camelize($word);
+
+        return strtolower($word[0]) . substr($word, 1);
+    }
+
+    /**
+     * Converts a class name to its table name (pluralized)
+     * naming conventions. For example, converts "Person" to "people"
+     * @param string $className the class name for getting related table_name
+     * @return string
+     */
+    public static function tableize($className)
+    {
+        return static::pluralize(static::underscore($className));
+    }
+
+    /**
+     * Returns a string with all spaces converted to given replacement,
+     * non word characters removed and the rest of characters transliterated.
      *
+     * If intl extension isn't available uses fallback that converts latin characters only
+     * and removes the rest. You may customize characters map via $transliteration property
+     * of the helper.
+     *
+     * @param string $string An arbitrary string to convert
+     * @param string $replacement The replacement to use for spaces
+     * @param boolean $lowercase whether to return the string in lowercase or not. Defaults to `true`.
+     * @return string The converted string.
+     */
+    public static function slug($string, $replacement = '-', $lowercase = true)
+    {
+        $string = static::transliterate($string);
+        $string = preg_replace('/[^a-zA-Z0-9=\s—–-]+/u', '', $string);
+        $string = preg_replace('/[=\s—–-]+/u', $replacement, $string);
+        $string = trim($string, $replacement);
+
+        return $lowercase ? strtolower($string) : $string;
+    }
+
+    /**
+     * Returns transliterated version of a string.
+     *
+     * If intl extension isn't available uses fallback that converts latin characters only
+     * and removes the rest. You may customize characters map via $transliteration property
+     * of the helper.
+     *
+     * @param string $string input string
+     * @return string
+     */
+    protected static function transliterate($string)
+    {
+        if (static::hasIntl()) {
+            return transliterator_transliterate(static::$transliterator, $string);
+        } else {
+            return strtr($string, static::$transliteration);
+        }
+    }
+
+    /**
+     * @return boolean if intl extension is loaded
+     */
+    protected static function hasIntl()
+    {
+        return extension_loaded('intl');
+    }
+
+    /**
+     * Converts a table name to its class name. For example, converts "people" to "Person"
+     * @param string $tableName
+     * @return string
+     */
+    public static function classify($tableName)
+    {
+        return static::camelize(static::singularize($tableName));
+    }
+
+    /**
+     * Converts number to its ordinal English form. For example, converts 13 to 13th, 2 to 2nd ...
      * @param integer $number the number to get its ordinal value
      * @return string
      */
@@ -547,6 +531,51 @@ class BaseInflector
                 return $number . 'rd';
             default:
                 return $number . 'th';
+        }
+    }
+
+    /**
+     * Converts a list of words into a sentence.
+     *
+     * Special treatment is done for the last few words. For example,
+     *
+     * ```php
+     * $words = ['Spain', 'France'];
+     * echo Inflector::sentence($words);
+     * // output: Spain and France
+     *
+     * $words = ['Spain', 'France', 'Italy'];
+     * echo Inflector::sentence($words);
+     * // output: Spain, France and Italy
+     *
+     * $words = ['Spain', 'France', 'Italy'];
+     * echo Inflector::sentence($words, ' & ');
+     * // output: Spain, France & Italy
+     * ```
+     *
+     * @param array $words the words to be converted into an string
+     * @param string $twoWordsConnector the string connecting words when there are only two
+     * @param string $lastWordConnector the string connecting the last two words. If this is null, it will
+     * take the value of `$twoWordsConnector`.
+     * @param string $connector the string connecting words other than those connected by
+     * $lastWordConnector and $twoWordsConnector
+     * @return string the generated sentence
+     * @since 2.0.1
+     */
+    public static function sentence(array $words, $twoWordsConnector = ' and ', $lastWordConnector = null, $connector = ', ')
+    {
+        if ($lastWordConnector === null) {
+            $lastWordConnector = $twoWordsConnector;
+        }
+        switch (count($words)) {
+            case 0:
+                return '';
+            case 1:
+                return reset($words);
+            case 2:
+                return implode($twoWordsConnector, $words);
+            default:
+                return implode($connector, array_slice($words, 0, -1)) . $lastWordConnector . end($words);
         }
     }
 }
