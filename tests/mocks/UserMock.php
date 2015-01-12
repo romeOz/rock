@@ -1,8 +1,6 @@
 <?php
 namespace rockunit\mocks;
 
-use rock\base\ComponentsTrait;
-use rock\base\ObjectTrait;
 use rock\user\User;
 use rockunit\core\db\models\Users;
 

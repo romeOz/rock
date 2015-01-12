@@ -5,15 +5,20 @@ use apps\common\models\users\Users;
 use rock\base\CollectionInterface;
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
-use rock\base\StorageInterface;
+use rock\cookie\Cookie;
+use rock\di\Container;
 use rock\helpers\ArrayHelper;
+use rock\session\SessionInterface;
 
-class User implements \ArrayAccess, CollectionInterface, StorageInterface, ComponentsInterface
+class User implements \ArrayAccess, CollectionInterface, ComponentsInterface
 {
     use ComponentsTrait;
 
-    /** @var  CollectionInterface */
-    protected static $storage;
+    /**
+     * The adapter where to store the token: cookies or session (by default).
+     * @var string|array|SessionInterface
+     */
+    public $storage = 'session';
     /**
      * Session key as container.
      * @var string
@@ -28,10 +33,12 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
 
     public function init()
     {
-        if (isset(static::$storage)) {
-            return;
+        if (!is_object($this->storage)) {
+            $this->storage = Container::load($this->storage);
         }
-        static::$storage = $this->Rock->session;
+        if ($this->storage instanceof Cookie) {
+            $this->storage->httpOnly = true;
+        }
     }
 
     /**
@@ -39,7 +46,7 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
      */
     public function getIsActive()
     {
-        return static::$storage->exists("{$this->container}.id");
+        return $this->storage->exists("{$this->container}.id");
     }
 
     /**
@@ -51,7 +58,7 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
             return null;
         }
 
-        return static::$storage->get($this->prepareKeys($keys), $default);
+        return $this->storage->get($this->prepareKeys($keys), $default);
     }
 
     /**
@@ -99,7 +106,7 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
         if (!$this->getIsActive()) {
             return null;
         }
-        return ArrayHelper::only(static::$storage->get($this->container), $only, $exclude);
+        return ArrayHelper::only($this->storage->get($this->container), $only, $exclude);
     }
 
     /**
@@ -122,7 +129,7 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
         if (!isset($value)) {
             return;
         }
-        static::$storage->add($this->prepareKeys($keys), $value);
+        $this->storage->add($this->prepareKeys($keys), $value);
     }
 
     /**
@@ -177,7 +184,7 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
      */
     public function count()
     {
-        return !$this->getIsActive() ? 0 : count(static::$storage->get($this->container));
+        return !$this->getIsActive() ? 0 : count($this->storage->get($this->container));
     }
 
     /**
@@ -197,7 +204,7 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
             return;
         }
 
-        static::$storage->remove($this->prepareKeys($keys));
+        $this->storage->remove($this->prepareKeys($keys));
     }
 
     /**
@@ -231,7 +238,7 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
      */
     public function removeAll()
     {
-        static::$storage->remove($this->container);
+        $this->storage->remove($this->container);
     }
 
     /**
@@ -321,7 +328,7 @@ class User implements \ArrayAccess, CollectionInterface, StorageInterface, Compo
      */
     public function loadAllowance($action)
     {
-        if ((!$allowance = static::$storage->get($this->prepareKeys('_allowance'))) || !isset($allowance[$action])) {
+        if ((!$allowance = $this->storage->get($this->prepareKeys('_allowance'))) || !isset($allowance[$action])) {
             return [2, time()];
         }
 
