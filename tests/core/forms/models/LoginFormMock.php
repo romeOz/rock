@@ -3,11 +3,11 @@
 namespace rockunit\core\forms\models;
 
 
-use apps\common\models\forms\BaseRecoveryForm;
+use apps\common\models\forms\BaseLoginForm;
 use rock\Rock;
 use rockunit\core\db\models\BaseUsers;
 
-class RecoveryForm extends BaseRecoveryForm
+class LoginFormMock extends BaseLoginForm
 {
     /**
      * Finds user by `email`
@@ -17,11 +17,11 @@ class RecoveryForm extends BaseRecoveryForm
     public function getUsers()
     {
         if (!isset($this->_users)) {
-            if (!$this->_users = BaseUsers::findOneByEmail($this->email, BaseUsers::STATUS_ACTIVE, false)) {
-                $this->addErrorAsPlaceholder(Rock::t('invalidEmail'), 'e_recovery');
+            if (!$this->_users = BaseUsers::findOneByEmail($this->email, null, false)) {
+                $this->addErrorAsPlaceholder(Rock::t('notExistsUser'), 'e_login');
             }
         }
 
         return $this->_users;
     }
-} 
+}

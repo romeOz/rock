@@ -8,7 +8,7 @@ use rock\base\ModelEvent;
 use rock\Rock;
 use rockunit\core\db\models\BaseUsers;
 
-class SignupForm extends BaseSignupForm
+class SignupFormMock extends BaseSignupForm
 {
 
     protected function validateExistsUser()
