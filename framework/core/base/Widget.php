@@ -23,7 +23,7 @@ class Widget
 
     /**
      * @var Widget[] the widgets that are currently being rendered (not ended). This property
-     * is maintained by [[begin()]] and [[end()]] methods.
+     * is maintained by {@see \rock\base\Widget::begin()} and {@see \rock\base\Widget::end()} methods.
      * @internal
      */
     public static $stack = [];
@@ -31,7 +31,7 @@ class Widget
     /**
      * Begins a widget.
      * This method creates an instance of the calling class. It will apply the configuration
-     * to the created instance. A matching [[end()]] call should be called later.
+     * to the created instance. A matching {@see \rock\base\Widget::end()} call should be called later.
      * @param array $config name-value pairs that will be used to initialize the object properties
      * @return static the newly created widget instance
      */
@@ -51,7 +51,7 @@ class Widget
      * Note that the rendering result of the widget is directly echoed out.
      *
      * @return static the widget instance that is ended.
-     * @throws WidgetException if [[begin()]] and [[end()]] calls are not properly nested
+     * @throws WidgetException if {@see \rock\base\Widget::begin()} and {@see \rock\base\Widget::end()} calls are not properly nested
      */
     public static function end()
     {

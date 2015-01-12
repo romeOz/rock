@@ -27,7 +27,7 @@ use rock\helpers\ArrayHelper;
 abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
 {
     /**
-     * @event Event an event that is triggered when the record is initialized via [[init()]].
+     * @event Event an event that is triggered when the record is initialized via {@see \rock\base\ObjectInterface::init()}.
      */
     const EVENT_INIT = 'init';
     const EVENT_BEFORE_FIND = 'beforeFind';
@@ -37,7 +37,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
     const EVENT_AFTER_FIND = 'afterFind';
     /**
      * @event ModelEvent an event that is triggered before inserting a record.
-     * You may set [[ModelEvent::isValid]] to be false to stop the insertion.
+     * You may set {@see \rock\base\ModelEvent::$isValid} to be false to stop the insertion.
      */
     const EVENT_BEFORE_INSERT = 'beforeInsert';
     /**
@@ -46,7 +46,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
     const EVENT_AFTER_INSERT = 'afterInsert';
     /**
      * @event ModelEvent an event that is triggered before updating a record.
-     * You may set [[ModelEvent::isValid]] to be false to stop the update.
+     * You may set {@see \rock\base\ModelEvent::$isValid} to be false to stop the update.
      */
     const EVENT_BEFORE_UPDATE = 'beforeUpdate';
     /**
@@ -55,7 +55,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
     const EVENT_AFTER_UPDATE = 'afterUpdate';
     /**
      * @event ModelEvent an event that is triggered before deleting a record.
-     * You may set [[ModelEvent::isValid]] to be false to stop the deletion.
+     * You may set {@see \rock\base\ModelEvent::$isValid} to be false to stop the deletion.
      */
     const EVENT_BEFORE_DELETE = 'beforeDelete';
     /**
@@ -527,7 +527,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
     /**
      * Returns the attribute values that have been modified since they are loaded or saved most recently.
      * @param string[]|null $names the names of the attributes whose values may be returned if they are
-     * changed recently. If null, [[attributes()]] will be used.
+     * changed recently. If null, {@see \rock\db\BaseActiveRecord::getAttributes()} will be used.
      * @return array the changed attribute values (name-value pairs)
      */
     public function getDirtyAttributes($names = null)
@@ -589,19 +589,19 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      *
      * This method performs the following steps in order:
      *
-     * 1. call [[beforeValidate()]] when `$runValidation` is true. If validation
+     * 1. call {@see \rock\base\Model::beforeValidate()} when `$runValidation` is true. If validation
      *    fails, it will skip the rest of the steps;
-     * 2. call [[afterValidate()]] when `$runValidation` is true.
+     * 2. call {@see \rock\base\Model::afterValidate()} when `$runValidation` is true.
      * 3. call {@see \rock\db\BaseActiveRecord::beforeSave()}. If the method returns false, it will skip the
      *    rest of the steps;
      * 4. save the record into database. If this fails, it will skip the rest of the steps;
      * 5. call {@see \rock\db\BaseActiveRecord::afterSave()};
      *
-     * In the above step 1, 2, 3 and 5, events [[EVENT_BEFORE_VALIDATE]], {@see \rock\db\BaseActiveRecord::EVENT_BEFORE_UPDATE},
-     * {@see \rock\db\BaseActiveRecord::EVENT_AFTER_UPDATE} and [[EVENT_AFTER_VALIDATE]]
+     * In the above step 1, 2, 3 and 5, events {@see \rock\base\Model::EVENT_BEFORE_VALIDATE}, {@see \rock\db\BaseActiveRecord::EVENT_BEFORE_UPDATE},
+     * {@see \rock\db\BaseActiveRecord::EVENT_AFTER_UPDATE} and {@see \rock\base\Model::EVENT_AFTER_VALIDATE}
      * will be raised by the corresponding methods.
      *
-     * Only the [[dirtyAttributes|changed attribute values]] will be saved into database.
+     * Only the {@see \rock\db\BaseActiveRecord::$dirtyAttributes}(changed attribute values) will be saved into database.
      *
      * For example, to update a customer record:
      *
@@ -896,7 +896,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * This method is called at the end of inserting or updating a record.
      * 
      * The default implementation will trigger an {@see \rock\db\BaseActiveRecord::EVENT_AFTER_INSERT} event when `$insert` is true,
-     * or an {@see \rock\db\BaseActiveRecord::EVENT_AFTER_UPDATE} event if `$insert` is false. The event class used is [[AfterSaveEvent]].
+     * or an {@see \rock\db\BaseActiveRecord::EVENT_AFTER_UPDATE} event if `$insert` is false. The event class used is {@see \rock\db\AfterSaveEvent}.
      * When overriding this method, make sure you call the parent implementation so that
      * the event is triggered.
      * @param boolean $insert whether this method called while inserting a record.

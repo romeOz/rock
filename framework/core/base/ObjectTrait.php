@@ -34,7 +34,7 @@ trait ObjectTrait
      * The default implementation does two things:
      *
      * - Initializes the object with the given configuration `$config`.
-     * - Call [[init()]].
+     * - Call {@see \rock\base\ObjectInterface::init()}.
      *
      * If this method is overridden in a child class, it is recommended that
      *
