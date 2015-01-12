@@ -298,7 +298,7 @@ class Html
         $csrf = Rock::$app->csrf;
         if ($csrf instanceof CSRF && $csrf->enableCsrfValidation) {
             return static::tag('meta', '', ['name' => 'csrf-param', 'content' => $csrf->csrfParam]) . "\n    "
-                   . static::tag('meta', '', ['name' => 'csrf-token', 'content' => $csrf->create('')]) . "\n";
+                   . static::tag('meta', '', ['name' => 'csrf-token', 'content' => $csrf->get()]) . "\n";
         } else {
             return '';
         }
@@ -339,7 +339,7 @@ class Html
                 $method = 'post';
             }
             if ($token->enableCsrfValidation && !strcasecmp($method, 'post')) {
-                $csrf = $token->create($name);
+                $csrf = $token->get(/*$name*/);
                 $hiddenInputs[] = static::hiddenInput(
                     isset($name) ? "{$name}[_csrf]" : '_csrf',
                     $csrf,

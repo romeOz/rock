@@ -17,6 +17,6 @@ class CSRF extends Snippet
             return false;
         }
         $token = $this->Rock->csrf;
-        return $token->create($this->name);
+        return $token->get();
     }
 }

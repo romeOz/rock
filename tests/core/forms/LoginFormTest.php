@@ -2,12 +2,14 @@
 
 namespace rockunit\core\forms;
 
+use rock\csrf\CSRF;
+use rock\di\Container;
 use rock\i18n\i18n;
 use rock\Rock;
 use rockunit\common\CommonTestTrait;
 use rockunit\core\db\DatabaseTestCase;
 use rockunit\core\db\models\ActiveRecord;
-use rockunit\core\forms\models\LoginForm;
+use rockunit\core\forms\models\LoginFormMock;
 
 /**
  * @group forms
@@ -16,8 +18,6 @@ use rockunit\core\forms\models\LoginForm;
 class LoginFormTest extends DatabaseTestCase
 {
     use CommonTestTrait;
-
-    public static $post = [];
 
     public static function setUpBeforeClass()
     {
@@ -35,7 +35,6 @@ class LoginFormTest extends DatabaseTestCase
     {
         parent::setUp();
         ActiveRecord::$connection = $this->getConnection();
-        $_POST = static::$post;
         static::sessionUp();
         Rock::$app->template->removeAllPlaceholders();
         Rock::$app->template->removeAllPlaceholders(true);
@@ -53,8 +52,10 @@ class LoginFormTest extends DatabaseTestCase
      */
     public function testFail(array $post, array $errors)
     {
-        $model = new LoginForm();
-        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
+        /** @var CSRF $csrf */
+        $csrf = Container::load(CSRF::className());
+        $model = new LoginFormMock();
+        $post[$csrf->csrfParam] = call_user_func($post[$csrf->csrfParam]);
         $_POST = [$model->formName() => $post];
         $model->load($_POST);
         $this->assertFalse($model->validate());
@@ -70,7 +71,7 @@ class LoginFormTest extends DatabaseTestCase
                     'email' => ' FOOgmail.ru    ',
                     'password' => 'abc',
                     Rock::$app->csrf->csrfParam => function () {
-                        return Rock::$app->csrf->create((new LoginForm())->formName());
+                        return Rock::$app->csrf->get();
                     },
                 ],
                 [
@@ -104,7 +105,7 @@ class LoginFormTest extends DatabaseTestCase
                     'email' => 'linda@gmail.com',
                     'password' => '123456f',
                     Rock::$app->csrf->csrfParam => function () {
-                        return Rock::$app->csrf->create((new LoginForm())->formName());
+                        return Rock::$app->csrf->get(/*(new LoginForm())->formName()*/);
                     },
                 ],
                 [
@@ -119,7 +120,7 @@ class LoginFormTest extends DatabaseTestCase
                     'email' => 'jane@hotmail.com',
                     'password' => '123456',
                     Rock::$app->csrf->csrfParam => function () {
-                        return Rock::$app->csrf->create((new LoginForm())->formName());
+                        return Rock::$app->csrf->get(/*(new LoginForm())->formName()*/);
                     },
                 ],
                 [
@@ -134,13 +135,14 @@ class LoginFormTest extends DatabaseTestCase
 
     public function testSuccess()
     {
-        $token = Rock::$app->csrf;
+        /** @var CSRF $csrf */
+        $csrf = Container::load(CSRF::className());
         $post = [
             'email' => 'Linda@gmail.com',
             'password' => '123456',
         ];
-        $model = new LoginForm();
-        $post[$token->csrfParam] = $token->create($model->formName());
+        $model = new LoginFormMock();
+        $post[$csrf->csrfParam] = $csrf->get();
         $_POST = [$model->formName() => $post];
         $model->load($_POST);
         $this->assertTrue($model->validate());

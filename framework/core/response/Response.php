@@ -996,7 +996,7 @@ class Response
             return;
         }
         $csrf = $this->Rock->csrf;
-        $csrfToken = $csrf->create();
+        $csrfToken = $csrf->get();
         if ($csrfToken) {
             if (is_array($this->data)) {
                 $this->data[$csrf->csrfParam] = $csrfToken;

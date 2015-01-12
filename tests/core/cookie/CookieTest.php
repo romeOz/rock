@@ -4,29 +4,26 @@ namespace rockunit\core\cookie;
 
 use rock\Rock;
 use rock\sanitize\Sanitize;
+use rockunit\common\CommonTestTrait;
 
 /**
  * @group base
  */
 class CookieTest extends \PHPUnit_Framework_TestCase
 {
-    public static $session = [];
-    public static $cookie = [];
+    use CommonTestTrait;
 
     public function setUp()
     {
-        $_SESSION = static::$session;
-        $_COOKIE = static::$cookie;
-        Rock::$app->cookie->removeAll();
-        Rock::$app->session->removeAll();
+        static::sessionUp();
     }
 
     public function tearDown()
     {
-        static::$session = $_SESSION;
-        static::$cookie = $_COOKIE;
+        static::sessionDown();
     }
 
+    // tests
 
     /**
      * @dataProvider providerGet

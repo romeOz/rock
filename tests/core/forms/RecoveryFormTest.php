@@ -2,13 +2,16 @@
 
 namespace rockunit\core\forms;
 
+use rock\csrf\CSRF;
+use rock\di\Container;
 use rock\i18n\i18n;
 use rock\Rock;
+use rockunit\common\CommonTestTrait;
 use rockunit\core\db\DatabaseTestCase;
 use rockunit\core\db\models\ActiveRecord;
 use rockunit\core\db\models\BaseUsers;
-use rockunit\core\forms\models\RecoveryForm;
-use rockunit\core\forms\models\SignupForm;
+use rockunit\core\forms\models\RecoveryFormMock;
+use rockunit\core\forms\models\SignupFormMock;
 use rockunit\mocks\UserMock;
 
 /**
@@ -17,9 +20,7 @@ use rockunit\mocks\UserMock;
  */
 class RecoveryFormTest extends DatabaseTestCase
 {
-    public static $session = [];
-    public static $post = [];
-    public static $cookie = [];
+    use  CommonTestTrait;
 
     public static function setUpBeforeClass()
     {
@@ -37,21 +38,18 @@ class RecoveryFormTest extends DatabaseTestCase
     {
         parent::setUp();
         ActiveRecord::$connection = $this->getConnection();
-        $_SESSION = static::$session;
-        $_COOKIE = static::$cookie;
-        $_POST = static::$post;
-        Rock::$app->session->removeAll();
-        Rock::$app->cookie->removeAll();
-        Rock::$app->template->removeAllPlaceholders();
-        Rock::$app->template->removeAllPlaceholders(true);
+        static::sessionUp();
+        static::activeSession();
+        $template = Rock::$app->template;
+        $template->removeAllPlaceholders();
+        $template->removeAllPlaceholders(true);
     }
 
     public function tearDown()
     {
         parent::tearDown();
-        static::$session = $_SESSION;
-        static::$cookie = $_COOKIE;
-        static::$post = $_POST;
+        static::sessionDown();
+        static::activeSession(false);
     }
 
     /**
@@ -59,8 +57,10 @@ class RecoveryFormTest extends DatabaseTestCase
      */
     public function testFail(array $post, array $errors)
     {
-        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
-        $model = new RecoveryForm();
+        /** @var CSRF $csrf */
+        $csrf = Container::load(CSRF::className());
+        $post[$csrf->csrfParam] = call_user_func($post[$csrf->csrfParam]);
+        $model = new RecoveryFormMock();
         $_POST = [$model->formName() => $post];
         $model->load($_POST);
         $this->assertFalse($model->validate());
@@ -75,7 +75,7 @@ class RecoveryFormTest extends DatabaseTestCase
                 [
                     'email' => '        fooGMAIL.ru  ',
                     Rock::$app->csrf->csrfParam => function () {
-                        return Rock::$app->csrf->create((new RecoveryForm())->formName());
+                        return Rock::$app->csrf->get();
                     },
                     'captcha' => '12345'
                 ],
@@ -94,7 +94,7 @@ class RecoveryFormTest extends DatabaseTestCase
                 [
                     'email' => '',
                     Rock::$app->csrf->csrfParam => function () {
-                        return Rock::$app->csrf->create((new RecoveryForm())->formName());
+                        return Rock::$app->csrf->get(/*(new RecoveryForm())->formName()*/);
                     },
                     'captcha' => ''
                 ],
@@ -129,19 +129,18 @@ class RecoveryFormTest extends DatabaseTestCase
 
     public function testExistsUserByEmailFail()
     {
+        /** @var CSRF $csrf */
+        $csrf = Container::load(CSRF::className());
         $post = [
             'email' => 'chuck@hotmail.com',
             'username' => 'Chuck',
             'password' => '123456',
             'password_confirm' => '123456',
-            Rock::$app->csrf->csrfParam => function () {
-                return Rock::$app->csrf->create((new RecoveryForm())->formName());
-            },
+            $csrf->csrfParam => $csrf->get(),
             'captcha' => '12345'
         ];
-        Rock::$app->session->setFlash('captcha', '12345');
-        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
-        $model = new RecoveryForm();
+        static::getSession()->setFlash('captcha', '12345');
+        $model = new RecoveryFormMock();
         $_POST = [$model->formName() => $post];
         $model->load($_POST);
         $this->assertFalse($model->validate());
@@ -160,19 +159,18 @@ class RecoveryFormTest extends DatabaseTestCase
 
     public function testCaptchaFail()
     {
+        /** @var CSRF $csrf */
+        $csrf = Container::load(CSRF::className());
         $post = [
             'email' => 'foo@gmail.ru',
             'username' => 'Jane',
             'password' => '123456',
             'password_confirm' => '123456',
-            Rock::$app->csrf->csrfParam => function () {
-                return Rock::$app->csrf->create((new RecoveryForm())->formName());
-            },
+            $csrf->csrfParam =>$csrf->get(),
             'captcha' => '1234'
         ];
-        Rock::$app->session->setFlash('captcha', '12345');
-        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
-        $model = (new RecoveryForm());
+        static::getSession()->setFlash('captcha', '12345');
+        $model = (new RecoveryFormMock());
         $_POST = [$model->formName() => $post];
         $model->load($_POST);
         $this->assertFalse($model->validate());
@@ -190,18 +188,18 @@ class RecoveryFormTest extends DatabaseTestCase
 
     public function testSuccess()
     {
+        /** @var CSRF $csrf */
+        $csrf = Container::load(CSRF::className());
+
         $email = 'chuck@gmail.com';
         $this->signUp($email);
         $post = [
             'email' => $email,
-            Rock::$app->csrf->csrfParam => function () {
-                return Rock::$app->csrf->create((new RecoveryForm())->formName());
-            },
+            $csrf->csrfParam => $csrf->get(),
             'captcha' => '12345'
         ];
-        Rock::$app->session->setFlash('captcha', '12345');
-        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
-        $model = new RecoveryForm();
+        static::getSession()->setFlash('captcha', '12345');
+        $model = new RecoveryFormMock();
         $_POST = [$model->formName() => $post];
         $model->load($_POST);
         $this->assertTrue($model->validate());
@@ -212,19 +210,19 @@ class RecoveryFormTest extends DatabaseTestCase
 
     protected function signUp($email)
     {
+        /** @var CSRF $csrf */
+        $csrf = Container::load(CSRF::className());
+
         $post = [
             'email' => $email,
             'username' => 'Chuck',
             'password' => '123456',
             'password_confirm' => '123456',
-            Rock::$app->csrf->csrfParam => function () {
-                return Rock::$app->csrf->create((new SignupForm())->formName());
-            },
+            $csrf->csrfParam => $csrf->get(),
             'captcha' => '12345'
         ];
-        Rock::$app->session->setFlash('captcha', '12345');
-        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
-        $model = new SignupForm();
+        static::getSession()->setFlash('captcha', '12345');
+        $model = new SignupFormMock();
         $_POST = [$model->formName() => $post];
         $model->load($_POST);
         $this->assertTrue($model->validate());

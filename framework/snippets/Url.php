@@ -127,7 +127,7 @@ class Url extends Snippet implements UrlInterface
         }
         if ($this->csrf) {
             $token = $this->Rock->csrf;
-            $this->addArgs[$token->csrfParam] = $token->create();
+            $this->addArgs[$token->csrfParam] = $token->get();
         }
         if (!empty($this->args)) {
             $urlBuilder->setArgs($this->args);

@@ -9,24 +9,47 @@ use rock\cache\CacheStub;
 use rock\file\FileManager;
 use rock\helpers\FileHelper;
 use rock\Rock;
+use rockunit\core\session\mocks\SessionMock;
 
 trait CommonTestTrait
 {
     protected static $session = [];
     protected static $cookie = [];
+    public static $post = [];
+
+    /**
+     * @return SessionMock
+     */
+    public static function getSession()
+    {
+        Rock::$app->di['session'] = [
+            'class' => SessionMock::className(),
+            //'singleton' => true
+        ];
+
+        return Rock::$app->session;
+    }
+
+    public static function activeSession($active = true)
+    {
+        SessionMock::$isActive = $active;
+    }
+
 
     protected static function sessionUp()
     {
         $_SESSION = static::$session;
         $_COOKIE = static::$cookie;
+        $_POST = static::$post;
         Rock::$app->cookie->removeAll();
-        Rock::$app->session->removeAll();
+        static::getSession()->removeAll();
     }
 
     protected static function sessionDown()
     {
         static::$session = $_SESSION;
         static::$cookie = $_COOKIE;
+        static::$post = $_POST;
     }
 
     protected static function clearRuntime()

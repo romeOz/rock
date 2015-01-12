@@ -2,12 +2,15 @@
 
 namespace rockunit\core\forms;
 
+use rock\csrf\CSRF;
+use rock\di\Container;
 use rock\i18n\i18n;
 use rock\Rock;
+use rockunit\common\CommonTestTrait;
 use rockunit\core\db\DatabaseTestCase;
 use rockunit\core\db\models\ActiveRecord;
 use rockunit\core\db\models\BaseUsers;
-use rockunit\core\forms\models\SignupForm;
+use rockunit\core\forms\models\SignupFormMock;
 
 /**
  * @group forms
@@ -15,9 +18,7 @@ use rockunit\core\forms\models\SignupForm;
  */
 class SignupFormTest extends DatabaseTestCase
 {
-    public static $session = [];
-    public static $post = [];
-    public static $cookie = [];
+    use  CommonTestTrait;
 
     public static function setUpBeforeClass()
     {
@@ -35,21 +36,18 @@ class SignupFormTest extends DatabaseTestCase
     {
         parent::setUp();
         ActiveRecord::$connection = $this->getConnection();
-        $_SESSION = static::$session;
-        $_COOKIE = static::$cookie;
-        $_POST = static::$post;
-        Rock::$app->session->removeAll();
-        Rock::$app->cookie->removeAll();
-        Rock::$app->template->removeAllPlaceholders();
-        Rock::$app->template->removeAllPlaceholders(true);
+        static::sessionUp();
+        static::activeSession();
+        $template = Rock::$app->template;
+        $template->removeAllPlaceholders();
+        $template->removeAllPlaceholders(true);
     }
 
     public function tearDown()
     {
         parent::tearDown();
-        static::$session = $_SESSION;
-        static::$cookie = $_COOKIE;
-        static::$post = $_POST;
+        static::sessionDown();
+        static::activeSession(false);
     }
 
     /**
@@ -57,7 +55,7 @@ class SignupFormTest extends DatabaseTestCase
      */
     public function testFail(array $post, array $errors)
     {
-        $model = new SignupForm();
+        $model = new SignupFormMock();
         $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
         $_POST = [$model->formName() => $post];
         $model->load($_POST);
@@ -74,7 +72,7 @@ class SignupFormTest extends DatabaseTestCase
                     'email' => ' FOOgmail.ru    ',
                     'username' => '',
                     'password' => 'abc',
-                    Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new SignupForm())->formName());},
+                    Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->get(/*(new SignupForm())->formName()*/);},
                     'password_confirm' => 'abc',
                     'captcha' => '12345'
                 ],
@@ -103,7 +101,7 @@ class SignupFormTest extends DatabaseTestCase
                     'username' => 'foo',
                     'password' => '123456',
                     'password_confirm' => '123456',
-                    Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new SignupForm())->formName());},
+                    Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->get(/*(new SignupForm())->formName()*/);},
                     'captcha' => ''
                 ],
                 [
@@ -123,7 +121,7 @@ class SignupFormTest extends DatabaseTestCase
                     'username' => 'foo',
                     'password' => 'abc',
                     'password_confirm' => 'abcde',
-                    Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new SignupForm())->formName());},
+                    Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->get(/*(new SignupForm())->formName()*/);},
                 ],
                 [
                     'captcha' =>
@@ -167,103 +165,88 @@ class SignupFormTest extends DatabaseTestCase
 
     public function testExistsUserByUsernameFail()
     {
+        /** @var CSRF $csrf */
+        $csrf = Container::load(CSRF::className());
         $post = [
             'email' => 'foo@gmail.ru',
             'username' => 'Jane',
             'password' => '123456',
             'password_confirm' => '123456',
-            Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new SignupForm())->formName());},
+            $csrf->csrfParam => $csrf->get(),
             'captcha' => '12345'
         ];
-        Rock::$app->session->setFlash('captcha', '12345');
-        $model = new SignupForm();
-        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
+        static::getSession()->setFlash('captcha', '12345');
+        $model = new SignupFormMock();
         $_POST = [$model->formName() => $post];
         $model->load($_POST);
         $this->assertFalse($model->validate());
         $this->assertFalse($model->isSignup);
-        $this->assertEquals(
-            [
-                'e_signup' =>
-                    [
-                        'User with this name/e-mail already exists.',
-                    ],
-            ],
-            $model->getErrors()
-        );
+        $expected = ['e_signup' =>['User with this name/e-mail already exists.',],];
+        $this->assertEquals($expected, $model->getErrors());
     }
 
     public function testExistsUserByEmailFail()
     {
+        /** @var CSRF $csrf */
+        $csrf = Container::load(CSRF::className());
         $post = [
             'email' => 'jane@hotmail.com',
             'username' => 'Chuck',
             'password' => '123456',
             'password_confirm' => '123456',
-            Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new SignupForm())->formName());},
+            $csrf->csrfParam => $csrf->get(),
             'captcha' => '12345'
         ];
-        Rock::$app->session->setFlash('captcha', '12345');
-        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
-        $model = (new SignupForm());
+        static::getSession()->setFlash('captcha', '12345');
+        $model = (new SignupFormMock());
         $_POST = [$model->formName() => $post];
         $model->load($_POST);
         $this->assertFalse($model->validate());
         $this->assertFalse($model->isSignup);
-        $this->assertEquals(
-            [
-                'e_signup' =>
-                    [
-                        'User with this name/e-mail already exists.',
-                    ],
-            ],
-            $model->getErrors()
-        );
+
+        $expected = ['e_signup' =>['User with this name/e-mail already exists.',],];
+        $this->assertEquals($expected, $model->getErrors());
     }
 
 
     public function testCaptchaFail()
     {
+        /** @var CSRF $csrf */
+        $csrf = Container::load(CSRF::className());
         $post = [
             'email' => 'foo@gmail.ru',
             'username' => 'Jane',
             'password' => '123456',
             'password_confirm' => '123456',
-            Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new SignupForm())->formName());},
+            $csrf->csrfParam => $csrf->get(),
             'captcha' => '1234'
         ];
-        Rock::$app->session->setFlash('captcha', '12345');
-        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
-        $model = new SignupForm();
+        static::getSession()->setFlash('captcha', '12345');
+        $model = new SignupFormMock();
         $_POST = [$model->formName() => $post];
         $model->load($_POST);
         $this->assertFalse($model->validate());
         $this->assertFalse($model->isSignup);
-        $this->assertEquals(
-            [
-                'captcha' =>
-                    [
-                        0 => 'captcha must be valid',
-                    ],
-            ],
-            $model->getErrors()
-        );
+
+        $expected = ['captcha' =>['captcha must be valid',],];
+        $this->assertEquals($expected, $model->getErrors());
     }
 
 
     public function testSuccess()
     {
+        /** @var CSRF $csrf */
+        $csrf = Container::load(CSRF::className());
         $post = [
             'email' => 'chuck@gmail.ru',
             'username' => 'Chuck',
             'password' => '123456',
             'password_confirm' => '123456',
-            Rock::$app->csrf->csrfParam => function(){ return Rock::$app->csrf->create((new SignupForm())->formName());},
+            $csrf->csrfParam => $csrf->get(),
             'captcha' => '12345'
         ];
-        Rock::$app->session->setFlash('captcha', '12345');
-        $post[Rock::$app->csrf->csrfParam] = call_user_func($post[Rock::$app->csrf->csrfParam]);
-        $model = new SignupForm();
+        static::getSession()->setFlash('captcha', '12345');
+        $model = new SignupFormMock();
         $_POST = [$model->formName() => $post];
         $model->load($_POST);
         $this->assertTrue($model->validate());

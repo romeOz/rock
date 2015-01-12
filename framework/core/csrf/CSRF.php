@@ -4,12 +4,12 @@ namespace rock\csrf;
 
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
-use rock\base\StorageInterface;
 use rock\cookie\Cookie;
+use rock\di\Container;
 use rock\request\RequestInterface;
 use rock\session\SessionInterface;
 
-class CSRF implements ComponentsInterface, RequestInterface, StorageInterface
+class CSRF implements ComponentsInterface, RequestInterface
 {
     use ComponentsTrait;
 
@@ -18,11 +18,9 @@ class CSRF implements ComponentsInterface, RequestInterface, StorageInterface
      */
     const CSRF_HEADER = 'X-CSRF-Token';
     /**
-     * The adapter where to store the token: cookies or session (by default).
-     * @var int
-     * @see StorageInterface
+     * @event
      */
-    public $adapterStorage = self::SESSION;
+    const EVENT_AFTER_VALID = 'afterValid';
     /**
      * @var boolean whether to enable CSRF (Cross-Site Request Forgery) validation. Defaults to true.
      * When CSRF validation is enabled, forms submitted to an Rock Web application must be originated
@@ -40,22 +38,21 @@ class CSRF implements ComponentsInterface, RequestInterface, StorageInterface
      * This property is used only when @see \rock\csrf\CSRF::enableCsrfValidation is true.
      */
     public $csrfParam = '_csrf';
-    /** @var  SessionInterface */
-    protected static $storage;
-    /** @var  string */
-    private static $_token;
+    /**
+     * The adapter where to store the token: cookies or session (by default).
+     * @var string|array|SessionInterface
+     */
+    public $storage = 'session';
+
 
     public function init()
     {
-        if (isset(static::$storage)) {
-            return;
+        if (!is_object($this->storage)) {
+            $this->storage = Container::load($this->storage);
         }
-        if ($this->adapterStorage === self::COOKIE) {
-            $configs = $this->Rock->di->get(Cookie::className())['args'];
-            $configs['httpOnly'] = true;
-            static::$storage = new Cookie($configs);
-        } else {
-            static::$storage = $this->Rock->session;
+        
+        if ($this->storage instanceof Cookie) {
+            $this->storage->httpOnly = true;
         }
     }
 
@@ -66,35 +63,44 @@ class CSRF implements ComponentsInterface, RequestInterface, StorageInterface
      * this method is called, a new CSRF token will be generated and persisted (in session or cookie).
      * @return string
      */
-    public function create($regenerate = false)
+    public function get($regenerate = false)
     {
         if ($this->enableCsrfValidation === false) {
             return null;
         }
-        if (!$regenerate && isset(self::$_token)) {
-            return self::$_token;
+        if ($regenerate || ($token = $this->load()) === null) {
+            $token = $this->generate();
         }
-        $token = self::$_token = $this->Rock->security->generateRandomKey();
-        static::$storage->add($this->csrfParam, $token);
+
+        return $token;
+    }
+
+    protected function generate()
+    {
+        $token = $this->Rock->security->generateRandomKey();
+        $this->storage->add($this->csrfParam, $token);
         return $token;
     }
 
     /**
      * Validation token.
      *
-     * @param string $token value of token.
+     * @param string $compare value of token.
      * @return bool
      */
-    public function valid($token = null)
+    public function valid($compare = null)
     {
         if ($this->enableCsrfValidation === false) {
             return true;
         }
-        if (!empty($token)) {
-            if ($this->getCsrfTokenFromHeader() === $this->get() || $this->get() === $token) {
+        if (!empty($compare)) {
+            $token = $this->load();
+            if ($this->getCsrfTokenFromHeader() === $token || $token === $compare) {
+                $this->trigger(self::EVENT_AFTER_VALID);
                 return true;
             }
         }
+        $this->trigger(self::EVENT_AFTER_VALID);
         return false;
     }
 
@@ -114,17 +120,17 @@ class CSRF implements ComponentsInterface, RequestInterface, StorageInterface
      */
     public function remove()
     {
-        static::$storage->remove($this->csrfParam);
+        $this->storage->remove($this->csrfParam);
     }
 
     /**
-     * Has CSRF-token.
+     * Exists CSRF-token.
      *
-     * @return boolean whether the named cookie exists
+     * @return boolean
      */
-    public function has()
+    public function exists()
     {
-        return static::$storage->exists($this->csrfParam);
+        return $this->storage->exists($this->csrfParam);
     }
 
     /**
@@ -132,8 +138,8 @@ class CSRF implements ComponentsInterface, RequestInterface, StorageInterface
      *
      * @return string
      */
-    public function get()
+    protected function load()
     {
-        return static::$storage->get($this->csrfParam);
+        return $this->storage->get($this->csrfParam);
     }
 }
