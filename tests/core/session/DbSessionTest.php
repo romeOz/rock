@@ -4,12 +4,12 @@ namespace rockunit\core\session;
 
 
 use rockunit\common\CommonTestTrait;
-use rockunit\core\session\mocks\SessionMock;
+use rockunit\core\db\mocks\SessionMock;
 
 /**
  * @group base
  */
-class SessionTest extends \PHPUnit_Framework_TestCase
+class DbSessionTest extends \PHPUnit_Framework_TestCase
 {
     use CommonTestTrait;
     use CommonSessionTrait;
