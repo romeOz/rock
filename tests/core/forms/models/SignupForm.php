@@ -5,7 +5,6 @@ namespace rockunit\core\forms\models;
 
 use apps\common\models\forms\BaseSignupForm;
 use rock\base\ModelEvent;
-use rock\event\Event;
 use rock\Rock;
 use rockunit\core\db\models\BaseUsers;
 

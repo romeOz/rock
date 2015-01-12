@@ -14,7 +14,6 @@ use rockunit\core\db\models\ActiveRecord;
  */
 class SluggableBehaviorTest extends DatabaseTestCase
 {
-
     protected function setUp()
     {
         parent::setUp();
