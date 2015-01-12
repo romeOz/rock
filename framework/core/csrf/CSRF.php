@@ -62,14 +62,16 @@ class CSRF implements ComponentsInterface, RequestInterface, StorageInterface
     /**
      * Creating CSRF-token
      *
+     * @param boolean $regenerate whether to regenerate CSRF token. When this parameter is true, each time
+     * this method is called, a new CSRF token will be generated and persisted (in session or cookie).
      * @return string
      */
-    public function create()
+    public function create($regenerate = false)
     {
         if ($this->enableCsrfValidation === false) {
             return null;
         }
-        if (isset(self::$_token)) {
+        if (!$regenerate && isset(self::$_token)) {
             return self::$_token;
         }
         $token = self::$_token = $this->Rock->security->generateRandomKey();
