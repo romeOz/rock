@@ -125,7 +125,7 @@ class HeaderCollection implements \IteratorAggregate, \ArrayAccess, \Countable
      * @param string $name the name of the header
      * @return boolean whether the named header exists
      */
-    public function has($name)
+    public function exists($name)
     {
         $name = strtolower($name);
         return isset($this->_headers[$name]);
@@ -173,7 +173,7 @@ class HeaderCollection implements \IteratorAggregate, \ArrayAccess, \Countable
      */
     public function offsetExists($name)
     {
-        return $this->has($name);
+        return $this->exists($name);
     }
 
     /**
