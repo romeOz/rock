@@ -2,6 +2,7 @@
 /**
  * start timestamp by load application.
  */
+use rock\i18n\i18nInterface;
 use rock\request\Request;
 use rock\Rock;
 
@@ -15,7 +16,8 @@ defined('DEBUG') or define('DEBUG', true);
 defined('DS') or define('DS', DIRECTORY_SEPARATOR);
 Rock::$app = new Rock();
 
-Rock::$app->language = Request::getPreferredLanguage(Rock::$app->allowLanguages);
+Rock::$app->allowLanguages = array(i18nInterface::EN, i18nInterface::RU);
+Rock::$app->language = (new Request())->getPreferredLanguage(Rock::$app->allowLanguages);
 
 /**
  * Catch error

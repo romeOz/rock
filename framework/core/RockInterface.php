@@ -7,7 +7,7 @@ namespace rock;
  * "Rock"
  *
  * @property-read string $language
- * @property-read string[] $allowLanguages
+ * @property-read string[] $allowLanguages a list of the languages supported by the application.
  * @property-read string $charset
  * @property-read \rock\base\Controller $controller
  * @property-read string $name

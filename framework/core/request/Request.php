@@ -9,13 +9,35 @@ use rock\Rock;
 use rock\sanitize\Sanitize;
 
 /**
- * Class `Request`
+ * The web Request class represents an HTTP request
  *
- * @property-read string scheme
- * @property-read string host
- * @property-read string hostInfo
- * @property-read string queryString
+ * @property string $absoluteUrl The currently requested absolute URL. This property is read-only.
+ * @property array $acceptableContentTypes The content types ordered by the quality score. Types with the
+ * highest scores will be returned first. The array keys are the content types, while the array values are the
+ * corresponding quality score and other parameters as given in the header.
+ * @property-read string $scheme
+ * @property integer $port Port number for insecure requests.
+ * @property integer $securePort Port number for secure requests.
+ * @property string $serverName Server name. This property is read-only.
+ * @property integer $serverPort Server port number. This property is read-only.
+ * @property-read string $host hostname part  (e.g. `www.site.com`).
+ * @property-read string $hostInfo Schema and hostname part (with port number if needed) of the request URL (e.g.
+ * `http://www.site.com`).
+ * @property-read string $queryString Part of the request URL that is after the question mark. This property is
+ * read-only.
+ * @property string $url The currently requested relative URL. Note that the URI returned is URL-encoded.
+ * @property string $baseUrl The relative URL for the application.
+ * @property string $referrer URL referrer, null if not present. This property is read-only.
+ * @property string $scriptFile The entry script file path.
+ * @property string $scriptUrl The relative URL of the entry script.
+ * @property string $userAgent User agent, null if not present. This property is read-only.
+ * @property string $userHost User host name, null if cannot be determined. This property is read-only.
+ * @property-read string $userIP User IP address. Null is returned if the user IP address cannot be detected. This
+ * property is read-only.
  * @property-read array $eTags The entity tags. This property is read-only.
+ * @property-read string $rawBody The request body. This property is read-only.
+ * @property array $acceptableLanguages The languages ordered by the preference level. The first element
+ * represents the most preferred language.
  *
  * @package rock\request
  */
@@ -35,7 +57,6 @@ class Request implements RequestInterface, ComponentsInterface
      * @var string|boolean the name of the POST parameter that is used to indicate if a request is a `PUT`, `PATCH` or `DELETE`
      * request tunneled through POST. Default to '_method'.
      * @see getMethod()
-     * @see getBodyParams()
      */
     public $methodVar = '_method';
     /**
@@ -140,7 +161,7 @@ class Request implements RequestInterface, ComponentsInterface
         return self::prepareValue('_DELETE', $name, $default, $sanitize);
     }
 
-    private static $_contentTypes;
+    private $_contentTypes;
     
     /**
      * Returns the content types acceptable by the end user.
@@ -165,15 +186,15 @@ class Request implements RequestInterface, ComponentsInterface
      */
     public function getAcceptableContentTypes()
     {
-        if (self::$_contentTypes === null) {
+        if ($this->_contentTypes === null) {
             if (isset($_SERVER['HTTP_ACCEPT'])) {
-                self::$_contentTypes = $this->parseAcceptHeader($_SERVER['HTTP_ACCEPT']);
+                $this->_contentTypes = $this->parseAcceptHeader($_SERVER['HTTP_ACCEPT']);
             } else {
-                self::$_contentTypes = [];
+                $this->_contentTypes = [];
             }
         }
 
-        return self::$_contentTypes;
+        return $this->_contentTypes;
     }
 
     /**
@@ -187,7 +208,7 @@ class Request implements RequestInterface, ComponentsInterface
      */
     public function setAcceptableContentTypes($value)
     {
-        self::$_contentTypes = $value;
+        $this->_contentTypes = $value;
     }
     
     /**
@@ -212,27 +233,35 @@ class Request implements RequestInterface, ComponentsInterface
 
         return null;
     }
-    
-    private static $_languages;
 
+    private $_languages;
 
     /**
      * Returns the languages acceptable by the end user.
-     * 
      * This is determined by the `Accept-Language` HTTP header.
      * @return array the languages ordered by the preference level. The first element
      * represents the most preferred language.
      */
-    public static function getAcceptableLanguages()
+    public function getAcceptableLanguages()
     {
-        if (self::$_languages === null) {
+        if ($this->_languages === null) {
             if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-                self::$_languages = static::parseAcceptHeader($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+                $this->_languages = array_keys(static::parseAcceptHeader($_SERVER['HTTP_ACCEPT_LANGUAGE']));
             } else {
-                self::$_languages = [];
+                $this->_languages = [];
             }
         }
-        return self::$_languages;
+
+        return $this->_languages;
+    }
+
+    /**
+     * @param array $value the languages that are acceptable by the end user. They should
+     * be ordered by the preference level.
+     */
+    public function setAcceptableLanguages($value)
+    {
+        $this->_languages = $value;
     }
 
     /**
@@ -259,7 +288,7 @@ class Request implements RequestInterface, ComponentsInterface
      * @return array the acceptable values ordered by their quality score. The values with the highest scores
      * will be returned first.
      */
-    public static function parseAcceptHeader($header)
+    public function parseAcceptHeader($header)
     {
         $accepts = [];
         foreach (explode(',', $header) as $i => $part) {
@@ -286,28 +315,28 @@ class Request implements RequestInterface, ComponentsInterface
         }
 
         usort($accepts, function ($a, $b) {
-                $a = $a['q']; // index, name, q
-                $b = $b['q'];
-                if ($a[2] > $b[2]) {
-                    return -1;
-                } elseif ($a[2] < $b[2]) {
-                    return 1;
-                } elseif ($a[1] === $b[1]) {
-                    return $a[0] > $b[0] ? 1 : -1;
-                } elseif ($a[1] === '*/*') {
-                    return 1;
-                } elseif ($b[1] === '*/*') {
-                    return -1;
+            $a = $a['q']; // index, name, q
+            $b = $b['q'];
+            if ($a[2] > $b[2]) {
+                return -1;
+            } elseif ($a[2] < $b[2]) {
+                return 1;
+            } elseif ($a[1] === $b[1]) {
+                return $a[0] > $b[0] ? 1 : -1;
+            } elseif ($a[1] === '*/*') {
+                return 1;
+            } elseif ($b[1] === '*/*') {
+                return -1;
+            } else {
+                $wa = $a[1][strlen($a[1]) - 1] === '*';
+                $wb = $b[1][strlen($b[1]) - 1] === '*';
+                if ($wa xor $wb) {
+                    return $wa ? 1 : -1;
                 } else {
-                    $wa = $a[1][strlen($a[1]) - 1] === '*';
-                    $wb = $b[1][strlen($b[1]) - 1] === '*';
-                    if ($wa xor $wb) {
-                        return $wa ? 1 : -1;
-                    } else {
-                        return $a[0] > $b[0] ? 1 : -1;
-                    }
+                    return $a[0] > $b[0] ? 1 : -1;
                 }
-            });
+            }
+        });
 
         $result = [];
         foreach ($accepts as $accept) {
@@ -319,37 +348,28 @@ class Request implements RequestInterface, ComponentsInterface
         return $result;
     }
 
-
-    /**
-     * @param array $value the languages that are acceptable by the end user. They should
-     * be ordered by the preference level.
-     */
-    public static function setAcceptableLanguages($value)
-    {
-        self::$_languages = $value;
-    }
-
     /**
      * Returns the user-preferred language that should be used by this application.
-     * 
      * The language resolution is based on the user preferred languages and the languages
      * supported by the application. The method will try to find the best match.
      * @param array $languages a list of the languages supported by the application. If this is empty, the current
      * application language will be returned without further processing.
      * @return string the language that the application should use.
      */
-    public static function getPreferredLanguage(array $languages = [])
+    public function getPreferredLanguage(array $languages = [])
     {
         if (empty($languages)) {
             return Rock::$app->language;
         }
-
-        foreach (static::getAcceptableLanguages() as $acceptableLanguage => $q) {
+        foreach (static::getAcceptableLanguages() as $acceptableLanguage) {
             $acceptableLanguage = str_replace('_', '-', strtolower($acceptableLanguage));
             foreach ($languages as $language) {
-                $language = str_replace('_', '-', strtolower($language));
-                // en-us==en-us, en==en-us, en-us==en
-                if ($language === $acceptableLanguage || strpos($acceptableLanguage, $language . '-') === 0 || strpos($language, $acceptableLanguage . '-') === 0) {
+                $normalizedLanguage = str_replace('_', '-', strtolower($language));
+
+                if ($normalizedLanguage === $acceptableLanguage || // en-us==en-us
+                    strpos($acceptableLanguage, $normalizedLanguage . '-') === 0 || // en==en-us
+                    strpos($normalizedLanguage, $acceptableLanguage . '-') === 0) { // en-us==en
+
                     return $language;
                 }
             }
@@ -611,18 +631,18 @@ class Request implements RequestInterface, ComponentsInterface
     /**
      * @var string
      */
-    private static $_schema;
+    private $_schema;
 
     /**
      * @return string
      */
     public function getScheme()
     {
-        if (static::$_schema === null) {
-            static::$_schema = $this->isSecureConnection() ? 'https' : 'http';
+        if ($this->_schema === null) {
+            $this->_schema = $this->isSecureConnection() ? 'https' : 'http';
         }
 
-        return static::$_schema;
+        return $this->_schema;
     }
 
     private $_host;
@@ -821,7 +841,7 @@ class Request implements RequestInterface, ComponentsInterface
         return isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : null;
     }
 
-    private static $_port;
+    private $_port;
 
 
     /**
@@ -834,10 +854,10 @@ class Request implements RequestInterface, ComponentsInterface
      */
     public function getPort()
     {
-        if (self::$_port === null) {
-            self::$_port = !$this->isSecureConnection() && isset($_SERVER['SERVER_PORT']) ? (int)$_SERVER['SERVER_PORT'] : 80;
+        if ($this->_port === null) {
+            $this->_port = !$this->isSecureConnection() && isset($_SERVER['SERVER_PORT']) ? (int)$_SERVER['SERVER_PORT'] : 80;
         }
-        return self::$_port;
+        return $this->_port;
     }
 
     /**
@@ -848,13 +868,13 @@ class Request implements RequestInterface, ComponentsInterface
      */
     public function setPort($value)
     {
-        if ($value != self::$_port) {
-            self::$_port = (int)$value;
+        if ($value != $this->_port) {
+            $this->_port = (int)$value;
             $this->_hostInfo = null;
         }
     }
 
-    private static $_securePort;
+    private $_securePort;
 
     /**
      * Returns the port to use for secure requests.
@@ -866,10 +886,10 @@ class Request implements RequestInterface, ComponentsInterface
      */
     public function getSecurePort()
     {
-        if (self::$_securePort === null) {
-            self::$_securePort = $this->isSecureConnection() && isset($_SERVER['SERVER_PORT']) ? (int)$_SERVER['SERVER_PORT'] : 443;
+        if ($this->_securePort === null) {
+            $this->_securePort = $this->isSecureConnection() && isset($_SERVER['SERVER_PORT']) ? (int)$_SERVER['SERVER_PORT'] : 443;
         }
-        return self::$_securePort;
+        return $this->_securePort;
     }
 
     /**
@@ -881,8 +901,8 @@ class Request implements RequestInterface, ComponentsInterface
      */
     public function setSecurePort($value)
     {
-        if ($value != self::$_securePort) {
-            self::$_securePort = (int)$value;
+        if ($value != $this->_securePort) {
+            $this->_securePort = (int)$value;
             $this->_hostInfo = null;
         }
     }
@@ -1027,6 +1047,30 @@ class Request implements RequestInterface, ComponentsInterface
                (stripos($_SERVER['HTTP_USER_AGENT'], 'Shockwave') !== false || stripos($_SERVER['HTTP_USER_AGENT'], 'Flash') !== false);
     }
 
+    private $_rawBody;
+
+    /**
+     * Returns the raw HTTP request body.
+     * @return string the request body
+     */
+    public function getRawBody()
+    {
+        if ($this->_rawBody === null) {
+            $this->_rawBody = trim(file_get_contents('php://input'));
+        }
+
+        return $this->_rawBody;
+    }
+
+    /**
+     * Sets the raw HTTP request body, this method is mainly used by test scripts to simulate raw HTTP requests.
+     * @param $rawBody
+     */
+    public function setRawBody($rawBody)
+    {
+        $this->_rawBody = $rawBody;
+    }
+
     /**
      * Parse vars of HEAD, PUT, PATCH, DELETE
      */
@@ -1035,7 +1079,7 @@ class Request implements RequestInterface, ComponentsInterface
         $method = $this->getMethod();
         if (empty($GLOBALS['_' . $method]) && array_key_exists($method, ['HEAD' => 0, 'POST' => 1, 'PUT' => 2, 'PATCH' => 3, 'DELETE' => 4])) {
 
-            $stream = trim(file_get_contents('php://input'));
+            $stream = $this->getRawBody();
             if ($this->getContentType() === 'application/json' || Json::is($stream)) {
                 $array = Json::decode($stream, true);
             } else {

@@ -193,7 +193,7 @@ class ContentNegotiatorFilter extends ActionFilter
                     return $supported;
                 }
             }
-            return Request::getPreferredLanguage(Rock::$app->allowLanguages);//reset($this->languages);
+            return $request->getPreferredLanguage();//reset($this->languages);
         }
 
         foreach ($request->getAcceptableLanguages() as $language => $params) {
@@ -207,7 +207,7 @@ class ContentNegotiatorFilter extends ActionFilter
             }
         }
 
-        return Request::getPreferredLanguage(Rock::$app->allowLanguages);//reset($this->languages);
+        return $request->getPreferredLanguage();//reset($this->languages);
     }
 
     /**

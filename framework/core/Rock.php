@@ -41,9 +41,10 @@ class Rock
      */
     public $language = i18nInterface::EN;
     /**
+     * A list of the languages supported by the application.
      * @var array
      */
-    public $allowLanguages = [i18nInterface::EN, i18nInterface::RU];
+    public $allowLanguages = [];
     /**
      * Current controller
      * @var Controller
