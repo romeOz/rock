@@ -133,7 +133,7 @@ class ActiveDataProvider
         if (is_array($this->query)) {
             $result = $this->prepareArray();
         } elseif ($this->query instanceof QueryInterface) {
-            $result = $this->prepareModels($this->connection, $subAttributes);
+            $result = $this->prepareModels($subAttributes);
         }
 
         return $this->prepareDataWithCallback($result);
@@ -393,9 +393,14 @@ class ActiveDataProvider
                 foreach ($models as $model) {
                     $kk = [];
                     foreach ($pks as $pk) {
+                        if (!isset($model[$pk])) {
+                            continue;
+                        }
                         $kk[$pk] = $model[$pk];
                     }
-                    $keys[] = $kk;
+                    if (!empty($kk)) {
+                        $keys[] = $kk;
+                    }
                 }
             }
 
