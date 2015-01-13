@@ -115,7 +115,7 @@ class FileHelper extends Util
      *
      * This method will first try to determine the MIME type based on
      * [finfo_open](http://php.net/manual/en/function.finfo-open.php). If this doesn't work, it will
-     * fall back to {@see BaseFile::getMimeTypeByExtension()}
+     * fall back to {@see \rock\helpers\FileHelper::getMimeTypeByExtension()}
      *
      * @param string $file           the file name.
      * @param string $magicFile      name of the optional magic database file, usually something like `/path/to/magic.mime`.

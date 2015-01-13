@@ -760,7 +760,7 @@ class Response
      * - a string representing a URL (e.g. "http://example.com")
      * - a string representing a URL alias (e.g. "@example.com")
      *   Note that the route is with respect to the whole application, instead of relative to a controller or module.
-     *   {@see \rock\helpers\BaseHtml::url()} will be used to convert the array into a URL.
+     *   {@see \rock\url\Url} will be used to convert the array into a URL.
      *
      * Any relative URL will be converted into an absolute one by prepending it with the host info
      * of the current request.
