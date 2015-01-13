@@ -3,7 +3,7 @@
  * Config "frontend"
  */
 
-$configs = require(dirname(dirname(__DIR__)) . '/common/configs/configs.php');
+$config = require(dirname(dirname(__DIR__)) . '/common/configs/configs.php');
 
 \rock\Rock::setAlias('scope', '@frontend');
 \rock\Rock::setAlias('views', '@frontend/views');
@@ -13,11 +13,11 @@ $configs = require(dirname(dirname(__DIR__)) . '/common/configs/configs.php');
 
 $path = \rock\Rock::getAlias('@frontend') . '/configs/';
 
-$configs['_components'] = array_merge(
-    $configs['_components'],
-    require($path . 'models.php'),
-    require($path . 'controllers.php'),
-    require($path . 'snippets.php')
+$config['components'] = \rock\helpers\ArrayHelper::merge(
+    $config['components'],
+    require(__DIR__ . '/models.php'),
+    require(__DIR__ . '/controllers.php'),
+    require(__DIR__ . '/snippets.php')
 );
 return $configs;
 

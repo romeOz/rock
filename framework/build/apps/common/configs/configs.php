@@ -38,16 +38,15 @@ use rock\template\Template;
 \rock\Rock::setAlias('img', '@assets/images');
 \rock\Rock::setAlias('images', '@img');
 
-$components = \rock\helpers\ArrayHelper::merge(
+$config = \rock\helpers\ArrayHelper::merge(
     require(\rock\Rock::getAlias('@rock/classes.php')),
     require(__DIR__ . '/classes.php'),
     require(__DIR__ . '/controllers.php'),
     require(__DIR__ . '/snippets.php')
 );
 
-
 return [
-    'siteUrl'              => (new \rock\request\Request())->getHostInfo() .'/',
-    'emailSender'          => $components['mail']['From'],
-    '_components'   => $components,
+    'siteUrl'       => (new \rock\request\Request())->getHostInfo() .'/',
+    'emailSender'   => $config['mail']['From'],
+    'components'    => $config,
 ];
