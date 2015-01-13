@@ -3,7 +3,6 @@ namespace rock\template;
 
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
-use rock\base\Config;
 use rock\base\Snippet;
 use rock\cache\CacheInterface;
 use rock\event\Event;
@@ -1190,7 +1189,7 @@ class Template implements ComponentsInterface
             );
             // config
         } elseif ($matches['type'] === '**') {
-            $result = ArrayHelper::getValue(Config::getAll(true), explode('.', $matches['name']));
+            $result = ArrayHelper::getValue(Rock::$config, explode('.', $matches['name']));
             // get alias
         } elseif ($matches['type'] === '$$') {
             $result = Rock::getAlias("@{$matches['name']}");

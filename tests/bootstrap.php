@@ -24,7 +24,7 @@ $_SESSION = [];
 //$_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4';
 date_default_timezone_set('UTC');
 
-if (!$configs = require(dirname(__DIR__) . '/apps/common/configs/configs.php')) {
+if (!$config = require(dirname(__DIR__) . '/apps/common/configs/configs.php')) {
     die('configs is empty/not found');
 }
 
@@ -38,9 +38,10 @@ Rock::$app->language = \rock\i18n\i18nInterface::EN;
 
 require(dirname(__DIR__) . '/framework/polyfills.php');
 
-\rock\base\Config::set($configs);
-
-\rock\di\Container::addMulti($configs['_components']);
+Rock::$components = $config['components'] ? : [];
+unset($config['components']);
+Rock::$config = $config;
+\rock\di\Container::addMulti(Rock::$components);
 
 
 \rock\exception\BaseException::$logged = false;

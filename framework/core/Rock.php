@@ -4,7 +4,6 @@ namespace rock;
 
 use League\Flysystem\Util;
 use rock\base\ClassName;
-use rock\base\Config;
 use rock\base\Controller;
 use rock\di\Container;
 use rock\event\Event;
@@ -46,6 +45,16 @@ class Rock
      */
     public $allowLanguages = [];
     /**
+     * Config application.
+     * @var array
+     */
+    public static $config = [];
+    /**
+     * Components used by the Rock autoloading mechanism.
+     * @var array
+     */
+    public static $components = [];
+    /**
      * Current controller
      * @var Controller
      */
@@ -62,8 +71,10 @@ class Rock
     {
         \rock\helpers\Trace::beginProfile(\rock\helpers\Trace::APP, \rock\helpers\Trace::TOKEN_APP_RUNTIME);
         try {
-            Config::set($configs);
-            Container::addMulti($configs['_components']);
+            static::$components = $configs['components'];
+            unset($configs['components']);
+            static::$config = $configs;
+            Container::addMulti(static::$components);
 
             Event::on(
                 static::className(),

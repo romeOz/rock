@@ -4,7 +4,6 @@ namespace rock\route;
 
 
 use rock\base\ComponentsTrait;
-use rock\base\Config;
 use rock\di\Container;
 use rock\event\Event;
 use rock\helpers\ArrayHelper;
@@ -69,14 +68,16 @@ class Route implements RequestInterface, ErrorsInterface
     public static function setConfigScope($path, $clear = true)
     {
         $path = Rock::getAlias($path);
-        if (!file_exists($path) || (!$configs = require($path))) {
+        if (!file_exists($path) || (!$config = require($path))) {
             throw new RouteException(RouteException::UNKNOWN_FILE, ['path' => $path]);
         }
         if ($clear) {
             Container::removeAll();
         }
-        Config::set($configs);
-        Container::addMulti($configs['_components']);
+        Rock::$components = $config['components'] ? : [];
+        unset($config['components']);
+        Rock::$config = $config;
+        Container::addMulti(Rock::$components);
     }
 
     /**
