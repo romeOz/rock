@@ -458,8 +458,6 @@ return array_merge(
         ],
         'security' => [
             'class' => Security::className(),
-            'deriveKeyStrategy' => 'hmac', // for PHP version < 5.5.0
-            //'deriveKeyStrategy' => 'pbkdf2', // for PHP version >= 5.5.0
         ],
         'sanitize' => [
             'class' => \rock\sanitize\Sanitize::className(),
