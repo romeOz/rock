@@ -3,7 +3,6 @@ namespace rock\response;
 
 use rock\base\ComponentsTrait;
 use rock\csrf\CSRF;
-use rock\event\Event;
 use rock\exception\BaseException;
 use rock\helpers\FileHelper;
 use rock\helpers\StringHelper;
@@ -330,19 +329,20 @@ class Response
         if ($this->isSent) {
             return;
         }
-        Event::trigger(static::className(), self::EVENT_BEFORE_SEND);
+        $this->trigger(self::EVENT_BEFORE_SEND);
         $this->addCSP();
         $this->addCSRF();
         $this->prepare();
-        Event::trigger(static::className(), self::EVENT_AFTER_PREPARE);
+        $this->trigger(self::EVENT_AFTER_PREPARE);
         $this->sendHeaders();
         $this->sendContent();
-        Event::trigger(static::className(), self::EVENT_AFTER_SEND);
+        $this->trigger(self::EVENT_AFTER_SEND);
         $this->isSent = true;
         if ($die === true) {
             die(0);
         }
     }
+
     /**
      * Clears the headers, cookies, content, status code of the response.
      */
@@ -367,8 +367,7 @@ class Response
             return;
         }
         $statusCode = $this->getStatusCode();
-        $statusText = $this->statusText;
-        header("HTTP/{$this->version} $statusCode {$statusText}");
+        header("HTTP/{$this->version} $statusCode {$this->statusText}");
         if ($this->_headers) {
             $headers = $this->getHeaders();
             foreach ($headers as $name => $values) {
@@ -449,19 +448,24 @@ class Response
      *
      * @param string $filePath the path of the file to be sent.
      * @param string $attachmentName the file name shown to the user. If null, it will be determined from `$filePath`.
-     * @param string $mimeType the MIME type of the content. If null, it will be guessed based on `$filePath`
+     * @param array $options additional options for sending the file. The following options are supported:
+     *
+     *  - `mimeType`: the MIME type of the content. If not set, it will be guessed based on `$filePath`
+     *  - `inline`: boolean, whether the browser should open the file within the browser window. Defaults to false,
+     *     meaning a download dialog will pop up.
+     *
      * @return static the response object itself
      */
-    public function sendFile($filePath, $attachmentName = null, $mimeType = null)
+    public function sendFile($filePath, $attachmentName = null, $options = [])
     {
-        if ($mimeType === null && ($mimeType = FileHelper::getMimeTypeByExtension($filePath)) === null) {
-            $mimeType = 'application/octet-stream';
+        if (!isset($options['mimeType'])) {
+            $options['mimeType'] = FileHelper::getMimeTypeByExtension($filePath);
         }
         if ($attachmentName === null) {
             $attachmentName = basename($filePath);
         }
         $handle = fopen($filePath, 'rb');
-        $this->sendStreamAsFile($handle, $attachmentName, $mimeType);
+        $this->sendStreamAsFile($handle, $attachmentName, $options);
 
         return $this;
     }
@@ -475,31 +479,32 @@ class Response
      * @param string $content the content to be sent.
      *                        The existing {@see \rock\response\Response::$content} will be discarded.
      * @param string $attachmentName the file name shown to the user.
-     * @param string $mimeType the MIME type of the content.
+     * @param array $options additional options for sending the file. The following options are supported:
+     *
+     *  - `mimeType`: the MIME type of the content. Defaults to 'application/octet-stream'.
+     *  - `inline`: boolean, whether the browser should open the file within the browser window. Defaults to false,
+     *     meaning a download dialog will pop up.
+     *
      * @return static the response object itself
      * @throws BaseException if the requested range is not satisfiable
      */
-    public function sendContentAsFile($content, $attachmentName, $mimeType = 'application/octet-stream')
+    public function sendContentAsFile($content, $attachmentName, $options = [])
     {
         $headers = $this->getHeaders();
+
         $contentLength = StringHelper::byteLength($content);
         $range = $this->getHttpRange($contentLength);
+
         if ($range === false) {
             $headers->set('Content-Range', "bytes */$contentLength");
             throw new ResponseException('Requested range not satisfiable');
         }
 
-        $headers->setDefault('Pragma', 'public')
-            ->setDefault('Accept-Ranges', 'bytes')
-            ->setDefault('Expires', '0')
-            ->setDefault('Content-Type', $mimeType)
-            ->setDefault('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
-            ->setDefault('Content-Transfer-Encoding', 'binary')
-            ->setDefault('Content-Length', StringHelper::byteLength($content))
-            ->setDefault('Content-Disposition', "attachment; filename=\"$attachmentName\"");
+        $mimeType = isset($options['mimeType']) ? $options['mimeType'] : 'application/octet-stream';
+        $this->setDownloadHeaders($attachmentName, $mimeType, !empty($options['inline']), $contentLength);
 
         list($begin, $end) = $range;
-        if ($begin !=0 || $end != $contentLength - 1) {
+        if ($begin != 0 || $end != $contentLength - 1) {
             $this->setStatusCode(206);
             $headers->set('Content-Range', "bytes $begin-$end/$contentLength");
             $this->content = StringHelper::byteSubstr($content, $begin, $end - $begin + 1);
@@ -521,11 +526,16 @@ class Response
      *
      * @param resource $handle the handle of the stream to be sent.
      * @param string $attachmentName the file name shown to the user.
-     * @param string $mimeType the MIME type of the stream content.
+     * @param array $options additional options for sending the file. The following options are supported:
+     *
+     *  - `mimeType`: the MIME type of the content. Defaults to 'application/octet-stream'.
+     *  - `inline`: boolean, whether the browser should open the file within the browser window. Defaults to false,
+     *     meaning a download dialog will pop up.
+     *
      * @return static the response object itself
      * @throws BaseException if the requested range cannot be satisfied.
      */
-    public function sendStreamAsFile($handle, $attachmentName, $mimeType = 'application/octet-stream')
+    public function sendStreamAsFile($handle, $attachmentName, $options = [])
     {
         $headers = $this->getHeaders();
         fseek($handle, 0, SEEK_END);
@@ -545,18 +555,42 @@ class Response
             $this->setStatusCode(200);
         }
 
-        $length = $end - $begin + 1;
+        $mimeType = isset($options['mimeType']) ? $options['mimeType'] : 'application/octet-stream';
+        $this->setDownloadHeaders($attachmentName, $mimeType, !empty($options['inline']), $end - $begin + 1);
 
+        $this->format = self::FORMAT_RAW;
+        $this->stream = [$handle, $begin, $end];
+
+        return $this;
+    }
+
+    /**
+     * Sets a default set of HTTP headers for file downloading purpose.
+     * @param string $attachmentName the attachment file name
+     * @param string $mimeType the MIME type for the response. If null, `Content-Type` header will NOT be set.
+     * @param boolean $inline whether the browser should open the file within the browser window. Defaults to false,
+     * meaning a download dialog will pop up.
+     * @param integer $contentLength the byte length of the file being downloaded. If null, `Content-Length` header will NOT be set.
+     * @return static the response object itself
+     */
+    public function setDownloadHeaders($attachmentName, $mimeType = null, $inline = false, $contentLength = null)
+    {
+        $headers = $this->getHeaders();
+
+        $disposition = $inline ? 'inline' : 'attachment';
         $headers->setDefault('Pragma', 'public')
             ->setDefault('Accept-Ranges', 'bytes')
             ->setDefault('Expires', '0')
-            ->setDefault('Content-Type', $mimeType)
             ->setDefault('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
-            ->setDefault('Content-Transfer-Encoding', 'binary')
-            ->setDefault('Content-Length', $length)
-            ->setDefault('Content-Disposition', "attachment; filename=\"$attachmentName\"");
-        $this->format = self::FORMAT_RAW;
-        $this->stream = [$handle, $begin, $end];
+            ->setDefault('Content-Disposition', "$disposition; filename=\"$attachmentName\"");
+
+        if ($mimeType !== null) {
+            $headers->setDefault('Content-Type', $mimeType);
+        }
+
+        if ($contentLength !== null) {
+            $headers->setDefault('Content-Length', $contentLength);
+        }
 
         return $this;
     }
@@ -642,23 +676,36 @@ class Response
      *
      * @param string $filePath file name with full path
      * @param string $attachmentName file name shown to the user. If null, it will be determined from `$filePath`.
-     * @param string $mimeType the MIME type of the file. If null, it will be determined based on `$filePath`.
-     * @param string $xHeader the name of the x-sendfile header.
+     * @param array $options additional options for sending the file. The following options are supported:
+     *
+     *  - `mimeType`: the MIME type of the content. If not set, it will be guessed based on `$filePath`
+     *  - `inline`: boolean, whether the browser should open the file within the browser window. Defaults to false,
+     *     meaning a download dialog will pop up.
+     *  - xHeader: string, the name of the x-sendfile header. Defaults to "X-Sendfile".
+     *
      * @return static the response object itself
      */
-    public function xSendFile($filePath, $attachmentName = null, $mimeType = null, $xHeader = 'X-Sendfile')
+    public function xSendFile($filePath, $attachmentName = null, $options = [])
     {
-        if ($mimeType === null && ($mimeType = FileHelper::getMimeTypeByExtension($filePath)) === null) {
-            $mimeType = 'application/octet-stream';
-        }
         if ($attachmentName === null) {
             $attachmentName = basename($filePath);
         }
+        if (isset($options['mimeType'])) {
+            $mimeType = $options['mimeType'];
+        } elseif (($mimeType = FileHelper::getMimeTypeByExtension($filePath)) === null) {
+            $mimeType = 'application/octet-stream';
+        }
+        if (isset($options['xHeader'])) {
+            $xHeader = $options['xHeader'];
+        } else {
+            $xHeader = 'X-Sendfile';
+        }
 
+        $disposition = empty($options['inline']) ? 'attachment' : 'inline';
         $this->getHeaders()
             ->setDefault($xHeader, $filePath)
             ->setDefault('Content-Type', $mimeType)
-            ->setDefault('Content-Disposition', "attachment; filename=\"$attachmentName\"");
+            ->setDefault('Content-Disposition', "{$disposition}; filename=\"{$attachmentName}\"");
 
         return $this;
     }
@@ -746,9 +793,13 @@ class Response
      * @param integer $statusCode the HTTP status code. Defaults to 302.
      * See @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
      * for details about HTTP status code
+     * @param boolean $checkAjax whether to specially handle AJAX (and PJAX) requests. Defaults to true,
+     * meaning if the current request is an AJAX or PJAX request, then calling this method will cause the browser
+     * to redirect to the given URL. If this is false, a `Location` header will be sent, which when received as
+     * an AJAX/PJAX response, may NOT cause browser redirection.
      * @return static the response object itself
      */
-    public function redirect($url, $statusCode = 302)
+    public function redirect($url, $statusCode = 302, $checkAjax = true)
     {
 //        if (is_array($url) && isset($url[0])) {
 //            // ensure the route is absolute
@@ -761,13 +812,18 @@ class Response
         if (strpos($url, '/') === 0 && strpos($url, '//') !== 0) {
             $url = $request->getHostInfo() . $url;
         }
-        if ($request->isPjax()) {
-            $this->getHeaders()->set('X-Pjax-Url', $url);}
-        elseif ($request->isAjax()) {
-            $this->getHeaders()->set('X-Redirect', $url);
+        if ($checkAjax) {
+            if ($request->isPjax()) {
+                $this->getHeaders()->set('X-Pjax-Url', $url);
+            } elseif ($request->isAjax()) {
+                $this->getHeaders()->set('X-Redirect', $url);
+            } else {
+                $this->getHeaders()->set('Location', $url);
+            }
         } else {
             $this->getHeaders()->set('Location', $url);
         }
+
         $this->setStatusCode($statusCode);
 
         return $this;
