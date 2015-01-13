@@ -322,7 +322,7 @@ class Security implements ComponentsInterface
      * @throws SecurityException on failure.
      * @return string the generated random bytes
      */
-    public function generateRandomBytes($length = 32)
+    public function generateRandomKey($length = 32)
     {
         if (!extension_loaded('mcrypt')) {
             throw new SecurityException('The mcrypt PHP extension is not installed.');
@@ -344,7 +344,7 @@ class Security implements ComponentsInterface
      */
     public function generateRandomString($length = 32)
     {
-        $bytes = $this->generateRandomBytes($length);
+        $bytes = $this->generateRandomKey($length);
         return strtr(StringHelper::byteSubstr(base64_encode($bytes), 0, $length), '+/=', '_-.');
     }
 
@@ -482,7 +482,7 @@ class Security implements ComponentsInterface
         }
 
         // Get 20 * 8bits of random entropy
-        $rand = $this->generateRandomBytes(20);
+        $rand = $this->generateRandomKey(20);
 
         // Add the microtime for a little more entropy.
         $rand .= microtime(true);

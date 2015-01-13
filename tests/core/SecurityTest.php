@@ -131,7 +131,7 @@ class SecurityTest extends \PHPUnit_Framework_TestCase
     public function testGenerateRandomBytes()
     {
         $length = 21;
-        $key = $this->security->generateRandomBytes($length);
+        $key = $this->security->generateRandomKey($length);
         $this->assertEquals($length, strlen($key));
     }
 
