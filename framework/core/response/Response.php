@@ -349,7 +349,6 @@ class Response
     public function clear()
     {
         $this->_headers = null;
-        //$this->_cookies = null;
         $this->_statusCode = 200;
         $this->statusText = 'OK';
         $this->data = null;
@@ -380,31 +379,7 @@ class Response
                 }
             }
         }
-        //$this->sendCookies();
     }
-
-
-//    /**
-//     * Sends the cookies to the client.
-//     */
-//    protected function sendCookies()
-//    {
-//        if ($this->_cookies === null) {
-//            return;
-//        }
-//        $request = Rock::$app->getRequest();
-//        if ($request->enableCookieValidation) {
-//            $validationKey = $request->getCookieValidationKey();
-//        }
-//        foreach ($this->getCookies() as $cookie) {
-//            $value = $cookie->value;
-//            if ($cookie->expire != 1  && isset($validationKey)) {
-//                $value = $this->Rock->security->hashData(serialize($value), $validationKey);
-//            }
-//            setcookie($cookie->name, $value, $cookie->expire, $cookie->path, $cookie->domain, $cookie->secure, $cookie->httpOnly);
-//        }
-//        $this->getCookies()->removeAll();
-//    }
 
     /**
      * Sends the response content to the client
@@ -801,11 +776,6 @@ class Response
      */
     public function redirect($url, $statusCode = 302, $checkAjax = true)
     {
-//        if (is_array($url) && isset($url[0])) {
-//            // ensure the route is absolute
-//            $url[0] = '/' . ltrim($url[0], '/');
-//        }
-
         $request = $this->Rock->request;
         $urlBuilder = Url::set($url);
         $url = $urlBuilder->getAbsoluteUrl();
