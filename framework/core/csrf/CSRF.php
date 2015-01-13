@@ -77,7 +77,7 @@ class CSRF implements ComponentsInterface, RequestInterface
 
     protected function generate()
     {
-        $token = $this->Rock->security->generateRandomKey();
+        $token = $this->Rock->security->generateRandomString();
         $this->storage->add($this->csrfParam, $token);
         return $token;
     }

@@ -138,7 +138,7 @@ class SecurityTest extends \PHPUnit_Framework_TestCase
     public function testGenerateRandomKey()
     {
         $length = 21;
-        $key = $this->security->generateRandomKey($length);
+        $key = $this->security->generateRandomString($length);
         $this->assertEquals($length, strlen($key));
         $this->assertEquals(1, preg_match('/[A-Za-z0-9_.-]+/', $key));
     }

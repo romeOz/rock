@@ -281,7 +281,7 @@ class BaseUsers extends ActiveRecord
      */
     public function generateToken()
     {
-        $this->token = $this->Rock->security->generateRandomKey() . '_' . time();
+        $this->token = $this->Rock->security->generateRandomString() . '_' . time();
     }
 
     /**

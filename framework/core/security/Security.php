@@ -304,7 +304,7 @@ class Security implements ComponentsInterface
         }
 
         if (!isset($this->_keys[$name]) || $regenerate) {
-            $this->_keys[$name] = $this->generateRandomKey($length);
+            $this->_keys[$name] = $this->generateRandomString($length);
             file_put_contents($keyFile, json_encode($this->_keys));
         }
 
@@ -342,7 +342,7 @@ class Security implements ComponentsInterface
      * @throws SecurityException Exception on failure.
      * @return string the generated random key
      */
-    public function generateRandomKey($length = 32)
+    public function generateRandomString($length = 32)
     {
         $bytes = $this->generateRandomBytes($length);
         return strtr(StringHelper::byteSubstr(base64_encode($bytes), 0, $length), '+/=', '_-.');
