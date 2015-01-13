@@ -2,7 +2,9 @@
 namespace rockunit\core\request;
 
 
+use rock\i18n\i18nInterface;
 use rock\request\Request;
+use rock\Rock;
 use rock\sanitize\Sanitize;
 
 /**
@@ -124,6 +126,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     public function testPreferredLanguage()
     {
+        Rock::$app->language = i18nInterface::EN;
         $request = new Request();
         $request->acceptableLanguages = [];
         $this->assertEquals('en', $request->getPreferredLanguage());
