@@ -60,6 +60,7 @@ class Rock
      */
     public static function bootstrap(array $configs)
     {
+        \rock\helpers\Trace::beginProfile(\rock\helpers\Trace::APP, \rock\helpers\Trace::TOKEN_APP_RUNTIME);
         try {
             Config::set($configs);
             Container::addMulti($configs['_components']);
