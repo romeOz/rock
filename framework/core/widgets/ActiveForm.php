@@ -116,7 +116,7 @@ class ActiveForm extends Widget
         $name = $this->model->formName();
         $this->clientOptions($name);
 
-        echo Html::beginForm($name, $this->action, $this->method, $this->options);
+        echo Html::beginForm($this->action, $this->method, $name, $this->options);
     }
 
     protected function clientOptions($name)

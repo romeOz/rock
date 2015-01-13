@@ -36,7 +36,7 @@ class Html
     ];
     /**
      * @var array the preferred order of attributes in a tag. This mainly affects the order of the attributes
-     * that are rendered by {@see \rock\helpers\BaseHtml::renderTagAttributes()}.
+     * that are rendered by {@see \rock\helpers\Html::renderTagAttributes()}.
      */
     public static $attributeOrder = [
         'type',
@@ -44,21 +44,25 @@ class Html
         'class',
         'name',
         'value',
+
         'href',
         'src',
         'action',
         'method',
+
         'selected',
         'checked',
         'readonly',
         'disabled',
         'multiple',
+
         'size',
         'maxlength',
         'width',
         'height',
         'rows',
         'cols',
+
         'alt',
         'title',
         'rel',
@@ -66,17 +70,77 @@ class Html
     ];
 
     /**
+     * Encodes special characters into HTML entities.
+     *
+     * The {@see \rock\Rock::$charset} will be used for encoding.
+     *
+     * @param string  $content      the content to be encoded
+     * @param boolean $doubleEncode whether to encode HTML entities in `$content`. If false,
+     *                              HTML entities in `$content` will not be further encoded.
+     * @return string the encoded content
+     * @see decode()
+     * @see http://www.php.net/manual/en/function.htmlspecialchars.php
+     */
+    public static function encode($content, $doubleEncode = true)
+    {
+        return StringHelper::encode($content, $doubleEncode);
+    }
+
+    /**
      * Decodes special HTML entities back to the corresponding characters.
      *
-     * This is the opposite of {@see \rock\helpers\BaseHtml::encode()}.
+     * This is the opposite of {@see \rock\helpers\Html::encode()}.
      *
      * @param string $content the content to be decoded
-     * @return string the decoded content {@see \rock\helpers\BaseHtml::encode()}
+     * @return string the decoded content {@see \rock\helpers\Html::encode()}
      * @see http://www.php.net/manual/en/function.htmlspecialchars-decode.php
      */
     public static function decode($content)
     {
         return StringHelper::decode($content);
+    }
+
+    /**
+     * Generates a complete HTML tag.
+     *
+     * @param string $name    the tag name
+     * @param string $content the content to be enclosed between the start and end tags. It will not be HTML-encoded.
+     *                        If this is coming from end users, you should consider {@see \rock\helpers\Html::encode()} it to prevent XSS attacks.
+     * @param array  $options the HTML tag attributes (HTML options) in terms of name-value pairs.
+     *                        These will be rendered as the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()}.
+     *                        If a value is null, the corresponding attribute will not be rendered.
+     *
+     * For example when using `['class' => 'my-class', 'target' => '_blank', 'value' => null]` it will result in the
+     * html attributes rendered like this: `class="my-class" target="_blank"`.
+     *
+     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     *
+     * @return string the generated HTML tag
+     * @see beginTag()
+     * @see endTag()
+     */
+    public static function tag($name, $content = '', $options = [])
+    {
+        $html = "<$name" . static::renderTagAttributes($options) . '>';
+
+        return isset(static::$voidElements[strtolower($name)]) ? $html : "$html$content</$name>";
+    }
+
+    /**
+     * Generates a start tag.
+     *
+     * @param string $name    the tag name
+     * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
+     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()}.
+     *                        If a value is null, the corresponding attribute will not be rendered.
+     *                        See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     * @return string the generated start tag
+     * @see endTag()
+     * @see tag()
+     */
+    public static function beginTag($name, $options = [])
+    {
+        return "<$name" . static::renderTagAttributes($options) . '>';
     }
 
     /**
@@ -97,10 +161,10 @@ class Html
      *
      * @param string $content the style content
      * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
-     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()}.
+     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()}.
      *                        If a value is null, the corresponding attribute will not be rendered.
      *                        If the options does not contain "type", a "type" attribute with value "text/css" will be used.
-     *                        See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     *                        See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated style tag
      */
     public static function style($content, $options = [])
@@ -109,114 +173,14 @@ class Html
     }
 
     /**
-     * Generates a complete HTML tag.
-     *
-     * @param string $name    the tag name
-     * @param string $content the content to be enclosed between the start and end tags. It will not be HTML-encoded.
-     *                        If this is coming from end users, you should consider {@see \rock\helpers\BaseHtml::encode()} it to prevent XSS attacks.
-     * @param array  $options the HTML tag attributes (HTML options) in terms of name-value pairs.
-     *                        These will be rendered as the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()}.
-     *                        If a value is null, the corresponding attribute will not be rendered.
-     *
-     * For example when using `['class' => 'my-class', 'target' => '_blank', 'value' => null]` it will result in the
-     * html attributes rendered like this: `class="my-class" target="_blank"`.
-     *
-     * See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
-     *
-     * @return string the generated HTML tag
-     * @see beginTag()
-     * @see endTag()
-     */
-    public static function tag($name, $content = '', $options = [])
-    {
-        $html = "<$name" . static::renderTagAttributes($options) . '>';
-
-        return isset(static::$voidElements[strtolower($name)]) ? $html : "$html$content</$name>";
-    }
-
-    /**
-     * Renders the HTML tag attributes.
-     *
-     * Attributes whose values are of boolean type will be treated as
-     * [boolean attributes](http://www.w3.org/TR/html5/infrastructure.html#boolean-attributes).
-     *
-     * Attributes whose values are null will not be rendered.
-     *
-     * The values of attributes will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()}.
-     *
-     * The "data" attribute is specially handled when it is receiving an array value. In this case,
-     * the array will be "expanded" and a list data attributes will be rendered. For example,
-     * if `'data' => ['id' => 1, 'name' => 'rock']`, then this will be rendered:
-     * `data-id="1" data-name="rock"`.
-     * Additionally `'data' => ['params' => ['id' => 1, 'name' => 'rock'], 'status' => 'ok']` will be rendered as:
-     * `data-params='{"id":1,"name":"rock"}' data-status="ok"`.
-     *
-     * @param array $attributes attributes to be rendered.
-     *                          The attribute values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} .
-     * @return string the rendering result. If the attributes are not empty, they will be rendered
-     *                          into a string with a leading white space (so that it can be directly appended to the tag name
-     *                          in a tag. If there is no attribute, an empty string will be returned.
-     */
-    public static function renderTagAttributes($attributes)
-    {
-        unset($attributes['wrapperTpl']);
-        if (count($attributes) > 1) {
-            $sorted = [];
-            foreach (static::$attributeOrder as $name) {
-                if (isset($attributes[$name])) {
-                    $sorted[$name] = $attributes[$name];
-                }
-            }
-            $attributes = array_merge($sorted, $attributes);
-        }
-        $html = '';
-        foreach ($attributes as $name => $value) {
-            if (is_bool($value)) {
-                if ($value) {
-                    $html .= " $name";
-                }
-            } elseif (is_array($value) && $name === 'data') {
-                foreach ($value as $n => $v) {
-                    if (is_array($v)) {
-                        $html .= " $name-$n='" . Json::encode($v, JSON_HEX_APOS) . "'";
-                    } else {
-                        $html .= " $name-$n=\"" . static::encode($v) . '"';
-                    }
-                }
-            } elseif ($value !== null) {
-                $html .= " $name=\"" . static::encode($value) . '"';
-            }
-        }
-
-        return $html;
-    }
-
-    /**
-     * Encodes special characters into HTML entities.
-     *
-     * The {@see \rock\Rock::$charset} will be used for encoding.
-     *
-     * @param string  $content      the content to be encoded
-     * @param boolean $doubleEncode whether to encode HTML entities in `$content`. If false,
-     *                              HTML entities in `$content` will not be further encoded.
-     * @return string the encoded content
-     * @see decode()
-     * @see http://www.php.net/manual/en/function.htmlspecialchars.php
-     */
-    public static function encode($content, $doubleEncode = true)
-    {
-        return StringHelper::encode($content, $doubleEncode);
-    }
-
-    /**
      * Generates a script tag.
      *
      * @param string $content the script content
      * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
-     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} .
+     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
      *                        If a value is null, the corresponding attribute will not be rendered.
      *                        If the options does not contain "type", a "type" attribute with value "text/javascript" will be rendered.
-     *                        See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     *                        See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated script tag
      */
     public static function script($content, $options = [])
@@ -236,8 +200,8 @@ class Html
      *   for supporting old versions of IE browsers.
      *
      * The rest of the options will be rendered as the attributes of the resulting link tag. The values will
-     * be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} . If a value is null, the corresponding attribute will not be rendered.
-     * See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     * be HTML-encoded using {@see \rock\helpers\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
+     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated link tag
      */
     public static function cssFile($url, $options = [])
@@ -252,6 +216,9 @@ class Html
             unset($options['condition']);
 
             return "<!--[if $condition]>\n" . static::tag('link', '', $options) . "\n<![endif]-->";
+        } elseif (isset($options['noscript']) && $options['noscript'] === true) {
+            unset($options['noscript']);
+            return "<noscript>" . static::tag('link', '', $options) . "</noscript>";
         } else {
             return static::tag('link', '', $options);
         }
@@ -269,8 +236,8 @@ class Html
      *   for supporting old versions of IE browsers.
      *
      * The rest of the options will be rendered as the attributes of the resulting script tag. The values will
-     * be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()}. If a value is null, the corresponding attribute will not be rendered.
-     * See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     * be HTML-encoded using {@see \rock\helpers\Html::encode()}. If a value is null, the corresponding attribute will not be rendered.
+     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated script tag
      */
     public static function jsFile($url, $options = [])
@@ -307,28 +274,28 @@ class Html
     /**
      * Generates a form start tag.
      *
-     * @param string|null  $name    name of form
      * @param array|string $action  the form action URL. This parameter
      *                              will be processed by {@see \rock\url\Url::getAbsoluteUrl()}.
      * @param string       $method  the form submission method, such as "post", "get", "put", "delete" (case-insensitive).
      *                              Since most browsers only support "post" and "get", if other methods are given, they will
      *                              be simulated using "post", and a hidden input will be added which contains the actual method type.
      *                              See {@see \rock\request\Request::$methodVar} for more details.
+     * @param string|null  $name    name of form
      * @param array        $options the tag options in terms of name-value pairs. These will be rendered as
-     *                              the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()}.
+     *                              the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()}.
      *                              If a value is null, the corresponding attribute will not be rendered.
-     *                              See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     *                              See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated form start tag.
      * @see endForm()
      */
-    public static function beginForm($name = null, $action = null, $method = 'post', $options = [])
+    public static function beginForm($action = null, $method = 'post', $name = null, $options = [])
     {
         $urlBuilder = Url::set($action);
         $action = $urlBuilder->getAbsoluteUrl();
         $hiddenInputs = [];
         $request = Rock::$app->request;
         if ($request instanceof Request) {
-            $token = Rock::$app->csrf;
+            $csrf = Rock::$app->csrf;
             if (strcasecmp($method, 'get') && strcasecmp($method, 'post')) {
                 // simulate PUT, DELETE, etc. via POST
                 $hiddenInputs[] = static::hiddenInput(
@@ -338,15 +305,16 @@ class Html
                 );
                 $method = 'post';
             }
-            if ($token->enableCsrfValidation && !strcasecmp($method, 'post')) {
-                $csrf = $token->get(/*$name*/);
+            if ($csrf->enableCsrfValidation && !strcasecmp($method, 'post')) {
+                $token = $csrf->get();
                 $hiddenInputs[] = static::hiddenInput(
                     isset($name) ? "{$name}[_csrf]" : '_csrf',
-                    $csrf,
+                    $token,
                     ArrayHelper::getValue($options, 'hiddenCsrf', [])
                 );
             }
         }
+
         if (!strcasecmp($method, 'get') && ($pos = strpos($action, '?')) !== false) {
             // query parameters in the action are ignored for GET method
             // we use hidden fields to add them back
@@ -374,60 +342,6 @@ class Html
     }
 
     /**
-     * Generates a hidden input field.
-     *
-     * @param string $name    the name attribute.
-     * @param string $value   the value attribute. If it is null, the value attribute will not be generated.
-     * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
-     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} .
-     *                        If a value is null, the corresponding attribute will not be rendered.
-     *                        See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
-     * @return string the generated button tag
-     */
-    public static function hiddenInput($name, $value = null, $options = [])
-    {
-        return static::input('hidden', $name, $value, $options);
-    }
-
-    /**
-     * Generates an input type of the given type.
-     *
-     * @param string $type    the type attribute.
-     * @param string $name    the name attribute. If it is null, the name attribute will not be generated.
-     * @param string $value   the value attribute. If it is null, the value attribute will not be generated.
-     * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
-     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} .
-     *                        If a value is null, the corresponding attribute will not be rendered.
-     *                        See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
-     * @return string the generated input tag
-     */
-    public static function input($type, $name = null, $value = null, $options = [])
-    {
-        $options['type'] = $type;
-        $options['name'] = $name;
-        $options['value'] = $value === null ? null : (string)$value;
-
-        return static::tag('input', '', $options);
-    }
-
-    /**
-     * Generates a start tag.
-     *
-     * @param string $name    the tag name
-     * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
-     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()}.
-     *                        If a value is null, the corresponding attribute will not be rendered.
-     *                        See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
-     * @return string the generated start tag
-     * @see endTag()
-     * @see tag()
-     */
-    public static function beginTag($name, $options = [])
-    {
-        return "<$name" . static::renderTagAttributes($options) . '>';
-    }
-
-    /**
      * Generates a form end tag.
      *
      * @return string the generated tag
@@ -442,16 +356,16 @@ class Html
      * Generates a hyperlink tag.
      *
      * @param string            $text    link body. It will NOT be HTML-encoded. Therefore you can pass in HTML code
-     *                                   such as an image tag. If this is coming from end users, you should consider {@see \rock\helpers\BaseHtml::encode()}
+     *                                   such as an image tag. If this is coming from end users, you should consider {@see \rock\helpers\Html::encode()}
      *                                   it to prevent XSS attacks.
      * @param array|string|null $url     the URL for the hyperlink tag. This parameter will be
      *                                   processed by {@see \rock\url\Url::getAbsoluteUrl()}
      *                                   and will be used for the "href" attribute of the tag. If this parameter is null, the "href" attribute
      *                                   will not be generated.
      * @param array             $options the tag options in terms of name-value pairs. These will be rendered as
-     *                                   the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()}.
+     *                                   the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()}.
      *                                   If a value is null, the corresponding attribute will not be rendered.
-     *                                   See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     *                                   See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated hyperlink
      */
     public static function a($text, $url = null, $options = [])
@@ -468,14 +382,14 @@ class Html
      * Generates a mailto hyperlink.
      *
      * @param string $text    link body. It will NOT be HTML-encoded. Therefore you can pass in HTML code
-     *                        such as an image tag. If this is coming from end users, you should consider {@see \rock\helpers\BaseHtml::encode()}
+     *                        such as an image tag. If this is coming from end users, you should consider {@see \rock\helpers\Html::encode()}
      *                        it to prevent XSS attacks.
      * @param string $email   email address. If this is null, the first parameter (link body) will be treated
      *                        as the email address and used.
      * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
-     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} .
+     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
      *                        If a value is null, the corresponding attribute will not be rendered.
-     *                        See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     *                        See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated mailto link
      */
     public static function mailto($text, $email = null, $options = [])
@@ -491,9 +405,9 @@ class Html
      * @param array|string $src     the image URL. This parameter will be
      *                              processed by {@see \rock\url\Url::getAbsoluteUrl()} .
      * @param array        $options the tag options in terms of name-value pairs. These will be rendered as
-     *                              the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} .
+     *                              the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
      *                              If a value is null, the corresponding attribute will not be rendered.
-     *                              See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     *                              See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated image tag
      */
     public static function img($src, $options = [])
@@ -510,9 +424,45 @@ class Html
         return static::tag('img', '', $options);
     }
 
-    protected static function isBase64($value)
+    /**
+     * Generates a label tag.
+     *
+     * @param string $content label text. It will NOT be HTML-encoded. Therefore you can pass in HTML code
+     *                        such as an image tag. If this is is coming from end users, you should {@see \rock\helpers\Html::encode()}
+     *                        it to prevent XSS attacks.
+     * @param string $for     the ID of the HTML element that this label is associated with.
+     *                        If this is null, the "for" attribute will not be generated.
+     * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
+     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
+     *                        If a value is null, the corresponding attribute will not be rendered.
+     *                        See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     * @return string the generated label tag
+     */
+    public static function label($content, $for = null, $options = [])
     {
-        return mb_substr($value, 0, 5, 'UTF-8') === 'data:';
+        $options['for'] = $for;
+
+        return static::tag('label', $content, $options);
+    }
+
+    /**
+     * Generates a button tag.
+     *
+     * @param string $content the content enclosed within the button tag. It will NOT be HTML-encoded.
+     *                        Therefore you can pass in HTML code such as an image tag. If this is is coming from end users,
+     *                        you should consider {@see \rock\helpers\Html::encode()} it to prevent XSS attacks.
+     * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
+     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
+     *                        If a value is null, the corresponding attribute will not be rendered.
+     *                        See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     * @return string the generated button tag
+     */
+    public static function button($content = 'Button', $options = [])
+    {
+        if (!isset($options['type'])) {
+            $options['type'] = 'button';
+        }
+        return static::tag('button', $content, $options);
     }
 
     /**
@@ -520,11 +470,11 @@ class Html
      *
      * @param string $content the content enclosed within the button tag. It will NOT be HTML-encoded.
      *                        Therefore you can pass in HTML code such as an image tag. If this is is coming from end users,
-     *                        you should consider {@see \rock\helpers\BaseHtml::encode()} it to prevent XSS attacks.
+     *                        you should consider {@see \rock\helpers\Html::encode()} it to prevent XSS attacks.
      * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
-     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} .
+     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
      *                        If a value is null, the corresponding attribute will not be rendered.
-     *                        See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     *                        See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated submit button tag
      */
     public static function submitButton($content = 'Submit', $options = [])
@@ -535,32 +485,15 @@ class Html
     }
 
     /**
-     * Generates a button tag.
-     *
-     * @param string $content the content enclosed within the button tag. It will NOT be HTML-encoded.
-     *                        Therefore you can pass in HTML code such as an image tag. If this is is coming from end users,
-     *                        you should consider {@see \rock\helpers\BaseHtml::encode()} it to prevent XSS attacks.
-     * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
-     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} .
-     *                        If a value is null, the corresponding attribute will not be rendered.
-     *                        See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
-     * @return string the generated button tag
-     */
-    public static function button($content = 'Button', $options = [])
-    {
-        return static::tag('button', $content, $options);
-    }
-
-    /**
      * Generates a reset button tag.
      *
      * @param string $content the content enclosed within the button tag. It will NOT be HTML-encoded.
      *                        Therefore you can pass in HTML code such as an image tag. If this is is coming from end users,
-     *                        you should consider {@see \rock\helpers\BaseHtml::encode()} it to prevent XSS attacks.
+     *                        you should consider {@see \rock\helpers\Html::encode()} it to prevent XSS attacks.
      * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
-     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} .
+     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
      *                        If a value is null, the corresponding attribute will not be rendered.
-     *                        See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     *                        See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated reset button tag
      */
     public static function resetButton($content = 'Reset', $options = [])
@@ -571,13 +504,34 @@ class Html
     }
 
     /**
+     * Generates an input type of the given type.
+     *
+     * @param string $type    the type attribute.
+     * @param string $name    the name attribute. If it is null, the name attribute will not be generated.
+     * @param string $value   the value attribute. If it is null, the value attribute will not be generated.
+     * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
+     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
+     *                        If a value is null, the corresponding attribute will not be rendered.
+     *                        See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     * @return string the generated input tag
+     */
+    public static function input($type, $name = null, $value = null, $options = [])
+    {
+        $options['type'] = $type;
+        $options['name'] = $name;
+        $options['value'] = $value === null ? null : (string)$value;
+
+        return static::tag('input', '', $options);
+    }
+
+    /**
      * Generates an input button.
      *
      * @param string $label   the value attribute. If it is null, the value attribute will not be generated.
      * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
-     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} .
+     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
      *                        If a value is null, the corresponding attribute will not be rendered.
-     *                        See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     *                        See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated button tag
      */
     public static function buttonInput($label = 'Button', $options = [])
@@ -593,9 +547,9 @@ class Html
      *
      * @param string $label   the value attribute. If it is null, the value attribute will not be generated.
      * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
-     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} .
+     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
      *                        If a value is null, the corresponding attribute will not be rendered.
-     *                        See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     *                        See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated button tag
      */
     public static function submitInput($label = 'Submit', $options = [])
@@ -610,9 +564,9 @@ class Html
      * Generates a reset input button.
      *
      * @param string $label   the value attribute. If it is null, the value attribute will not be generated.
-     * @param array  $options the attributes of the button tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()}.
+     * @param array  $options the attributes of the button tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()}.
      *                        Attributes whose value is null will be ignored and not put in the tag returned.
-     *                        See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     *                        See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated button tag
      */
     public static function resetInput($label = 'Reset', $options = [])
@@ -629,9 +583,9 @@ class Html
      * @param string $name    the name attribute.
      * @param string $value   the value attribute. If it is null, the value attribute will not be generated.
      * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
-     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} .
+     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
      *                        If a value is null, the corresponding attribute will not be rendered.
-     *                        See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     *                        See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated button tag
      */
     public static function textInput($name, $value = null, $options = [])
@@ -640,14 +594,30 @@ class Html
     }
 
     /**
+     * Generates a hidden input field.
+     *
+     * @param string $name    the name attribute.
+     * @param string $value   the value attribute. If it is null, the value attribute will not be generated.
+     * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
+     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
+     *                        If a value is null, the corresponding attribute will not be rendered.
+     *                        See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     * @return string the generated button tag
+     */
+    public static function hiddenInput($name, $value = null, $options = [])
+    {
+        return static::input('hidden', $name, $value, $options);
+    }
+
+    /**
      * Generates a password input field.
      *
      * @param string $name    the name attribute.
      * @param string $value   the value attribute. If it is null, the value attribute will not be generated.
      * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
-     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} .
+     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
      *                        If a value is null, the corresponding attribute will not be rendered.
-     *                        See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     *                        See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated button tag
      */
     public static function passwordInput($name, $value = null, $options = [])
@@ -665,14 +635,119 @@ class Html
      * @param string $name    the name attribute.
      * @param string $value   the value attribute. If it is null, the value attribute will not be generated.
      * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
-     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()}.
+     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()}.
      *                        If a value is null, the corresponding attribute will not be rendered.
-     *                        See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     *                        See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated button tag
      */
     public static function fileInput($name, $value = null, $options = [])
     {
         return static::input('file', $name, $value, $options);
+    }
+
+    /**
+     * Generates a text area input.
+     *
+     * @param string $name    the input name
+     * @param string $value   the input value. Note that it will be encoded using {@see \rock\helpers\Html::encode()}.
+     * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
+     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
+     *                        If a value is null, the corresponding attribute will not be rendered.
+     *                        See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     * @return string the generated text area tag
+     */
+    public static function textarea($name, $value = '', $options = [])
+    {
+        $options['name'] = $name;
+
+        return static::tag('textarea', static::encode($value), $options);
+    }
+
+    /**
+     * Generates a radio button input.
+     *
+     * @param string  $name    the name attribute.
+     * @param boolean $checked whether the radio button should be checked.
+     * @param array   $options the tag options in terms of name-value pairs. The following options are specially handled:
+     *
+     * - uncheck: string, the value associated with the uncheck state of the radio button. When this attribute
+     *   is present, a hidden input will be generated so that if the radio button is not checked and is submitted,
+     *   the value of this attribute will still be submitted to the server via the hidden input.
+     * - label: string, a label displayed next to the radio button.  It will NOT be HTML-encoded. Therefore you can pass
+     *   in HTML code such as an image tag. If this is is coming from end users, you should {@see \rock\helpers\Html::encode()} it to prevent XSS attacks.
+     *   When this option is specified, the radio button will be enclosed by a label tag.
+     * - labelOptions: array, the HTML attributes for the label tag. Do not set this option unless you set the "label" option.
+     *
+     * The rest of the options will be rendered as the attributes of the resulting radio button tag. The values will
+     * be HTML-encoded
+     * using {@see \rock\helpers\Html::encode()}. If a value is null, the corresponding attribute will not be rendered.
+     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     *
+     * @return string the generated radio button tag
+     */
+    public static function radio($name, $checked = false, $options = [])
+    {
+        $options['checked'] = (bool) $checked;
+        $value = array_key_exists('value', $options) ? $options['value'] : '1';
+        if (isset($options['uncheck'])) {
+            // add a hidden field so that if the radio button is not selected, it still submits a value
+            $hidden = static::hiddenInput($name, $options['uncheck']);
+            unset($options['uncheck']);
+        } else {
+            $hidden = '';
+        }
+        if (isset($options['label'])) {
+            $label = $options['label'];
+            $labelOptions = isset($options['labelOptions']) ? $options['labelOptions'] : [];
+            unset($options['label'], $options['labelOptions']);
+            $content = static::label(static::input('radio', $name, $value, $options) . ' ' . $label, null, $labelOptions);
+            return $hidden . $content;
+        } else {
+            return $hidden . static::input('radio', $name, $value, $options);
+        }
+    }
+
+    /**
+     * Generates a checkbox input.
+     *
+     * @param string  $name    the name attribute.
+     * @param boolean $checked whether the checkbox should be checked.
+     * @param array   $options the tag options in terms of name-value pairs. The following options are specially handled:
+     *
+     * - uncheck: string, the value associated with the uncheck state of the checkbox. When this attribute
+     *   is present, a hidden input will be generated so that if the checkbox is not checked and is submitted,
+     *   the value of this attribute will still be submitted to the server via the hidden input.
+     * - label: string, a label displayed next to the checkbox.  It will NOT be HTML-encoded. Therefore you can pass
+     *   in HTML code such as an image tag. If this is is coming from end users, you should {@see \rock\helpers\Html::encode()} it to prevent XSS attacks.
+     *   When this option is specified, the checkbox will be enclosed by a label tag.
+     * - labelOptions: array, the HTML attributes for the label tag. Do not set this option unless you set the "label" option.
+     *
+     * The rest of the options will be rendered as the attributes of the resulting checkbox tag. The values will
+     * be HTML-encoded using {@see \rock\helpers\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
+     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     *
+     * @return string the generated checkbox tag
+     */
+    public static function checkbox($name, $checked = false, $options = [])
+    {
+        $options['checked'] = (boolean)$checked;
+        $value = array_key_exists('value', $options) ? $options['value'] : '1';
+        if (isset($options['uncheck'])) {
+            // add a hidden field so that if the checkbox is not selected, it still submits a value
+            $hidden = static::hiddenInput($name, $options['uncheck']);
+            unset($options['uncheck']);
+        } else {
+            $hidden = '';
+        }
+        if (isset($options['label'])) {
+            $label = $options['label'];
+            $labelOptions = isset($options['labelOptions']) ? $options['labelOptions'] : [];
+            unset($options['label'], $options['labelOptions']);
+            $content = static::label(static::input('checkbox', $name, $value, $options) . ' ' . $label, null, $labelOptions);
+            return $hidden . $content;
+        } else {
+            return $hidden . static::input('checkbox', $name, $value, $options);
+        }
     }
 
     /**
@@ -706,8 +781,8 @@ class Html
      *   Defaults to `false`.
      *
      * The rest of the options will be rendered as the attributes of the resulting tag. The values will
-     * be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()}. If a value is null, the corresponding attribute will not be rendered.
-     * See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     * be HTML-encoded using {@see \rock\helpers\Html::encode()}. If a value is null, the corresponding attribute will not be rendered.
+     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      *
      * @return string the generated drop-down list tag
      */
@@ -757,8 +832,8 @@ class Html
      *   Defaults to `false`.
      *
      * The rest of the options will be rendered as the attributes of the resulting tag. The values will
-     * be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()}. If a value is null, the corresponding attribute will not be rendered.
-     * See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     * be HTML-encoded using {@see \rock\helpers\Html::encode()}. If a value is null, the corresponding attribute will not be rendered.
+     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      *
      * @return string the generated list box tag
      */
@@ -767,13 +842,13 @@ class Html
         if (!array_key_exists('size', $options)) {
             $options['size'] = 4;
         }
-        if (!empty($options['multiple']) && substr($name, -2) !== '[]') {
+        if (!empty($options['multiple']) && !empty($name) && substr_compare($name, '[]', -2, 2)) {
             $name .= '[]';
         }
         $options['name'] = $name;
         if (isset($options['unselect'])) {
             // add a hidden field so that if the list box has no option being selected, it still submits a value
-            if (substr($name, -2) === '[]') {
+            if (!empty($name) && substr_compare($name, '[]', -2, 2) === 0) {
                 $name = substr($name, 0, -2);
             }
             $hidden = static::hiddenInput($name, $options['unselect']);
@@ -787,99 +862,9 @@ class Html
     }
 
     /**
-     * Renders the option tags.
-     *
-     * That can be used by {@see \rock\helpers\BaseHtml::dropDownList()} and {@see \rock\helpers\BaseHtml::listBox()}.
-     *
-     * @param string|array $selection  the selected value(s). This can be either a string for single selection
-     *                                 or an array for multiple selections.
-     * @param array        $items      the option data items. The array keys are option values, and the array values
-     *                                 are the corresponding option labels. The array can also be nested (i.e. some array values are arrays too).
-     *                                 For each sub-array, an option group will be generated whose label is the key associated with the sub-array.
-     *                                 If you have a list of data models, you may convert them into the format described above using {@see \rock\helpers\ArrayHelper::map()}.
-     *
-     * Note, the values and labels will be automatically HTML-encoded by this method, and the blank spaces in
-     * the labels will also be HTML-encoded.
-     * @param array        $tagOptions the $options parameter that
-     *                                 is passed to the {@see \rock\helpers\BaseHtml::dropDownList()} or {@see \rock\helpers\BaseHtml::listBox()} call.
-     *                                 This method will take out these elements, if any: "prompt", "options" and "groups". See more details
-     *                                 in {@see \rock\helpers\BaseHtml::dropDownList()} for the explanation of these elements.
-     *
-     * @return string the generated list options
-     */
-    public static function renderSelectOptions($selection, $items, &$tagOptions = [])
-    {
-        $lines = [];
-        $encodeSpaces = static::remove($tagOptions, 'encodeSpaces', false);
-        if (isset($tagOptions['prompt'])) {
-            $prompt = $encodeSpaces
-                ? str_replace(' ', '&nbsp;', static::encode($tagOptions['prompt'])) : static::encode(
-                    $tagOptions['prompt']);
-            $lines[] = static::tag('option', $prompt, ['value' => '']);
-        }
-        $options = isset($tagOptions['options']) ? $tagOptions['options'] : [];
-        $groups = isset($tagOptions['groups']) ? $tagOptions['groups'] : [];
-        unset($tagOptions['prompt'], $tagOptions['options'], $tagOptions['groups']);
-        $options['encodeSpaces'] = ArrayHelper::getValue($options, 'encodeSpaces', $encodeSpaces);
-        foreach ($items as $key => $value) {
-            if (is_array($value)) {
-                $groupAttrs = isset($groups[$key]) ? $groups[$key] : [];
-                $groupAttrs['label'] = $key;
-                $attrs = ['options' => $options, 'groups' => $groups];
-                $content = static::renderSelectOptions($selection, $value, $attrs);
-                $lines[] = static::tag('optgroup', "\n" . $content . "\n", $groupAttrs);
-            } else {
-                $attrs = isset($options[$key]) ? $options[$key] : [];
-                $attrs['value'] = (string)$key;
-                $attrs['selected'] = $selection !== null &&
-                                     (!is_array($selection) && !strcmp($key, $selection)
-                                      || is_array($selection) && in_array($key, $selection));
-                $lines[] = static::tag(
-                    'option',
-                    ($encodeSpaces ? str_replace(' ', '&nbsp;', static::encode($value)) : static::encode($value)),
-                    $attrs);
-            }
-        }
-
-        return implode("\n", $lines);
-    }
-
-    /**
-     * Removes an item from an array and returns the value.
-     *
-     * If the key does not exist in the array, the default value will be returned instead.
-     *
-     * Usage examples,
-     *
-     * ```php
-     * // $array = ['type' => 'A', 'options' => [1, 2]];
-     * // working with array
-     * $type = Html::remove($array, 'type');
-     * // $array content
-     * // $array = ['options' => [1, 2]];
-     * ```
-     *
-     * @param array  $array   the array to extract value from
-     * @param string $key     key name of the array element
-     * @param mixed  $default the default value to be returned if the specified key does not exist
-     * @return mixed|null the value of the element if found, default value otherwise
-     */
-    public static function remove(&$array, $key, $default = null)
-    {
-        if (is_array($array) && (isset($array[$key]) || array_key_exists($key, $array))) {
-            $value = $array[$key];
-            unset($array[$key]);
-
-            return $value;
-        }
-
-        return $default;
-    }
-
-    /**
      * Generates a list of checkboxes.
      *
-     * A checkbox list allows multiple selection, like {@see \rock\helpers\BaseHtml::listBox()}.
+     * A checkbox list allows multiple selection, like {@see \rock\helpers\Html::listBox()}.
      * As a result, the corresponding submitted value is an array.
      *
      * @param string       $name      the name attribute of each checkbox.
@@ -895,7 +880,7 @@ class Html
      * - encode: boolean, whether to HTML-encode the checkbox labels. Defaults to true.
      *   This option is ignored if `item` option is set.
      * - separator: string, the HTML code that separates items.
-     * - itemOptions: array, the options for generating the radio button tag using {@see \rock\helpers\BaseHtml::checkbox()}.
+     * - itemOptions: array, the options for generating the radio button tag using {@see \rock\helpers\Html::checkbox()}.
      * - item: callable, a callback that can be used to customize the generation of the HTML code
      *   corresponding to a single item in $items. The signature of this callback must be:
      *
@@ -907,7 +892,7 @@ class Html
      *   is the label for the checkbox; and $name, $value and $checked represent the name,
      *   value and the checked status of the checkbox input, respectively.
      *
-     * See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      *
      * @return string the generated checkbox list
      */
@@ -916,6 +901,7 @@ class Html
         if (substr($name, -2) !== '[]') {
             $name .= '[]';
         }
+
         $formatter = isset($options['item']) ? $options['item'] : null;
         $itemOptions = isset($options['itemOptions']) ? $options['itemOptions'] : [];
         $encode = !isset($options['encode']) || $options['encode'];
@@ -923,23 +909,19 @@ class Html
         $index = 0;
         foreach ($items as $value => $label) {
             $checked = $selection !== null &&
-                       (!is_array($selection) && !strcmp($value, $selection)
-                        || is_array($selection) && in_array($value, $selection));
+                (!is_array($selection) && !strcmp($value, $selection)
+                    || is_array($selection) && in_array($value, $selection));
             if ($formatter !== null) {
                 $lines[] = call_user_func($formatter, $index, $label, $name, $checked, $value);
             } else {
-                $lines[] = static::checkbox(
-                    $name,
-                    $checked,
-                    array_merge(
-                        $itemOptions,
-                        [
-                            'value' => $value,
-                            'label' => $encode ? static::encode($label) : $label,
-                        ]));
+                $lines[] = static::checkbox($name, $checked, array_merge($itemOptions, [
+                    'value' => $value,
+                    'label' => $encode ? static::encode($label) : $label,
+                ]));
             }
             $index++;
         }
+
         if (isset($options['unselect'])) {
             // add a hidden field so that if the list box has no option being selected, it still submits a value
             $name2 = substr($name, -2) === '[]' ? substr($name, 0, -2) : $name;
@@ -948,83 +930,11 @@ class Html
             $hidden = '';
         }
         $separator = isset($options['separator']) ? $options['separator'] : "\n";
+
         $tag = isset($options['tag']) ? $options['tag'] : 'div';
         unset($options['tag'], $options['unselect'], $options['encode'], $options['separator'], $options['item'], $options['itemOptions']);
 
         return $hidden . static::tag($tag, implode($separator, $lines), $options);
-    }
-
-    /**
-     * Generates a checkbox input.
-     *
-     * @param string  $name    the name attribute.
-     * @param boolean $checked whether the checkbox should be checked.
-     * @param array   $options the tag options in terms of name-value pairs. The following options are specially handled:
-     *
-     * - uncheck: string, the value associated with the uncheck state of the checkbox. When this attribute
-     *   is present, a hidden input will be generated so that if the checkbox is not checked and is submitted,
-     *   the value of this attribute will still be submitted to the server via the hidden input.
-     * - label: string, a label displayed next to the checkbox.  It will NOT be HTML-encoded. Therefore you can pass
-     *   in HTML code such as an image tag. If this is is coming from end users, you should {@see \rock\helpers\BaseHtml::encode()} it to prevent XSS attacks.
-     *   When this option is specified, the checkbox will be enclosed by a label tag.
-     * - labelOptions: array, the HTML attributes for the label tag. This is only used when the "label" option is specified.
-     * - container: array|boolean, the HTML attributes for the container tag. This is only used when the "label" option is specified.
-     *   If it is false, no container will be rendered. If it is an array or not, a "div" container will be rendered
-     *   around the the radio button.
-     *
-     * The rest of the options will be rendered as the attributes of the resulting checkbox tag. The values will
-     * be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} . If a value is null, the corresponding attribute will not be rendered.
-     * See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
-     *
-     * @return string the generated checkbox tag
-     */
-    public static function checkbox($name, $checked = false, $options = [])
-    {
-        $options['checked'] = (boolean)$checked;
-        $value = array_key_exists('value', $options) ? $options['value'] : '1';
-        if (isset($options['uncheck'])) {
-            // add a hidden field so that if the checkbox is not selected, it still submits a value
-            $hidden = static::hiddenInput($name, $options['uncheck']);
-            unset($options['uncheck']);
-        } else {
-            $hidden = '';
-        }
-        if (isset($options['label'])) {
-            $label = $options['label'];
-            $labelOptions = isset($options['labelOptions']) ? $options['labelOptions'] : [];
-            $container = isset($options['container']) ? $options['container'] : ['class' => 'checkbox'];
-            unset($options['label'], $options['labelOptions'], $options['container']);
-            $content =
-                static::label(static::input('checkbox', $name, $value, $options) . ' ' . $label, null, $labelOptions);
-            if (is_array($container)) {
-                return $hidden . static::tag('div', $content, $container);
-            } else {
-                return $hidden . $content;
-            }
-        } else {
-            return $hidden . static::input('checkbox', $name, $value, $options);
-        }
-    }
-
-    /**
-     * Generates a label tag.
-     *
-     * @param string $content label text. It will NOT be HTML-encoded. Therefore you can pass in HTML code
-     *                        such as an image tag. If this is is coming from end users, you should {@see \rock\helpers\BaseHtml::encode()}
-     *                        it to prevent XSS attacks.
-     * @param string $for     the ID of the HTML element that this label is associated with.
-     *                        If this is null, the "for" attribute will not be generated.
-     * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
-     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} .
-     *                        If a value is null, the corresponding attribute will not be rendered.
-     *                        See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
-     * @return string the generated label tag
-     */
-    public static function label($content, $for = null, $options = [])
-    {
-        $options['for'] = $for;
-
-        return static::tag('label', $content, $options);
     }
 
     /**
@@ -1034,8 +944,8 @@ class Html
      *
      * @param string       $name      the name attribute of each radio button.
      * @param string|array $selection the selected value(s).
-     * @param array        $items     the data item used to generate the radio buttons.
-     *                                The array values are the labels, while the array keys are the corresponding radio button values.
+     * @param array $items the data item used to generate the radio buttons.
+     * The array keys are the radio button values, while the array values are the corresponding labels.
      * @param array        $options   options (name => config) for the radio button list. The following options are supported:
      *
      * - unselect: string, the value that should be submitted when none of the radio buttons is selected.
@@ -1055,7 +965,7 @@ class Html
      *   is the label for the radio button; and $name, `$value` and `$checked` represent the name,
      *   value and the checked status of the radio button input, respectively.
      *
-     * See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      *
      * @return string the generated radio button list
      */
@@ -1068,23 +978,19 @@ class Html
         $index = 0;
         foreach ($items as $value => $label) {
             $checked = $selection !== null &&
-                       (!is_array($selection) && !strcmp($value, $selection)
-                        || is_array($selection) && in_array($value, $selection));
+                (!is_array($selection) && !strcmp($value, $selection)
+                    || is_array($selection) && in_array($value, $selection));
             if ($formatter !== null) {
                 $lines[] = call_user_func($formatter, $index, $label, $name, $checked, $value);
             } else {
-                $lines[] = static::radio(
-                    $name,
-                    $checked,
-                    array_merge(
-                        $itemOptions,
-                        [
-                            'value' => $value,
-                            'label' => $encode ? static::encode($label) : $label,
-                        ]));
+                $lines[] = static::radio($name, $checked, array_merge($itemOptions, [
+                    'value' => $value,
+                    'label' => $encode ? static::encode($label) : $label,
+                ]));
             }
             $index++;
         }
+
         $separator = isset($options['separator']) ? $options['separator'] : "\n";
         if (isset($options['unselect'])) {
             // add a hidden field so that if the list box has no option being selected, it still submits a value
@@ -1092,94 +998,11 @@ class Html
         } else {
             $hidden = '';
         }
+
         $tag = isset($options['tag']) ? $options['tag'] : 'div';
         unset($options['tag'], $options['unselect'], $options['encode'], $options['separator'], $options['item'], $options['itemOptions']);
 
         return $hidden . static::tag($tag, implode($separator, $lines), $options);
-    }
-
-    /**
-     * Generates a radio button input.
-     *
-     * @param string  $name    the name attribute.
-     * @param boolean $checked whether the radio button should be checked.
-     * @param array   $options the tag options in terms of name-value pairs. The following options are specially handled:
-     *
-     * - uncheck: string, the value associated with the uncheck state of the radio button. When this attribute
-     *   is present, a hidden input will be generated so that if the radio button is not checked and is submitted,
-     *   the value of this attribute will still be submitted to the server via the hidden input.
-     * - label: string, a label displayed next to the radio button.  It will NOT be HTML-encoded. Therefore you can pass
-     *   in HTML code such as an image tag. If this is is coming from end users, you should {@see \rock\helpers\BaseHtml::encode()} it to prevent XSS attacks.
-     *   When this option is specified, the radio button will be enclosed by a label tag.
-     * - labelOptions: array, the HTML attributes for the label tag. This is only used when the "label" option is specified.
-     * - container: array|boolean, the HTML attributes for the container tag. This is only used when the "label" option is specified.
-     *   If it is false, no container will be rendered. If it is an array or not, a "div" container will be rendered
-     *   around the the radio button.
-     *
-     * The rest of the options will be rendered as the attributes of the resulting radio button tag. The values will
-     * be HTML-encoded
-     * using {@see \rock\helpers\BaseHtml::encode()}. If a value is null, the corresponding attribute will not be rendered.
-     * See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
-     *
-     * @return string the generated radio button tag
-     */
-    public static function radio($name, $checked = false, $options = [])
-    {
-        $options['checked'] = (boolean)$checked;
-        $value = array_key_exists('value', $options) ? $options['value'] : '1';
-        if (isset($options['uncheck'])) {
-            // add a hidden field so that if the radio button is not selected, it still submits a value
-            $hidden = static::hiddenInput($name, $options['uncheck']);
-            unset($options['uncheck']);
-        } else {
-            $hidden = '';
-        }
-        if (isset($options['label'])) {
-            $label = $options['label'];
-            $labelOptions = isset($options['labelOptions']) ? $options['labelOptions'] : [];
-            $container = isset($options['container']) ? $options['container'] : ['class' => 'radio'];
-            unset($options['label'], $options['labelOptions'], $options['container']);
-            $content =
-                static::label(static::input('radio', $name, $value, $options) . ' ' . $label, null, $labelOptions);
-            if (is_array($container)) {
-                return $hidden . static::tag('div', $content, $container);
-            } else {
-                return $hidden . $content;
-            }
-        } else {
-            return $hidden . static::input('radio', $name, $value, $options);
-        }
-    }
-
-    /**
-     * Generates an ordered list.
-     *
-     * @param array|\Traversable $items   the items for generating the list. Each item generates a single list item.
-     *                                    Note that items will be automatically HTML encoded if `$options['encode']` is not set or true.
-     * @param array              $options options (name => config) for the radio button list. The following options are supported:
-     *
-     * - encode: boolean, whether to HTML-encode the items. Defaults to true.
-     *   This option is ignored if the `item` option is specified.
-     * - itemOptions: array, the HTML attributes for the `li` tags. This option is ignored if the `item` option is specified.
-     * - item: callable, a callback that is used to generate each individual list item.
-     *   The signature of this callback must be:
-     *
-     *   ```php
-     *   function ($item, $index)
-     *   ```
-     *
-     *   where $index is the array key corresponding to `$item` in `$items`. The callback should return
-     *   the whole list item tag.
-     *
-     * See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
-     *
-     * @return string the generated ordered list. An empty string is returned if `$items` is empty.
-     */
-    public static function ol($items, $options = [])
-    {
-        $options['tag'] = 'ol';
-
-        return static::ul($items, $options);
     }
 
     /**
@@ -1202,7 +1025,7 @@ class Html
      * where $index is the array key corresponding to `$item` in `$items`. The callback should return
      * the whole list item tag.
      *
-     * See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      *
      * @return string the generated unordered list. An empty list tag will be returned if `$items` is empty.
      */
@@ -1213,9 +1036,11 @@ class Html
         $formatter = isset($options['item']) ? $options['item'] : null;
         $itemOptions = isset($options['itemOptions']) ? $options['itemOptions'] : [];
         unset($options['tag'], $options['encode'], $options['item'], $options['itemOptions']);
+
         if (empty($items)) {
             return static::tag($tag, '', $options);
         }
+
         $results = [];
         foreach ($items as $index => $item) {
             if ($formatter !== null) {
@@ -1229,24 +1054,55 @@ class Html
     }
 
     /**
+     * Generates an ordered list.
+     *
+     * @param array|\Traversable $items   the items for generating the list. Each item generates a single list item.
+     *                                    Note that items will be automatically HTML encoded if `$options['encode']` is not set or true.
+     * @param array              $options options (name => config) for the radio button list. The following options are supported:
+     *
+     * - encode: boolean, whether to HTML-encode the items. Defaults to true.
+     *   This option is ignored if the `item` option is specified.
+     * - itemOptions: array, the HTML attributes for the `li` tags. This option is ignored if the `item` option is specified.
+     * - item: callable, a callback that is used to generate each individual list item.
+     *   The signature of this callback must be:
+     *
+     *   ```php
+     *   function ($item, $index)
+     *   ```
+     *
+     *   where $index is the array key corresponding to `$item` in `$items`. The callback should return
+     *   the whole list item tag.
+     *
+     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     *
+     * @return string the generated ordered list. An empty string is returned if `$items` is empty.
+     */
+    public static function ol($items, $options = [])
+    {
+        $options['tag'] = 'ol';
+
+        return static::ul($items, $options);
+    }
+
+    /**
      * Generates a label tag for the given model attribute.
      *
      * The label text is the label associated with the attribute, obtained via {@see \rock\base\Model::getAttributeLabel()}.
      *
      * @param Model  $model     the model object
      * @param string $attribute the attribute name or expression.
-     *                          See {@see \rock\helpers\BaseHtml::getAttributeName()} for the format
+     *                          See {@see \rock\helpers\Html::getAttributeName()} for the format
      *                          about attribute expression.
      * @param array  $options   the tag options in terms of name-value pairs. These will be rendered as
-     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} .
+     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
      *                          If a value is null, the corresponding attribute will not be rendered.
      *                          The following options are specially handled:
      *
-     * - label: this specifies the label to be displayed. Note that this will NOT be {@see \rock\helpers\BaseHtml::encode()}.
+     * - label: this specifies the label to be displayed. Note that this will NOT be {@see \rock\helpers\Html::encode()}.
      *   If this is not set, {@see \rock\base\Model::getAttributeLabel()} will be called to get the label for display
      *   (after encoding).
      *
-     * See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      *
      * @return string the generated label tag
      */
@@ -1261,100 +1117,22 @@ class Html
     }
 
     /**
-     * Generates an appropriate input ID for the specified attribute name or expression.
-     *
-     * This method converts the result {@see \rock\helpers\BaseHtml::getInputName()} into a valid input ID.
-     * For example, if {@see \rock\helpers\BaseHtml::getInputName()} returns `Post[content]`, this method will return `post-content`.
-     *
-     * @param Model  $model     the model object
-     * @param string $attribute the attribute name or expression.
-     *                          See {@see \rock\helpers\BaseHtml::getAttributeName()} for explanation of attribute expression.
-     * @return string the generated input ID
-     * @throws HtmlException if the attribute name contains non-word characters.
-     */
-    public static function getInputId($model, $attribute)
-    {
-        $name = strtolower(static::getInputName($model, $attribute));
-
-        return str_replace(['[]', '][', '[', ']', ' ', '.'], ['', '-', '-', '', '-', '-'], $name);
-    }
-
-    /**
-     * Generates an appropriate input name for the specified attribute name or expression.
-     *
-     * This method generates a name that can be used as the input name to collect user input
-     * for the specified attribute. The name is generated according to the @see Model::formName
-     * of the model and the given attribute name. For example, if the form name of the `Post` model
-     * is `Post`, then the input name generated for the `content` attribute would be `Post[content]`.
-     *
-     * See {@see \rock\helpers\BaseHtml::getAttributeName()} for explanation of attribute expression.
-     *
-     * @param Model  $model     the model object
-     * @param string $attribute the attribute name or expression
-     * @return string the generated input name
-     * @throws HtmlException if the attribute name contains non-word characters.
-     */
-    public static function getInputName($model, $attribute)
-    {
-        $formName = $model->formName();
-        if (!preg_match('/(^|.*\])([\w\.]+)(\[.*|$)/', $attribute, $matches)) {
-            throw new HtmlException('Attribute name must contain word characters only.');
-        }
-        $prefix = $matches[1];
-        $attribute = $matches[2];
-        $suffix = $matches[3];
-        if ($formName === '' && $prefix === '') {
-            return $attribute . $suffix;
-        } elseif ($formName !== '') {
-            return $formName . $prefix . "[$attribute]" . $suffix;
-        } else {
-            throw new HtmlException(get_class($model) . '::formName() cannot be empty for tabular inputs.');
-        }
-    }
-
-    /**
-     * Returns the real attribute name from the given attribute expression.
-     *
-     * An attribute expression is an attribute name prefixed and/or suffixed with array indexes.
-     * It is mainly used in tabular data input and/or input of array type. Below are some examples:
-     *
-     * - `[0]content` is used in tabular data input to represent the "content" attribute
-     *   for the first model in tabular input;
-     * - `dates[0]` represents the first array element of the "dates" attribute;
-     * - `[0]dates[0]` represents the first array element of the "dates" attribute
-     *   for the first model in tabular input.
-     *
-     * If `$attribute` has neither prefix nor suffix, it will be returned back without change.
-     *
-     * @param string $attribute the attribute name or expression
-     * @return string the attribute name without prefix and suffix.
-     * @throws HtmlException if the attribute name contains non-word characters.
-     */
-    public static function getAttributeName($attribute)
-    {
-        if (preg_match('/(^|.*\])([\w\.]+)(\[.*|$)/', $attribute, $matches)) {
-            return $matches[2];
-        } else {
-            throw new HtmlException('Attribute name must contain word characters only.');
-        }
-    }
-
-    /**
      * Generates a tag that contains the first validation error of the specified model attribute.
      *
      * Note that even if there is no validation error, this method will still return an empty error tag.
      *
      * @param Model  $model     the model object
-     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\BaseHtml::getAttributeName()} for the format
+     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\Html::getAttributeName()} for the format
      *                          about attribute expression.
      * @param array  $options   the tag options in terms of name-value pairs. The values will be HTML-encoded
-     *                          using {@see \rock\helpers\BaseHtml::encode()} . If a value is null, the corresponding attribute will not be rendered.
+     *                          using {@see \rock\helpers\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
      *
      * The following options are specially handled:
      *
      * - tag: this specifies the tag name. If not set, "div" will be used.
+     * - encode: boolean, if set to false then value won't be encoded.
      *
-     * See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      *
      * @return string the generated label tag
      */
@@ -1366,28 +1144,10 @@ class Html
             return '';
         }
         $tag = isset($options['tag']) ? $options['tag'] : 'div';
-        unset($options['tag']);
+        $encode = !isset($options['encode']) || $options['encode'] !== false;
+        unset($options['tag'], $options['encode']);
 
-        return Html::tag($tag, Html::encode($error), $options);
-    }
-
-    /**
-     * Generates a text input tag for the given model attribute.
-     *
-     * This method will generate the "name" and "value" tag attributes automatically for the model attribute
-     * unless they are explicitly specified in `$options`.
-     *
-     * @param Model  $model     the model object
-     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\BaseHtml::getAttributeName()} for the format
-     *                          about attribute expression.
-     * @param array  $options   the tag options in terms of name-value pairs. These will be rendered as
-     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} .
-     *                          See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
-     * @return string the generated input tag
-     */
-    public static function activeTextInput($model, $attribute, $options = [])
-    {
-        return static::activeInput('text', $model, $attribute, $options);
+        return Html::tag($tag, $encode ? Html::encode($error) : $error, $options);
     }
 
     /**
@@ -1397,11 +1157,11 @@ class Html
      *
      * @param string $type      the input type (e.g. 'text', 'password')
      * @param Model  $model     the model object
-     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\BaseHtml::getAttributeName()} for the format
+     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\Html::getAttributeName()} for the format
      *                          about attribute expression.
      * @param array  $options   the tag options in terms of name-value pairs. These will be rendered as
-     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} .
-     *                          See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
+     *                          See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated input tag
      */
     public static function activeInput($type, $model, $attribute, $options = [])
@@ -1416,50 +1176,41 @@ class Html
     }
 
     /**
-     * Returns the value of the specified attribute name or expression.
+     * Generates a text input tag for the given model attribute.
      *
-     * For an attribute expression like `[0]dates[0]`, this method will return the value of `$model->dates[0]`.
-     * See {@see \rock\helpers\BaseHtml::getAttributeName()} for more details about attribute expression.
-     *
-     * If an attribute value is an instance of {@see \rock\db\ActiveRecordInterface} or an array of such instances,
-     * the primary value(s) of the AR instance(s) will be returned instead.
+     * This method will generate the "name" and "value" tag attributes automatically for the model attribute
+     * unless they are explicitly specified in `$options`.
      *
      * @param Model  $model     the model object
-     * @param string $attribute the attribute name or expression
-     * @return string|array the corresponding attribute value
-     * @throws HtmlException if the attribute name contains non-word characters.
+     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\Html::getAttributeName()} for the format
+     *                          about attribute expression.
+     * @param array  $options   the tag options in terms of name-value pairs. These will be rendered as
+     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
+     *                          See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     * @return string the generated input tag
      */
-    public static function getAttributeValue($model, $attribute)
+    public static function activeTextInput($model, $attribute, $options = [])
     {
-        if (!preg_match('/(^|.*\])([\w\.]+)(\[.*|$)/', $attribute, $matches)) {
-            throw new HtmlException('Attribute name must contain word characters only.');
-        }
-        $attribute = $matches[2];
-        $value = $model->$attribute;
-        if ($matches[3] !== '') {
-            foreach (explode('][', trim($matches[3], '[]')) as $id) {
-                if ((is_array($value) || $value instanceof \ArrayAccess) && isset($value[$id])) {
-                    $value = $value[$id];
-                } else {
-                    return null;
-                }
-            }
-        }
-        // https://github.com/yiisoft/yii2/issues/1457
-        if (is_array($value)) {
-            foreach ($value as $i => $v) {
-                if ($v instanceof ActiveRecordInterface) {
-                    $v = $v->getPrimaryKey(false);
-                    $value[$i] = is_array($v) ? json_encode($v) : $v;
-                }
-            }
-        } elseif ($value instanceof ActiveRecordInterface) {
-            $value = $value->getPrimaryKey(false);
+        return static::activeInput('text', $model, $attribute, $options);
+    }
 
-            return is_array($value) ? json_encode($value) : $value;
-        }
-
-        return $value;
+    /**
+     * Generates a hidden input tag for the given model attribute.
+     *
+     * This method will generate the "name" and "value" tag attributes automatically for the model attribute
+     * unless they are explicitly specified in `$options`.
+     *
+     * @param Model  $model     the model object
+     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\Html::getAttributeName()} for the format
+     *                          about attribute expression.
+     * @param array  $options   the tag options in terms of name-value pairs. These will be rendered as
+     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
+     *                          See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     * @return string the generated input tag
+     */
+    public static function activeHiddenInput($model, $attribute, $options = [])
+    {
+        return static::activeInput('hidden', $model, $attribute, $options);
     }
 
     /**
@@ -1469,11 +1220,11 @@ class Html
      * unless they are explicitly specified in `$options`.
      *
      * @param Model  $model     the model object
-     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\BaseHtml::getAttributeName()} for the format
+     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\Html::getAttributeName()} for the format
      *                          about attribute expression.
      * @param array  $options   the tag options in terms of name-value pairs. These will be rendered as
-     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()}.
-     *                          See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()}.
+     *                          See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated input tag
      */
     public static function activePasswordInput($model, $attribute, $options = [])
@@ -1488,11 +1239,11 @@ class Html
      * unless they are explicitly specified in `$options`.
      *
      * @param Model  $model     the model object
-     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\BaseHtml::getAttributeName()} for the format
+     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\Html::getAttributeName()} for the format
      *                          about attribute expression.
      * @param array  $options   the tag options in terms of name-value pairs. These will be rendered as
-     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} .
-     *                          See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
+     *                          See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated input tag
      */
     public static function activeFileInput($model, $attribute, $options = [])
@@ -1500,26 +1251,7 @@ class Html
         // add a hidden field so that if a model only has a file field, we can
         // still use isset($_POST[$modelClass]) to detect if the input is submitted
         return static::activeHiddenInput($model, $attribute, ['id' => null, 'value' => ''])
-               . static::activeInput('file', $model, $attribute, $options);
-    }
-
-    /**
-     * Generates a hidden input tag for the given model attribute.
-     *
-     * This method will generate the "name" and "value" tag attributes automatically for the model attribute
-     * unless they are explicitly specified in `$options`.
-     *
-     * @param Model  $model     the model object
-     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\BaseHtml::getAttributeName()} for the format
-     *                          about attribute expression.
-     * @param array  $options   the tag options in terms of name-value pairs. These will be rendered as
-     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} .
-     *                          See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
-     * @return string the generated input tag
-     */
-    public static function activeHiddenInput($model, $attribute, $options = [])
-    {
-        return static::activeInput('hidden', $model, $attribute, $options);
+            . static::activeInput('file', $model, $attribute, $options);
     }
 
     /**
@@ -1528,11 +1260,11 @@ class Html
      * The model attribute value will be used as the content in the textarea.
      *
      * @param Model  $model     the model object
-     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\BaseHtml::getAttributeName()} for the format
+     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\Html::getAttributeName()} for the format
      *                          about attribute expression.
      * @param array  $options   the tag options in terms of name-value pairs. These will be rendered as
-     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()}.
-     *                          See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()}.
+     *                          See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated textarea tag
      */
     public static function activeTextarea($model, $attribute, $options = [])
@@ -1547,46 +1279,30 @@ class Html
     }
 
     /**
-     * Generates a text area input.
-     *
-     * @param string $name    the input name
-     * @param string $value   the input value. Note that it will be encoded using {@see \rock\helpers\BaseHtml::encode()}.
-     * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
-     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} .
-     *                        If a value is null, the corresponding attribute will not be rendered.
-     *                        See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
-     * @return string the generated text area tag
-     */
-    public static function textarea($name, $value = '', $options = [])
-    {
-        $options['name'] = $name;
-
-        return static::tag('textarea', static::encode($value), $options);
-    }
-
-    /**
-     * Generates a radio button tag for the given model attribute.
+     * Generates a radio button tag together with a label for the given model attribute.
      *
      * This method will generate the "checked" tag attribute according to the model attribute value.
      *
      * @param Model  $model     the model object
-     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\BaseHtml::getAttributeName()} for the format
+     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\Html::getAttributeName()} for the format
      *                          about attribute expression.
      * @param array  $options   the tag options in terms of name-value pairs. The following options are specially handled:
      *
      * - uncheck: string, the value associated with the uncheck state of the radio button. If not set,
      *   it will take the default value '0'. This method will render a hidden input so that if the radio button
      *   is not checked and is submitted, the value of this attribute will still be submitted to the server
-     *   via the hidden input.
+     *   via the hidden input. If you do not want any hidden input, you should explicitly set this option as null.
      * - label: string, a label displayed next to the radio button.  It will NOT be HTML-encoded. Therefore you can pass
-     *   in HTML code such as an image tag. If this is is coming from end users, you should {@see \rock\helpers\BaseHtml::encode()} it to prevent XSS attacks.
-     *   When this option is specified, the radio button will be enclosed by a label tag.
+     *   in HTML code such as an image tag. If this is is coming from end users, you should {@see \rock\helpers\Html::encode()} it to prevent XSS attacks.
+     *   The radio button will be enclosed by the label tag. Note that if you do not specify this option, a default label
+     *   will be used based on the attribute label declaration in the model. If you do not want any label, you should
+     *   explicitly set this option as null.
      * - labelOptions: array, the HTML attributes for the label tag. This is only used when the "label" option is specified.
      *
      * The rest of the options will be rendered as the attributes of the resulting tag. The values will
-     * be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} . If a value is null, the corresponding attribute will not be rendered.
+     * be HTML-encoded using {@see \rock\helpers\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
      *
-     * See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      *
      * @return string the generated radio button tag
      */
@@ -1594,13 +1310,19 @@ class Html
     {
         $name = isset($options['name']) ? $options['name'] : static::getInputName($model, $attribute);
         $value = static::getAttributeValue($model, $attribute);
+
         if (!array_key_exists('value', $options)) {
             $options['value'] = '1';
         }
         if (!array_key_exists('uncheck', $options)) {
             $options['uncheck'] = '0';
         }
+        if (!array_key_exists('label', $options)) {
+            $options['label'] = static::encode($model->getAttributeLabel(static::getAttributeName($attribute)));
+        }
+
         $checked = "$value" === "{$options['value']}";
+
         if (!array_key_exists('id', $options)) {
             $options['id'] = static::getInputId($model, $attribute);
         }
@@ -1609,12 +1331,12 @@ class Html
     }
 
     /**
-     * Generates a checkbox tag for the given model attribute.
+     * Generates a checkbox tag together with a label for the given model attribute.
      *
      * This method will generate the "checked" tag attribute according to the model attribute value.
      *
      * @param Model  $model     the model object
-     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\BaseHtml::getAttributeName()} for the format
+     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\Html::getAttributeName()} for the format
      *                          about attribute expression.
      * @param array  $options   the tag options in terms of name-value pairs. The following options are specially handled:
      *
@@ -1623,13 +1345,15 @@ class Html
      *   is not checked and is submitted, the value of this attribute will still be submitted to the server
      *   via the hidden input.
      * - label: string, a label displayed next to the checkbox.  It will NOT be HTML-encoded. Therefore you can pass
-     *   in HTML code such as an image tag. If this is is coming from end users, you should {@see \rock\helpers\BaseHtml::encode()} it to prevent XSS attacks.
-     *   When this option is specified, the checkbox will be enclosed by a label tag.
+     *   in HTML code such as an image tag. If this is is coming from end users, you should {@see \rock\helpers\Html::encode()} it to prevent XSS attacks.
+     *   The checkbox will be enclosed by the label tag. Note that if you do not specify this option, a default label
+     *   will be used based on the attribute label declaration in the model. If you do not want any label, you should
+     *   explicitly set this option as null.
      * - labelOptions: array, the HTML attributes for the label tag. This is only used when the "label" option is specified.
      *
      * The rest of the options will be rendered as the attributes of the resulting tag. The values will
-     * be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} . If a value is null, the corresponding attribute will not be rendered.
-     * See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     * be HTML-encoded using {@see \rock\helpers\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
+     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      *
      * @return string the generated checkbox tag
      */
@@ -1637,13 +1361,19 @@ class Html
     {
         $name = isset($options['name']) ? $options['name'] : static::getInputName($model, $attribute);
         $value = static::getAttributeValue($model, $attribute);
+
         if (!array_key_exists('value', $options)) {
             $options['value'] = '1';
         }
         if (!array_key_exists('uncheck', $options)) {
             $options['uncheck'] = '0';
         }
+        if (!array_key_exists('label', $options)) {
+            $options['label'] = static::encode($model->getAttributeLabel(static::getAttributeName($attribute)));
+        }
+
         $checked = "$value" === "{$options['value']}";
+
         if (!array_key_exists('id', $options)) {
             $options['id'] = static::getInputId($model, $attribute);
         }
@@ -1657,7 +1387,7 @@ class Html
      * The selection of the drop-down list is taken from the value of the model attribute.
      *
      * @param Model  $model     the model object
-     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\BaseHtml::getAttributeName()} for the format
+     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\Html::getAttributeName()} for the format
      *                          about attribute expression.
      * @param array  $items     the option data items. The array keys are option values, and the array values
      *                          are the corresponding option labels. The array can also be nested (i.e. some array values are arrays too).
@@ -1685,8 +1415,8 @@ class Html
      *   Defaults to `false`.
      *
      * The rest of the options will be rendered as the attributes of the resulting tag. The values will
-     * be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} . If a value is null, the corresponding attribute will not be rendered.
-     * See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     * be HTML-encoded using {@see \rock\helpers\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
+     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      *
      * @return string the generated drop-down list tag
      */
@@ -1700,42 +1430,12 @@ class Html
     }
 
     /**
-     * Generates a list of input fields.
-     *
-     * This method is mainly called by {@see \rock\helpers\BaseHtml::activeListBox()}, {@see \rock\helpers\BaseHtml::activeRadioList()} and {@see \rock\helpers\BaseHtml::activeCheckBoxList()}.
-     *
-     * @param string $type      the input type. This can be `listBox`, `radioList`, or `checkBoxList`.
-     * @param Model  $model     the model object
-     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\BaseHtml::getAttributeName()} for the format
-     *                          about attribute expression.
-     * @param array  $items     the data item used to generate the input fields.
-     *                          The array keys are the labels, while the array values are the corresponding input values.
-     *                          Note that the labels will NOT be HTML-encoded, while the values will.
-     * @param array  $options   options (name => config) for the input list. The supported special options
-     *                          depend on the input type specified by `$type`.
-     * @return string the generated input list
-     */
-    protected static function activeListInput($type, $model, $attribute, $items, $options = [])
-    {
-        $name = isset($options['name']) ? $options['name'] : static::getInputName($model, $attribute);
-        $selection = static::getAttributeValue($model, $attribute);
-        if (!array_key_exists('unselect', $options)) {
-            $options['unselect'] = '';
-        }
-        if (!array_key_exists('id', $options)) {
-            $options['id'] = static::getInputId($model, $attribute);
-        }
-
-        return static::$type($name, $selection, $items, $options);
-    }
-
-    /**
      * Generates a list box.
      *
      * The selection of the list box is taken from the value of the model attribute.
      *
      * @param Model  $model     the model object
-     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\BaseHtml::getAttributeName()} for the format
+     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\Html::getAttributeName()} for the format
      *                          about attribute expression.
      * @param array  $items     the option data items. The array keys are option values, and the array values
      *                          are the corresponding option labels. The array can also be nested (i.e. some array values are arrays too).
@@ -1766,8 +1466,8 @@ class Html
      *   Defaults to `false`.
      *
      * The rest of the options will be rendered as the attributes of the resulting tag. The values will
-     * be HTML-encoded using {@see \rock\helpers\BaseHtml::encode()} . If a value is null, the corresponding attribute will not be rendered.
-     * See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     * be HTML-encoded using {@see \rock\helpers\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
+     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      *
      * @return string the generated list box tag
      */
@@ -1779,15 +1479,15 @@ class Html
     /**
      * Generates a list of checkboxes.
      *
-     * A checkbox list allows multiple selection, like {@see \rock\helpers\BaseHtml::listBox()}.
+     * A checkbox list allows multiple selection, like {@see \rock\helpers\Html::listBox()}.
      * As a result, the corresponding submitted value is an array.
      * The selection of the checkbox list is taken from the value of the model attribute.
      *
      * @param Model  $model     the model object
-     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\BaseHtml::getAttributeName()} for the format
+     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\Html::getAttributeName()} for the format
      *                          about attribute expression.
-     * @param array  $items     the data item used to generate the checkboxes.
-     *                          The array values are the labels, while the array keys are the corresponding checkbox values.
+     * @param array $items the data item used to generate the checkboxes.
+     * The array keys are the checkbox values, and the array values are the corresponding labels.
      *                          Note that the labels will NOT be HTML-encoded, while the values will.
      * @param array  $options   options (name => config) for the checkbox list. The following options are specially handled:
      *
@@ -1806,7 +1506,7 @@ class Html
      *   is the label for the checkbox; and $name, $value and $checked represent the name,
      *   value and the checked status of the checkbox input.
      *
-     * See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      *
      * @return string the generated checkbox list
      */
@@ -1822,10 +1522,10 @@ class Html
      * The selection of the radio buttons is taken from the value of the model attribute.
      *
      * @param Model  $model     the model object
-     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\BaseHtml::getAttributeName()} for the format
+     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\Html::getAttributeName()} for the format
      *                          about attribute expression.
-     * @param array  $items     the data item used to generate the radio buttons.
-     *                          The array keys are the labels, while the array values are the corresponding radio button values.
+     * @param array $items the data item used to generate the radio buttons.
+     * The array keys are the radio values, and the array values are the corresponding labels.
      *                          Note that the labels will NOT be HTML-encoded, while the values will.
      * @param array  $options   options (name => config) for the radio button list. The following options are specially handled:
      *
@@ -1844,13 +1544,156 @@ class Html
      *   is the label for the radio button; and $name, $value and $checked represent the name,
      *   value and the checked status of the radio button input.
      *
-     * See {@see \rock\helpers\BaseHtml::renderTagAttributes()} for details on how attributes are being rendered.
+     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
      *
      * @return string the generated radio button list
      */
     public static function activeRadioList($model, $attribute, $items, $options = [])
     {
         return static::activeListInput('radioList', $model, $attribute, $items, $options);
+    }
+
+    /**
+     * Generates a list of input fields.
+     *
+     * This method is mainly called by {@see \rock\helpers\Html::activeListBox()}, {@see \rock\helpers\Html::activeRadioList()} and {@see \rock\helpers\Html::activeCheckBoxList()}.
+     *
+     * @param string $type      the input type. This can be `listBox`, `radioList`, or `checkBoxList`.
+     * @param Model  $model     the model object
+     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\Html::getAttributeName()} for the format
+     *                          about attribute expression.
+     * @param array  $items     the data item used to generate the input fields.
+     *                          The array keys are the labels, while the array values are the corresponding input values.
+     *                          Note that the labels will NOT be HTML-encoded, while the values will.
+     * @param array  $options   options (name => config) for the input list. The supported special options
+     *                          depend on the input type specified by `$type`.
+     * @return string the generated input list
+     */
+    protected static function activeListInput($type, $model, $attribute, $items, $options = [])
+    {
+        $name = isset($options['name']) ? $options['name'] : static::getInputName($model, $attribute);
+        $selection = static::getAttributeValue($model, $attribute);
+        if (!array_key_exists('unselect', $options)) {
+            $options['unselect'] = '';
+        }
+        if (!array_key_exists('id', $options)) {
+            $options['id'] = static::getInputId($model, $attribute);
+        }
+
+        return static::$type($name, $selection, $items, $options);
+    }
+
+    /**
+     * Renders the option tags.
+     *
+     * That can be used by {@see \rock\helpers\Html::dropDownList()} and {@see \rock\helpers\Html::listBox()}.
+     *
+     * @param string|array $selection  the selected value(s). This can be either a string for single selection
+     *                                 or an array for multiple selections.
+     * @param array        $items      the option data items. The array keys are option values, and the array values
+     *                                 are the corresponding option labels. The array can also be nested (i.e. some array values are arrays too).
+     *                                 For each sub-array, an option group will be generated whose label is the key associated with the sub-array.
+     *                                 If you have a list of data models, you may convert them into the format described above using {@see \rock\helpers\ArrayHelper::map()}.
+     *
+     * Note, the values and labels will be automatically HTML-encoded by this method, and the blank spaces in
+     * the labels will also be HTML-encoded.
+     * @param array        $tagOptions the $options parameter that
+     *                                 is passed to the {@see \rock\helpers\Html::dropDownList()} or {@see \rock\helpers\Html::listBox()} call.
+     *                                 This method will take out these elements, if any: "prompt", "options" and "groups". See more details
+     *                                 in {@see \rock\helpers\Html::dropDownList()} for the explanation of these elements.
+     *
+     * @return string the generated list options
+     */
+    public static function renderSelectOptions($selection, $items, &$tagOptions = [])
+    {
+        $lines = [];
+        $encodeSpaces = static::remove($tagOptions, 'encodeSpaces', false);
+        if (isset($tagOptions['prompt'])) {
+            $prompt = $encodeSpaces ? str_replace(' ', '&nbsp;', static::encode($tagOptions['prompt'])) : static::encode($tagOptions['prompt']);
+            $lines[] = static::tag('option', $prompt, ['value' => '']);
+        }
+
+        $options = isset($tagOptions['options']) ? $tagOptions['options'] : [];
+        $groups = isset($tagOptions['groups']) ? $tagOptions['groups'] : [];
+        unset($tagOptions['prompt'], $tagOptions['options'], $tagOptions['groups']);
+        $options['encodeSpaces'] = ArrayHelper::getValue($options, 'encodeSpaces', $encodeSpaces);
+
+        foreach ($items as $key => $value) {
+            if (is_array($value)) {
+                $groupAttrs = isset($groups[$key]) ? $groups[$key] : [];
+                $groupAttrs['label'] = $key;
+                $attrs = ['options' => $options, 'groups' => $groups, 'encodeSpaces' => $encodeSpaces];
+                $content = static::renderSelectOptions($selection, $value, $attrs);
+                $lines[] = static::tag('optgroup', "\n" . $content . "\n", $groupAttrs);
+            } else {
+                $attrs = isset($options[$key]) ? $options[$key] : [];
+                $attrs['value'] = (string) $key;
+                $attrs['selected'] = $selection !== null &&
+                        (!is_array($selection) && !strcmp($key, $selection)
+                        || is_array($selection) && in_array($key, $selection));
+                $lines[] = static::tag('option', ($encodeSpaces ? str_replace(' ', '&nbsp;', static::encode($value)) : static::encode($value)), $attrs);
+            }
+        }
+
+        return implode("\n", $lines);
+    }
+
+    /**
+     * Renders the HTML tag attributes.
+     *
+     * Attributes whose values are of boolean type will be treated as
+     * [boolean attributes](http://www.w3.org/TR/html5/infrastructure.html#boolean-attributes).
+     *
+     * Attributes whose values are null will not be rendered.
+     *
+     * The values of attributes will be HTML-encoded using {@see \rock\helpers\Html::encode()}.
+     *
+     * The "data" attribute is specially handled when it is receiving an array value. In this case,
+     * the array will be "expanded" and a list data attributes will be rendered. For example,
+     * if `'data' => ['id' => 1, 'name' => 'rock']`, then this will be rendered:
+     * `data-id="1" data-name="rock"`.
+     * Additionally `'data' => ['params' => ['id' => 1, 'name' => 'rock'], 'status' => 'ok']` will be rendered as:
+     * `data-params='{"id":1,"name":"rock"}' data-status="ok"`.
+     *
+     * @param array $attributes attributes to be rendered.
+     *                          The attribute values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
+     * @return string the rendering result. If the attributes are not empty, they will be rendered
+     *                          into a string with a leading white space (so that it can be directly appended to the tag name
+     *                          in a tag. If there is no attribute, an empty string will be returned.
+     */
+    public static function renderTagAttributes($attributes)
+    {
+        unset($attributes['wrapperTpl']);
+        if (count($attributes) > 1) {
+            $sorted = [];
+            foreach (static::$attributeOrder as $name) {
+                if (isset($attributes[$name])) {
+                    $sorted[$name] = $attributes[$name];
+                }
+            }
+            $attributes = array_merge($sorted, $attributes);
+        }
+
+        $html = '';
+        foreach ($attributes as $name => $value) {
+            if (is_bool($value)) {
+                if ($value) {
+                    $html .= " $name";
+                }
+            } elseif (is_array($value) && $name === 'data') {
+                foreach ($value as $n => $v) {
+                    if (is_array($v)) {
+                        $html .= " $name-$n='" . Json::encode($v, JSON_HEX_APOS) . "'";
+                    } else {
+                        $html .= " $name-$n=\"" . static::encode($v) . '"';
+                    }
+                }
+            } elseif ($value !== null) {
+                $html .= " $name=\"" . static::encode($value) . '"';
+            }
+        }
+
+        return $html;
     }
 
     /**
@@ -1934,6 +1777,56 @@ class Html
     }
 
     /**
+     * Removes the specified CSS style from the HTML options.
+     *
+     * For example,
+     *
+     * ```php
+     * Html::removeCssStyle($options, ['width', 'height']);
+     * ```
+     *
+     * @param array        $options    the HTML options to be modified.
+     * @param string|array $properties the CSS properties to be removed. You may use a string
+     *                                 if you are removing a single property.
+     * @see addCssStyle()
+     */
+    public static function removeCssStyle(&$options, $properties)
+    {
+        if (!empty($options['style'])) {
+            $style = static::cssStyleToArray($options['style']);
+            foreach ((array)$properties as $property) {
+                unset($style[$property]);
+            }
+            $options['style'] = static::cssStyleFromArray($style);
+        }
+    }
+
+    /**
+     * Converts a CSS style array into a string representation.
+     *
+     * For example,
+     *
+     * ```php
+     * print_r(Html::cssStyleFromArray(['width' => '100px', 'height' => '200px']));
+     * // will display: 'width: 100px; height: 200px;'
+     * ```
+     *
+     * @param array $style the CSS style array. The array keys are the CSS property names,
+     *                     and the array values are the corresponding CSS property values.
+     * @return string the CSS style string. If the CSS style is empty, a null will be returned.
+     */
+    public static function cssStyleFromArray(array $style)
+    {
+        $result = '';
+        foreach ($style as $name => $value) {
+            $result .= "$name: $value; ";
+        }
+
+        // return null if empty to avoid rendering the "style" attribute
+        return $result === '' ? null : rtrim($result);
+    }
+
+    /**
      * Converts a CSS style string into an array representation.
      *
      * The array keys are the CSS property names, and the array values
@@ -1963,52 +1856,166 @@ class Html
     }
 
     /**
-     * Converts a CSS style array into a string representation.
+     * Returns the real attribute name from the given attribute expression.
      *
-     * For example,
+     * An attribute expression is an attribute name prefixed and/or suffixed with array indexes.
+     * It is mainly used in tabular data input and/or input of array type. Below are some examples:
      *
-     * ```php
-     * print_r(Html::cssStyleFromArray(['width' => '100px', 'height' => '200px']));
-     * // will display: 'width: 100px; height: 200px;'
-     * ```
+     * - `[0]content` is used in tabular data input to represent the "content" attribute
+     *   for the first model in tabular input;
+     * - `dates[0]` represents the first array element of the "dates" attribute;
+     * - `[0]dates[0]` represents the first array element of the "dates" attribute
+     *   for the first model in tabular input.
      *
-     * @param array $style the CSS style array. The array keys are the CSS property names,
-     *                     and the array values are the corresponding CSS property values.
-     * @return string the CSS style string. If the CSS style is empty, a null will be returned.
+     * If `$attribute` has neither prefix nor suffix, it will be returned back without change.
+     *
+     * @param string $attribute the attribute name or expression
+     * @return string the attribute name without prefix and suffix.
+     * @throws HtmlException if the attribute name contains non-word characters.
      */
-    public static function cssStyleFromArray(array $style)
+    public static function getAttributeName($attribute)
     {
-        $result = '';
-        foreach ($style as $name => $value) {
-            $result .= "$name: $value; ";
+        if (preg_match('/(^|.*\])([\w\.]+)(\[.*|$)/', $attribute, $matches)) {
+            return $matches[2];
+        } else {
+            throw new HtmlException('Attribute name must contain word characters only.');
         }
-
-        // return null if empty to avoid rendering the "style" attribute
-        return $result === '' ? null : rtrim($result);
     }
 
     /**
-     * Removes the specified CSS style from the HTML options.
+     * Returns the value of the specified attribute name or expression.
      *
-     * For example,
+     * For an attribute expression like `[0]dates[0]`, this method will return the value of `$model->dates[0]`.
+     * See {@see \rock\helpers\Html::getAttributeName()} for more details about attribute expression.
+     *
+     * If an attribute value is an instance of {@see \rock\db\ActiveRecordInterface} or an array of such instances,
+     * the primary value(s) of the AR instance(s) will be returned instead.
+     *
+     * @param Model  $model     the model object
+     * @param string $attribute the attribute name or expression
+     * @return string|array the corresponding attribute value
+     * @throws HtmlException if the attribute name contains non-word characters.
+     */
+    public static function getAttributeValue($model, $attribute)
+    {
+        if (!preg_match('/(^|.*\])([\w\.]+)(\[.*|$)/', $attribute, $matches)) {
+            throw new HtmlException('Attribute name must contain word characters only.');
+        }
+        $attribute = $matches[2];
+        $value = $model->$attribute;
+        if ($matches[3] !== '') {
+            foreach (explode('][', trim($matches[3], '[]')) as $id) {
+                if ((is_array($value) || $value instanceof \ArrayAccess) && isset($value[$id])) {
+                    $value = $value[$id];
+                } else {
+                    return null;
+                }
+            }
+        }
+
+        // https://github.com/yiisoft/yii2/issues/1457
+        if (is_array($value)) {
+            foreach ($value as $i => $v) {
+                if ($v instanceof ActiveRecordInterface) {
+                    $v = $v->getPrimaryKey(false);
+                    $value[$i] = is_array($v) ? json_encode($v) : $v;
+                }
+            }
+        } elseif ($value instanceof ActiveRecordInterface) {
+            $value = $value->getPrimaryKey(false);
+
+            return is_array($value) ? json_encode($value) : $value;
+        }
+
+        return $value;
+    }
+
+    /**
+     * Generates an appropriate input name for the specified attribute name or expression.
+     *
+     * This method generates a name that can be used as the input name to collect user input
+     * for the specified attribute. The name is generated according to the @see Model::formName
+     * of the model and the given attribute name. For example, if the form name of the `Post` model
+     * is `Post`, then the input name generated for the `content` attribute would be `Post[content]`.
+     *
+     * See {@see \rock\helpers\Html::getAttributeName()} for explanation of attribute expression.
+     *
+     * @param Model  $model     the model object
+     * @param string $attribute the attribute name or expression
+     * @return string the generated input name
+     * @throws HtmlException if the attribute name contains non-word characters.
+     */
+    public static function getInputName($model, $attribute)
+    {
+        $formName = $model->formName();
+        if (!preg_match('/(^|.*\])([\w\.]+)(\[.*|$)/', $attribute, $matches)) {
+            throw new HtmlException('Attribute name must contain word characters only.');
+        }
+        $prefix = $matches[1];
+        $attribute = $matches[2];
+        $suffix = $matches[3];
+        if ($formName === '' && $prefix === '') {
+            return $attribute . $suffix;
+        } elseif ($formName !== '') {
+            return $formName . $prefix . "[$attribute]" . $suffix;
+        } else {
+            throw new HtmlException(get_class($model) . '::formName() cannot be empty for tabular inputs.');
+        }
+    }
+
+    /**
+     * Generates an appropriate input ID for the specified attribute name or expression.
+     *
+     * This method converts the result {@see \rock\helpers\Html::getInputName()} into a valid input ID.
+     * For example, if {@see \rock\helpers\Html::getInputName()} returns `Post[content]`, this method will return `post-content`.
+     *
+     * @param Model  $model     the model object
+     * @param string $attribute the attribute name or expression.
+     *                          See {@see \rock\helpers\Html::getAttributeName()} for explanation of attribute expression.
+     * @return string the generated input ID
+     * @throws HtmlException if the attribute name contains non-word characters.
+     */
+    public static function getInputId($model, $attribute)
+    {
+        $name = strtolower(static::getInputName($model, $attribute));
+
+        return str_replace(['[]', '][', '[', ']', ' '], ['', '-', '-', '', '-'], $name);
+    }
+
+    /**
+     * Removes an item from an array and returns the value.
+     *
+     * If the key does not exist in the array, the default value will be returned instead.
+     *
+     * Usage examples,
      *
      * ```php
-     * Html::removeCssStyle($options, ['width', 'height']);
+     * // $array = ['type' => 'A', 'options' => [1, 2]];
+     * // working with array
+     * $type = Html::remove($array, 'type');
+     * // $array content
+     * // $array = ['options' => [1, 2]];
      * ```
      *
-     * @param array        $options    the HTML options to be modified.
-     * @param string|array $properties the CSS properties to be removed. You may use a string
-     *                                 if you are removing a single property.
-     * @see addCssStyle()
+     * @param array  $array   the array to extract value from
+     * @param string $key     key name of the array element
+     * @param mixed  $default the default value to be returned if the specified key does not exist
+     * @return mixed|null the value of the element if found, default value otherwise
      */
-    public static function removeCssStyle(&$options, $properties)
+    public static function remove(&$array, $key, $default = null)
     {
-        if (!empty($options['style'])) {
-            $style = static::cssStyleToArray($options['style']);
-            foreach ((array)$properties as $property) {
-                unset($style[$property]);
-            }
-            $options['style'] = static::cssStyleFromArray($style);
+        if (is_array($array) && (isset($array[$key]) || array_key_exists($key, $array))) {
+            $value = $array[$key];
+            unset($array[$key]);
+
+            return $value;
         }
+
+        return $default;
+    }
+
+    protected static function isBase64($value)
+    {
+        return mb_substr($value, 0, 5, 'UTF-8') === 'data:';
     }
 } 
