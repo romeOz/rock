@@ -64,7 +64,6 @@ class AlphaTest extends \PHPUnit_Framework_TestCase
     public function providerValid()
     {
         return [
-            ['', ''],
             ['alganet', ''],
             ['alganet', 'alganet'],
             ['0alg-anet0', '0-9'],
@@ -84,6 +83,9 @@ class AlphaTest extends \PHPUnit_Framework_TestCase
     public function providerInvalid()
     {
         return [
+            ['', ''],
+            [null, ''],
+            [[], ''],
             ['@#$', ''],
             ['_', ''],
             ['dgç', ''],
@@ -92,9 +94,7 @@ class AlphaTest extends \PHPUnit_Framework_TestCase
             [11123, ''],
             [1e21, ''],
             [0, ''],
-            [null, ''],
             [new \stdClass, ''],
-            [[], ''],
         ];
     }
 }

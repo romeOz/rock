@@ -27,7 +27,11 @@ class NegativeTest extends \PHPUnit_Framework_TestCase
     public function providerValid()
     {
         return [
+            // skip empty
             [''],
+            [null],
+            [[]],
+            
             ['-1.44'],
             [-1e-5],
             [-10],
@@ -39,7 +43,6 @@ class NegativeTest extends \PHPUnit_Framework_TestCase
         return [
             [0],
             [-0],
-            [null],
             ['a'],
             [' '],
             ['Foo'],

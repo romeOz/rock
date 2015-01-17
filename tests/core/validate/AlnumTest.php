@@ -63,7 +63,6 @@ class AlnumTest extends \PHPUnit_Framework_TestCase
     public function providerValid()
     {
         return [
-            ['', ''],
             ['alganet', ''],
             ['alganet', 'alganet'],
             ['0alg-anet0', '0-9'],
@@ -85,13 +84,14 @@ class AlnumTest extends \PHPUnit_Framework_TestCase
     public function providerInvalid()
     {
         return [
+            [null, ''],
+            [[], ''],
+            ['', ''],
             ['@#$', ''],
             ['_', ''],
             ['dgç', ''],
             [1e21, ''], //evaluates to "1.0E+21"
-            [null, ''],
             [new \stdClass, ''],
-            [[], ''],
         ];
     }
 }

@@ -62,7 +62,6 @@ class CntrlTest extends \PHPUnit_Framework_TestCase
     public function providerValid()
     {
         return [
-            [''],
             ["\n"],
             ["\r"],
             ["\t"],
@@ -74,6 +73,9 @@ class CntrlTest extends \PHPUnit_Framework_TestCase
     public function providerInvalid()
     {
         return [
+            [''],
+            [null],
+            [[]],
             ['16-50'],
             ['a'],
             [' '],
@@ -82,7 +84,6 @@ class CntrlTest extends \PHPUnit_Framework_TestCase
             ['-12'],
             [-12],
             ['alganet'],
-            [[]]
         ];
     }
 }

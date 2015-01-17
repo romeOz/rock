@@ -78,7 +78,6 @@ class ValidateTest extends \PHPUnit_Framework_TestCase
     public function providerNumericValid()
     {
         return [
-            [''],
             [0],
             [5],
             [5.5]
@@ -122,7 +121,6 @@ class ValidateTest extends \PHPUnit_Framework_TestCase
     public function providerArrValid()
     {
         return [
-            [''],
             [[]],
             [['foo']],
         ];
@@ -395,7 +393,7 @@ class ValidateTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($validate->validate(''));
         $validate = Validate::notOf(
             Validate::required()->string()->placeholders(['name' => 'email']));
-        $this->assertTrue($validate->validate(''));
+        $this->assertFalse($validate->validate(''));
         $validate = Validate::notOf(
             Validate::required()->string()->placeholders(['name' => 'email']));
         $this->assertFalse($validate->validate('foo'));

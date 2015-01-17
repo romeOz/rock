@@ -171,6 +171,11 @@ class Validate implements i18nInterface
      */
     public $one = false;
     /**
+     * @var boolean whether this validation rule should be skipped if the attribute value
+     * is null or an empty string.
+     */
+    public $skipOnEmpty = true;
+    /**
      * Category dictionary.
      * @var string
      */
@@ -287,7 +292,10 @@ class Validate implements i18nInterface
                 break;
             }
 
-            if ($input === '' && $ruleName !== 'required') {
+//            if ($input === '' && $ruleName !== 'required') {
+//                continue;
+//            }
+            if ($this->skipOnEmpty && $rule->skipOnEmpty && $this->isEmpty($input, $rule)) {
                 continue;
             }
 
@@ -387,6 +395,25 @@ class Validate implements i18nInterface
         /** @var static $self */
         $self = Rock::factory(static::className());
         return call_user_func_array([$self, $name], $arguments);
+    }
+
+    /**
+     * Checks if the given value is empty.
+     *
+     * A value is considered empty if it is null, an empty array, or the trimmed result is an empty string.
+     * Note that this method is different from PHP empty(). It will return false when the value is 0.
+     *
+     * @param mixed $value the value to be checked
+     * @param Rule  $rule
+     * @return bool whether the value is empty
+     */
+    protected function isEmpty($value, Rule $rule)
+    {
+        if ($rule->isEmpty !== null) {
+            return call_user_func($rule->isEmpty, $value);
+        } else {
+            return $value === null || $value === [] || $value === '';
+        }
     }
 
     protected function attributesInternal(array $attributes)

@@ -32,6 +32,9 @@ class Length extends Rule
      */
     public function validate($input)
     {
+        if (is_int($input)) {
+            $input = (string)$input;
+        }
         $length = $this->extractLength($input);
         return $this->validateMin($length) && $this->validateMax($length);
     }

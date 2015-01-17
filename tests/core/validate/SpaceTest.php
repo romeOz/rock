@@ -62,7 +62,6 @@ class SpaceTest extends \PHPUnit_Framework_TestCase
     public function providerValid()
     {
         return [
-            [''],
             ["\n"],
             [" "],
             ["    "],
@@ -74,6 +73,9 @@ class SpaceTest extends \PHPUnit_Framework_TestCase
     public function providerInvalid()
     {
         return [
+            [''],
+            [null],
+            [[]],
             ['16-50'],
             ['a'],
             ['Foo'],
@@ -81,7 +83,6 @@ class SpaceTest extends \PHPUnit_Framework_TestCase
             ['-12'],
             [-12],
             ['_'],
-            [[]],
         ];
     }
 }

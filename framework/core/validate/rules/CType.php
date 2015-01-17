@@ -7,6 +7,8 @@ use rock\validate\ValidateException;
 
 abstract class CType extends Rule
 {
+    public $skipOnEmpty = false;
+
     public function __construct($additionalChars = '', $config = [])
     {
         $this->parentConstruct($config);
