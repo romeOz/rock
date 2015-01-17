@@ -4,9 +4,9 @@ namespace rock\widgets;
 
 use rock\base\Model;
 use rock\base\Widget;
+use rock\di\Container;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Html;
-use rock\Rock;
 
 class ActiveForm extends Widget
 {
@@ -41,14 +41,14 @@ class ActiveForm extends Widget
      */
     public $options = [];
     /**
-     * @var array the default configuration used by `field()` when creating a new field object.
+     * @var string the default field class name when calling {@see \rock\widgets\ActiveForm::field()} to create a new field.
+     * @see fieldConfig
      */
-    public $fieldConfig;
+    public $fieldClass = 'rock\widgets\ActiveField';
     /**
-     * @var string the default CSS class for the error summary container.
-     * @see errorSummary()
+     * @var array the default configuration used by {@see \rock\widgets\ActiveForm::field()} when creating a new field object.
      */
-    public $errorSummaryCssClass = 'error-summary';
+    public $fieldConfig = [];
     /**
      * @var string the CSS class that is added to a field container when the associated attribute is required.
      */
@@ -70,11 +70,6 @@ class ActiveForm extends Widget
      * If {@see \rock\widgets\ActiveField::enableClientValidation} is set, its value will take precedence for that input field.
      */
     public $enableClientValidation = true;
-//    /**
-//     * @var boolean whether to enable AJAX-based data validation.
-//     * If {@see \rock\widgets\ActiveField::enableAjaxValidation} is set, its value will take precedence for that input field.
-//     */
-//    public $enableAjaxValidation = false;
     /**
      * @var array|string the URL for performing AJAX-based validation. This property will be processed by
      * {@see \rock\url\Url::getAbsoluteUrl()}. Please refer to {@see \rock\url\Url::getAbsoluteUrl()} for more details on how to configure this property.
@@ -94,10 +89,17 @@ class ActiveForm extends Widget
     /**
      * @var array the client validation options for individual attributes. Each element of the array
      * represents the validation options for a particular attribute.
-     * @internal
      */
     public $attributes = [];
     public $submitted = false;
+    /**
+     * @var string
+     */
+    protected $modelName;
+    /**
+     * @var ActiveField[] the ActiveField objects that are currently active
+     */
+    private $_fields = [];
 
     /**
      * Initializes the widget.
@@ -113,45 +115,50 @@ class ActiveForm extends Widget
             $this->fieldConfig['enableClientValidation'] = $this->enableClientValidation;
             $this->fieldConfig['validateOnChanged'] = $this->validateOnChanged;
         }
-        $name = $this->model->formName();
-        $this->clientOptions($name);
+        $this->modelName = $this->model->formName();
+        $this->options = $this->clientOptions($this->options);
 
-        echo Html::beginForm($this->action, $this->method, $name, $this->options);
+        echo Html::beginForm($this->action, $this->method, $this->modelName, $this->options);
     }
 
-    protected function clientOptions($name)
+    protected function clientOptions(array $options)
     {
-        if (!empty($name)) {
-            $this->options['name'] = $name;
-            if (!isset($this->options['data-ng-init'])) {
-                $this->options['data-ng-init'] = 'formName="' . $name . '";';
+        if (!$this->enableClientValidation) {
+            return $options;
+        }
+
+        if (!empty($this->modelName)) {
+            $options['name'] = $this->modelName;
+            if (!isset($options['data-ng-init'])) {
+                $options['data-ng-init'] = 'formName="' . $this->modelName . '";';
                 if ($this->validateOnChanged) {
-                    $this->options['data-ng-init'] .= 'validateOnChanged=true;';
+                    $options['data-ng-init'] .= 'validateOnChanged=true;';
                 }
             }
         }
-        if (!isset($this->options['data-ng-submit'])) {
-            $this->options['data-ng-submit'] = 'submit($event)';
+        if (!isset($options['data-ng-submit'])) {
+            $options['data-ng-submit'] = 'submit($event)';
         }
         $request = $this->Rock->request;
-        $this->options['hiddenMethod'] = array_merge(
+        $options['hiddenMethod'] = array_merge(
             [
-                'data-ng-model' =>  (isset($name) ? $name : 'form').".values.{$request->methodVar}",
+                'data-ng-model' =>  (isset($this->modelName) ? $this->modelName : 'form').".values.{$request->methodVar}",
                 'data-simple-name' => $request->methodVar
             ],
-            ArrayHelper::getValue($this->options, 'hiddenMethod', [])
+            ArrayHelper::getValue($options, 'hiddenMethod', [])
         );
         $token = $this->Rock->csrf;
-        $this->options['hiddenCsrf'] = array_merge(
+        $options['hiddenCsrf'] = array_merge(
             [
-                'data-ng-model' => (isset($name) ? $name : 'form') . '.values.'. $token->csrfParam,
+                'data-ng-model' => (isset($this->modelName) ? $this->modelName : 'form') . '.values.'. $token->csrfParam,
                 'data-simple-name' => $token->csrfParam,
                 'data-rock-form-add-csrf' => '',
                 'data-ng-value' => 'rock.csrf.getToken()'
 
             ],
-            ArrayHelper::getValue($this->options, 'hiddenCsrf', [])
+            ArrayHelper::getValue($options, 'hiddenCsrf', [])
         );
+        return $options;
     }
 
     /**
@@ -160,9 +167,12 @@ class ActiveForm extends Widget
      */
     public function run()
     {
+        if (!empty($this->_fields)) {
+            throw new WidgetException('Each beginField() should have a matching endField() call.');
+        }
+        
         echo Html::endForm();
     }
-
 
     /**
      * Generates a form field.
@@ -177,17 +187,54 @@ class ActiveForm extends Widget
      */
     public function field($model, $attribute, $options = [])
     {
-        return Rock::factory(
-            array_merge(
-                $this->fieldConfig, 
-                $options,
-                [
-                   'model' => $model,
-                   'attribute' => $attribute,
-                   'form' => $this,
-                ]
-            )
-        );
+        $config = $this->fieldConfig;
+        if ($config instanceof \Closure) {
+            $config = call_user_func($config, $model, $attribute);
+        }
+        if (!isset($config['class'])) {
+            $config['class'] = $this->fieldClass;
+        }
+        
+        return Container::load(ArrayHelper::merge($config, $options, [
+            'model' => $model,
+            'attribute' => $attribute,
+            'form' => $this,
+        ]));
+    }
+
+    /**
+     * Begins a form field.
+     * This method will create a new form field and returns its opening tag.
+     * You should call {@see \rock\widgets\ActiveForm::endField()} afterwards.
+     * @param Model $model the data model
+     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\Html::getAttributeName()} for the format
+     * about attribute expression.
+     * @param array $options the additional configurations for the field object
+     * @return string the opening tag
+     * @see endField()
+     * @see field()
+     */
+    public function beginField($model, $attribute, $options = [])
+    {
+        $field = $this->field($model, $attribute, $options);
+        $this->_fields[] = $field;
+        return $field->begin();
+    }
+
+    /**
+     * Ends a form field.
+     * This method will return the closing tag of an active form field started by {@see \rock\widgets\ActiveForm::beginField()}.
+     * @return string the closing tag of the form field
+     * @throws WidgetException if this method is called without a prior {@see \rock\widgets\ActiveForm::beginField()} call.
+     */
+    public function endField()
+    {
+        $field = array_pop($this->_fields);
+        if ($field instanceof ActiveField) {
+            return $field->end();
+        } else {
+            throw new WidgetException('Mismatching endField() call.');
+        }
     }
 
     /**
