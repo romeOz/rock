@@ -22,14 +22,6 @@ trait ObjectTrait
     protected $Rock;
 
     /**
-     * Array of data optimization
-     *
-     * @var array
-     */
-    protected static $caching = [];
-
-
-    /**
      * Constructor.
      * The default implementation does two things:
      *
