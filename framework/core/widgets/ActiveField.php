@@ -95,34 +95,11 @@ class ActiveField
      * If not set, it will take the value of {@see \rock\widgets\ActiveForm::enableClientValidation}.
      */
     public $enableClientValidation = true;
-//    /**
-//     * @var boolean whether to enable AJAX-based data validation.
-//     * If not set, it will take the value of {@see \rock\widgets\ActiveForm::enableAjaxValidation}.
-//     */
-//    public $enableAjaxValidation;
     /**
      * @var boolean whether to perform validation when the input field loses focus and its value is found changed.
      * If not set, it will take the value of {@see \rock\widgets\ActiveForm::validateOnChanged}.
      */
     public $validateOnChanged = false;
-
-//    /**
-//     * @var integer number of milliseconds that the validation should be delayed when the input field
-//     * is changed or the user types in the field.
-//     * If not set, it will take the value of {@see \rock\widgets\ActiveForm::$validationDelay}.
-//     */
-//    public $validationDelay;
-    /**
-     * @var array the jQuery selectors for selecting the container, input and error tags.
-     * The array keys should be "container", "input", and/or "error", and the array values
-     * are the corresponding selectors. For example, `['input' => '#my-input']`.
-     *
-     * The container selector is used under the context of the form, while the input and the error
-     * selectors are used under the context of the container.
-     *
-     * You normally do not need to set this property as the default selectors should work well for most cases.
-     */
-    public $selectors;
     /**
      * @var array different parts of the field (e.g. input, label). This will be used together with
      * {@see \rock\widgets\ActiveField::$template} to generate the final field HTML code. The keys are the
@@ -268,12 +245,12 @@ class ActiveField
                 ? "{$formName}.values.{$this->attribute}"
                 : "form.values.{$this->attribute}";
         }
-        if (!isset($options['data-ng-class'])) {
+        if ($this->enableClientValidation && !isset($options['data-ng-class'])) {
             $options['data-ng-class'] = isset($formName)
                 ? 'showHighlightError("' . $formName . '[' . $this->attribute . ']")'
                 : 'showHighlightError("' . $this->attribute . '")';
         }
-        if ($this->validateOnChanged) {
+        if ($this->enableClientValidation && $this->validateOnChanged) {
             $options['data-rock-form-focus'] = '';
         }
         if (isset($options['value']) && empty($options['value']) && !isset($options['data-rock-reset-field'])) {
@@ -362,7 +339,7 @@ class ActiveField
         $options = $this->options;
         $class = isset($options['class']) ? [$options['class']] : [];
         $class[] = "field-$inputID";
-        if ($this->required && isset($this->form)) {
+        if (isset($this->form) && $this->model->isAttributeRequired($attribute)) {
             $class[] = $this->form->requiredCssClass;
         }
         if ($this->model->hasErrors($attribute) && isset($this->form)) {
@@ -632,13 +609,16 @@ class ActiveField
     {
         $options = $this->calculateClientInputOption($options);
         if ($enclosedByLabel) {
-            if (!isset($options['label'])) {
-                $attribute = Html::getAttributeName($this->attribute);
-                $options['label'] = Html::encode($this->model->getAttributeLabel($attribute));
-            }
             $this->parts['{input}'] = Html::activeRadio($this->model, $this->attribute, $options);
             $this->parts['{label}'] = '';
         } else {
+            if (isset($options['label']) && !isset($this->parts['{label}'])) {
+                $this->parts['{label}'] = $options['label'];
+                if (!empty($options['labelOptions'])) {
+                    $this->labelOptions = $options['labelOptions'];
+                }
+            }
+            unset($options['label'], $options['labelOptions']);
             $this->parts['{input}'] = Html::activeRadio($this->model, $this->attribute, $options);
         }
         $this->adjustLabelFor($options);
@@ -671,14 +651,19 @@ class ActiveField
      */
     public function checkbox($options = [], $enclosedByLabel = true)
     {
+        $options = $this->calculateClientInputOption($options);
         if ($enclosedByLabel) {
-            if (!isset($options['label'])) {
-                $attribute = Html::getAttributeName($this->attribute);
-                $options['label'] = Html::encode($this->model->getAttributeLabel($attribute));
-            }
             $this->parts['{input}'] = Html::activeCheckbox($this->model, $this->attribute, $options);
             $this->parts['{label}'] = '';
         } else {
+            if (isset($options['label']) && !isset($this->parts['{label}'])) {
+                $this->parts['{label}'] = $options['label'];
+                if (!empty($options['labelOptions'])) {
+                    $this->labelOptions = $options['labelOptions'];
+                }
+            }
+            unset($options['labelOptions']);
+            $options['label'] = null;
             $this->parts['{input}'] = Html::activeCheckbox($this->model, $this->attribute, $options);
         }
         $this->adjustLabelFor($options);
@@ -734,47 +719,6 @@ class ActiveField
         $this->setCache($cacheKey, $this->parts['{input}']);
 
         return $this;
-    }
-
-    protected function getCacheKey($method)
-    {
-        $model = $this->model;
-
-        return $model::className() . $this->attribute . $method;
-    }
-
-    /**
-     * @param string $key
-     * @return bool|mixed
-     */
-    protected function getCache($key)
-    {
-        if (!$this->cache() instanceof CacheInterface) {
-            return false;
-        }
-
-        return $this->cache()->get($key);
-    }
-
-    /**
-     * @return CacheInterface|null
-     */
-    protected function cache()
-    {
-        if (!$this->enableCache) {
-            return null;
-        }
-
-        return $this->Rock->{$this->cacheClass};
-    }
-
-    protected function setCache($key, $value)
-    {
-        if (!$this->cache() instanceof CacheInterface) {
-            return false;
-        }
-
-        return $this->cache()->set($key, $value, $this->cacheExpire, $this->cacheTags);
     }
 
     /**
@@ -981,5 +925,46 @@ class ActiveField
         $this->enableCache = false;
 
         return $this;
+    }
+
+    protected function getCacheKey($method)
+    {
+        $model = $this->model;
+
+        return $model::className() . $this->attribute . $method;
+    }
+
+    /**
+     * @param string $key
+     * @return bool|mixed
+     */
+    protected function getCache($key)
+    {
+        if (!$this->cache() instanceof CacheInterface) {
+            return false;
+        }
+
+        return $this->cache()->get($key);
+    }
+
+    /**
+     * @return CacheInterface|null
+     */
+    protected function cache()
+    {
+        if (!$this->enableCache) {
+            return null;
+        }
+
+        return $this->Rock->{$this->cacheClass};
+    }
+
+    protected function setCache($key, $value)
+    {
+        if (!$this->cache() instanceof CacheInterface) {
+            return false;
+        }
+
+        return $this->cache()->set($key, $value, $this->cacheExpire, $this->cacheTags);
     }
 }
