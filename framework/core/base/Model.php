@@ -243,11 +243,6 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
      */
     public function validate(array $attributes = null, $clearErrors = true)
     {
-        $rules = $this->rules();
-//        if (empty($rules)) {
-//            return true;
-//        }
-
         if ($clearErrors) {
             $this->clearErrors();
         }
@@ -258,7 +253,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
         if (!$this->beforeValidate()) {
             return false;
         }
-        if ($this->_rulesInternal($attributes, $rules) === false) {
+        if ($this->_rulesInternal($attributes) === false) {
             //Event::offClass($this);
             //$this->detachEvents();
             return false;
@@ -266,217 +261,59 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
         $this->afterValidate();
         return true;
     }
-
-    private function _rulesInternal(array $attributes, array $rules)
+    
+    /**
+     * Returns the validators applicable to the current {@see \rock\base\Model::$scenario}.
+     * @param string $attribute the name of the attribute whose applicable validators should be returned.
+     * If this is null, the validators for ALL attributes in the model will be returned.
+     * @return array the validators applicable to the current {@see \rock\base\Model::$scenario}.
+     */
+    public function getActiveRules($attribute = null)
     {
-        foreach($rules as $rule){
+        $rules = [];
+        $scenario = $this->getScenario();
+
+        foreach ($this->rules() as $rule) {
+
             if (isset($rule['scenarios'])) {
-                if (is_string($rule['scenarios']) && $this->scenario !== $rule['scenarios']) {
+                if (is_string($rule['scenarios']) && $scenario !== $rule['scenarios']) {
                     continue;
                 }
-                if (is_array($rule['scenarios']) && !in_array($this->scenario, $rule['scenarios'], true)) {
+                if (is_array($rule['scenarios']) && !in_array($scenario, $rule['scenarios'], true)) {
                     continue;
                 }
                 unset($rule['scenarios']);
             }
 
-            $type = array_shift($rule);
-            if ($type !== self::RULE_SANITIZE && $type !== self::RULE_VALIDATE) {
-                throw new ModelException("Unknown type of rule: {$type}");
-            }
-            $attributeNames = array_shift($rule);
-            if (is_string($attributeNames)) {
-                $attributeNames = [$attributeNames];
-            }
-            if ($type === self::RULE_SANITIZE) {
-                $attributes = $this->_filterInternal($attributeNames, $attributes, $rule);
-                if (!$this->hasErrors()) {
-                    $this->setAttributes($attributes);
-                }
-                continue;
-            }
-
-            if ($type === self::RULE_VALIDATE) {
-                if (!$this->_validateInternal($attributeNames, $attributes, $rule)) {
-                    break;
-                }
-                continue;
+            if ($attribute === null || in_array($attribute, (array)$rule[1], true)) {
+                $rules[] = $rule;
             }
         }
-
-        if ($this->hasErrors()) {
-            return false;
-        }
-
-        $this->setAttributes(array_filter($attributes, function($value){return isset($value);}));
-        return true;
+        return $rules;
     }
 
-    private function _filterInternal(array $attributeNames, array $attributes, array $rules)
+    /**
+     * Returns a value indicating whether the attribute is required.
+     * This is determined by checking if the attribute is associated with a
+     * `required` validation rule in the
+     * current {@see \rock\base\Model::$scenario}.
+     *
+     * Note that when the validator has a conditional validation applied using
+     * `when` this method will return
+     * `false` regardless of the `when` condition because it may be called be
+     * before the model is loaded with data.
+     *
+     * @param string $attribute attribute name
+     * @return boolean whether the attribute is required
+     */
+    public function isAttributeRequired($attribute)
     {
-        foreach ($attributeNames as $name) {
-            if (!isset($attributes[$name])) {
-                $attributes[$name] = null;
-            }
-
-            foreach ($rules as $key => $rule) {
-                $args = [];
-                if (is_string($key)) {
-                    if (!is_array($rule)) {
-                        throw new ModelException('Arguments must be `array`');
-                    }
-                    $args = $rule;
-                    $rule = $key;
-                }
-                // closure
-                if ($rule instanceof \Closure) {
-                    array_unshift($args, $attributes[$name]);
-                    $attributes[$name] = call_user_func_array($rule, $args);
-                    continue;
-                }
-
-                // method
-                if (method_exists($this, $rule)) {
-                    array_unshift($args, $attributes[$name]);
-                    $attributes[$name] = call_user_func_array([$this, $rule], $args);
-                    continue;
-                }
-
-                /** @var \rock\sanitize\Sanitize $sanitize */
-                $sanitize = Rock::factory(\rock\sanitize\Sanitize::className());
-                // function
-                if (function_exists($rule) && !$sanitize->existsRule($rule)) {
-                    array_unshift($args, $attributes[$name]);
-                    $attributes[$name] = call_user_func_array($rule, $args);
-                    continue;
-                }
-
-                $attributes[$name] = call_user_func_array([$sanitize, $rule], $args)->sanitize($attributes[$name]);
+        foreach ($this->getActiveRules($attribute) as $rule) {
+            if (!isset($rule['when']) && array_search('required', $rule, true)) {
+                return true;
             }
         }
-        return $attributes;
-    }
-
-    private function _validateInternal(array $attributeNames, array $attributes, array $rules)
-    {
-        $messages = [];
-        $valid = true;
-        if (isset($rules['messages'])) {
-            $messages = $rules['messages'];
-        }
-        foreach ($attributeNames as $name) {
-            if (!isset($attributes[$name])) {
-                $attributes[$name] = null;
-            }
-            $placeholders = [];
-            if (isset($rules['placeholders'])) {
-                $placeholders = $rules['placeholders'];
-            }
-            if ($this->useLabelsAsPlaceholders && !isset($placeholders['name'])) {
-                if (($label = $this->attributeLabels()) && isset($label[$name])) {
-                    $placeholders['name'] = $label[$name];
-                }
-            }
-            foreach ($rules as $key => $ruleName) {
-                if ($key === 'placeholders' || $key === 'messages' || $key === 'one' || $key === 'when') {
-                    continue;
-                }
-                if ($ruleName === 'one') {
-                    $rules[$ruleName] = 0;
-                    continue;
-                }
-                $args = [];
-                if (is_string($key)) {
-                    if (!is_array($ruleName)) {
-                        throw new ModelException('Arguments must be `array`');
-                    }
-                    $args = $ruleName;
-                    $ruleName = $key;
-                }
-
-                // closure
-                if ($ruleName instanceof \Closure) {
-//                    if ($attributes[$name] === '') {
-//                        continue;
-//                    }
-                    array_unshift($args, $this);
-                    array_unshift($args, $name);
-                    array_unshift($args, $attributes[$name]);
-                    if (!call_user_func_array($ruleName, $args)) {
-                        $valid = false;
-                    }
-                    continue;
-                }
-
-                // method
-                if (method_exists($this, $ruleName) || $ruleName instanceof \Closure) {
-//                    if ($attributes[$name] === '') {
-//                        continue;
-//                    }
-                    array_unshift($args, $this);
-                    array_unshift($args, $name);
-                    array_unshift($args, $attributes[$name]);
-                    $fx = method_exists($this, $ruleName) ? [$this, $ruleName] : $ruleName;
-                    if (!call_user_func_array($fx, $args)) {
-                        $valid = false;
-                    }
-                    continue;
-                }
-
-                /** @var ValidateModel $validate */
-                $validate = Rock::factory(ValidateModel::className());
-                // function
-                if (function_exists($ruleName) && !$validate->existsRule($ruleName)) {
-                    if ($attributes[$name] === '') {
-                        continue;
-                    }
-                    array_unshift($args, $attributes[$name]);
-                    if (!call_user_func_array($ruleName, $args)) {
-                        if (!isset($placeholders['name'])) {
-                            $placeholders['name'] = 'value';
-                        }
-                        $message = isset($messages[$ruleName]) ? $messages[$ruleName] : Rock::t('validation.call', $placeholders);
-                        $this->addError($name, $message);
-                        $valid = false;
-                    }
-                    continue;
-                }
-
-                // rule
-                if ($validate->existsModelRule($ruleName)) {
-                    array_unshift($args, $this);
-                }
-                $validate = call_user_func_array([$validate, $ruleName], $args);
-                if ($placeholders) {
-                    $validate->placeholders($placeholders);
-                }
-                if ($messages) {
-                    $validate->messages($messages);
-                }
-                if ($validate->existsModelRule($ruleName)) {
-                    if (!$validate->validate($name)) {
-                        $valid = false;
-                        $this->addError($name, $validate->getFirstError());
-                    }
-                    continue;
-                }
-                if (!$validate->validate($attributes[$name])) {
-                    $valid = false;
-                    $this->addError($name, $validate->getFirstError());
-                }
-
-            }
-            if (isset($rules['one'])) {
-                if ((is_int($rules['one']) || $rules['one'] === $name) && !$valid) {
-                    return false;
-                }
-            }
-        }
-
-        if (isset($rules['when']) && $valid === true) {
-            return $this->_validateInternal($attributeNames, $attributes, $rules['when']);
-        }
-        return true;
+        return false;
     }
 
     /**
@@ -730,7 +567,6 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
         return $values;
     }
 
-
     /**
      * Sets the attribute values in a massive way.
      * 
@@ -766,6 +602,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
 //            Rock::trace(__METHOD__, "Failed to set unsafe attribute '$name' in '" . get_class($this) . "'.");
 //        }
     }
+
     /**
      * Returns the scenario that this model is used in.
      *
@@ -780,7 +617,6 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
         return $this->_scenario;
     }
 
-
     /**
      * Returns the attribute names that are safe to be massively assigned in the current scenario.
      * @return string[] safe attribute names
@@ -789,8 +625,6 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
     {
         return $this->attributes();
     }
-
-
 
     /**
      * Populates the model with the data from end user.
@@ -982,5 +816,208 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
         }
 
         $this->Rock->template->addPlaceholder($placeholder, $msg, true);
+    }
+
+
+    private function _rulesInternal(array $attributes)
+    {
+        foreach($this->getActiveRules() as $rule){
+            $type = array_shift($rule);
+            if ($type !== self::RULE_SANITIZE && $type !== self::RULE_VALIDATE) {
+                throw new ModelException("Unknown type of rule: {$type}");
+            }
+            $attributeNames = array_shift($rule);
+            if (is_string($attributeNames)) {
+                $attributeNames = [$attributeNames];
+            }
+            if ($type === self::RULE_SANITIZE) {
+                $attributes = $this->_filterInternal($attributeNames, $attributes, $rule);
+                if (!$this->hasErrors()) {
+                    $this->setAttributes($attributes);
+                }
+                continue;
+            }
+
+            if ($type === self::RULE_VALIDATE) {
+                if (!$this->_validateInternal($attributeNames, $attributes, $rule)) {
+                    break;
+                }
+                continue;
+            }
+        }
+
+        if ($this->hasErrors()) {
+            return false;
+        }
+
+        $this->setAttributes(array_filter($attributes, function($value){return isset($value);}));
+        return true;
+    }
+
+    private function _filterInternal(array $attributeNames, array $attributes, array $rules)
+    {
+        foreach ($attributeNames as $name) {
+            if (!isset($attributes[$name])) {
+                $attributes[$name] = null;
+            }
+
+            foreach ($rules as $key => $rule) {
+                $args = [];
+                if (is_string($key)) {
+                    if (!is_array($rule)) {
+                        throw new ModelException('Arguments must be `array`');
+                    }
+                    $args = $rule;
+                    $rule = $key;
+                }
+                // closure
+                if ($rule instanceof \Closure) {
+                    array_unshift($args, $attributes[$name]);
+                    $attributes[$name] = call_user_func_array($rule, $args);
+                    continue;
+                }
+
+                // method
+                if (method_exists($this, $rule)) {
+                    array_unshift($args, $attributes[$name]);
+                    $attributes[$name] = call_user_func_array([$this, $rule], $args);
+                    continue;
+                }
+
+                /** @var \rock\sanitize\Sanitize $sanitize */
+                $sanitize = Rock::factory(\rock\sanitize\Sanitize::className());
+                // function
+                if (function_exists($rule) && !$sanitize->existsRule($rule)) {
+                    array_unshift($args, $attributes[$name]);
+                    $attributes[$name] = call_user_func_array($rule, $args);
+                    continue;
+                }
+
+                $attributes[$name] = call_user_func_array([$sanitize, $rule], $args)->sanitize($attributes[$name]);
+            }
+        }
+        return $attributes;
+    }
+
+    private function _validateInternal(array $attributeNames, array $attributes, array $rules)
+    {
+        $messages = [];
+        $valid = true;
+        if (isset($rules['messages'])) {
+            $messages = $rules['messages'];
+        }
+        foreach ($attributeNames as $name) {
+            if (!isset($attributes[$name])) {
+                $attributes[$name] = null;
+            }
+            $placeholders = [];
+            if (isset($rules['placeholders'])) {
+                $placeholders = $rules['placeholders'];
+            }
+            if ($this->useLabelsAsPlaceholders && !isset($placeholders['name'])) {
+                if (($label = $this->attributeLabels()) && isset($label[$name])) {
+                    $placeholders['name'] = $label[$name];
+                }
+            }
+            foreach ($rules as $key => $ruleName) {
+                if ($key === 'placeholders' || $key === 'messages' || $key === 'one' || $key === 'when') {
+                    continue;
+                }
+                if ($ruleName === 'one') {
+                    $rules[$ruleName] = 0;
+                    continue;
+                }
+                $args = [];
+                if (is_string($key)) {
+                    if (!is_array($ruleName)) {
+                        throw new ModelException('Arguments must be `array`');
+                    }
+                    $args = $ruleName;
+                    $ruleName = $key;
+                }
+
+                // closure
+                if ($ruleName instanceof \Closure) {
+                    //                    if ($attributes[$name] === '') {
+                    //                        continue;
+                    //                    }
+                    array_unshift($args, $this);
+                    array_unshift($args, $name);
+                    array_unshift($args, $attributes[$name]);
+                    if (!call_user_func_array($ruleName, $args)) {
+                        $valid = false;
+                    }
+                    continue;
+                }
+
+                // method
+                if (method_exists($this, $ruleName) || $ruleName instanceof \Closure) {
+                    //                    if ($attributes[$name] === '') {
+                    //                        continue;
+                    //                    }
+                    array_unshift($args, $this);
+                    array_unshift($args, $name);
+                    array_unshift($args, $attributes[$name]);
+                    $fx = method_exists($this, $ruleName) ? [$this, $ruleName] : $ruleName;
+                    if (!call_user_func_array($fx, $args)) {
+                        $valid = false;
+                    }
+                    continue;
+                }
+
+                /** @var ValidateModel $validate */
+                $validate = Rock::factory(ValidateModel::className());
+                // function
+                if (function_exists($ruleName) && !$validate->existsRule($ruleName)) {
+                    if ($attributes[$name] === '') {
+                        continue;
+                    }
+                    array_unshift($args, $attributes[$name]);
+                    if (!call_user_func_array($ruleName, $args)) {
+                        if (!isset($placeholders['name'])) {
+                            $placeholders['name'] = 'value';
+                        }
+                        $message = isset($messages[$ruleName]) ? $messages[$ruleName] : Rock::t('validation.call', $placeholders);
+                        $this->addError($name, $message);
+                        $valid = false;
+                    }
+                    continue;
+                }
+
+                // rule
+                if ($validate->existsModelRule($ruleName)) {
+                    array_unshift($args, $this);
+                }
+                $validate = call_user_func_array([$validate, $ruleName], $args);
+                if ($placeholders) {
+                    $validate->placeholders($placeholders);
+                }
+                if ($messages) {
+                    $validate->messages($messages);
+                }
+                if ($validate->existsModelRule($ruleName)) {
+                    if (!$validate->validate($name)) {
+                        $valid = false;
+                        $this->addError($name, $validate->getFirstError());
+                    }
+                    continue;
+                }
+                if (!$validate->validate($attributes[$name])) {
+                    $valid = false;
+                    $this->addError($name, $validate->getFirstError());
+                }
+
+            }
+            if (isset($rules['one'])) {
+                if ((is_int($rules['one']) || $rules['one'] === $name) && !$valid) {
+                    return false;
+                }
+            }
+        }
+
+        if (isset($rules['when']) && $valid === true) {
+            return $this->_validateInternal($attributeNames, $attributes, $rules['when']);
+        }
+        return true;
     }
 }

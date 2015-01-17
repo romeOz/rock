@@ -4,51 +4,6 @@ namespace rockunit\core\base;
 use rock\base\Model;
 use rock\Rock;
 
-class FooModal extends Model
-{
-    public $rules;
-    public $username;
-    public $email;
-    public $age;
-    public $password;
-
-    public function rules()
-    {
-        return $this->rules;
-    }
-
-    public function safeAttributes()
-    {
-        return ['username', 'email', 'age'];
-    }
-
-    public function attributeLabels()
-    {
-        return ['email' => Rock::t('email'), 'username' => Rock::t('username')];
-    }
-
-
-    public function customFilter($input = '', $punctuation = '')
-    {
-        return $input . $punctuation;
-    }
-
-    public function customValidate($input = '', $attributeName)
-    {
-        if ($input === '') {
-            return true;
-        }
-        $placeholders = ['name' => 'value'];
-        if (is_string($input)) {
-            if (($label = $this->attributeLabels()) && isset($label[$attributeName])) {
-                $placeholders['name'] = $label[$attributeName];
-            }
-            $this->addError($attributeName, Rock::t('call', $placeholders, 'validate'));
-            return false;
-        }
-        return true;
-    }
-}
 /**
  * @group base
  */
@@ -371,5 +326,74 @@ class ModelRulesTest extends \PHPUnit_Framework_TestCase
                 ],
         ];
         $this->assertSame($expected, $model->getErrors());
+    }
+
+    public function testIsAttributeRequired()
+    {
+        $model = new FooModal();
+        $model->rules = [
+            [
+                FooModal::RULE_SANITIZE, ['email', 'username', 'age'], 'trim'
+            ],
+            [
+                FooModal::RULE_VALIDATE, ['email', 'username'], 'required'
+            ],
+            [
+                FooModal::RULE_SANITIZE, 'email', 'mb_strtolower' => [Rock::$app->charset], 'removeTags'
+            ],
+            [
+                FooModal::RULE_SANITIZE, 'username', 'customFilter' => ['.']
+            ],
+        ];
+        $model->setAttributes(['username' => 'Tom   ', 'email' => ' <b>ToM@site.com</b>   ', 'password' => 'qwerty']);
+
+        $this->assertTrue($model->isAttributeRequired('username'));
+        $this->assertFalse($model->isAttributeRequired('age'));
+    }
+}
+
+class FooModal extends Model
+{
+    public $rules;
+    public $username;
+    public $email;
+    public $age;
+    public $password;
+
+    public function rules()
+    {
+        return $this->rules;
+    }
+
+    public function safeAttributes()
+    {
+        return ['username', 'email', 'age'];
+    }
+
+    public function attributeLabels()
+    {
+        return ['email' => Rock::t('email'), 'username' => Rock::t('username')];
+    }
+
+
+    public function customFilter($input = '', $punctuation = '')
+    {
+        return $input . $punctuation;
+    }
+
+    public function customValidate($input = '', $attributeName)
+    {
+        if ($input === '') {
+            return true;
+        }
+        $placeholders = ['name' => 'value'];
+        if (is_string($input)) {
+            if (($label = $this->attributeLabels()) && isset($label[$attributeName])) {
+                $placeholders['name'] = $label[$attributeName];
+            }
+            $this->addError($attributeName, Rock::t('call', $placeholders, 'validate'));
+            return false;
+        }
+        return true;
     }
 }
