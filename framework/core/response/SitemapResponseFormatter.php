@@ -3,11 +3,12 @@
 namespace rock\response;
 
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\helpers\Helper;
 use Tackk\Cartographer\Sitemap;
 
-class SitemapResponseFormatter implements ResponseFormatterInterface
+class SitemapResponseFormatter implements ResponseFormatterInterface, ObjectInterface
 {
     use ObjectTrait {
         ObjectTrait::__construct as parentConstruct;

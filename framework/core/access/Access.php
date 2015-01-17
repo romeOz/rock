@@ -27,8 +27,6 @@ class Access implements ErrorsInterface
      * @var bool
      */
     public $sendHeaders = true;
-
-
     /**
      * ```php
      * [[new Object, 'method'], $args]
@@ -41,19 +39,18 @@ class Access implements ErrorsInterface
      * @var array
      */
     public $success;
-
     /**
-     * ~~~~~~~~~~~~~~~
+     * ```php
      * [[new Object, 'method'], $args]
      * [['Object', 'staticMethod'], $args]
      * [callback, $args]
-     * ~~~~~~~~~~~~~~~
+     * ```
+     *
      * function(array params, Access $access){}
      *
      * @var array
      */
     public $fail;
-
     /**
      * @var int
      */

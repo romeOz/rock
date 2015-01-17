@@ -5,7 +5,7 @@ namespace rock\base;
 
 use rock\db\BaseActiveRecord;
 
-class Behavior
+class Behavior implements ObjectInterface
 {
     use ObjectTrait;
 

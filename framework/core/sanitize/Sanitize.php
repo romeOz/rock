@@ -3,6 +3,7 @@
 namespace rock\sanitize;
 
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\Rock;
 use rock\sanitize\rules\Abs;
@@ -81,7 +82,7 @@ use rock\sanitize\rules\UpperFirst;
  *
  * @package rock\sanitize
  */
-class Sanitize
+class Sanitize implements ObjectInterface
 {
     use ObjectTrait {
         ObjectTrait::__construct as parentConstruct;

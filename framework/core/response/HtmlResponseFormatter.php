@@ -3,9 +3,10 @@
 namespace rock\response;
 
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 
-class HtmlResponseFormatter implements ResponseFormatterInterface
+class HtmlResponseFormatter implements ResponseFormatterInterface, ObjectInterface
 {
     use ObjectTrait;
 

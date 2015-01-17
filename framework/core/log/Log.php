@@ -6,12 +6,13 @@ namespace rock\log;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\helpers\FileHelper;
 use rock\helpers\StringHelper;
 use rock\Rock;
 
-class Log implements LoggerInterface
+class Log implements LoggerInterface, ObjectInterface
 {
     use ObjectTrait {
         ObjectTrait::__construct as parentConstruct;

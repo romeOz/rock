@@ -2,9 +2,10 @@
 namespace rock\mail;
 
 
+use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
 
-class Mail extends \PHPMailer
+class Mail extends \PHPMailer implements ComponentsInterface
 {
     use ComponentsTrait {
         ComponentsTrait::__construct as parentConstruct;

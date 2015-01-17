@@ -8,10 +8,11 @@ use DOMDocument;
 use DOMElement;
 use DOMText;
 use rock\base\Arrayable;
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\helpers\ObjectHelper;
 
-class XmlResponseFormatter implements ResponseFormatterInterface
+class XmlResponseFormatter implements ResponseFormatterInterface, ObjectInterface
 {
     use ObjectTrait;
     /**

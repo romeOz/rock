@@ -6,7 +6,8 @@ use League\Flysystem\CacheInterface;
 use League\Flysystem\Config;
 use League\Flysystem\Filesystem;
 use League\Flysystem\PluginInterface;
-use rock\base\ComponentsTrait;
+use rock\base\ObjectInterface;
+use rock\base\ObjectTrait;
 use rock\helpers\ArrayHelper;
 use rock\helpers\StringHelper;
 
@@ -22,10 +23,10 @@ use rock\helpers\StringHelper;
  * @method Config getConfig()
  * @method CacheInterface getCache()
  */
-class FileManager
+class FileManager implements ObjectInterface
 {
-    use ComponentsTrait {
-        ComponentsTrait::__call as parentCall;
+    use ObjectTrait {
+        ObjectTrait::__call as parentCall;
     }
 
     const TYPE_FILE = 'file';

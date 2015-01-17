@@ -2,16 +2,16 @@
 
 namespace rock\image;
 
-
-
-use rock\base\ComponentsTrait;
+use rock\base\ObjectInterface;
+use rock\base\ObjectTrait;
 use rock\file\FileManager;
 use rock\imagine\Image;
 use rock\Rock;
 
-class DataProvider
+class DataProvider implements ObjectInterface
 {
-    use ComponentsTrait;
+    use ObjectTrait;
+
     public $width;
     public $height;
     public $maxFiles = 100;

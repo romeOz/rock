@@ -2,6 +2,7 @@
 
 namespace rock\validate;
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\helpers\StringHelper;
 use rock\i18n\i18nInterface;
@@ -127,7 +128,7 @@ use rock\validate\rules\Writable;
  * 
  * @package rock\validate
  */
-class Validate implements i18nInterface
+class Validate implements i18nInterface, ObjectInterface
 {
     use ObjectTrait {
         ObjectTrait::__construct as parentConstruct;

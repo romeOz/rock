@@ -4,7 +4,8 @@ namespace rock\date;
 
 
 use DateTimeZone;
-use rock\base\ComponentsTrait;
+use rock\base\ObjectInterface;
+use rock\base\ObjectTrait;
 use rock\date\locale\En;
 use rock\date\locale\EnUK;
 use rock\date\locale\Locale;
@@ -18,11 +19,10 @@ use rock\i18n\i18nInterface;
  * @method  time()
  * @method  datetime()
  */
-class DateTime extends \DateTime implements i18nInterface, DateTimeInterface
+class DateTime extends \DateTime implements i18nInterface, DateTimeInterface, ObjectInterface
 {
-    use ComponentsTrait {
-        ComponentsTrait::__construct as parentConstruct;
-        ComponentsTrait::__call as parentCall;
+    use ObjectTrait {
+        ObjectTrait::__construct as parentConstruct;
     }
 
     const DEFAULT_FORMAT = 'Y-m-d H:i:s';

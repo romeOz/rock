@@ -4,6 +4,7 @@ namespace rock\route;
 
 
 use rock\base\ComponentsTrait;
+use rock\base\ObjectInterface;
 use rock\di\Container;
 use rock\event\Event;
 use rock\helpers\ArrayHelper;
@@ -13,7 +14,7 @@ use rock\request\RequestInterface;
 use rock\Rock;
 use rock\sanitize\Sanitize;
 
-class Route implements RequestInterface, ErrorsInterface
+class Route implements RequestInterface, ErrorsInterface, ObjectInterface
 {
     use ComponentsTrait;
     use ErrorsTrait;

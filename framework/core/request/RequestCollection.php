@@ -3,14 +3,16 @@
 namespace rock\request;
 
 use rock\base\CollectionInterface;
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\exception\BaseException;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 
-class RequestCollection implements \ArrayAccess, CollectionInterface
+class RequestCollection implements \ArrayAccess, CollectionInterface, ObjectInterface
 {
     use ObjectTrait;
+
     /** @var array */
     public $data = [];
     /** @var  string */

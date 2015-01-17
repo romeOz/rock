@@ -3,10 +3,11 @@
 namespace rock\response;
 
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\helpers\Json;
 
-class JsonResponseFormatter implements ResponseFormatterInterface
+class JsonResponseFormatter implements ResponseFormatterInterface, ObjectInterface
 {
     use ObjectTrait;
 

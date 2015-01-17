@@ -3,10 +3,11 @@
 namespace rock\validate;
 
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 
 
-class Attributes
+class Attributes implements ObjectInterface
 {
     use ObjectTrait {
         ObjectTrait::__construct as parentConstruct;

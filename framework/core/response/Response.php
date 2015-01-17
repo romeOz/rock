@@ -1,6 +1,7 @@
 <?php
 namespace rock\response;
 
+use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
 use rock\csrf\CSRF;
 use rock\exception\BaseException;
@@ -46,7 +47,7 @@ use rock\url\Url;
  * @property boolean $isSuccessful Whether this response is successful. This property is read-only.
  * @property integer $statusCode The HTTP status code to send with the response.
  */
-class Response
+class Response implements ComponentsInterface
 {
     use ComponentsTrait;
     /**

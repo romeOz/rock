@@ -1,8 +1,8 @@
 <?php
 namespace rock\request;
 
-use rock\base\ComponentsInterface;
-use rock\base\ComponentsTrait;
+use rock\base\ObjectInterface;
+use rock\base\ObjectTrait;
 use rock\helpers\Helper;
 use rock\helpers\Json;
 use rock\Rock;
@@ -41,11 +41,10 @@ use rock\sanitize\Sanitize;
  *
  * @package rock\request
  */
-class Request implements RequestInterface, ComponentsInterface
+class Request implements RequestInterface, ObjectInterface
 {
-    use ComponentsTrait {
-        ComponentsTrait::__construct as parentConstruct;
-        ComponentsTrait::__get as parentGet;
+    use ObjectTrait {
+        ObjectTrait::__construct as parentConstruct;
     }
 
     /**

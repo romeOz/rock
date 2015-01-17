@@ -3,9 +3,10 @@
 namespace rock\rbac;
 
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 
-abstract class Item implements ItemInterface
+abstract class Item implements ItemInterface, ObjectInterface
 {
     use ObjectTrait;
 

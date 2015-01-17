@@ -1,8 +1,8 @@
 <?php
 namespace rock\captcha;
 
-use rock\base\ComponentsInterface;
-use rock\base\ComponentsTrait;
+use rock\base\ObjectInterface;
+use rock\base\ObjectTrait;
 use rock\helpers\Helper;
 use rock\Rock;
 
@@ -10,10 +10,10 @@ use rock\Rock;
  * @author   Kruglov Sergei (fork by Romeo)
  * @link     http://captcha.ru, http://kruglov.ru
  */
-class Captcha implements ComponentsInterface, CaptchaInterface
+class Captcha implements ObjectInterface, CaptchaInterface
 {
-    use ComponentsTrait {
-        ComponentsTrait::init as parentInit;
+    use ObjectTrait {
+        ObjectTrait::init as parentInit;
     }
 
     /**

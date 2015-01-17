@@ -6,7 +6,7 @@ namespace rock\base;
 use rock\Rock;
 use rock\widgets\WidgetException;
 
-class Widget
+class Widget implements ComponentsInterface
 {
     use ComponentsTrait;
 

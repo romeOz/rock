@@ -5,7 +5,6 @@ namespace rock\widgets;
 
 use rock\captcha\CaptchaInterface;
 use rock\helpers\Html;
-use rock\Rock;
 use rock\url\Url;
 
 class Captcha extends InputWidget implements CaptchaInterface

@@ -2,9 +2,10 @@
 
 namespace rock\validate;
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 
-class When
+class When implements ObjectInterface
 {
     use ObjectTrait {
         ObjectTrait::__construct as parentConstruct;

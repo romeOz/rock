@@ -3,9 +3,10 @@
 namespace rock\sanitize;
 
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 
-class AllOf
+class AllOf implements ObjectInterface
 {
     use ObjectTrait {
         ObjectTrait::__construct as parentConstruct;

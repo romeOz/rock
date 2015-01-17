@@ -2,13 +2,14 @@
 namespace rock\search;
 
 
-use rock\base\ComponentsTrait;
+use rock\base\ObjectInterface;
+use rock\base\ObjectTrait;
 use rock\exception\BaseException;
 use rock\Rock;
 
-class PHPMorphy
+class PHPMorphy implements ObjectInterface
 {
-    use ComponentsTrait;
+    use ObjectTrait;
     /**
      * @var \phpMorphy
      */

@@ -4,14 +4,15 @@ namespace rock\markdown;
 
 
 use cebe\markdown\MarkdownExtra;
-use rock\base\ComponentsTrait;
+use rock\base\ObjectInterface;
+use rock\base\ObjectTrait;
 use rock\helpers\Helper;
 use rock\image\DataProvider;
 use rock\Rock;
 
-class Markdown extends MarkdownExtra
+class Markdown extends MarkdownExtra implements ObjectInterface
 {
-    use ComponentsTrait;
+    use ObjectTrait;
 
     const DUMMY = 1;
     const DUMMY_PLAY = 2;

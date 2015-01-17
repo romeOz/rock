@@ -2,6 +2,7 @@
 
 namespace rock\widgets;
 
+use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
 use rock\base\Model;
 use rock\base\Widget;
@@ -12,9 +13,10 @@ use rock\helpers\Html;
 use rock\helpers\Json;
 use rock\Rock;
 
-class ActiveField
+class ActiveField implements ComponentsInterface
 {
     use ComponentsTrait;
+
     /**
      * @var ActiveForm the form that this field is associated with.
      */

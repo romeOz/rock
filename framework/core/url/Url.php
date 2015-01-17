@@ -2,6 +2,7 @@
 
 namespace rock\url;
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\di\Container;
 use rock\helpers\Helper;
@@ -21,7 +22,7 @@ use rock\Rock;
  * @property string|null $fragment
  * @package rock\template\url
  */
-class Url implements UrlInterface
+class Url implements UrlInterface, ObjectInterface
 {
     use ObjectTrait {
         ObjectTrait::__construct as parentConstruct;

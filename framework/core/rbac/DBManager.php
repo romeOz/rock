@@ -14,7 +14,6 @@ use rock\Rock;
 
 class DBManager extends RBAC
 {
-
     /**
      * @var Connection|string the DB connection object or the application component ID of the DB connection.
      * After the DbManager object is created, if you want to change this property, you should only assign it

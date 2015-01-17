@@ -1,13 +1,14 @@
 <?php
 namespace rock\event;
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\ObjectHelper;
 use rock\Rock;
 
-class Event
+class Event implements ObjectInterface
 {
     use ObjectTrait;
 

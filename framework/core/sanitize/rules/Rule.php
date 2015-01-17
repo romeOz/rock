@@ -3,9 +3,10 @@
 namespace rock\sanitize\rules;
 
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 
-abstract class Rule
+abstract class Rule implements ObjectInterface
 {
     use ObjectTrait{
         ObjectTrait::__construct as parentConstruct;

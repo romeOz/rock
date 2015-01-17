@@ -3,12 +3,13 @@
 namespace rock\rbac;
 
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\Serialize;
 
-abstract class RBAC implements RBACInterface
+abstract class RBAC implements RBACInterface, ObjectInterface
 {
     use ObjectTrait;
 

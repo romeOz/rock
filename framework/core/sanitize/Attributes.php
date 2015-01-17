@@ -3,10 +3,11 @@
 namespace rock\sanitize;
 
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\helpers\ArrayHelper;
 
-class Attributes
+class Attributes implements ObjectInterface
 {
     use ObjectTrait {
         ObjectTrait::__construct as parentConstruct;

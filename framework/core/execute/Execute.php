@@ -3,9 +3,10 @@
 namespace rock\execute;
 
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 
-abstract class Execute
+abstract class Execute implements ObjectInterface
 {
     use ObjectTrait;
 

@@ -36,7 +36,7 @@ use rock\validate\ValidateModel;
  *
  * @package models
  */
-class Model implements \IteratorAggregate, \ArrayAccess, Arrayable
+class Model implements \IteratorAggregate, \ArrayAccess, Arrayable, ComponentsInterface
 {
     use ComponentsTrait {
         ComponentsTrait::__get as parentGet;

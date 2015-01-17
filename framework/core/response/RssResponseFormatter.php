@@ -7,9 +7,10 @@ use FeedWriter\ATOM;
 use FeedWriter\Feed;
 use FeedWriter\RSS1;
 use FeedWriter\RSS2;
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 
-class RssResponseFormatter implements ResponseFormatterInterface
+class RssResponseFormatter implements ResponseFormatterInterface, ObjectInterface
 {
     use ObjectTrait {
         ObjectTrait::__construct as parentConstruct;

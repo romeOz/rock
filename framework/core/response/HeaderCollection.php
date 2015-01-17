@@ -3,10 +3,11 @@
 namespace rock\response;
 
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\helpers\ArrayHelper;
 
-class HeaderCollection implements \IteratorAggregate, \ArrayAccess, \Countable
+class HeaderCollection implements \IteratorAggregate, \ArrayAccess, \Countable, ObjectInterface
 {
     use ObjectTrait;
     /**

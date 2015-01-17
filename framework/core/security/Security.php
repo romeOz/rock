@@ -1,8 +1,8 @@
 <?php
 namespace rock\security;
 
-use rock\base\ComponentsInterface;
-use rock\base\ComponentsTrait;
+use rock\base\ObjectInterface;
+use rock\base\ObjectTrait;
 use rock\helpers\StringHelper;
 
 /**
@@ -18,9 +18,9 @@ use rock\helpers\StringHelper;
  *
  * > Note: this class requires 'mcrypt' PHP extension. For the highest security level PHP version >= 5.5.0 is recommended.
  */
-class Security implements ComponentsInterface
+class Security implements ObjectInterface
 {
-    use ComponentsTrait;
+    use ObjectTrait;
     
     /**
      * Cipher algorithm for mcrypt module.
