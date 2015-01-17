@@ -44,7 +44,7 @@ class Session extends \rock\session\Session
     /**
      * Initializes the Session component.
      * This method will initialize the {@see \rock\mongodb\Session::$connection} property to make sure it refers to a valid MongoDB connection.
-     * @throws Exception if {@see \rock\mongodb\Session::$connection} is invalid.
+     * @throws MongoException if {@see \rock\mongodb\Session::$connection} is invalid.
      */
     public function init()
     {

@@ -2,7 +2,7 @@
 
 namespace rockunit\core\db\sqlite;
 
-use rock\db\Exception;
+use rock\db\DbException;
 use rock\db\Query;
 use rock\db\sqlite\Schema;
 use rockunit\core\db\QueryBuilderTest;
@@ -80,7 +80,7 @@ class SqliteQueryBuilderTest extends QueryBuilderTest
 
     public function testAddDropPrimaryKey()
     {
-        $this->setExpectedException(Exception::className());
+        $this->setExpectedException(DbException::className());
         parent::testAddDropPrimaryKey();
     }
 

@@ -174,7 +174,8 @@ class Collection
 
     /**
      * Drops this collection.
-     * @throws Exception on failure.
+     *
+*@throws MongoException on failure.
      * @return boolean whether the operation successful.
      */
     public function drop()
@@ -202,7 +203,7 @@ class Collection
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
 
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 
@@ -224,7 +225,7 @@ class Collection
      * ```
      *
      * @param array $options list of options in format: optionName => optionValue.
-     * @throws Exception on failure.
+     * @throws MongoException on failure.
      * @return boolean whether the operation successful.
      */
     public function createIndex($columns, $options = [])
@@ -262,13 +263,14 @@ class Collection
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
 
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 
     /**
      * Drop indexes for specified column(s).
-     * @param string|array $columns column name or list of column names.
+     *
+*@param string|array $columns column name or list of column names.
      * If array is given, each element in the array has as key the field name, and as
      * value either 1 for ascending sort, or -1 for descending sort.
      * Use value 'text' to specify text index.
@@ -284,7 +286,7 @@ class Collection
      * ]
      * ```
      *
-     * @throws Exception on failure.
+     * @throws MongoException on failure.
      * @return boolean whether the operation successful.
      */
     public function dropIndex($columns)
@@ -316,7 +318,7 @@ class Collection
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
 
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 
@@ -341,7 +343,8 @@ class Collection
 
     /**
      * Drops all indexes for this collection.
-     * @throws Exception on failure.
+     *
+*@throws MongoException on failure.
      * @return integer count of dropped indexes.
      */
     public function dropAllIndexes()
@@ -368,7 +371,7 @@ class Collection
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
 
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 
@@ -399,12 +402,13 @@ class Collection
 
     /**
      * Updates a document and returns it.
-     * @param array $condition query condition
+     *
+*@param array $condition query condition
      * @param array $update update criteria
      * @param array $fields fields to be returned
      * @param array $options list of options in format: optionName => optionValue.
      * @return array|null the original document, or the modified document when $options['new'] is set.
-     * @throws Exception on failure.
+     * @throws MongoException on failure.
      * @see http://www.php.net/manual/en/mongocollection.findandmodify.php
      */
     public function findAndModify($condition, $update, $fields = [], $options = [])
@@ -431,16 +435,17 @@ class Collection
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
 
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 
     /**
      * Inserts new data into collection.
-     * @param array|object $data data to be inserted.
+     *
+*@param array|object $data data to be inserted.
      * @param array $options list of options in format: optionName => optionValue.
      * @return \MongoId new record id instance.
-     * @throws Exception on failure.
+     * @throws MongoException on failure.
      */
     public function insert($data, $options = [])
     {
@@ -466,16 +471,17 @@ class Collection
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
 
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 
     /**
      * Inserts several new rows into collection.
-     * @param array $rows array of arrays or objects to be inserted.
+     *
+*@param array $rows array of arrays or objects to be inserted.
      * @param array $options list of options in format: optionName => optionValue.
      * @return array inserted data, each row will have "_id" key assigned to it.
-     * @throws Exception on failure.
+     * @throws MongoException on failure.
      */
     public function batchInsert($rows, $options = [])
     {
@@ -500,8 +506,7 @@ class Collection
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
-
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 
@@ -509,11 +514,12 @@ class Collection
      * Updates the rows, which matches given criteria by given data.
      * Note: for "multiple" mode Mongo requires explicit strategy "$set" or "$inc"
      * to be specified for the "newData". If no strategy is passed "$set" will be used.
-     * @param array $condition description of the objects to update.
+     *
+*@param array $condition description of the objects to update.
      * @param array $newData the object with which to update the matching records.
      * @param array $options list of options in format: optionName => optionValue.
      * @return integer|boolean number of updated documents or whether operation was successful.
-     * @throws Exception on failure.
+     * @throws MongoException on failure.
      */
     public function update($condition, $newData, $options = [])
     {
@@ -549,17 +555,17 @@ class Collection
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
-
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 
     /**
      * Update the existing database data, otherwise insert this data
-     * @param array|object $data data to be updated/inserted.
+     *
+*@param array|object $data data to be updated/inserted.
      * @param array $options list of options in format: optionName => optionValue.
      * @return \MongoId updated/new record id instance.
-     * @throws Exception on failure.
+     * @throws MongoException on failure.
      */
     public function save($data, $options = [])
     {
@@ -584,17 +590,17 @@ class Collection
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
-
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 
     /**
      * Removes data from the collection.
-     * @param array $condition description of records to remove.
+     *
+*@param array $condition description of records to remove.
      * @param array $options list of options in format: optionName => optionValue.
      * @return integer|boolean number of updated documents or whether operation was successful.
-     * @throws Exception on failure.
+     * @throws MongoException on failure.
      * @see http://www.php.net/manual/en/mongocollection.remove.php
      */
     public function remove($condition = [], $options = [])
@@ -625,17 +631,17 @@ class Collection
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
-
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 
     /**
      * Returns a list of distinct values for the given column across a collection.
-     * @param string $column column to use.
+     *
+*@param string $column column to use.
      * @param array $condition query parameters.
      * @return array|boolean array of distinct values, or "false" on failure.
-     * @throws Exception on failure.
+     * @throws MongoException on failure.
      */
     public function distinct($column, $condition = [])
     {
@@ -665,18 +671,18 @@ class Collection
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
-
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 
     /**
      * Performs aggregation using Mongo Aggregation Framework.
-     * @param array $pipeline list of pipeline operators, or just the first operator
+     *
+*@param array $pipeline list of pipeline operators, or just the first operator
      * @param array $pipelineOperator additional pipeline operator. You can specify additional
      * pipelines via third argument, fourth argument etc.
      * @return array the result of the aggregation.
-     * @throws Exception on failure.
+     * @throws MongoException on failure.
      * @see http://docs.mongodb.org/manual/applications/aggregation/
      */
     public function aggregate($pipeline, $pipelineOperator = [])
@@ -709,14 +715,14 @@ class Collection
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
-
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 
     /**
      * Performs aggregation using Mongo "group" command.
-     * @param mixed $keys fields to group by. If an array or non-code object is passed,
+     *
+*@param mixed $keys fields to group by. If an array or non-code object is passed,
      * it will be the key used to group results. If instance of {@see \MongoCode} passed,
      * it will be treated as a function that returns the key to group by.
      * @param array $initial Initial value of the aggregation counter object.
@@ -727,7 +733,7 @@ class Collection
      *  - condition - criteria for including a document in the aggregation.
      *  - finalize - function called once per unique key that takes the final output of the reduce function.
      * @return array the result of the aggregation.
-     * @throws Exception on failure.
+     * @throws MongoException on failure.
      * @see http://docs.mongodb.org/manual/reference/command/group/
      */
     public function group($keys, $initial, $reduce, $options = [])
@@ -780,8 +786,7 @@ class Collection
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
-
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 
@@ -820,7 +825,7 @@ class Collection
      *  - jsMode - boolean -Specifies whether to convert intermediate data into BSON format between the execution of the map and reduce functions.
      *  - verbose - boolean - specifies whether to include the timing information in the result information.
      * @return string|array the map reduce output collection name or output results.
-     * @throws Exception on failure.
+     * @throws MongoException on failure.
      */
     public function mapReduce($map, $reduce, $out, $condition = [], $options = [])
     {
@@ -878,14 +883,14 @@ class Collection
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
-
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 
     /**
      * Performs full text search.
-     * @param string $search string of terms that MongoDB parses and uses to query the text index.
+     *
+*@param string $search string of terms that MongoDB parses and uses to query the text index.
      * @param array $condition criteria for filtering a results list.
      * @param array $fields list of fields to be returned in result.
      * @param array $options additional optional parameters to the mapReduce command. Valid options include:
@@ -894,7 +899,7 @@ class Collection
      *    and the rules for the stemmer and tokenizer. If not specified, the search uses the default
      *    language of the index.
      * @return array the highest scoring documents, in descending order by score.
-     * @throws Exception on failure.
+     * @throws MongoException on failure.
      */
     public function fullTextSearch($search, $condition = [], $fields = [], $options = [])
     {
@@ -937,15 +942,15 @@ class Collection
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
-
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 
     /**
      * Checks if command execution result ended with an error.
-     * @param mixed $result raw command execution result.
-     * @throws Exception if an error occurred.
+     *
+*@param mixed $result raw command execution result.
+     * @throws MongoException if an error occurred.
      */
     protected function tryResultError($result)
     {
@@ -963,16 +968,17 @@ class Collection
 //                } else {
 //                    $errorCode = 0;
 //                }
-                throw new Exception($errorMessage);
+                throw new MongoException($errorMessage);
             }
         } elseif (!$result) {
-            throw new Exception('Unknown error, use "w=1" option to enable error tracking');
+            throw new MongoException('Unknown error, use "w=1" option to enable error tracking');
         }
     }
 
     /**
      * Throws an exception if there was an error on the last operation.
-     * @throws Exception if an error occurred.
+     *
+*@throws MongoException if an error occurred.
      */
     protected function tryLastError()
     {
@@ -1034,10 +1040,11 @@ class Collection
 
     /**
      * Parses the condition specification and generates the corresponding Mongo condition.
-     * @param array $condition the condition specification. Please refer to {@see \rock\db\QueryInterface::where()}
+     *
+*@param array $condition the condition specification. Please refer to {@see \rock\db\QueryInterface::where()}
      * on how to specify a condition.
      * @return array the generated Mongo condition
-     * @throws Exception if the condition is in bad format
+     * @throws MongoException if the condition is in bad format
      */
     public function buildCondition($condition)
     {
@@ -1053,7 +1060,7 @@ class Collection
         ];
 
         if (!is_array($condition)) {
-            throw new Exception('Condition should be an array.');
+            throw new MongoException('Condition should be an array.');
         } elseif (empty($condition)) {
             return [];
         }
@@ -1065,7 +1072,7 @@ class Collection
 
                 return $this->$method($operator, $condition);
             } else {
-                throw new Exception('Found unknown operator in query: ' . $operator);
+                throw new MongoException('Found unknown operator in query: ' . $operator);
             }
         } else {
             // hash format: 'column1' => 'value1', 'column2' => 'value2', ...
@@ -1143,16 +1150,17 @@ class Collection
 
     /**
      * Creates an Mongo condition, which emulates the `BETWEEN` operator.
-     * @param string $operator the operator to use
+     *
+*@param string $operator the operator to use
      * @param array $operands the first operand is the column name. The second and third operands
      * describe the interval that column value should be in.
      * @return array the generated Mongo condition.
-     * @throws Exception if wrong number of operands have been given.
+     * @throws MongoException if wrong number of operands have been given.
      */
     public function buildBetweenCondition($operator, $operands)
     {
         if (!isset($operands[0], $operands[1], $operands[2])) {
-            throw new Exception("Operator '$operator' requires three operands.");
+            throw new MongoException("Operator '$operator' requires three operands.");
         }
         list($column, $value1, $value2) = $operands;
         if (strncmp('NOT', $operator, 3) === 0) {
@@ -1174,17 +1182,18 @@ class Collection
 
     /**
      * Creates an Mongo condition with the `IN` operator.
-     * @param string $operator the operator to use (e.g. `IN` or `NOT IN`)
+     *
+*@param string $operator the operator to use (e.g. `IN` or `NOT IN`)
      * @param array $operands the first operand is the column name. If it is an array
      * a composite IN condition will be generated.
      * The second operand is an array of values that column value should be among.
      * @return array the generated Mongo condition.
-     * @throws Exception if wrong number of operands have been given.
+     * @throws MongoException if wrong number of operands have been given.
      */
     public function buildInCondition($operator, $operands)
     {
         if (!isset($operands[0], $operands[1])) {
-            throw new Exception("Operator '$operator' requires two operands.");
+            throw new MongoException("Operator '$operator' requires two operands.");
         }
 
         list($column, $values) = $operands;
@@ -1217,16 +1226,17 @@ class Collection
 
     /**
      * Creates a Mongo regular expression condition.
-     * @param string $operator the operator to use
+     *
+*@param string $operator the operator to use
      * @param array $operands the first operand is the column name.
      * The second operand is a single value that column value should be compared with.
      * @return array the generated Mongo condition.
-     * @throws Exception if wrong number of operands have been given.
+     * @throws MongoException if wrong number of operands have been given.
      */
     public function buildRegexCondition($operator, $operands)
     {
         if (!isset($operands[0], $operands[1])) {
-            throw new Exception("Operator '$operator' requires two operands.");
+            throw new MongoException("Operator '$operator' requires two operands.");
         }
         list($column, $value) = $operands;
         if (!($value instanceof \MongoRegex)) {
@@ -1238,16 +1248,17 @@ class Collection
 
     /**
      * Creates a Mongo condition, which emulates the `LIKE` operator.
-     * @param string $operator the operator to use
+     *
+*@param string $operator the operator to use
      * @param array $operands the first operand is the column name.
      * The second operand is a single value that column value should be compared with.
      * @return array the generated Mongo condition.
-     * @throws Exception if wrong number of operands have been given.
+     * @throws MongoException if wrong number of operands have been given.
      */
     public function buildLikeCondition($operator, $operands)
     {
         if (!isset($operands[0], $operands[1])) {
-            throw new Exception("Operator '$operator' requires two operands.");
+            throw new MongoException("Operator '$operator' requires two operands.");
         }
         list($column, $value) = $operands;
         if (!($value instanceof \MongoRegex)) {

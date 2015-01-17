@@ -3,7 +3,7 @@
 namespace rockunit\core\db;
 
 use rock\db\DataReader;
-use rock\db\Exception;
+use rock\db\DbException;
 use rock\helpers\Trace;
 use rockunit\common\CommonTestTrait;
 
@@ -76,7 +76,7 @@ class CommandTest extends DatabaseTestCase
         $this->assertEquals(1, $command->queryScalar());
 
         $command = $db->createCommand('bad SQL');
-        $this->setExpectedException(Exception::className());
+        $this->setExpectedException(DbException::className());
         $command->execute();
     }
 
@@ -137,7 +137,7 @@ class CommandTest extends DatabaseTestCase
         $this->assertNull($command->queryScalar());
 
         $command = $db->createCommand('bad SQL');
-        $this->setExpectedException(Exception::className());
+        $this->setExpectedException(DbException::className());
         $command->query();
     }
 
@@ -309,7 +309,7 @@ class CommandTest extends DatabaseTestCase
 
     public function testIntegrityViolation()
     {
-        $this->setExpectedException(Exception::className());
+        $this->setExpectedException(DbException::className());
 
         $db = $this->getConnection();
 

@@ -106,10 +106,11 @@ class Database
      * Note: Mongo creates new collections automatically on the first demand,
      * this method makes sense only for the migration script or for the case
      * you need to create collection with the specific options.
-     * @param string $name name of the collection
+     *
+*@param string $name name of the collection
      * @param array $options collection options in format: "name" => "value"
      * @return \MongoCollection new Mongo collection instance.
-     * @throws Exception on failure.
+     * @throws MongoException on failure.
      */
     public function createCollection($name, $options = [])
     {
@@ -134,16 +135,17 @@ class Database
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
 
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 
     /**
      * Executes Mongo command.
-     * @param array $command command specification.
+     *
+*@param array $command command specification.
      * @param array $options options in format: "name" => "value"
      * @return array database response.
-     * @throws Exception on failure.
+     * @throws MongoException on failure.
      */
     public function executeCommand($command, $options = [])
     {
@@ -170,14 +172,15 @@ class Database
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
 
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 
     /**
      * Checks if command execution result ended with an error.
-     * @param mixed $result raw command execution result.
-     * @throws Exception if an error occurred.
+     *
+*@param mixed $result raw command execution result.
+     * @throws MongoException if an error occurred.
      */
     protected function tryResultError($result)
     {
@@ -193,10 +196,10 @@ class Database
                 } else {
                     $errorCode = 0;
                 }
-                throw new Exception($errorMessage, $errorCode);
+                throw new MongoException($errorMessage, $errorCode);
             }
         } elseif (!$result) {
-            throw new Exception('Unknown error, use "w=1" option to enable error tracking');
+            throw new MongoException('Unknown error, use "w=1" option to enable error tracking');
         }
     }
 }

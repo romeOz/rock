@@ -150,9 +150,10 @@ class Command
      * this may improve performance.
      * For SQL statement with binding parameters, this method is invoked
      * automatically.
-     * @param boolean $forRead whether this method is called for a read query. If null, it means
+     *
+*@param boolean $forRead whether this method is called for a read query. If null, it means
      * the SQL statement should be used to determine whether it is for read or write.
-     * @throws Exception if there is any DB error
+     * @throws DbException if there is any DB error
      */
     public function prepare($forRead = null)
     {
@@ -178,7 +179,7 @@ class Command
             $this->bindPendingParams();
         } catch (\Exception $e) {
             $message = $e->getMessage() . "\nFailed to prepare SQL: {$this->getRawSql()}";
-            throw new Exception($message, [], $e);
+            throw new DbException($message, [], $e);
         }
     }
 
@@ -291,8 +292,9 @@ class Command
     /**
      * Executes the SQL statement and returns query result.
      * This method is for executing a SQL query that returns result set, such as `SELECT`.
-     * @return DataReader the reader object for fetching the query result
-     * @throws Exception execution failed
+     *
+*@return DataReader the reader object for fetching the query result
+     * @throws DbException execution failed
      */
     public function query()
     {
@@ -301,12 +303,13 @@ class Command
 
     /**
      * Executes the SQL statement and returns ALL rows at once.
-     * @param integer $fetchMode the result fetch mode. Please refer to [PHP manual](http://www.php.net/manual/en/function.PDOStatement-setFetchMode.php)
+     *
+*@param integer $fetchMode the result fetch mode. Please refer to [PHP manual](http://www.php.net/manual/en/function.PDOStatement-setFetchMode.php)
      * for valid fetch modes. If this parameter is null, the value set in {@see \rock\db\Command::$fetchMode} will be used.
      * @param bool $subAttributes
      * @return array all rows of the query result. Each array element is an array representing a row of data.
      * An empty array is returned if the query results in nothing.
-     * @throws Exception execution failed
+     * @throws DbException execution failed
      */
     public function queryAll($fetchMode = null, $subAttributes = false)
     {
@@ -316,12 +319,13 @@ class Command
     /**
      * Executes the SQL statement and returns the first row of the result.
      * This method is best used when only the first row of result is needed for a query.
-     * @param integer $fetchMode the result fetch mode. Please refer to [PHP manual](http://www.php.net/manual/en/function.PDOStatement-setFetchMode.php)
+     *
+*@param integer $fetchMode the result fetch mode. Please refer to [PHP manual](http://www.php.net/manual/en/function.PDOStatement-setFetchMode.php)
      * for valid fetch modes. If this parameter is null, the value set in {@see \rock\db\Command::$fetchMode} will be used.
      * @param bool    $subAttributes
      * @return array|null the first row (in terms of an array) of the query result. False is returned if the query
      * results in nothing.
-     * @throws Exception execution failed
+     * @throws DbException execution failed
      */
     public function queryOne($fetchMode = null, $subAttributes = false)
     {
@@ -331,9 +335,10 @@ class Command
     /**
      * Executes the SQL statement and returns the value of the first column in the first row of data.
      * This method is best used when only a single value is needed for a query.
-     * @return string|null the value of the first column in the first row of the query result.
+     *
+*@return string|null the value of the first column in the first row of the query result.
      * False is returned if there is no value.
-     * @throws Exception execution failed
+     * @throws DbException execution failed
      */
     public function queryScalar()
     {
@@ -349,8 +354,9 @@ class Command
      * Executes the SQL statement and returns the first column of the result.
      * This method is best used when only the first column of result (i.e. the first element in each row)
      * is needed for a query.
-     * @return array the first column of the query result. Empty array is returned if the query results in nothing.
-     * @throws Exception execution failed
+     *
+*@return array the first column of the query result. Empty array is returned if the query results in nothing.
+     * @throws DbException execution failed
      */
     public function queryColumn()
     {
@@ -730,11 +736,12 @@ class Command
      * 
      * The sequence will be reset such that the primary key of the next new row inserted
      * will have the specified value or 1.
-     * @param string $table the name of the table whose primary key sequence will be reset
+     *
+*@param string $table the name of the table whose primary key sequence will be reset
      * @param mixed $value the value for the primary key of the next new row inserted. If this is not set,
      * the next new row's primary key will have a value 1.
      * @return Command the command object itself
-     * @throws Exception if this is not supported by the underlying DBMS
+     * @throws DbException if this is not supported by the underlying DBMS
      */
     public function resetSequence($table, $value = null)
     {
@@ -745,12 +752,13 @@ class Command
 
     /**
      * Builds a SQL command for enabling or disabling integrity check.
-     * @param boolean $check whether to turn on or off the integrity check.
+     *
+*@param boolean $check whether to turn on or off the integrity check.
      * @param string $schema the schema name of the tables. Defaults to empty string, meaning the current
      * or default schema.
      * @param string $table the table name.
      * @return Command the command object itself
-     * @throws Exception if this is not supported by the underlying DBMS
+     * @throws DbException if this is not supported by the underlying DBMS
      */
     public function checkIntegrity($check = true, $schema = '', $table = '')
     {
@@ -764,8 +772,9 @@ class Command
      * 
      * This method should only be used for executing non-query SQL statement, such as `INSERT`, `DELETE`, `UPDATE` SQLs.
      * No result set will be returned.
-     * @return integer number of rows affected by the execution.
-     * @throws Exception execution failed
+     *
+*@return integer number of rows affected by the execution.
+     * @throws DbException execution failed
      */
     public function execute()
     {
@@ -801,18 +810,19 @@ class Command
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e: $message;
             Rock::trace('db.query', $token);
-            throw new Exception($message, [], $e);
+            throw new DbException($message, [], $e);
         }
     }
 
     /**
      * Performs the actual DB query of a SQL statement.
-     * @param string $method method of PDOStatement to be called
+     *
+*@param string $method method of PDOStatement to be called
      * @param integer $fetchMode the result fetch mode. Please refer to [PHP manual](http://www.php.net/manual/en/function.PDOStatement-setFetchMode.php)
      * for valid fetch modes. If this parameter is null, the value set in {@see \rock\db\Command::$fetchMode} will be used.
      * @param bool    $subAttributes
      * @return mixed the method execution result
-     * @throws Exception if the query causes any problem
+     * @throws DbException if the query causes any problem
      */
     protected function queryInternal($method, $fetchMode = null, $subAttributes = false)
     {
@@ -885,8 +895,7 @@ class Command
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('db.query', $token);
-
-            throw new Exception($message, [], $e);
+            throw new DbException($message, [], $e);
         }
     }
 }

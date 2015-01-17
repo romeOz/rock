@@ -1,7 +1,7 @@
 <?php
 namespace rock\db\mssql;
 
-use rock\db\Exception;;
+use rock\db\DbException;;
 
 /**
  * QueryBuilder is the query builder for MS SQL Server databases (version 2008 and above).
@@ -158,7 +158,7 @@ class QueryBuilder extends \rock\db\QueryBuilder
      * @param string $schema the schema of the tables. Defaults to empty string, meaning the current or default schema.
      * @param string $table the table name. Defaults to empty string, meaning that no table will be changed.
      * @return string the SQL statement for checking integrity
-     * @throws Exception if the table does not exist or there is no sequence associated with the table.
+     * @throws DbException if the table does not exist or there is no sequence associated with the table.
      */
     public function checkIntegrity($check = true, $schema = '', $table = '')
     {
@@ -167,7 +167,7 @@ class QueryBuilder extends \rock\db\QueryBuilder
         }
         $table = $this->connection->quoteTableName($table);
         if ($this->connection->getTableSchema($table) === null) {
-            throw new Exception("Table not found: {$table}.");
+            throw new DbException("Table not found: {$table}.");
         }
         $enable = $check ? 'CHECK' : 'NOCHECK';
 
@@ -199,7 +199,7 @@ class QueryBuilder extends \rock\db\QueryBuilder
 
     /**
      * @return boolean whether the version of the MSSQL being used is older than 2012.
-     * @throws \rock\db\Exception
+     * @throws \rock\db\DbException
      */
     protected function isOldMssql()
     {

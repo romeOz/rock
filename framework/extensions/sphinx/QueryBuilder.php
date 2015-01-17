@@ -62,10 +62,11 @@ class QueryBuilder
 
     /**
      * Generates a SELECT SQL statement from a {@see \rock\sphinx\Query} object.
-     * @param Query $query the {@see \rock\sphinx\Query} object from which the SQL statement will be generated
+     *
+*@param Query $query the {@see \rock\sphinx\Query} object from which the SQL statement will be generated
      * @param array $params the parameters to be bound to the generated SQL statement. These parameters will
      * be included in the result with the additional parameters generated during the query building process.
-     * @throws Exception if query contains 'join' option.
+     * @throws SphinxException if query contains 'join' option.
      * @return array the generated SQL statement (the first array element) and the corresponding
      * parameters to be bound to the SQL statement (the second array element). The parameters returned
      * include those provided in `$params`.
@@ -75,7 +76,7 @@ class QueryBuilder
         $query = $query->prepare($this);
 
         if (!empty($query->join)) {
-            throw new Exception('Build of "' . get_class($query) . '::join" is not supported.');
+            throw new SphinxException('Build of "' . get_class($query) . '::join" is not supported.');
         }
 
         $params = empty($params) ? $query->params : array_merge($params, $query->params);
@@ -650,12 +651,13 @@ class QueryBuilder
 
     /**
      * Parses the condition specification and generates the corresponding SQL expression.
-     * @param IndexSchema[] $indexes list of indexes, which affected by query
+     *
+*@param IndexSchema[] $indexes list of indexes, which affected by query
      * @param string|array $condition the condition specification. Please refer to {@see \rock\sphinx\Query::where()}
      * on how to specify a condition.
      * @param array $params the binding parameters to be populated
      * @return string the generated SQL expression
-     * @throws Exception if the condition is in bad format
+     * @throws SphinxException if the condition is in bad format
      */
     public function buildCondition($indexes, $condition, &$params)
     {
@@ -737,17 +739,18 @@ class QueryBuilder
 
     /**
      * Inverts an SQL expressions with `NOT` operator.
-     * @param IndexSchema[] $indexes list of indexes, which affected by query
+     *
+*@param IndexSchema[] $indexes list of indexes, which affected by query
      * @param string $operator the operator to use for connecting the given operands
      * @param array $operands the SQL expressions to connect.
      * @param array $params the binding parameters to be populated
      * @return string the generated SQL expression
-     * @throws Exception if wrong number of operands have been given.
+     * @throws SphinxException if wrong number of operands have been given.
      */
     public function buildNotCondition($indexes, $operator, $operands, &$params)
     {
         if (count($operands) != 1) {
-            throw new Exception("Operator '$operator' requires exactly one operand.");
+            throw new SphinxException("Operator '$operator' requires exactly one operand.");
         }
 
         $operand = reset($operands);
@@ -763,18 +766,19 @@ class QueryBuilder
 
     /**
      * Creates an SQL expressions with the `BETWEEN` operator.
-     * @param IndexSchema[] $indexes list of indexes, which affected by query
+     *
+*@param IndexSchema[] $indexes list of indexes, which affected by query
      * @param string $operator the operator to use (e.g. `BETWEEN` or `NOT BETWEEN`)
      * @param array $operands the first operand is the column name. The second and third operands
      * describe the interval that column value should be in.
      * @param array $params the binding parameters to be populated
      * @return string the generated SQL expression
-     * @throws Exception if wrong number of operands have been given.
+     * @throws SphinxException if wrong number of operands have been given.
      */
     public function buildBetweenCondition($indexes, $operator, $operands, &$params)
     {
         if (!isset($operands[0], $operands[1], $operands[2])) {
-            throw new Exception("Operator '$operator' requires three operands.");
+            throw new SphinxException("Operator '$operator' requires three operands.");
         }
 
         list($column, $value1, $value2) = $operands;
@@ -792,7 +796,8 @@ class QueryBuilder
 
     /**
      * Creates an SQL expressions with the `IN` operator.
-     * @param IndexSchema[] $indexes list of indexes, which affected by query
+     *
+*@param IndexSchema[] $indexes list of indexes, which affected by query
      * @param string $operator the operator to use (e.g. `IN` or `NOT IN`)
      * @param array $operands the first operand is the column name. If it is an array
      * a composite IN condition will be generated.
@@ -801,12 +806,12 @@ class QueryBuilder
      * operator is `IN` and empty if operator is `NOT IN`.
      * @param array $params the binding parameters to be populated
      * @return string the generated SQL expression
-     * @throws Exception if wrong number of operands have been given.
+     * @throws SphinxException if wrong number of operands have been given.
      */
     public function buildInCondition($indexes, $operator, $operands, &$params)
     {
         if (!isset($operands[0], $operands[1])) {
-            throw new Exception("Operator '$operator' requires two operands.");
+            throw new SphinxException("Operator '$operator' requires two operands.");
         }
 
         list($column, $values) = $operands;
@@ -894,7 +899,8 @@ class QueryBuilder
 
     /**
      * Creates an SQL expressions with the `LIKE` operator.
-     * @param IndexSchema[] $indexes list of indexes, which affected by query
+     *
+*@param IndexSchema[] $indexes list of indexes, which affected by query
      * @param string $operator the operator to use (e.g. `LIKE`, `NOT LIKE`, `OR LIKE` or `OR NOT LIKE`)
      * @param array $operands an array of two or three operands
      *
@@ -911,12 +917,12 @@ class QueryBuilder
      *   the values will be automatically enclosed within a pair of percentage characters.
      * @param array $params the binding parameters to be populated
      * @return string the generated SQL expression
-     * @throws Exception if wrong number of operands have been given.
+     * @throws SphinxException if wrong number of operands have been given.
      */
     public function buildLikeCondition($indexes, $operator, $operands, &$params)
     {
         if (!isset($operands[0], $operands[1])) {
-            throw new Exception("Operator '$operator' requires two operands.");
+            throw new SphinxException("Operator '$operator' requires two operands.");
         }
 
         $escape = isset($operands[2]) ? $operands[2] : ['%'=>'\%', '_'=>'\_', '\\'=>'\\\\'];
@@ -962,17 +968,18 @@ class QueryBuilder
 
     /**
      * Creates an SQL expressions like `"column" operator value`.
-     * @param IndexSchema[] $indexes list of indexes, which affected by query
+     *
+*@param IndexSchema[] $indexes list of indexes, which affected by query
      * @param string $operator the operator to use. Anything could be used e.g. `>`, `<=`, etc.
      * @param array $operands contains two column names.
      * @param array $params the binding parameters to be populated
      * @return string the generated SQL expression
-     * @throws Exception if count($operands) is not 2
+     * @throws SphinxException if count($operands) is not 2
      */
     public function buildSimpleCondition($indexes, $operator, $operands, &$params)
     {
         if (count($operands) !== 2) {
-            throw new Exception("Operator '$operator' requires two operands.");
+            throw new SphinxException("Operator '$operator' requires two operands.");
         }
 
         list($column, $value) = $operands;

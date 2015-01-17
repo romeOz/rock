@@ -3,7 +3,7 @@ namespace rock\db;
 
 use rock\exception\BaseException;
 
-class Exception extends BaseException
+class DbException extends BaseException
 {
     const NOT_SUPPORT_SCHEMA = 'Connection does not support reading schema information for {driver} DBMS.';
     const NOT_SUPPORT_RESETTING = '{driver} does not support resetting sequence.';

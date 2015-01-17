@@ -157,7 +157,7 @@ class ActiveRecord extends BaseActiveRecord
      * @param boolean $one whether this method is called by {@see \rock\db\ActiveRecord::findOne()}
      *                     or {@see \rock\db\ActiveRecord::findAll()}
      * @return static|static[]
-     * @throws Exception if there is no primary key defined
+     * @throws DbException if there is no primary key defined
      * @internal
      */
     protected static function findByCondition($condition, $one)
@@ -174,7 +174,7 @@ class ActiveRecord extends BaseActiveRecord
                 }
                 $condition = [$pk => $condition];
             } else {
-                throw new Exception('"' . get_called_class() . '" must have a primary key.');
+                throw new DbException('"' . get_called_class() . '" must have a primary key.');
             }
         }
 
@@ -299,7 +299,7 @@ class ActiveRecord extends BaseActiveRecord
      * Returns the schema information of the DB table associated with this AR class.
      *
      * @param null $connection
-     * @throws Exception
+     * @throws DbException
      * @return TableSchema the schema information of the DB table associated with this AR class.
      */
     public static function getTableSchema($connection = null)
@@ -318,7 +318,7 @@ class ActiveRecord extends BaseActiveRecord
         if ($schema !== null) {
             return $schema;
         } else {
-            throw new Exception('The table does not exist: ' . static::tableName());
+            throw new DbException('The table does not exist: ' . static::tableName());
         }
     }
 
@@ -554,7 +554,7 @@ class ActiveRecord extends BaseActiveRecord
      * meaning all attributes that are loaded from DB will be saved.
      * @return integer|boolean the number of rows affected, or false if validation fails
      * or {@see \rock\db\BaseActiveRecord::beforeSave()} stops the updating process.
-     * @throws Exception if {@see \rock\db\BaseActiveRecord::optimisticLock()}(optimistic locking) is enabled and the data
+     * @throws DbException if {@see \rock\db\BaseActiveRecord::optimisticLock()}(optimistic locking) is enabled and the data
      * being updated is outdated.
      * @throws \Exception in case update failed.
      */
@@ -599,7 +599,7 @@ class ActiveRecord extends BaseActiveRecord
      *
      * @return integer|boolean the number of rows deleted, or false if the deletion is unsuccessful for some reason.
      * Note that it is possible the number of rows deleted is 0, even though the deletion execution is successful.
-     * @throws Exception if {@see \rock\db\BaseActiveRecord::optimisticLock()}(optimistic locking) is enabled and the data
+     * @throws DbException if {@see \rock\db\BaseActiveRecord::optimisticLock()}(optimistic locking) is enabled and the data
      * being deleted is outdated.
      * @throws \Exception in case delete failed.
      */
@@ -626,9 +626,10 @@ class ActiveRecord extends BaseActiveRecord
 
     /**
      * Deletes an ActiveRecord without considering transaction.
-     * @return integer|boolean the number of rows deleted, or false if the deletion is unsuccessful for some reason.
+     *
+*@return integer|boolean the number of rows deleted, or false if the deletion is unsuccessful for some reason.
      * Note that it is possible the number of rows deleted is 0, even though the deletion execution is successful.
-     * @throws Exception
+     * @throws DbException
      */
     protected function deleteInternal()
     {
@@ -643,7 +644,7 @@ class ActiveRecord extends BaseActiveRecord
             }
             $result = $this->deleteAll($condition);
             if ($lock !== null && !$result) {
-                throw new Exception('The object being deleted is outdated.');
+                throw new DbException('The object being deleted is outdated.');
             }
             $this->setOldAttributes(null);
             $this->afterDelete();

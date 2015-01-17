@@ -100,10 +100,11 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * Finds ActiveRecord instance(s) by the given condition.
      * 
      * This method is internally called by {@see BaseActiveRecord::findOne()} and {@see BaseActiveRecord::findAll()}.
-     * @param mixed $condition please refer to {@see BaseActiveRecord::findOne()} for the explanation of this parameter
+     *
+*@param mixed $condition please refer to {@see BaseActiveRecord::findOne()} for the explanation of this parameter
      * @param boolean $one whether this method is called by {@see BaseActiveRecord::findOne()} or {@see BaseActiveRecord::findAll()}
      * @return static|static[]
-     * @throws Exception if there is no primary key defined
+     * @throws DbException if there is no primary key defined
      * @internal
      */
     protected static function findByCondition($condition, $one)
@@ -116,7 +117,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
             if (isset($primaryKey[0])) {
                 $condition = [$primaryKey[0] => $condition];
             } else {
-                throw new Exception('"' . get_called_class() . '" must have a primary key.');
+                throw new DbException('"' . get_called_class() . '" must have a primary key.');
             }
         }
 
@@ -134,12 +135,12 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * @param array $attributes attribute values (name-value pairs) to be saved into the table
      * @param string|array $condition the conditions that will be put in the WHERE part of the UPDATE SQL.
      * Please refer to {@see \rock\db\Query::where()} on how to specify this parameter.
-     * @throws Exception
+     * @throws DbException
      * @return integer the number of rows updated
      */
     public static function updateAll($attributes, $condition = '')
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new DbException(DbException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -154,12 +155,12 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * Use negative values if you want to decrement the counters.
      * @param string|array $condition the conditions that will be put in the WHERE part of the UPDATE SQL.
      * Please refer to {@see \rock\db\Query::where()} on how to specify this parameter.
-     * @throws Exception
+     * @throws DbException
      * @return integer the number of rows updated
      */
     public static function updateAllCounters($counters, $condition = '')
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new DbException(DbException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -175,12 +176,12 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * @param string|array $condition the conditions that will be put in the WHERE part of the DELETE SQL.
      * Please refer to {@see \rock\db\Query::where()} on how to specify this parameter.
      * @param array $params the parameters (name => value) to be bound to the query.
-     * @throws Exception
+     * @throws DbException
      * @return integer the number of rows deleted
      */
     public static function deleteAll($condition = '', $params = [])
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new DbException(DbException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -218,7 +219,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * This method is overridden so that attributes and related objects can be accessed like properties.
      *
      * @param string $name property name
-     * @throws Exception if relation name is wrong
+     * @throws DbException if relation name is wrong
      * @return mixed property value
      * @see getAttribute()
      */
@@ -437,7 +438,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * 
      * @param string $name the attribute name
      * @param mixed $value the attribute value.
-     * @throws Exception if the named attribute does not exist.
+     * @throws DbException if the named attribute does not exist.
      * @see hasAttribute()
      */
     public function setAttribute($name, $value)
@@ -445,7 +446,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
         if ($this->hasAttribute($name)) {
             $this->_attributes[$name] = $value;
         } else {
-            throw new Exception(get_class($this) . ' has no attribute named "' . $name . '".');
+            throw new DbException(get_class($this) . ' has no attribute named "' . $name . '".');
         }
     }
 
@@ -485,9 +486,10 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
 
     /**
      * Sets the old value of the named attribute.
-     * @param string $name the attribute name
+     *
+*@param string $name the attribute name
      * @param mixed $value the old attribute value.
-     * @throws Exception if the named attribute does not exist.
+     * @throws DbException if the named attribute does not exist.
      * @see hasAttribute()
      */
     public function setOldAttribute($name, $value)
@@ -495,7 +497,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
         if (isset($this->_oldAttributes[$name]) || $this->hasAttribute($name)) {
             $this->_oldAttributes[$name] = $value;
         } else {
-            throw new Exception(get_class($this) . ' has no attribute named "' . $name . '".');
+            throw new DbException(get_class($this) . ' has no attribute named "' . $name . '".');
         }
     }
 
@@ -630,9 +632,9 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * meaning all attributes that are loaded from DB will be saved.
      * @return integer|boolean the number of rows affected, or false if validation fails
      * or {@see \rock\db\BaseActiveRecord::beforeSave()} stops the updating process.
-     * @throws Exception if {@see \rock\db\BaseActiveRecord::optimisticLock()} optimistic locking is enabled and the data
+     * @throws DbException if {@see \rock\db\BaseActiveRecord::optimisticLock()} optimistic locking is enabled and the data
      * being updated is outdated.
-     * @throws Exception in case update failed.
+     * @throws DbException in case update failed.
      */
     public function update($runValidation = true, $attributeNames = null)
     {
@@ -687,7 +689,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * @see update()
      * @param array $attributes attributes to update
      * @return integer number of rows updated
-     * @throws Exception
+     * @throws DbException
      */
     protected function updateInternal($attributes = null)
     {
@@ -712,7 +714,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
         $rows = $this->updateAll($values, $condition);
 
         if ($lock !== null && !$rows) {
-            throw new Exception('The object being updated is outdated.');
+            throw new DbException('The object being updated is outdated.');
         }
 
         $changedAttributes = [];
@@ -770,7 +772,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      *
      * @return integer|boolean the number of rows deleted, or false if the deletion is unsuccessful for some reason.
      * Note that it is possible the number of rows deleted is 0, even though the deletion execution is successful.
-     * @throws Exception if {@see \rock\db\BaseActiveRecord::optimisticLock()} optimistic locking is enabled and the data
+     * @throws DbException if {@see \rock\db\BaseActiveRecord::optimisticLock()} optimistic locking is enabled and the data
      * being deleted is outdated.
      */
     public function delete()
@@ -786,7 +788,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
             }
             $result = $this->deleteAll($condition);
             if ($lock !== null && !$result) {
-                throw new Exception('The object being deleted is outdated.');
+                throw new DbException('The object being deleted is outdated.');
             }
             $this->_oldAttributes = null;
             $this->afterDelete();
@@ -1026,7 +1028,8 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * This refers to the primary key value that is populated into the record
      * after executing a find method (e.g. `find()`, `findOne()`).
      * The value remains unchanged even if the primary key attribute is manually assigned with a different value.
-     * @param boolean $asArray whether to return the primary key value as an array. If true,
+     *
+*@param boolean $asArray whether to return the primary key value as an array. If true,
      * the return value will be an array with column name as key and column value as value.
      * If this is false (default), a scalar value will be returned for non-composite primary key.
      * @property mixed The old primary key value. An array (column name => column value) is
@@ -1035,13 +1038,13 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * @return mixed the old primary key value. An array (column name => column value) is returned if the primary key
      * is composite or `$asArray` is true. A string is returned otherwise (null will be returned if
      * the key value is null).
-     * @throws Exception if the AR model does not have a primary key
+     * @throws DbException if the AR model does not have a primary key
      */
     public function getOldPrimaryKey($asArray = false)
     {
         $keys = $this->primaryKey();
         if (empty($keys)) {
-            throw new Exception(get_class($this) . ' does not have a primary key. You should either define a primary key for the corresponding table or override the primaryKey() method.');
+            throw new DbException(get_class($this) . ' does not have a primary key. You should either define a primary key for the corresponding table or override the primaryKey() method.');
         }
         if (count($keys) === 1 && !$asArray) {
             return isset($this->_oldAttributes[$keys[0]]) ? $this->_oldAttributes[$keys[0]] : null;
@@ -1124,9 +1127,10 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * Returns the relation object with the specified name.
      * A relation is defined by a getter method which returns an {@see \rock\db\ActiveQueryInterface} object.
      * It can be declared in either the Active Record class itself or one of its behaviors.
-     * @param string $name the relation name
+     *
+*@param string $name the relation name
      * @param boolean $throwException whether to throw exception if the relation does not exist.
-     * @throws Exception if the named relation does not exist.
+     * @throws DbException if the named relation does not exist.
      * @return ActiveQueryInterface|ActiveQuery the relational query object. If the relation does not exist
      * and `$throwException` is false, null will be returned.
      */
@@ -1138,14 +1142,14 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
             $relation = $this->$getter();
         } catch (\Exception $e) {
             if ($throwException) {
-                throw new Exception(get_class($this) . ' has no relation named "' . $name . '".', [], $e);
+                throw new DbException(get_class($this) . ' has no relation named "' . $name . '".', [], $e);
             } else {
                 return null;
             }
         }
         if (!$relation instanceof ActiveQueryInterface) {
             if ($throwException) {
-                throw new Exception(get_class($this) . ' has no relation named "' . $name . '".');
+                throw new DbException(get_class($this) . ' has no relation named "' . $name . '".');
             } else {
                 return null;
             }
@@ -1157,7 +1161,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
             $realName = lcfirst(substr($method->getName(), 3));
             if ($realName !== $name) {
                 if ($throwException) {
-                    throw new Exception('Relation names are case sensitive. ' . get_class($this) .
+                    throw new DbException('Relation names are case sensitive. ' . get_class($this) .
                                                              " has a relation named \"$realName\" instead of \"$name\".");
                 } else {
                     return null;
@@ -1185,7 +1189,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * @param array $extraColumns additional column values to be saved into the pivot table.
      * This parameter is only meaningful for a relationship involving a pivot table
      * (i.e., a relation set with {@see \rock\db\ActiveRelationTrait::via()} or {@see \rock\db\ActiveQuery::viaTable()}.)
-     * @throws Exception if the method is unable to link two models.
+     * @throws DbException if the method is unable to link two models.
      */
     public function link($name, $model, $extraColumns = [])
     {
@@ -1193,7 +1197,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
 
         if ($relation->via !== null) {
             if ($this->getIsNewRecord() || $model->getIsNewRecord()) {
-                throw new Exception('Unable to link models: both models must NOT be newly created.');
+                throw new DbException('Unable to link models: both models must NOT be newly created.');
             }
             if (is_array($relation->via)) {
                 /** @var ActiveQuery $viaRelation */
@@ -1233,7 +1237,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
             $p2 = $this->isPrimaryKey(array_values($relation->link));
             if ($p1 && $p2) {
                 if ($this->getIsNewRecord() && $model->getIsNewRecord()) {
-                    throw new Exception('Unable to link models: both models are newly created.');
+                    throw new DbException('Unable to link models: both models are newly created.');
                 } elseif ($this->getIsNewRecord()) {
                     $this->bindModels(array_flip($relation->link), $this, $model);
                 } else {
@@ -1244,7 +1248,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
             } elseif ($p2) {
                 $this->bindModels($relation->link, $model, $this);
             } else {
-                throw new Exception('Unable to link models: the link does not involve any primary key.');
+                throw new DbException('Unable to link models: the link does not involve any primary key.');
             }
         }
 
@@ -1274,7 +1278,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * @param boolean $delete whether to delete the model that contains the foreign key.
      * If false, the model's foreign key will be set null and saved.
      * If true, the model containing the foreign key will be deleted.
-     * @throws Exception if the models cannot be unlinked
+     * @throws DbException if the models cannot be unlinked
      */
     public function unlink($name, $model, $delete = false)
     {
@@ -1340,7 +1344,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
                 }
                 $delete ? $this->delete() : $this->save(false);
             } else {
-                throw new Exception('Unable to unlink models: the link does not involve any primary key.');
+                throw new DbException('Unable to unlink models: the link does not involve any primary key.');
             }
         }
 
@@ -1439,14 +1443,14 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * @param array $link
      * @param ActiveRecordInterface $foreignModel
      * @param ActiveRecordInterface $primaryModel
-     * @throws Exception
+     * @throws DbException
      */
     private function bindModels($link, $foreignModel, $primaryModel)
     {
         foreach ($link as $fk => $pk) {
             $value = $primaryModel->$pk;
             if ($value === null) {
-                throw new Exception('Unable to link models: the primary key of ' . get_class($primaryModel) .
+                throw new DbException('Unable to link models: the primary key of ' . get_class($primaryModel) .
                                     ' is null.');
             }
             if (is_array($foreignModel->$fk)) { // relation via array valued attribute

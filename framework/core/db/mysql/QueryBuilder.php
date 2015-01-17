@@ -1,7 +1,7 @@
 <?php
 namespace rock\db\mysql;
 
-use rock\db\Exception;
+use rock\db\DbException;
 
 /**
  * QueryBuilder is the query builder for MySQL databases.
@@ -35,18 +35,19 @@ class QueryBuilder extends \rock\db\QueryBuilder
 
     /**
      * Builds a SQL statement for renaming a column.
-     * @param string $table the table whose column is to be renamed. The name will be properly quoted by the method.
+     *
+*@param string $table the table whose column is to be renamed. The name will be properly quoted by the method.
      * @param string $oldName the old name of the column. The name will be properly quoted by the method.
      * @param string $newName the new name of the column. The name will be properly quoted by the method.
      * @return string the SQL statement for renaming a DB column.
-     * @throws Exception
+     * @throws DbException
      */
     public function renameColumn($table, $oldName, $newName)
     {
         $quotedTable = $this->connection->quoteTableName($table);
         $row = $this->connection->createCommand('SHOW CREATE TABLE ' . $quotedTable)->queryOne();
         if ($row === false) {
-            throw new Exception("Unable to find column '$oldName' in table '$table'.");
+            throw new DbException("Unable to find column '$oldName' in table '$table'.");
         }
         if (isset($row['Create Table'])) {
             $sql = $row['Create Table'];
@@ -97,11 +98,12 @@ class QueryBuilder extends \rock\db\QueryBuilder
      * Creates a SQL statement for resetting the sequence value of a table's primary key.
      * The sequence will be reset such that the primary key of the next new row inserted
      * will have the specified value or 1.
-     * @param string $tableName the name of the table whose primary key sequence will be reset
+     *
+*@param string $tableName the name of the table whose primary key sequence will be reset
      * @param mixed $value the value for the primary key of the next new row inserted. If this is not set,
      * the next new row's primary key will have a value 1.
      * @return string the SQL statement for resetting sequence
-     * @throws Exception if the table does not exist or there is no sequence associated with the table.
+     * @throws DbException if the table does not exist or there is no sequence associated with the table.
      */
     public function resetSequence($tableName, $value = null)
     {
@@ -117,9 +119,9 @@ class QueryBuilder extends \rock\db\QueryBuilder
 
             return "ALTER TABLE $tableName AUTO_INCREMENT=$value";
         } elseif ($table === null) {
-            throw new Exception("Table not found: $tableName");
+            throw new DbException("Table not found: $tableName");
         } else {
-            throw new Exception("There is no sequence associated with table '$tableName'.");
+            throw new DbException("There is no sequence associated with table '$tableName'.");
         }
     }
 

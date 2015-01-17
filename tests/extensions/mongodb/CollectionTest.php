@@ -3,7 +3,7 @@
 namespace rockunit\extensions\mongodb;
 
 use rock\helpers\Trace;
-use rock\mongodb\Exception;
+use rock\mongodb\MongoException;
 use rockunit\common\CommonTestTrait;
 
 /**
@@ -277,7 +277,7 @@ class CollectionTest extends MongoDbTestCase
         $this->assertTrue(!isset($result['status']));
 
         // Test exceptions
-        $this->setExpectedException(Exception::className());
+        $this->setExpectedException(MongoException::className());
         $collection->findAndModify(['name' => 'customer 1'], ['$wrongOperator' => ['status' => 1]]);
     }
 
@@ -437,7 +437,7 @@ class CollectionTest extends MongoDbTestCase
         $indexInfo = $collection->mongoCollection->getIndexInfo();
         $this->assertEquals(1, count($indexInfo));
 
-        $this->setExpectedException(Exception::className());
+        $this->setExpectedException(MongoException::className());
         $collection->dropIndex('name');
     }
 

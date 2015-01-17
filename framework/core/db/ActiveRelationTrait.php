@@ -133,10 +133,11 @@ trait ActiveRelationTrait
     /**
      * Finds the related records for the specified primary record.
      * This method is invoked when a relation of an ActiveRecord is being accessed in a lazy fashion.
-     * @param string $name the relation name
+     *
+*@param string $name the relation name
      * @param ActiveRecordInterface|BaseActiveRecord $model the primary model
      * @return mixed the related record(s)
-     * @throws Exception if the relation is invalid
+     * @throws DbException if the relation is invalid
      */
     public function findFor($name, $model)
     {
@@ -144,7 +145,7 @@ trait ActiveRelationTrait
             $method = new \ReflectionMethod($model, 'get' . $name);
             $realName = lcfirst(substr($method->getName(), 3));
             if ($realName !== $name) {
-                throw new Exception('Relation names are case sensitive. ' . get_class($model) .
+                throw new DbException('Relation names are case sensitive. ' . get_class($model) .
                                                          " has a relation named '{$realName}' instead of '{$name}'.");
             }
         }
@@ -178,17 +179,18 @@ trait ActiveRelationTrait
 
     /**
      * Finds the related records and populates them into the primary models.
-     * @param string $name the relation name
+     *
+*@param string $name the relation name
      * @param array $primaryModels primary models
      * @return array the related models
-     * @throws Exception if {@see \rock\db\ActiveRelationTrait::$link} is invalid
+     * @throws DbException if {@see \rock\db\ActiveRelationTrait::$link} is invalid
      */
     public function populateRelation($name, &$primaryModels)
     {
         /** @var \rock\db\ActiveQuery $this */
 
         if (!is_array($this->link)) {
-            throw new Exception('Invalid link: it must be an array of key-value pairs.');
+            throw new DbException('Invalid link: it must be an array of key-value pairs.');
         }
 
         if ($this->via instanceof self) {
@@ -450,7 +452,7 @@ trait ActiveRelationTrait
 
     /**
      * @param array $models
-     * @throws Exception
+     * @throws DbException
      */
     private function filterByModels($models)
     {
@@ -464,7 +466,7 @@ trait ActiveRelationTrait
             $attribute = reset($this->link);
             foreach ($models as $model) {
                 if (empty($this->link) && !isset($model[$attribute])) {
-                    throw new Exception("Field '{$attribute}' not found.");
+                    throw new DbException("Field '{$attribute}' not found.");
                 }
                 if (($value = $model[$attribute]) !== null) {
                     if (is_array($value)) {

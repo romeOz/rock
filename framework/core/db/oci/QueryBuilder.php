@@ -2,7 +2,7 @@
 namespace rock\db\oci;
 
 use rock\db\Connection;
-use rock\db\Exception;
+use rock\db\DbException;
 
 /**
  * QueryBuilder is the query builder for Oracle databases.
@@ -111,7 +111,7 @@ EOD;
     {
         $tableSchema = $this->connection->getTableSchema($table);
         if ($tableSchema === null) {
-            throw new Exception("Unknown table: $table");
+            throw new DbException("Unknown table: $table");
         }
         if ($tableSchema->sequenceName === null) {
             return '';
@@ -144,7 +144,7 @@ EOD;
             $sql .= ' ON DELETE ' . $delete;
         }
         if ($update !== null) {
-            throw new Exception('Oracle does not support ON UPDATE clause.');
+            throw new DbException('Oracle does not support ON UPDATE clause.');
         }
 
         return $sql;

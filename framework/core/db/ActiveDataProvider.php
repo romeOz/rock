@@ -164,11 +164,11 @@ class ActiveDataProvider
             }
             return $result;
         } else {
-            throw new Exception('Var must be of type array or instances ActiveRecord.');
+            throw new DbException('Var must be of type array or instances ActiveRecord.');
         }
 
         if (!is_array($data)) {
-            throw new Exception('Var must be of type array or instances ActiveRecord.');
+            throw new DbException('Var must be of type array or instances ActiveRecord.');
         }
 
         reset($data);

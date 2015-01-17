@@ -160,7 +160,7 @@ class Query extends \rock\db\Query
      */
     public function join($type, $table, $on = '', $params = [])
     {
-        throw new Exception('"' . __METHOD__ . '" is not supported.');
+        throw new SphinxException('"' . __METHOD__ . '" is not supported.');
     }
 
     /**
@@ -168,7 +168,7 @@ class Query extends \rock\db\Query
      */
     public function innerJoin($table, $on = '', $params = [])
     {
-        throw new Exception('"' . __METHOD__ . '" is not supported.');
+        throw new SphinxException('"' . __METHOD__ . '" is not supported.');
     }
 
     /**
@@ -176,7 +176,7 @@ class Query extends \rock\db\Query
      */
     public function leftJoin($table, $on = '', $params = [])
     {
-        throw new Exception('"' . __METHOD__ . '" is not supported.');
+        throw new SphinxException('"' . __METHOD__ . '" is not supported.');
     }
 
     /**
@@ -184,7 +184,7 @@ class Query extends \rock\db\Query
      */
     public function rightJoin($table, $on = '', $params = [])
     {
-        throw new Exception('"' . __METHOD__ . '" is not supported.');
+        throw new SphinxException('"' . __METHOD__ . '" is not supported.');
     }
     /**
      * Sets the query options.
@@ -306,8 +306,9 @@ class Query extends \rock\db\Query
 
     /**
      * Builds a snippets from provided source data.
-     * @param array $source the source data to extract a snippet from.
-     * @throws Exception in case {@see \rock\sphinx\Query::$match} is not specified.
+     *
+*@param array $source the source data to extract a snippet from.
+     * @throws SphinxException in case {@see \rock\sphinx\Query::$match} is not specified.
      * @return array snippets list.
      */
     protected function callSnippets(array $source)
@@ -317,17 +318,18 @@ class Query extends \rock\db\Query
 
     /**
      * Builds a snippets from provided source data by the given index.
-     * @param array $source the source data to extract a snippet from.
+     *
+*@param array $source the source data to extract a snippet from.
      * @param string $from name of the source index.
      * @return array snippets list.
-     * @throws Exception in case {@see \rock\sphinx\Query::$match} is not specified.
+     * @throws SphinxException in case {@see \rock\sphinx\Query::$match} is not specified.
      */
     protected function callSnippetsInternal(array $source, $from)
     {
         $connection = $this->getConnection();
         $match = $this->match;
         if ($match === null) {
-            throw new Exception('Unable to call snippets: "' . $this->className() . '::match" should be specified.');
+            throw new SphinxException('Unable to call snippets: "' . $this->className() . '::match" should be specified.');
         }
 
         return $connection->createCommand()

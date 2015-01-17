@@ -2,7 +2,7 @@
 namespace rock\mongodb\file;
 
 use rock\file\UploadedFile;
-use rock\mongodb\Exception;
+use rock\mongodb\MongoException;
 
 /**
  * ActiveRecord is the base class for classes representing Mongo GridFS files in terms of objects.
@@ -128,7 +128,7 @@ abstract class ActiveRecord extends \rock\mongodb\ActiveRecord
 
     /**
      * @see ActiveRecord::update()
-     * @throws Exception
+     * @throws MongoException
      */
     protected function updateInternal($attributes = null)
     {
@@ -185,7 +185,7 @@ abstract class ActiveRecord extends \rock\mongodb\ActiveRecord
             // that it doesn't change anything and thus returns 0.
             $rows = $collection->update($condition, $values);
             if ($lock !== null && !$rows) {
-                throw new Exception('The object being updated is outdated.');
+                throw new MongoException('The object being updated is outdated.');
             }
         }
 
@@ -201,9 +201,10 @@ abstract class ActiveRecord extends \rock\mongodb\ActiveRecord
 
     /**
      * Extracts filename from given raw file value.
-     * @param mixed $file raw file value.
+     *
+*@param mixed $file raw file value.
      * @return string file name.
-     * @throws Exception on invalid file value.
+     * @throws MongoException on invalid file value.
      */
     protected function extractFileName($file)
     {
@@ -213,10 +214,10 @@ abstract class ActiveRecord extends \rock\mongodb\ActiveRecord
             if (file_exists($file)) {
                 return $file;
             } else {
-                throw new Exception("File '{$file}' does not exist.");
+                throw new MongoException("File '{$file}' does not exist.");
             }
         } else {
-            throw new Exception('Unsupported type of "file" attribute.');
+            throw new MongoException('Unsupported type of "file" attribute.');
         }
     }
 
@@ -234,8 +235,9 @@ abstract class ActiveRecord extends \rock\mongodb\ActiveRecord
 
     /**
      * Returns the associated file content.
-     * @return null|string file content.
-     * @throws Exception on invalid file attribute value.
+     *
+*@return null|string file content.
+     * @throws MongoException on invalid file attribute value.
      */
     public function getFileContent()
     {
@@ -258,18 +260,19 @@ abstract class ActiveRecord extends \rock\mongodb\ActiveRecord
             if (file_exists($file)) {
                 return file_get_contents($file);
             } else {
-                throw new Exception("File '{$file}' does not exist.");
+                throw new MongoException("File '{$file}' does not exist.");
             }
         } else {
-            throw new Exception('Unsupported type of "file" attribute.');
+            throw new MongoException('Unsupported type of "file" attribute.');
         }
     }
 
     /**
      * Writes the the internal file content into the given filename.
-     * @param string $filename full filename to be written.
+     *
+*@param string $filename full filename to be written.
      * @return boolean whether the operation was successful.
-     * @throws Exception on invalid file attribute value.
+     * @throws MongoException on invalid file attribute value.
      */
     public function writeFile($filename)
     {
@@ -278,7 +281,7 @@ abstract class ActiveRecord extends \rock\mongodb\ActiveRecord
             $file = $this->refreshFile();
         }
         if (empty($file)) {
-            throw new Exception('There is no file associated with this object.');
+            throw new MongoException('There is no file associated with this object.');
         } elseif ($file instanceof \MongoGridFSFile) {
             return ($file->write($filename) == $file->getSize());
         } elseif ($file instanceof UploadedFile) {
@@ -287,10 +290,10 @@ abstract class ActiveRecord extends \rock\mongodb\ActiveRecord
             if (file_exists($file)) {
                 return copy($file, $filename);
             } else {
-                throw new Exception("File '{$file}' does not exist.");
+                throw new MongoException("File '{$file}' does not exist.");
             }
         } else {
-            throw new Exception('Unsupported type of "file" attribute.');
+            throw new MongoException('Unsupported type of "file" attribute.');
         }
     }
 
@@ -298,8 +301,9 @@ abstract class ActiveRecord extends \rock\mongodb\ActiveRecord
      * This method returns a stream resource that can be used with all file functions in PHP,
      * which deal with reading files. The contents of the file are pulled out of MongoDB on the fly,
      * so that the whole file does not have to be loaded into memory first.
-     * @return resource file stream resource.
-     * @throws Exception on invalid file attribute value.
+     *
+*@return resource file stream resource.
+     * @throws MongoException on invalid file attribute value.
      */
     public function getFileResource()
     {
@@ -308,7 +312,7 @@ abstract class ActiveRecord extends \rock\mongodb\ActiveRecord
             $file = $this->refreshFile();
         }
         if (empty($file)) {
-            throw new Exception('There is no file associated with this object.');
+            throw new MongoException('There is no file associated with this object.');
         } elseif ($file instanceof \MongoGridFSFile) {
             return $file->getResource();
         } elseif ($file instanceof UploadedFile) {
@@ -317,10 +321,10 @@ abstract class ActiveRecord extends \rock\mongodb\ActiveRecord
             if (file_exists($file)) {
                 return fopen($file, 'r');
             } else {
-                throw new Exception("File '{$file}' does not exist.");
+                throw new MongoException("File '{$file}' does not exist.");
             }
         } else {
-            throw new Exception('Unsupported type of "file" attribute.');
+            throw new MongoException('Unsupported type of "file" attribute.');
         }
     }
 }

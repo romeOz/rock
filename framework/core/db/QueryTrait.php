@@ -230,7 +230,7 @@ trait QueryTrait
      *
      * @param array $condition the original condition
      * @return array the condition with {@see \rock\db\QueryTrait::isEmpty()}(empty operands)] removed.
-     * @throws Exception if the condition operator is not supported
+     * @throws DbException if the condition operator is not supported
      */
     protected function filterCondition($condition)
     {

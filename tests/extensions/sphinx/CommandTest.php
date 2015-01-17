@@ -3,7 +3,7 @@
 namespace rockunit\extensions\sphinx;
 
 use rock\db\DataReader;
-use rock\db\Exception;
+use rock\db\DbException;
 
 /**
  * @group search
@@ -81,7 +81,7 @@ class CommandTest extends SphinxTestCase
         $this->assertEquals(1, $command->queryScalar());
 
         $command = $db->createCommand('bad SQL');
-        $this->setExpectedException(Exception::className());
+        $this->setExpectedException(DbException::className());
         $command->execute();
     }
 
@@ -142,7 +142,7 @@ class CommandTest extends SphinxTestCase
         $this->assertNull($command->queryScalar());
 
         $command = $db->createCommand('bad SQL');
-        $this->setExpectedException(Exception::className());
+        $this->setExpectedException(DbException::className());
         $command->query();
     }
 

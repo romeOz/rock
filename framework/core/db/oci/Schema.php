@@ -2,7 +2,7 @@
 namespace rock\db\oci;
 
 use rock\db\ColumnSchema;
-use rock\db\Exception;
+use rock\db\DbException;
 use rock\db\TableSchema;
 
 /**
@@ -172,7 +172,7 @@ EOD;
      * Returns the ID of the last inserted row or sequence value.
      * @param string $sequenceName name of the sequence object (required by some DBMS)
      * @return string the row ID of the last row inserted, or the last value retrieved from the sequence object
-     * @throws Exception if the DB connection is not active
+     * @throws DbException if the DB connection is not active
      */
     public function getLastInsertID($sequenceName = '')
     {
@@ -182,7 +182,7 @@ EOD;
                 return $connection->createCommand("SELECT {$sequenceName}.CURRVAL FROM DUAL")->queryScalar();
             });
         } else {
-            throw new Exception('DB Connection is not active.');
+            throw new DbException('DB Connection is not active.');
         }
     }
 

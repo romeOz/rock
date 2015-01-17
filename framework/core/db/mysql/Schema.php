@@ -2,7 +2,7 @@
 namespace rock\db\mysql;
 
 use rock\db\ColumnSchema;
-use rock\db\Exception;
+use rock\db\DbException;
 use rock\db\Expression;
 use rock\db\TableSchema;
 
@@ -190,7 +190,7 @@ class Schema extends \rock\db\Schema
         try {
             $columns = $this->connection->createCommand($sql)->queryAll();
         } catch (\Exception $e) {
-            if ($e instanceof Exception && strpos($e->getMessage(), 'SQLSTATE[42S02') !== false) {
+            if ($e instanceof DbException && strpos($e->getMessage(), 'SQLSTATE[42S02') !== false) {
                 // table does not exist
                 // https://dev.mysql.com/doc/refman/5.5/en/error-messages-server.html#error_er_bad_table_error
                 return false;

@@ -170,8 +170,9 @@ class Connection implements ComponentsInterface
     /**
      * Returns {@see \rock\mongodb\Connection::$defaultDatabaseName} value, if it is not set,
      * attempts to determine it from {@see \rock\mongodb\Connection::$dsn} value.
-     * @return string default database name
-     * @throws Exception if unable to determine default database name.
+     *
+*@return string default database name
+     * @throws MongoException if unable to determine default database name.
      */
     protected function fetchDefaultDatabaseName()
     {
@@ -181,7 +182,7 @@ class Connection implements ComponentsInterface
             } elseif (preg_match('/^mongodb:\\/\\/.+\\/([^?&]+)/s', $this->dsn, $matches)) {
                 $this->defaultDatabaseName = $matches[1];
             } else {
-                throw new Exception("Unable to determine default database name from dsn.");
+                throw new MongoException("Unable to determine default database name from dsn.");
             }
         }
 
@@ -258,13 +259,14 @@ class Connection implements ComponentsInterface
     /**
      * Establishes a Mongo connection.
      * It does nothing if a Mongo connection has already been established.
-     * @throws Exception if connection fails
+     *
+*@throws MongoException if connection fails
      */
     public function open()
     {
         if ($this->mongoClient === null) {
             if (empty($this->dsn)) {
-                throw new Exception($this->className() . '::dsn cannot be empty.');
+                throw new MongoException($this->className() . '::dsn cannot be empty.');
             }
             $token = 'Opening MongoDB connection: ' . $this->dsn;
             try {
@@ -280,7 +282,7 @@ class Connection implements ComponentsInterface
                 Rock::endProfile('mongodb', $token);
             } catch (\Exception $e) {
                 Rock::endProfile('mongodb', $token);
-                throw new Exception($e->getMessage(), [], $e);
+                throw new MongoException($e->getMessage(), [], $e);
             }
         }
     }

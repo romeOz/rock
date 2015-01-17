@@ -56,7 +56,7 @@ class SelectBuilder
 
     /**
      * @param array      $params
-     * @throws Exception
+     * @throws DbException
      * @return array
      */
     public function build(&$params = [])
@@ -111,7 +111,7 @@ class SelectBuilder
                     $alias = true;
                 }
             } else {
-                throw new Exception(Exception::WRONG_TYPE, ['name' => json_encode($select)]);
+                throw new DbException(DbException::WRONG_TYPE, ['name' => json_encode($select)]);
             }
             $aliasSeparator = Helper::getValue($aliasSeparator, $connection->aliasSeparator);
 

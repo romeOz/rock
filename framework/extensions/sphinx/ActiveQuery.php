@@ -313,14 +313,15 @@ class ActiveQuery extends Query implements ActiveQueryInterface
 
     /**
      * Fetches the source for the snippets using {@see \rock\sphinx\ActiveRecord::getSnippetSource()} method.
-     * @param ActiveRecord[] $models raw query result rows.
-     * @throws Exception if {@see \rock\db\ActiveQueryTrait::$asArray} enabled.
+     *
+*@param ActiveRecord[] $models raw query result rows.
+     * @throws SphinxException if {@see \rock\db\ActiveQueryTrait::$asArray} enabled.
      * @return array snippet source strings
      */
     protected function fetchSnippetSourceFromModels($models)
     {
         if ($this->asArray) {
-            throw new Exception('"' . __METHOD__ . '" unable to determine snippet source from plain array. Either disable "asArray" option or use regular "snippetCallback"');
+            throw new SphinxException('"' . __METHOD__ . '" unable to determine snippet source from plain array. Either disable "asArray" option or use regular "snippetCallback"');
         }
         $result = [];
         foreach ($models as $model) {

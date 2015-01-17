@@ -3,7 +3,7 @@
 namespace rockunit\extensions\mongodb;
 
 use rock\mongodb\Collection;
-use rock\mongodb\Exception;
+use rock\mongodb\MongoException;
 use rock\mongodb\file\Collection as FileCollection;
 use rock\mongodb\Connection;
 use rock\mongodb\Database;
@@ -42,7 +42,7 @@ class ConnectionTest extends MongoDbTestCase
 
         $connection = new Connection;
         $connection->dsn = 'unknown::memory:';
-        $this->setExpectedException(Exception::className());
+        $this->setExpectedException(MongoException::className());
         $connection->open();
     }
 

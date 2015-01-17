@@ -147,8 +147,9 @@ abstract class ActiveRecord extends BaseActiveRecord
 
     /**
      * Returns the schema information of the Sphinx index associated with this AR class.
-     * @param Connection|null $connection
-     * @throws Exception
+     *
+*@param Connection|null $connection
+     * @throws SphinxException
      * @return IndexSchema the schema information of the Sphinx index associated with this AR class.
      */
     public static function getIndexSchema($connection = null)
@@ -163,7 +164,7 @@ abstract class ActiveRecord extends BaseActiveRecord
         if ($schema !== null) {
             return $schema;
         } else {
-            throw new Exception("The index does not exist: " . static::indexName());
+            throw new SphinxException("The index does not exist: " . static::indexName());
         }
     }
 
@@ -263,11 +264,11 @@ abstract class ActiveRecord extends BaseActiveRecord
      * ```
      *
      * @return string snippet source string.
-     * @throws Exception if this is not supported by the Active Record class
+     * @throws SphinxException if this is not supported by the Active Record class
      */
     public function getSnippetSource()
     {
-        throw new Exception($this->className() . ' does not provide snippet source.');
+        throw new SphinxException($this->className() . ' does not provide snippet source.');
     }
 
     /**
@@ -447,7 +448,7 @@ abstract class ActiveRecord extends BaseActiveRecord
      * meaning all attributes that are loaded from DB will be saved.
      * @return integer|boolean the number of rows affected, or false if validation fails
      * or {@see \rock\db\BaseActiveRecord::beforeSave()} stops the updating process.
-     * @throws Exception if {@see \rock\db\BaseActiveRecord::optimisticLock()}(optimistic locking) is enabled and the data
+     * @throws SphinxException if {@see \rock\db\BaseActiveRecord::optimisticLock()}(optimistic locking) is enabled and the data
      * being updated is outdated.
      * @throws \Exception in case update failed.
      */
@@ -479,7 +480,7 @@ abstract class ActiveRecord extends BaseActiveRecord
 
     /**
      * @see update()
-     * @throws Exception
+     * @throws SphinxException
      */
     protected function updateInternal($attributes = null)
     {
@@ -526,7 +527,7 @@ abstract class ActiveRecord extends BaseActiveRecord
             $rows = $this->updateAll($values, $condition);
 
             if ($lock !== null && !$rows) {
-                throw new Exception('The object being updated is outdated.');
+                throw new SphinxException('The object being updated is outdated.');
             }
         }
 
@@ -555,7 +556,7 @@ abstract class ActiveRecord extends BaseActiveRecord
      *
      * @return integer|boolean the number of rows deleted, or false if the deletion is unsuccessful for some reason.
      * Note that it is possible the number of rows deleted is 0, even though the deletion execution is successful.
-     * @throws Exception if {@see \rock\db\BaseActiveRecord::optimisticLock()}(optimistic locking) is enabled and the data
+     * @throws SphinxException if {@see \rock\db\BaseActiveRecord::optimisticLock()}(optimistic locking) is enabled and the data
      * being deleted is outdated.
      * @throws \Exception in case delete failed.
      */
@@ -575,7 +576,7 @@ abstract class ActiveRecord extends BaseActiveRecord
                 }
                 $result = $this->deleteAll($condition);
                 if ($lock !== null && !$result) {
-                    throw new Exception('The object being deleted is outdated.');
+                    throw new SphinxException('The object being deleted is outdated.');
                 }
                 $this->setOldAttributes(null);
                 $this->afterDelete();

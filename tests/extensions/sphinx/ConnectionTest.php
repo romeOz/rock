@@ -2,7 +2,7 @@
 
 namespace rockunit\extensions\sphinx;
 
-use rock\db\Exception;
+use rock\db\DbException;
 use rock\sphinx\Connection;
 
 /**
@@ -39,7 +39,7 @@ class ConnectionTest extends SphinxTestCase
 
         $connection = new Connection;
         $connection->dsn = 'unknown::memory:';
-        $this->setExpectedException(Exception::className());
+        $this->setExpectedException(DbException::className());
         $connection->open();
     }
 }

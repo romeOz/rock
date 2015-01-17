@@ -5,7 +5,7 @@ namespace rockunit\extensions\mongodb;
 
 
 use rock\mongodb\Connection;
-use rock\mongodb\Exception;
+use rock\mongodb\MongoException;
 use rock\Rock;
 
 class MongoDbTestCase extends \PHPUnit_Framework_TestCase
@@ -77,7 +77,7 @@ class MongoDbTestCase extends \PHPUnit_Framework_TestCase
         if ($this->mongodb) {
             try {
                 $this->mongodb->getCollection($name)->drop();
-            } catch (Exception $e) {
+            } catch (MongoException $e) {
                 // shut down exception
             }
         }
@@ -92,7 +92,7 @@ class MongoDbTestCase extends \PHPUnit_Framework_TestCase
         if ($this->mongodb) {
             try {
                 $this->mongodb->getFileCollection($name)->drop();
-            } catch (Exception $e) {
+            } catch (MongoException $e) {
                 // shut down exception
             }
         }

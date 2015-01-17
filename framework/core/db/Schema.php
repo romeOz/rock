@@ -266,13 +266,14 @@ abstract class Schema
      * Returns all table names in the database.
      * This method should be overridden by child classes in order to support this feature
      * because the default implementation simply throws an exception.
-     * @param string $schema the schema of the tables. Defaults to empty string, meaning the current or default schema.
+     *
+*@param string $schema the schema of the tables. Defaults to empty string, meaning the current or default schema.
      * @return array all table names in the database. The names have NO schema name prefix.
-     * @throws Exception if this method is called
+     * @throws DbException if this method is called
      */
     protected function findTableNames($schema = '')
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new DbException(DbException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -288,20 +289,22 @@ abstract class Schema
      *
      * This method should be overridden by child classes in order to support this feature
      * because the default implementation simply throws an exception
-     * @param TableSchema $table the table metadata
+     *
+*@param TableSchema $table the table metadata
      * @return array all unique indexes for the given table.
-     * @throws Exception if this method is called
+     * @throws DbException if this method is called
      */
     public function findUniqueIndexes($table)
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new DbException(DbException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
      * Returns the ID of the last inserted row or sequence value.
-     * @param string $sequenceName name of the sequence object (required by some DBMS)
+     *
+*@param string $sequenceName name of the sequence object (required by some DBMS)
      * @return string the row ID of the last row inserted, or the last value retrieved from the sequence object
-     * @throws Exception if the DB connection is not active
+     * @throws DbException if the DB connection is not active
      * @see http://www.php.net/manual/en/function.PDO-lastInsertId.php
      */
     public function getLastInsertID($sequenceName = '')
@@ -309,7 +312,7 @@ abstract class Schema
         if ($this->connection->isActive) {
             return $this->connection->pdo->lastInsertId($sequenceName);
         } else {
-            throw new Exception('DB Connection is not active.');
+            throw new DbException('DB Connection is not active.');
         }
     }
 

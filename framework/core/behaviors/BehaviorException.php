@@ -5,7 +5,7 @@ namespace rock\behaviors;
 
 use rock\exception\BaseException;
 
-class Exception extends BaseException
+class BehaviorException extends BaseException
 {
 
 }

@@ -465,7 +465,7 @@ class Schema
             $columns = $this->connection->createCommand($sql)->queryAll();
             $this->connection->enableQueryCache = $enableQueryCache;
         } catch (\Exception $e) {
-            if (($e instanceof Exception || $e instanceof \rock\db\Exception) && strpos($e->getMessage(), 'SQLSTATE[42S02') !== false) {
+            if (($e instanceof SphinxException || $e instanceof \rock\db\DbException) && strpos($e->getMessage(), 'SQLSTATE[42S02') !== false) {
                 // index does not exist
                 // https://dev.mysql.com/doc/refman/5.5/en/error-messages-server.html#error_er_bad_table_error
                 return false;

@@ -77,7 +77,8 @@ class Transaction
 
     /**
      * Begins a transaction.
-     * @param string|null $isolationLevel The [isolation level][] to use for this transaction.
+     *
+*@param string|null $isolationLevel The [isolation level][] to use for this transaction.
      * This can be one of {@see \rock\db\Transaction::READ_UNCOMMITTED}, {@see \rock\db\Transaction::READ_COMMITTED}, {@see \rock\db\Transaction::REPEATABLE_READ} and {@see \rock\db\Transaction::SERIALIZABLE} but
      * also a string containing DBMS specific syntax to be used after `SET TRANSACTION ISOLATION LEVEL`.
      * If not specified (`null`) the isolation level will not be set explicitly and the DBMS default will be used.
@@ -91,12 +92,12 @@ class Transaction
      * At the time of this writing affected DBMS are MSSQL and SQLite.
      *
      * [isolation level]: http://en.wikipedia.org/wiki/Isolation_%28database_systems%29#Isolation_levels
-     * @throws Exception if {@see \rock\db\Transaction::$connection} is `null`.
+     * @throws DbException if {@see \rock\db\Transaction::$connection} is `null`.
      */
     public function begin($isolationLevel = null)
     {
         if ($this->connection === null) {
-            throw new Exception('Transaction::db must be set.');
+            throw new DbException('Transaction::db must be set.');
         }
         $this->connection->open();
 
@@ -136,12 +137,13 @@ class Transaction
 
     /**
      * Commits a transaction.
-     * @throws Exception if the transaction is not active
+     *
+*@throws DbException if the transaction is not active
      */
     public function commit()
     {
         if (!$this->getIsActive()) {
-            throw new Exception('Failed to commit transaction: transaction was inactive.');
+            throw new DbException('Failed to commit transaction: transaction was inactive.');
         }
 
         $this->_level--;
@@ -175,7 +177,8 @@ class Transaction
 
     /**
      * Rolls back a transaction.
-     * @throws Exception if the transaction is not active
+     *
+*@throws DbException if the transaction is not active
      */
     public function rollBack()
     {
@@ -211,7 +214,7 @@ class Transaction
             $schema->rollBackSavepoint('LEVEL' . $this->_level);
         } else {
             // throw an exception to fail the outer transaction
-            throw new Exception('Roll back failed: nested transaction not supported.');
+            throw new DbException('Roll back failed: nested transaction not supported.');
         }
     }
 
@@ -221,16 +224,17 @@ class Transaction
      * This method can be used to set the isolation level while the transaction is already active.
      * However this is not supported by all DBMS so you might rather specify the isolation level directly
      * when calling {@see \rock\db\Transaction::begin()}.
-     * @param string $level The transaction isolation level to use for this transaction.
+     *
+*@param string $level The transaction isolation level to use for this transaction.
      * This can be one of {@see \rock\db\Transaction::READ_UNCOMMITTED}, {@see \rock\db\Transaction::READ_COMMITTED}, {@see \rock\db\Transaction::REPEATABLE_READ} and {@see \rock\db\Transaction::SERIALIZABLE} but
      * also a string containing DBMS specific syntax to be used after `SET TRANSACTION ISOLATION LEVEL`.
-     * @throws Exception if the transaction is not active
+     * @throws DbException if the transaction is not active
      * @see http://en.wikipedia.org/wiki/Isolation_%28database_systems%29#Isolation_levels
      */
     public function setIsolationLevel($level)
     {
         if (!$this->getIsActive()) {
-            throw new Exception('Failed to set isolation level: transaction was inactive.');
+            throw new DbException('Failed to set isolation level: transaction was inactive.');
         }
         Rock::trace(
             'db',

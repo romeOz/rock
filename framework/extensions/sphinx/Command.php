@@ -198,7 +198,7 @@ class Command extends \rock\db\Command
      */
     public function createTable($table, $columns, $options = null, $exists = false)
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new SphinxException(SphinxException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -206,7 +206,7 @@ class Command extends \rock\db\Command
      */
     public function renameTable($table, $newName)
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new SphinxException(SphinxException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -214,7 +214,7 @@ class Command extends \rock\db\Command
      */
     public function dropTable($table, $exists = false)
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new SphinxException(SphinxException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -222,7 +222,7 @@ class Command extends \rock\db\Command
      */
     public function truncateTable($table)
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new SphinxException(SphinxException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -230,7 +230,7 @@ class Command extends \rock\db\Command
      */
     public function addColumn($table, $column, $type)
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new SphinxException(SphinxException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -238,7 +238,7 @@ class Command extends \rock\db\Command
      */
     public function dropColumn($table, $column)
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new SphinxException(SphinxException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -246,7 +246,7 @@ class Command extends \rock\db\Command
      */
     public function renameColumn($table, $oldName, $newName)
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new SphinxException(SphinxException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -254,7 +254,7 @@ class Command extends \rock\db\Command
      */
     public function alterColumn($table, $column, $type)
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new SphinxException(SphinxException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -262,7 +262,7 @@ class Command extends \rock\db\Command
      */
     public function addPrimaryKey($name, $table, $columns)
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new SphinxException(SphinxException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -270,7 +270,7 @@ class Command extends \rock\db\Command
      */
     public function dropPrimaryKey($name, $table)
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new SphinxException(SphinxException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -278,7 +278,7 @@ class Command extends \rock\db\Command
      */
     public function addForeignKey($name, $table, $columns, $refTable, $refColumns, $delete = null, $update = null)
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new SphinxException(SphinxException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -286,7 +286,7 @@ class Command extends \rock\db\Command
      */
     public function dropForeignKey($name, $table)
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new SphinxException(SphinxException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -294,7 +294,7 @@ class Command extends \rock\db\Command
      */
     public function createIndex($name, $table, $columns, $unique = false)
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new SphinxException(SphinxException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -302,7 +302,7 @@ class Command extends \rock\db\Command
      */
     public function dropIndex($name, $table)
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new SphinxException(SphinxException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -310,7 +310,7 @@ class Command extends \rock\db\Command
      */
     public function resetSequence($table, $value = null)
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new SphinxException(SphinxException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -318,6 +318,6 @@ class Command extends \rock\db\Command
      */
     public function checkIntegrity($check = true, $schema = '', $table = '')
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new SphinxException(SphinxException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 }

@@ -519,28 +519,30 @@ class QueryBuilder
      * Creates a SQL statement for resetting the sequence value of a table's primary key.
      * The sequence will be reset such that the primary key of the next new row inserted
      * will have the specified value or 1.
-     * @param string $table the name of the table whose primary key sequence will be reset
+     *
+*@param string $table the name of the table whose primary key sequence will be reset
      * @param array|string $value the value for the primary key of the next new row inserted. If this is not set,
      * the next new row's primary key will have a value 1.
      * @return string the SQL statement for resetting sequence
-     * @throws Exception if this is not supported by the underlying DBMS
+     * @throws DbException if this is not supported by the underlying DBMS
      */
     public function resetSequence($table, $value = null)
     {
-        throw new Exception(Exception::NOT_SUPPORT_RESETTING, ['driver' => $this->connection->getDriverName()]);
+        throw new DbException(DbException::NOT_SUPPORT_RESETTING, ['driver' => $this->connection->getDriverName()]);
     }
 
     /**
      * Builds a SQL statement for enabling or disabling integrity check.
-     * @param boolean $check whether to turn on or off the integrity check.
+     *
+*@param boolean $check whether to turn on or off the integrity check.
      * @param string $schema the schema of the tables. Defaults to empty string, meaning the current or default schema.
      * @param string $table the table name. Defaults to empty string, meaning that no table will be changed.
      * @return string the SQL statement for checking integrity
-     * @throws Exception if this is not supported by the underlying DBMS
+     * @throws DbException if this is not supported by the underlying DBMS
      */
     public function checkIntegrity($check = true, $schema = '', $table = '')
     {
-        throw new Exception(Exception::NOT_SUPPORT_INTEGRITY_CHECK, ['driver' => $this->connection->getDriverName()]);
+        throw new DbException(DbException::NOT_SUPPORT_INTEGRITY_CHECK, ['driver' => $this->connection->getDriverName()]);
     }
 
     /**
@@ -668,7 +670,7 @@ class QueryBuilder
      * @param array $joins
      * @param array $params the binding parameters to be populated
      * @return string the JOIN clause built from {@see \rock\db\Query::$join}.
-     * @throws Exception if the $joins parameter is not in proper format
+     * @throws DbException if the $joins parameter is not in proper format
      */
     public function buildJoin($joins, &$params)
     {
@@ -678,7 +680,7 @@ class QueryBuilder
 
         foreach ($joins as $i => $join) {
             if (!is_array($join) || !isset($join[0], $join[1])) {
-                throw new Exception('A join clause must be specified as an array of join type, join table, and optionally join condition.');
+                throw new DbException('A join clause must be specified as an array of join type, join table, and optionally join condition.');
             }
             // 0:join type, 1:join table, 2:on-condition (optional)
             list ($joinType, $table) = $join;
@@ -1005,12 +1007,12 @@ class QueryBuilder
      * @param array $operands the SQL expressions to connect.
      * @param array $params the binding parameters to be populated
      * @return string the generated SQL expression
-     * @throws Exception if wrong number of operands have been given.
+     * @throws DbException if wrong number of operands have been given.
      */
     public function buildNotCondition($operator, $operands, &$params)
     {
         if (count($operands) != 1) {
-            throw new Exception("Operator '$operator' requires exactly one operand.");
+            throw new DbException("Operator '$operator' requires exactly one operand.");
         }
 
         $operand = reset($operands);
@@ -1032,12 +1034,12 @@ class QueryBuilder
      * describe the interval that column value should be in.
      * @param array $params the binding parameters to be populated
      * @return string the generated SQL expression
-     * @throws Exception if wrong number of operands have been given.
+     * @throws DbException if wrong number of operands have been given.
      */
     public function buildBetweenCondition($operator, $operands, &$params)
     {
         if (!isset($operands[0], $operands[1], $operands[2])) {
-            throw new Exception("Operator '$operator' requires three operands.");
+            throw new DbException("Operator '$operator' requires three operands.");
         }
 
         list($column, $value1, $value2) = $operands;
@@ -1078,12 +1080,12 @@ class QueryBuilder
      * operator is `IN` and empty if operator is `NOT IN`.
      * @param array $params the binding parameters to be populated
      * @return string the generated SQL expression
-     * @throws Exception if wrong number of operands have been given.
+     * @throws DbException if wrong number of operands have been given.
      */
     public function buildInCondition($operator, $operands, &$params)
     {
         if (!isset($operands[0], $operands[1])) {
-            throw new Exception("Operator '$operator' requires two operands.");
+            throw new DbException("Operator '$operator' requires two operands.");
         }
 
         list($column, $values) = $operands;
@@ -1202,19 +1204,19 @@ class QueryBuilder
      *   the values will be automatically enclosed within a pair of percentage characters.
      * @param array $params the binding parameters to be populated
      * @return string the generated SQL expression
-     * @throws Exception if wrong number of operands have been given.
+     * @throws DbException if wrong number of operands have been given.
      */
     public function buildLikeCondition($operator, $operands, &$params)
     {
         if (!isset($operands[0], $operands[1])) {
-            throw new Exception("Operator '$operator' requires two operands.");
+            throw new DbException("Operator '$operator' requires two operands.");
         }
 
         $escape = isset($operands[2]) ? $operands[2] : ['%'=>'\%', '_'=>'\_', '\\'=>'\\\\'];
         unset($operands[2]);
 
         if (!preg_match('/^(AND |OR |)(((NOT |))I?LIKE)/', $operator, $matches)) {
-            throw new Exception("Invalid operator '$operator'.");
+            throw new DbException("Invalid operator '$operator'.");
         }
         $andor = ' ' . (!empty($matches[1]) ? $matches[1] : 'AND ');
         $not = !empty($matches[3]);
@@ -1253,11 +1255,12 @@ class QueryBuilder
 
     /**
      * Creates an SQL expressions with the `EXISTS` operator.
-     * @param string $operator the operator to use (e.g. `EXISTS` or `NOT EXISTS`)
+     *
+*@param string $operator the operator to use (e.g. `EXISTS` or `NOT EXISTS`)
      * @param array $operands contains only one element which is a {@see \rock\db\Query} object representing the sub-query.
      * @param array $params the binding parameters to be populated
      * @return string the generated SQL expression
-     * @throws Exception if the operand is not a {@see \rock\db\Query} object.
+     * @throws DbException if the operand is not a {@see \rock\db\Query} object.
      */
     public function buildExistsCondition($operator, $operands, &$params)
     {
@@ -1265,22 +1268,23 @@ class QueryBuilder
             list($sql, $params) = $this->build($operands[0], $params);
             return "$operator ($sql)";
         } else {
-            throw new Exception('Subquery for EXISTS operator must be a Query object.');
+            throw new DbException('Subquery for EXISTS operator must be a Query object.');
         }
     }
 
     /**
      * Creates an SQL expressions like `"column" operator value`.
-     * @param string $operator the operator to use. Anything could be used e.g. `>`, `<=`, etc.
+     *
+*@param string $operator the operator to use. Anything could be used e.g. `>`, `<=`, etc.
      * @param array $operands contains two column names.
      * @param array $params the binding parameters to be populated
      * @return string the generated SQL expression
-     * @throws Exception if wrong number of operands have been given.
+     * @throws DbException if wrong number of operands have been given.
      */
     public function buildSimpleCondition($operator, $operands, &$params)
     {
         if (count($operands) !== 2) {
-            throw new Exception("Operator '$operator' requires two operands.");
+            throw new DbException("Operator '$operator' requires two operands.");
         }
 
         list($column, $value) = $operands;

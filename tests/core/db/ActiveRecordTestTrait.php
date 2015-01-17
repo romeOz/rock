@@ -8,7 +8,7 @@ use rock\db\ActiveQueryInterface;
 use rock\db\ActiveRecordInterface;
 use rock\db\BaseActiveRecord;
 use rock\db\Connection;
-use rock\db\Exception;
+use rock\db\DbException;
 use rock\db\SelectBuilder;
 use rock\event\Event;
 use rock\helpers\Trace;
@@ -175,7 +175,7 @@ trait ActiveRecordTestTrait
         $customerId = $customerClass::find()->select('id')->where(['status' => 2])->scalar();
         $this->assertEquals(3, $customerId);
 
-        $this->setExpectedException(Exception::className());
+        $this->setExpectedException(DbException::className());
         $customerClass::find()->select('noname')->where(['status' => 2])->scalar();
     }
 

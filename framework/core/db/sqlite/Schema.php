@@ -2,7 +2,7 @@
 namespace rock\db\sqlite;
 
 use rock\db\ColumnSchema;
-use rock\db\Exception;
+use rock\db\DbException;
 use rock\db\Expression;
 use rock\db\TableSchema;
 use rock\db\Transaction;
@@ -253,9 +253,10 @@ class Schema extends \rock\db\Schema
 
     /**
      * Sets the isolation level of the current transaction.
-     * @param string $level The transaction isolation level to use for this transaction.
+     *
+*@param string $level The transaction isolation level to use for this transaction.
      * This can be either {@see \rock\db\Transaction::READ_UNCOMMITTED} or {@see \rock\db\Transaction::SERIALIZABLE}.
-     * @throws Exception when unsupported isolation levels are used.
+     * @throws DbException when unsupported isolation levels are used.
      * SQLite only supports SERIALIZABLE and READ UNCOMMITTED.
      * @see http://www.sqlite.org/pragma.html#pragma_read_uncommitted
      */
@@ -270,7 +271,7 @@ class Schema extends \rock\db\Schema
                 $this->connection->createCommand("PRAGMA read_uncommitted = True;")->execute();
             break;
             default:
-                throw new Exception(get_class($this) . ' only supports transaction isolation levels READ UNCOMMITTED and SERIALIZABLE.');
+                throw new DbException(get_class($this) . ' only supports transaction isolation levels READ UNCOMMITTED and SERIALIZABLE.');
         }
     }
 }

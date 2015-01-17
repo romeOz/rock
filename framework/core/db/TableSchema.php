@@ -73,8 +73,9 @@ class TableSchema
 
     /**
      * Manually specifies the primary key for this table.
-     * @param string|array $keys the primary key (can be composite)
-     * @throws Exception if the specified key cannot be found in the table.
+     *
+*@param string|array $keys the primary key (can be composite)
+     * @throws DbException if the specified key cannot be found in the table.
      */
     public function fixPrimaryKey($keys)
     {
@@ -89,7 +90,7 @@ class TableSchema
             if (isset($this->columns[$key])) {
                 $this->columns[$key]->isPrimaryKey = true;
             } else {
-                throw new Exception("Primary key '$key' cannot be found in table '{$this->name}'.");
+                throw new DbException("Primary key '$key' cannot be found in table '{$this->name}'.");
             }
         }
     }

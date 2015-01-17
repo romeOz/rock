@@ -2,7 +2,7 @@
 namespace rock\mongodb\file;
 
 use rock\di\Container;
-use rock\mongodb\Exception;
+use rock\mongodb\MongoException;
 use rock\Rock;
 
 /**
@@ -47,10 +47,11 @@ class Collection extends \rock\mongodb\Collection
 
     /**
      * Removes data from the collection.
-     * @param array $condition description of records to remove.
+     *
+*@param array $condition description of records to remove.
      * @param array $options list of options in format: optionName => optionValue.
      * @return integer|boolean number of updated documents or whether operation was successful.
-     * @throws Exception on failure.
+     * @throws MongoException on failure.
      */
     public function remove($condition = [], $options = [])
     {
@@ -63,12 +64,13 @@ class Collection extends \rock\mongodb\Collection
     /**
      * Creates new file in GridFS collection from given local filesystem file.
      * Additional attributes can be added file document using $metadata.
-     * @param string $filename name of the file to store.
+     *
+*@param string $filename name of the file to store.
      * @param array $metadata other metadata fields to include in the file document.
      * @param array $options list of options in format: optionName => optionValue
      * @return mixed the "_id" of the saved file document. This will be a generated {@see \MongoId}
      * unless an "_id" was explicitly specified in the metadata.
-     * @throws Exception on failure.
+     * @throws MongoException on failure.
      */
     public function insertFile($filename, $metadata = [], $options = [])
     {
@@ -89,19 +91,20 @@ class Collection extends \rock\mongodb\Collection
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
 
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 
     /**
      * Creates new file in GridFS collection with specified content.
      * Additional attributes can be added file document using $metadata.
-     * @param string $bytes string of bytes to store.
+     *
+*@param string $bytes string of bytes to store.
      * @param array $metadata other metadata fields to include in the file document.
      * @param array $options list of options in format: optionName => optionValue
      * @return mixed the "_id" of the saved file document. This will be a generated {@see \MongoId}
      * unless an "_id" was explicitly specified in the metadata.
-     * @throws Exception on failure.
+     * @throws MongoException on failure.
      */
     public function insertFileContent($bytes, $metadata = [], $options = [])
     {
@@ -122,19 +125,20 @@ class Collection extends \rock\mongodb\Collection
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
 
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 
     /**
      * Creates new file in GridFS collection from uploaded file.
      * Additional attributes can be added file document using $metadata.
-     * @param string $name name of the uploaded file to store. This should correspond to
+     *
+*@param string $name name of the uploaded file to store. This should correspond to
      * the file field's name attribute in the HTML form.
      * @param array $metadata other metadata fields to include in the file document.
      * @return mixed the "_id" of the saved file document. This will be a generated {@see \MongoId}
      * unless an "_id" was explicitly specified in the metadata.
-     * @throws Exception on failure.
+     * @throws MongoException on failure.
      */
     public function insertUploads($name, $metadata = [])
     {
@@ -154,15 +158,16 @@ class Collection extends \rock\mongodb\Collection
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
 
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 
     /**
      * Retrieves the file with given _id.
-     * @param mixed $id _id of the file to find.
+     *
+*@param mixed $id _id of the file to find.
      * @return \MongoGridFSFile|null found file, or null if file does not exist
-     * @throws Exception on failure.
+     * @throws MongoException on failure.
      */
     public function get($id)
     {
@@ -182,15 +187,16 @@ class Collection extends \rock\mongodb\Collection
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
 
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 
     /**
      * Deletes the file with given _id.
-     * @param mixed $id _id of the file to find.
+     *
+*@param mixed $id _id of the file to find.
      * @return boolean whether the operation was successful.
-     * @throws Exception on failure.
+     * @throws MongoException on failure.
      */
     public function delete($id)
     {
@@ -210,8 +216,7 @@ class Collection extends \rock\mongodb\Collection
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
-
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 }

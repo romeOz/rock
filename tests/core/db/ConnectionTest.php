@@ -3,7 +3,7 @@
 namespace rockunit\core\db;
 
 use rock\db\Connection;
-use rock\db\Exception;
+use rock\db\DbException;
 use rock\db\Transaction;
 
 /**
@@ -39,7 +39,7 @@ class ConnectionTest extends DatabaseTestCase
 
         $connection = new Connection;
         $connection->dsn = 'unknown::memory:';
-        $this->setExpectedException(Exception::className());
+        $this->setExpectedException(DbException::className());
         $connection->open();
     }
 

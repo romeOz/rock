@@ -2,7 +2,7 @@
 namespace rock\db\sqlite;
 
 use rock\db\Connection;
-use rock\db\Exception;
+use rock\db\DbException;
 use rock\db\Query;
 
 /**
@@ -99,11 +99,12 @@ class QueryBuilder extends \rock\db\QueryBuilder
      * Creates a SQL statement for resetting the sequence value of a table's primary key.
      * The sequence will be reset such that the primary key of the next new row inserted
      * will have the specified value or 1.
-     * @param string $tableName the name of the table whose primary key sequence will be reset
+     *
+*@param string $tableName the name of the table whose primary key sequence will be reset
      * @param mixed $value the value for the primary key of the next new row inserted. If this is not set,
      * the next new row's primary key will have a value 1.
      * @return string the SQL statement for resetting sequence
-     * @throws Exception if the table does not exist or there is no sequence associated with the table.
+     * @throws DbException if the table does not exist or there is no sequence associated with the table.
      */
     public function resetSequence($tableName, $value = null)
     {
@@ -125,9 +126,9 @@ class QueryBuilder extends \rock\db\QueryBuilder
                 // it's possible that sqlite_sequence does not exist
             }
         } elseif ($table === null) {
-            throw new Exception("Table not found: $tableName");
+            throw new DbException("Table not found: $tableName");
         } else {
-            throw new Exception("There is not sequence associated with table '$tableName'.'");
+            throw new DbException("There is not sequence associated with table '$tableName'.'");
         }
     }
 
@@ -166,33 +167,36 @@ class QueryBuilder extends \rock\db\QueryBuilder
 
     /**
      * Builds a SQL statement for dropping a DB column.
-     * @param string $table the table whose column is to be dropped. The name will be properly quoted by the method.
+     *
+*@param string $table the table whose column is to be dropped. The name will be properly quoted by the method.
      * @param string $column the name of the column to be dropped. The name will be properly quoted by the method.
      * @return string the SQL statement for dropping a DB column.
-     * @throws Exception this is not supported by SQLite
+     * @throws DbException this is not supported by SQLite
      */
     public function dropColumn($table, $column)
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new DbException(DbException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
      * Builds a SQL statement for renaming a column.
-     * @param string $table the table whose column is to be renamed. The name will be properly quoted by the method.
+     *
+*@param string $table the table whose column is to be renamed. The name will be properly quoted by the method.
      * @param string $oldName the old name of the column. The name will be properly quoted by the method.
      * @param string $newName the new name of the column. The name will be properly quoted by the method.
      * @return string the SQL statement for renaming a DB column.
-     * @throws Exception this is not supported by SQLite
+     * @throws DbException this is not supported by SQLite
      */
     public function renameColumn($table, $oldName, $newName)
     {
-        throw new Exception( Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new DbException(DbException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
      * Builds a SQL statement for adding a foreign key constraint to an existing table.
      * The method will properly quote the table and column names.
-     * @param string $name the name of the foreign key constraint.
+     *
+*@param string $name the name of the foreign key constraint.
      * @param string $table the table that the foreign key constraint will be added to.
      * @param string|array $columns the name of the column to that the constraint will be added on.
      * If there are multiple columns, separate them with commas or use an array to represent them.
@@ -202,23 +206,24 @@ class QueryBuilder extends \rock\db\QueryBuilder
      * @param string $delete the ON DELETE option. Most DBMS support these options: RESTRICT, CASCADE, NO ACTION, SET DEFAULT, SET NULL
      * @param string $update the ON UPDATE option. Most DBMS support these options: RESTRICT, CASCADE, NO ACTION, SET DEFAULT, SET NULL
      * @return string the SQL statement for adding a foreign key constraint to an existing table.
-     * @throws Exception this is not supported by SQLite
+     * @throws DbException this is not supported by SQLite
      */
     public function addForeignKey($name, $table, $columns, $refTable, $refColumns, $delete = null, $update = null)
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new DbException(DbException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
      * Builds a SQL statement for dropping a foreign key constraint.
-     * @param string $name the name of the foreign key constraint to be dropped. The name will be properly quoted by the method.
+     *
+*@param string $name the name of the foreign key constraint to be dropped. The name will be properly quoted by the method.
      * @param string $table the table whose foreign is to be dropped. The name will be properly quoted by the method.
      * @return string the SQL statement for dropping a foreign key constraint.
-     * @throws Exception this is not supported by SQLite
+     * @throws DbException this is not supported by SQLite
      */
     public function dropForeignKey($name, $table)
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new DbException(DbException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
@@ -231,36 +236,38 @@ class QueryBuilder extends \rock\db\QueryBuilder
      * in the generated SQL. For example, 'string' will be turned into 'varchar(255)', while 'string not null'
      * will become 'varchar(255) not null'.
      * @return string the SQL statement for changing the definition of a column.
-     * @throws Exception this is not supported by SQLite
+     * @throws DbException this is not supported by SQLite
      */
     public function alterColumn($table, $column, $type)
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new DbException(DbException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
      * Builds a SQL statement for adding a primary key constraint to an existing table.
-     * @param string $name the name of the primary key constraint.
+     *
+*@param string $name the name of the primary key constraint.
      * @param string $table the table that the primary key constraint will be added to.
      * @param string|array $columns comma separated string or array of columns that the primary key will consist of.
      * @return string the SQL statement for adding a primary key constraint to an existing table.
-     * @throws Exception this is not supported by SQLite
+     * @throws DbException this is not supported by SQLite
      */
     public function addPrimaryKey($name, $table, $columns)
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new DbException(DbException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**
      * Builds a SQL statement for removing a primary key constraint to an existing table.
-     * @param string $name the name of the primary key constraint to be removed.
+     *
+*@param string $name the name of the primary key constraint to be removed.
      * @param string $table the table that the primary key constraint will be removed from.
      * @return string the SQL statement for removing a primary key constraint from an existing table.
-     * @throws Exception this is not supported by SQLite	 *
+     * @throws DbException this is not supported by SQLite	 *
      */
     public function dropPrimaryKey($name, $table)
     {
-        throw new Exception(Exception::UNKNOWN_METHOD, ['method' => __METHOD__]);
+        throw new DbException(DbException::UNKNOWN_METHOD, ['method' => __METHOD__]);
     }
 
     /**

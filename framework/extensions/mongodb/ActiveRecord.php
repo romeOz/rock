@@ -143,12 +143,12 @@ abstract class ActiveRecord extends BaseActiveRecord
      * }
      * ```
      *
-     * @throws Exception if not implemented
+     * @throws MongoException if not implemented
      * @return array list of attribute names.
      */
     public function attributes()
     {
-        throw new Exception('The attributes() method of mongodb ActiveRecord has to be implemented by child classes.');
+        throw new MongoException('The attributes() method of mongodb ActiveRecord has to be implemented by child classes.');
     }
 
     /**
@@ -203,8 +203,8 @@ abstract class ActiveRecord extends BaseActiveRecord
      * @see ActiveRecord::insert()
      * @param null $attributes
      * @return bool
-     * @throws Exception
-     * @throws \rock\db\Exception
+     * @throws MongoException
+     * @throws \rock\db\DbException
      */
     protected function insertInternal($attributes = null)
     {
@@ -233,7 +233,7 @@ abstract class ActiveRecord extends BaseActiveRecord
 
     /**
      * @see ActiveRecord::update()
-     * @throws Exception
+     * @throws MongoException
      */
     protected function updateInternal($attributes = null)
     {
@@ -258,7 +258,7 @@ abstract class ActiveRecord extends BaseActiveRecord
         $rows = static::getCollection()->update($condition, $values);
 
         if ($lock !== null && !$rows) {
-            throw new Exception('The object being updated is outdated.');
+            throw new MongoException('The object being updated is outdated.');
         }
 
         $changedAttributes = [];
@@ -286,7 +286,7 @@ abstract class ActiveRecord extends BaseActiveRecord
      *
      * @return integer|boolean the number of documents deleted, or false if the deletion is unsuccessful for some reason.
      * Note that it is possible the number of documents deleted is 0, even though the deletion execution is successful.
-     * @throws Exception if {@see \rock\db\BaseActiveRecord::optimisticLock()}(optimistic locking) is enabled and the data
+     * @throws MongoException if {@see \rock\db\BaseActiveRecord::optimisticLock()}(optimistic locking) is enabled and the data
      * being deleted is outdated.
      * @throws \Exception in case delete failed.
      */
@@ -303,7 +303,7 @@ abstract class ActiveRecord extends BaseActiveRecord
 
     /**
      * @see ActiveRecord::delete()
-     * @throws Exception
+     * @throws MongoException
      */
     protected function deleteInternal()
     {
@@ -316,7 +316,7 @@ abstract class ActiveRecord extends BaseActiveRecord
         }
         $result = static::getCollection()->remove($condition);
         if ($lock !== null && !$result) {
-            throw new Exception('The object being deleted is outdated.');
+            throw new MongoException('The object being deleted is outdated.');
         }
         $this->setOldAttributes(null);
 

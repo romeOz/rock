@@ -109,7 +109,7 @@ class SluggableBehavior extends AttributeBehavior
         }
 
         if ($this->attribute === null && $this->value === null) {
-            throw new Exception('Either "attribute" or "value" property must be specified.');
+            throw new BehaviorException('Either "attribute" or "value" property must be specified.');
         }
     }
 

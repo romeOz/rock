@@ -396,7 +396,8 @@ class Connection implements ObjectInterface
     /**
      * Establishes a DB connection.
      * It does nothing if a DB connection has already been established.
-     * @throws Exception if connection fails
+     *
+*@throws DbException if connection fails
      */
     public function open()
     {
@@ -410,12 +411,12 @@ class Connection implements ObjectInterface
                 $this->pdo = $connection->pdo;
                 return;
             } else {
-                throw new Exception('None of the master DB servers is available.');
+                throw new DbException('None of the master DB servers is available.');
             }
         }
 
         if (empty($this->dsn)) {
-            throw new Exception('Connection::dsn cannot be empty.');
+            throw new DbException('Connection::dsn cannot be empty.');
         }
         $token = 'Opening DB connection: ' . $this->dsn;
         try {
@@ -426,7 +427,7 @@ class Connection implements ObjectInterface
             Rock::endProfile('db', $token);
         } catch (\PDOException $e) {
             Rock::endProfile('db', $token);
-            throw new Exception($e->getMessage(), [], $e);
+            throw new DbException($e->getMessage(), [], $e);
         }
     }
 
@@ -567,8 +568,9 @@ class Connection implements ObjectInterface
 
     /**
      * Returns the schema information for the database opened by this connection.
-     * @return Schema the schema information for the database opened by this connection.
-     * @throws Exception if there is no support for the current driver type
+     *
+*@return Schema the schema information for the database opened by this connection.
+     * @throws DbException if there is no support for the current driver type
      */
     public function getSchema()
     {
@@ -580,7 +582,7 @@ class Connection implements ObjectInterface
                 $this->_schema = is_array($this->schemaMap[$driver]) ? $this->schemaMap[$driver]['class'] : $this->schemaMap[$driver];
                 return $this->_schema = new $this->_schema(['connection'=>$this]);
             } else {
-                throw new Exception("Connection does not support reading schema information for '$driver' DBMS.");
+                throw new DbException("Connection does not support reading schema information for '$driver' DBMS.");
             }
         }
     }
@@ -792,10 +794,11 @@ class Connection implements ObjectInterface
      * Opens the connection to a server in the pool.
      *
      * This method implements the load balancing among the given list of the servers.
-     * @param array $pool the list of connection configurations in the server pool
+     *
+*@param array $pool the list of connection configurations in the server pool
      * @param array $sharedConfig the configuration common to those given in `$pool`.
      * @return Connection the opened DB connection, or null if no server is available
-     * @throws Exception if a configuration does not specify "dsn"
+     * @throws DbException if a configuration does not specify "dsn"
      */
     protected function openFromPool(array $pool, array $sharedConfig)
     {
@@ -814,7 +817,7 @@ class Connection implements ObjectInterface
         foreach ($pool as $config) {
             $config = array_merge($sharedConfig, $config);
             if (empty($config['dsn'])) {
-                throw new Exception('The "dsn" option must be specified.');
+                throw new DbException('The "dsn" option must be specified.');
             }
 
             $key = [__METHOD__, $config['dsn']];

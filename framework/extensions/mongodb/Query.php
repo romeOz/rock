@@ -125,11 +125,12 @@ class Query implements QueryInterface
 
     /**
      * Fetches rows from the given Mongo cursor.
-     * @param \MongoCursor $cursor Mongo cursor instance to fetch data from.
+     *
+*@param \MongoCursor $cursor Mongo cursor instance to fetch data from.
      * @param boolean $all whether to fetch all rows or only first one.
      * @param string|callable $indexBy the column name or PHP callback,
      * by which the query results should be indexed by.
-     * @throws Exception on failure.
+     * @throws MongoException on failure.
      * @return array|null result.
      */
     protected function fetchRows($cursor, $all = true, $indexBy = null)
@@ -162,7 +163,7 @@ class Query implements QueryInterface
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
 
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 
@@ -267,7 +268,7 @@ class Query implements QueryInterface
      * @param Connection $connection the Mongo connection used to execute the query.
      * If this parameter is not given, the `mongodb` application component will be used.
      * @return integer number of records
-     * @throws Exception on failure.
+     * @throws MongoException on failure.
      */
     public function count($q = '*', $connection = null)
     {
@@ -300,7 +301,7 @@ class Query implements QueryInterface
             $token['exception'] = DEBUG === true ? $e : $message;
             Rock::trace('mongodb.query', $token);
 
-            throw new Exception($message, [], $e);
+            throw new MongoException($message, [], $e);
         }
     }
 
