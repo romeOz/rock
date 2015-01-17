@@ -367,7 +367,15 @@ return array_merge(
         ],
         'validate' => [
             'class' => \rock\validate\Validate::className(),
-            'locale' => function (){ return Rock::$app->language;}
+            'locale' => function (){
+                return Rock::$app->language;
+            }
+        ],
+        \rock\validate\ValidateModel::className() => [
+            'class' => \rock\validate\ValidateModel::className(),
+            'locale' => function (){
+                return Rock::$app->language;
+            }
         ],
         'captcha' => [
             'class' => \rock\captcha\Captcha::className(),
