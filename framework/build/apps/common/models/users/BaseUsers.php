@@ -3,7 +3,7 @@
 namespace apps\common\models\users;
 
 use rock\db\ActiveRecord;
-use rock\helpers\Numeric;
+use rock\helpers\NumericHelper;
 
 /**
  * @property int id
@@ -277,7 +277,7 @@ class BaseUsers extends ActiveRecord
     public function setHash(array $attributes)
     {
         foreach ($attributes as $attribute) {
-            $this->{$attribute .'_hash'} = Numeric::hexToBin(md5($this->$attribute . static::tableName()));
+            $this->{$attribute .'_hash'} = NumericHelper::hexToBin(md5($this->$attribute . static::tableName()));
         }
     }
 
