@@ -7,6 +7,7 @@ use rock\base\ComponentsTrait;
 use rock\base\Model;
 use rock\base\Widget;
 use rock\cache\CacheInterface;
+use rock\di\Container;
 use rock\exception\BaseException;
 use rock\filters\RateLimiter;
 use rock\helpers\Html;
@@ -112,6 +113,12 @@ class ActiveField implements ComponentsInterface
      */
     public $parts = [];
     /**
+     * @var string|array|CacheInterface the cache object or the ID of the cache application component
+     * that is used for query caching.
+     * @see enableCache
+     */
+    public $cache = 'cache';
+    /**
      * @var boolean whether to enable query caching.
      * Note that in order to enable query caching, a valid cache component as specified
      * by `cacheClass` must be enabled and `enableCache` must be set true.
@@ -139,12 +146,6 @@ class ActiveField implements ComponentsInterface
      * @see enableCache
      */
     public $cacheTags;
-    /**
-     * @var string the cache object or the ID of the cache application component
-     * that is used for query caching.
-     * @see enableCache
-     */
-    public $cacheClass = 'cache';
     /** @var string */
     protected $formName = 'form';
 
@@ -152,6 +153,10 @@ class ActiveField implements ComponentsInterface
     {
         if ($formName = $this->model->formName()) {
             $this->formName = $formName;
+        }
+
+        if (!is_object($this->cache)) {
+            $this->cache = Container::load($this->cache);
         }
     }
 
@@ -708,7 +713,7 @@ class ActiveField implements ComponentsInterface
     public function dropDownList($items, $options = [])
     {
         $cacheKey = $this->getCacheKey(__METHOD__);
-        if (($this->parts['{input}'] = $this->getCache($cacheKey)) !== false) {
+        if (($this->parts['{input}'] = $this->cache->get($cacheKey)) !== false) {
             return $this;
         }
         if ($items instanceof \Closure) {
@@ -718,7 +723,7 @@ class ActiveField implements ComponentsInterface
         $options = $this->calculateClientInputOption($options);
         $this->adjustLabelFor($options);
         $this->parts['{input}'] = Html::activeDropDownList($this->model, $this->attribute, $items, $options);
-        $this->setCache($cacheKey, $this->parts['{input}']);
+        $this->cache->set($cacheKey, $this->parts['{input}']);
 
         return $this;
     }
@@ -762,7 +767,7 @@ class ActiveField implements ComponentsInterface
     public function listBox($items, $options = [])
     {
         $cacheKey = $this->getCacheKey(__METHOD__);
-        if (($this->parts['{input}'] = $this->getCache($cacheKey)) !== false) {
+        if (($this->parts['{input}'] = $this->cache->get($cacheKey)) !== false) {
             return $this;
         }
         if ($items instanceof \Closure) {
@@ -771,7 +776,7 @@ class ActiveField implements ComponentsInterface
         $options = array_merge($this->inputOptions, $options);
         $this->adjustLabelFor($options);
         $this->parts['{input}'] = Html::activeListBox($this->model, $this->attribute, $items, $options);
-        $this->setCache($cacheKey, $this->parts['{input}']);
+        $this->cache->set($cacheKey, $this->parts['{input}']);
 
         return $this;
     }
@@ -806,7 +811,7 @@ class ActiveField implements ComponentsInterface
     public function checkboxList($items, $options = [])
     {
         $cacheKey = $this->getCacheKey(__METHOD__);
-        if (($this->parts['{input}'] = $this->getCache($cacheKey)) !== false) {
+        if (($this->parts['{input}'] = $this->cache->get($cacheKey)) !== false) {
             return $this;
         }
         if ($items instanceof \Closure) {
@@ -814,7 +819,7 @@ class ActiveField implements ComponentsInterface
         }
         $this->adjustLabelFor($options);
         $this->parts['{input}'] = Html::activeCheckboxList($this->model, $this->attribute, $items, $options);
-        $this->setCache($cacheKey, $this->parts['{input}']);
+        $this->cache->set($cacheKey, $this->parts['{input}']);
 
         return $this;
     }
@@ -847,7 +852,7 @@ class ActiveField implements ComponentsInterface
     public function radioList($items, $options = [])
     {
         $cacheKey = $this->getCacheKey(__METHOD__);
-        if (($this->parts['{input}'] = $this->getCache($cacheKey)) !== false) {
+        if (($this->parts['{input}'] = $this->cache->get($cacheKey)) !== false) {
             return $this;
         }
         if ($items instanceof \Closure) {
@@ -858,7 +863,7 @@ class ActiveField implements ComponentsInterface
             $options['itemOptions']['data-ng-model'] = "{$this->formName}.values.{$this->attribute}";
         }
         $this->parts['{input}'] = Html::activeRadioList($this->model, $this->attribute, $items, $options);
-        $this->setCache($cacheKey, $this->parts['{input}']);
+        $this->cache->set($cacheKey, $this->parts['{input}']);
 
         return $this;
     }
@@ -934,39 +939,5 @@ class ActiveField implements ComponentsInterface
         $model = $this->model;
 
         return $model::className() . $this->attribute . $method;
-    }
-
-    /**
-     * @param string $key
-     * @return bool|mixed
-     */
-    protected function getCache($key)
-    {
-        if (!$this->cache() instanceof CacheInterface) {
-            return false;
-        }
-
-        return $this->cache()->get($key);
-    }
-
-    /**
-     * @return CacheInterface|null
-     */
-    protected function cache()
-    {
-        if (!$this->enableCache) {
-            return null;
-        }
-
-        return $this->Rock->{$this->cacheClass};
-    }
-
-    protected function setCache($key, $value)
-    {
-        if (!$this->cache() instanceof CacheInterface) {
-            return false;
-        }
-
-        return $this->cache()->set($key, $value, $this->cacheExpire, $this->cacheTags);
     }
 }
