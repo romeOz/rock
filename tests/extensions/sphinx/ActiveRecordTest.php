@@ -4,7 +4,6 @@ namespace rockunit\extensions\sphinx;
 
 
 use League\Flysystem\Adapter\Local;
-use rock\access\Access;
 use rock\cache\CacheFile;
 use rock\event\Event;
 use rock\file\FileManager;
@@ -50,6 +49,7 @@ class ActiveRecordTest extends SphinxTestCase
         ActiveRecord::$db = $this->getConnection();
         Trace::removeAll();
         unset($_POST['_method']);
+        Event::offAll();
     }
 
     protected function tearDown()

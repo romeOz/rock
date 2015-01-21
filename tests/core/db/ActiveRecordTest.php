@@ -4,6 +4,7 @@ namespace rockunit\core\db;
 
 
 use rock\db\ActiveQuery;
+use rock\event\Event;
 use rock\helpers\Trace;
 use rockunit\common\CommonTestTrait;
 use rockunit\core\db\models\ActiveRecord;
@@ -90,6 +91,7 @@ class ActiveRecordTest extends DatabaseTestCase
         parent::setUp();
         ActiveRecord::$connection = $this->getConnection();
         Trace::removeAll();
+        Event::offAll();
     }
 
 
