@@ -8,37 +8,6 @@ use rock\i18n\i18nInterface;
 use rock\response\Response;
 use rock\Rock;
 
-class FooController extends Controller
-{
-    public function behaviors()
-    {
-        return [
-            [
-                'class' => ContentNegotiatorFilter::className(),
-                'only' => ['actionIndex'],  // in a controller
-                'formats' => [
-                    'application/json' => Response::FORMAT_JSON,
-                ],
-                'languages' => [
-                    'en',
-                    'de',
-                ],
-            ],
-
-        ];
-    }
-
-    public function actionIndex()
-    {
-        return ['foo', 'bar'];
-    }
-
-    public function actionView()
-    {
-        return 'view';
-    }
-}
-
 /**
  * @group base
  * @group filters
@@ -69,4 +38,35 @@ class ContentNegotiatorFilterTest extends \PHPUnit_Framework_TestCase
         Rock::$app->response->format = Response::FORMAT_HTML;
     }
 }
- 
+
+
+class FooController extends Controller
+{
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => ContentNegotiatorFilter::className(),
+                'only' => ['actionIndex'],  // in a controller
+                'formats' => [
+                    'application/json' => Response::FORMAT_JSON,
+                ],
+                'languages' => [
+                    'en',
+                    'de',
+                ],
+            ],
+
+        ];
+    }
+
+    public function actionIndex()
+    {
+        return ['foo', 'bar'];
+    }
+
+    public function actionView()
+    {
+        return 'view';
+    }
+}

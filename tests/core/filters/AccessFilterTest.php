@@ -6,6 +6,47 @@ use rock\access\Access;
 use rock\base\Controller;
 use rock\filters\AccessFilter;
 
+/**
+ * @group base
+ * @group filters
+ */
+class AccessFilterTest extends \PHPUnit_Framework_TestCase
+{
+    public function testSelectActions()
+    {
+        $controller = new BarController();
+        $this->assertSame($controller->method('actionIndex'), 'index');
+        $this->assertNull($controller->actionView());
+        $this->expectOutputString('11');
+    }
+
+    public function testAllActions()
+    {
+        $controller = new FooController();
+        $this->assertNull($controller->method('actionIndex'));
+        $this->assertNull($controller->actionView());
+        $this->expectOutputString('1111');
+    }
+
+
+    public function testSuccess()
+    {
+        $controller = new BazController();
+        $this->assertSame($controller->method('actionIndex'), 'index');
+        $this->assertSame($controller->actionView(), 'view');
+        $this->expectOutputString('success0success0');
+    }
+
+    public function testMultiAccess()
+    {
+        $controller = new MultiAccessController();
+        $this->assertNull($controller->method('actionIndex'));
+        $this->assertNull($controller->method('actionUpdate'));
+        $this->assertNull($controller->actionView());
+        $this->assertSame($controller->actionCreate(), 'create');
+    }
+}
+
 class FooController extends Controller
 {
     public function behaviors()
@@ -66,8 +107,8 @@ class BarController extends Controller
                     echo $access->isErrorRoles().$access->isErrorIps().$access->isErrorCustom().$access->isErrorVerbs();
                 },
                 'success' =>  function(Access $access){
-                        echo 'success' . $access->getErrors();
-                    },
+                    echo 'success' . $access->getErrors();
+                },
             ],
         ];
     }
@@ -106,11 +147,11 @@ class BazController extends Controller
                         'roles' => ['editor']
                     ],
                 'fail' =>  function(Access $access){
-                        echo $access->isErrorRoles().$access->isErrorIps().$access->isErrorCustom().$access->isErrorVerbs();
-                    },
+                    echo $access->isErrorRoles().$access->isErrorIps().$access->isErrorCustom().$access->isErrorVerbs();
+                },
                 'success' =>  function(Access $access){
-                        echo 'success' . $access->getErrors();
-                    },
+                    echo 'success' . $access->getErrors();
+                },
             ],
         ];
     }
@@ -215,47 +256,6 @@ class MultiAccessController extends Controller
     public function actionCreate()
     {
         return 'create';
-    }
-}
-
-/**
- * @group base
- * @group filters
- */
-class AccessFilterTest extends \PHPUnit_Framework_TestCase
-{
-    public function testSelectActions()
-    {
-        $controller = new BarController();
-        $this->assertSame($controller->method('actionIndex'), 'index');
-        $this->assertNull($controller->actionView());
-        $this->expectOutputString('11');
-    }
-
-    public function testAllActions()
-    {
-        $controller = new FooController();
-        $this->assertNull($controller->method('actionIndex'));
-        $this->assertNull($controller->actionView());
-        $this->expectOutputString('1111');
-    }
-
-
-    public function testSuccess()
-    {
-        $controller = new BazController();
-        $this->assertSame($controller->method('actionIndex'), 'index');
-        $this->assertSame($controller->actionView(), 'view');
-        $this->expectOutputString('success0success0');
-    }
-
-    public function testMultiAccess()
-    {
-        $controller = new MultiAccessController();
-        $this->assertNull($controller->method('actionIndex'));
-        $this->assertNull($controller->method('actionUpdate'));
-        $this->assertNull($controller->actionView());
-        $this->assertSame($controller->actionCreate(), 'create');
     }
 }
  

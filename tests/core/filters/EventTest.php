@@ -9,26 +9,6 @@ use rock\base\Controller;
 use rock\event\Event;
 use rock\filters\AccessFilter;
 
-class FooController extends Controller
-{
-    public function actionIndex()
-    {
-        return 'index';
-    }
-
-    public function actionView()
-    {
-        if (!$this->beforeAction('actionView')) {
-            return null;
-        }
-        $event = new ActionEvent('actionView');
-        $event->result = 'view';
-        $this->trigger('test', $event);
-        return 'view';
-    }
-}
-
-
 /**
  * @group base
  * @group filters
@@ -107,4 +87,22 @@ class EventTest extends \PHPUnit_Framework_TestCase
         $this->expectOutputString('fail');
     }
 }
- 
+
+class FooController extends Controller
+{
+    public function actionIndex()
+    {
+        return 'index';
+    }
+
+    public function actionView()
+    {
+        if (!$this->beforeAction('actionView')) {
+            return null;
+        }
+        $event = new ActionEvent('actionView');
+        $event->result = 'view';
+        $this->trigger('test', $event);
+        return 'view';
+    }
+}

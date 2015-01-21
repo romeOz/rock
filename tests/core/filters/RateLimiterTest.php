@@ -6,55 +6,6 @@ use rock\base\Controller;
 use rock\filters\RateLimiter;
 use rock\Rock;
 
-class FooController extends Controller
-{
-    public function behaviors()
-    {
-        return [
-            'rateLimiter' => [
-                'class' => RateLimiter::className(),
-                'actions' => [
-                    'actionIndex' => [2, 2]
-                ]
-            ],
-
-        ];
-    }
-
-    public function actionIndex()
-    {
-        return 'test';
-    }
-
-    public function actionView()
-    {
-        return 'view';
-    }
-}
-
-
-class BarController extends Controller
-{
-    public function behaviors()
-    {
-        return [
-            'rateLimiter' => [
-                'class' => RateLimiter::className(),
-                'actions' => [
-                    'actionView' => [2, 5],
-                    '*' => [2, 2]
-                ]
-            ],
-
-        ];
-    }
-
-    public function actionIndex()
-    {
-        return 'test';
-    }
-}
-
 /**
  * @group base
  * @group filters
@@ -112,4 +63,53 @@ class RateLimiterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($controller->method('actionView'), 'view');
     }
 }
- 
+
+
+class FooController extends Controller
+{
+    public function behaviors()
+    {
+        return [
+            'rateLimiter' => [
+                'class' => RateLimiter::className(),
+                'actions' => [
+                    'actionIndex' => [2, 2]
+                ]
+            ],
+
+        ];
+    }
+
+    public function actionIndex()
+    {
+        return 'test';
+    }
+
+    public function actionView()
+    {
+        return 'view';
+    }
+}
+
+
+class BarController extends Controller
+{
+    public function behaviors()
+    {
+        return [
+            'rateLimiter' => [
+                'class' => RateLimiter::className(),
+                'actions' => [
+                    'actionView' => [2, 5],
+                    '*' => [2, 2]
+                ]
+            ],
+
+        ];
+    }
+
+    public function actionIndex()
+    {
+        return 'test';
+    }
+}
