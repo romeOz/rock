@@ -3,7 +3,6 @@
 namespace rockunit\core\widgets;
 
 
-use apps\frontend\controllers\FileManager;
 use rock\widgets\ActiveField;
 use rock\widgets\ActiveForm;
 use rockunit\core\widgets\mocks\ModelMock;

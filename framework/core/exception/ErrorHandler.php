@@ -87,18 +87,6 @@ class ErrorHandler implements LoggerInterface
         }
     }
 
-    protected static function log($level, $msg, $file, $line)
-    {
-        BaseException::log($level, $msg, ['file' => $file, 'line' => $line, 'stack' => $file . ' on line ' . $line]);
-        if (DEBUG === true) {
-
-            BaseException::debuger()->handleException(new \ErrorException($msg, $level, 0, $file, $line));
-        }
-        if ($level > self::ERROR) {
-            BaseException::displayFatal();
-        }
-    }
-
     /**
      * Set handler
      */
@@ -124,5 +112,17 @@ class ErrorHandler implements LoggerInterface
          * Catch fatal errors
          */
         register_shutdown_function([$self, 'handleShutdown']);
+    }
+
+    protected static function log($level, $msg, $file, $line)
+    {
+        BaseException::log($level, $msg, ['file' => $file, 'line' => $line, 'stack' => $file . ' on line ' . $line]);
+        if (DEBUG === true) {
+
+            BaseException::debuger()->handleException(new \ErrorException($msg, $level, 0, $file, $line));
+        }
+        if ($level > self::ERROR) {
+            BaseException::displayFatal();
+        }
     }
 }

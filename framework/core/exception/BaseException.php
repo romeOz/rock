@@ -27,7 +27,8 @@ class BaseException extends \Exception implements ExceptionInterface
      * @param array      $placeholders placeholders for replacement
      * @param \Exception|null $handler     handler
      */
-    public function __construct($msg, array $placeholders = [], \Exception $handler = null) {
+    public function __construct($msg, array $placeholders = [], \Exception $handler = null)
+    {
         if (isset($handler)) {
             if ($handler instanceof BaseException) {
                 return;
