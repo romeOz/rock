@@ -459,6 +459,7 @@ class ActiveRecordTest extends SphinxTestCase
 
     public function testBeforeFind()
     {
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
         // fail
         $query = ArticleFilterIndex::find()
             ->where(['id' => 1]);
