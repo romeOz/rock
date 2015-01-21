@@ -7,6 +7,7 @@ use rock\base\ObjectTrait;
 use rock\di\Container;
 use rock\helpers\Helper;
 use rock\helpers\StringHelper;
+use rock\request\Request;
 use rock\Rock;
 
 /**
@@ -53,6 +54,8 @@ class Url implements UrlInterface, ObjectInterface
      * @var int
      */
     public $defaultUrl = self::DEFAULT_ABSOLUTE;
+    /** @var  Request */
+    private $_request;
 
     /**
      * @param string|null  $url URL for formatting. If url as `NULL`, then use current (self) URL.
@@ -61,6 +64,8 @@ class Url implements UrlInterface, ObjectInterface
     public function __construct($url = null, $config = [])
     {
         $this->parentConstruct($config);
+        $this->_request = Container::load('request');
+
         $url = $this->defaultUrlInternal($url);
         $this->dataUrl = parse_url(trim($url));
         if (isset($this->dataUrl['query'])) {
@@ -249,8 +254,8 @@ class Url implements UrlInterface, ObjectInterface
     public function get($const = 0, $selfHost = false)
     {
         if ($selfHost == true) {
-            $this->dataUrl['scheme'] = $this->Rock->request->getScheme();
-            $this->dataUrl['host'] = $this->Rock->request->getHost();
+            $this->dataUrl['scheme'] = $this->_request->getScheme();
+            $this->dataUrl['host'] = $this->_request->getHost();
         }
 
         if ($const & self::HTTP && isset($this->dataUrl['host'])) {
@@ -259,8 +264,8 @@ class Url implements UrlInterface, ObjectInterface
             $this->dataUrl['scheme'] = 'https';
         } elseif($const & self::ABS) {
             if (!isset($this->dataUrl['host'])) {
-                $this->dataUrl['scheme'] = $this->Rock->request->getScheme();
-                $this->dataUrl['host'] = $this->Rock->request->getHost();
+                $this->dataUrl['scheme'] = $this->_request->getScheme();
+                $this->dataUrl['host'] = $this->_request->getHost();
             }
         } else {
             unset($this->dataUrl['scheme'] , $this->dataUrl['host'], $this->dataUrl['user'], $this->dataUrl['pass']);
@@ -344,8 +349,7 @@ class Url implements UrlInterface, ObjectInterface
     protected function defaultUrlInternal($url)
     {
         if (!isset($url)) {
-            $request = $this->Rock->request;
-            return $this->defaultUrl === self::DEFAULT_ABSOLUTE ? $request->getAbsoluteUrl() : $request->getReferrer();
+            return $this->defaultUrl === self::DEFAULT_ABSOLUTE ? $this->_request->getAbsoluteUrl() : $this->_request->getReferrer();
         }
         return Rock::getAlias($url);
     }

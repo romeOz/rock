@@ -3,8 +3,11 @@ namespace rock\captcha;
 
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
+use rock\di\Container;
 use rock\helpers\Helper;
+use rock\response\Response;
 use rock\Rock;
+use rock\session\Session;
 
 /**
  * @author   Kruglov Sergei (fork by Romeo)
@@ -65,7 +68,6 @@ class Captcha implements ObjectInterface, CaptchaInterface
      * @var float
      */
     public $whiteNoiseDensity = 0;
-
     /**
      * Noise black.
      * `0` -   no black noise
@@ -112,7 +114,6 @@ class Captcha implements ObjectInterface, CaptchaInterface
      * @var int
      */
     public $jpegQuality = 90;
-
     public $sessionName = 'captcha';
     /**
      * Code of captcha.
@@ -120,11 +121,17 @@ class Captcha implements ObjectInterface, CaptchaInterface
      * @var string
      */
     protected $code;
-
+    /** @var  Session */
+    protected $session;
+    /** @var  Response */
+    protected $response;
 
     public function init()
     {
         $this->parentInit();
+        $this->session = Container::load('session');
+        $this->response = Container::load('response');
+
         $this->length = Helper::getValue(
             $this->length,
             mt_rand(5, 7)
@@ -448,7 +455,7 @@ class Captcha implements ObjectInterface, CaptchaInterface
      */
     public function createSession()
     {
-        $this->Rock->session->setFlash($this->sessionName, $this->code, false);
+        $this->session->setFlash($this->sessionName, $this->code, false);
     }
 
     /**
@@ -472,7 +479,7 @@ class Captcha implements ObjectInterface, CaptchaInterface
      */
     protected function setHttpHeaders($mimeType)
     {
-        $this->Rock->response->getHeaders()
+        $this->response->getHeaders()
             ->set('Pragma', 'public')
             ->set('Expires', '0')
             ->set('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
@@ -514,7 +521,7 @@ class Captcha implements ObjectInterface, CaptchaInterface
      */
     public function hasSession($name = null)
     {
-        return $this->Rock->session->hasFlash(Helper::getValue($name, $this->sessionName));
+        return $this->session->hasFlash(Helper::getValue($name, $this->sessionName));
     }
 
     /**
@@ -525,7 +532,7 @@ class Captcha implements ObjectInterface, CaptchaInterface
      */
     public function getSession($name = null)
     {
-        return $this->Rock->session->getFlash(Helper::getValue($name, $this->sessionName));
+        return $this->session->getFlash(Helper::getValue($name, $this->sessionName));
     }
 
     /**
@@ -535,7 +542,7 @@ class Captcha implements ObjectInterface, CaptchaInterface
      */
     public function removeSession($name = null)
     {
-        $this->Rock->session->removeFlash(Helper::getValue($name, $this->sessionName));
+        $this->session->removeFlash(Helper::getValue($name, $this->sessionName));
     }
 
     /**

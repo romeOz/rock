@@ -7,6 +7,7 @@ use rock\base\ComponentsTrait;
 use rock\cookie\Cookie;
 use rock\di\Container;
 use rock\request\RequestInterface;
+use rock\security\Security;
 use rock\session\SessionInterface;
 
 class CSRF implements ComponentsInterface, RequestInterface
@@ -43,10 +44,14 @@ class CSRF implements ComponentsInterface, RequestInterface
      * @var string|array|SessionInterface
      */
     public $storage = 'session';
+    /** @var  Security */
+    protected $security;
 
 
     public function init()
     {
+        $this->security = Container::load('security');
+
         if (!is_object($this->storage)) {
             $this->storage = Container::load($this->storage);
         }
@@ -77,7 +82,7 @@ class CSRF implements ComponentsInterface, RequestInterface
 
     protected function generate()
     {
-        $token = $this->Rock->security->generateRandomString();
+        $token = $this->security->generateRandomString();
         $this->storage->add($this->csrfParam, $token);
         return $token;
     }

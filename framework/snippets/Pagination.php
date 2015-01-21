@@ -2,9 +2,11 @@
 namespace rock\snippets;
 
 use rock\base\Snippet;
+use rock\di\Container;
 use rock\helpers\Helper;
 use rock\helpers\StringHelper;
 use rock\Rock;
+use rock\url\Url;
 
 /**
  * Snippet "Pagination".
@@ -43,7 +45,6 @@ class Pagination extends Snippet
      * @var array
      */
     public $array;
-
     /**
      * May be a callable, snippet, and instance.
      *
@@ -83,6 +84,17 @@ class Pagination extends Snippet
     public $pageArgs = [];
     public $pageAnchor;
     public $autoEscape = false;
+    /** @var  Url */
+    protected $url;
+
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        parent::init();
+        $this->url = Container::load('url');
+    }
 
 
     public function get()
@@ -168,7 +180,7 @@ class Pagination extends Snippet
         $result = '';
         foreach ($data['pageDisplay'] as $num) {
             $this->pageArgs[$pageVar] = $num;
-            $url = $this->Rock->url->addArgs($this->pageArgs)->addAnchor($this->pageAnchor)->get();
+            $url = $this->url->addArgs($this->pageArgs)->addAnchor($this->pageAnchor)->get();
             // for active page
             if ((int)$data['pageCurrent'] === (int)$num) {
                 $result .=
@@ -210,7 +222,7 @@ class Pagination extends Snippet
         return $this->template->replaceByPrefix(
             isset($this->pageFirstTpl) ? $this->pageFirstTpl : '@common.views/pagination/first',
             [
-                'url' => $this->Rock->url
+                'url' => $this->url
                         ->addArgs($this->pageArgs)
                         ->addAnchor($this->pageAnchor)
                         ->get(),
@@ -230,7 +242,7 @@ class Pagination extends Snippet
         return $this->template->replaceByPrefix(
             isset($this->pageLastTpl) ? $this->pageLastTpl : '@common.views/pagination/last',
             [
-                'url' => $this->Rock->url
+                'url' => $this->url
                         ->addArgs($this->pageArgs)
                         ->addAnchor($this->pageAnchor)
                         ->get(),

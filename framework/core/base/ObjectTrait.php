@@ -7,19 +7,10 @@ use rock\exception\BaseException;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\ObjectHelper;
-use rock\Rock;
-use rock\RockInterface;
 
 trait ObjectTrait
 {
     use ClassName;
-
-    /**
-     * Class "Rock"
-     *
-     * @var RockInterface
-     */
-    protected $Rock;
 
     /**
      * Constructor.
@@ -37,7 +28,6 @@ trait ObjectTrait
      */
     public function __construct($config = [])
     {
-        $this->Rock = Rock::$app;
         $this->setProperties($config);
         $this->init();
     }
@@ -279,8 +269,6 @@ trait ObjectTrait
         foreach ($properties as $property => $value) {
             $this->{$property} = $value;
         }
-
-        $this->Rock = Rock::$app;
     }
 
     public function resetStatic($name = null, array $keys = null)
@@ -313,12 +301,11 @@ trait ObjectTrait
 
     public function __sleep()
     {
-        $this->Rock = null;
         return array_keys(get_object_vars($this));
     }
 
     public function __wakeup()
     {
-        $this->Rock = Rock::$app;
+
     }
 }

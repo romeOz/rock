@@ -4,6 +4,7 @@ namespace apps\common\controllers;
 
 
 use rock\base\Controller;
+use rock\Rock;
 
 class BaseCaptchaController extends Controller
 {
@@ -12,7 +13,6 @@ class BaseCaptchaController extends Controller
      */
     public function actionIndex()
     {
-        $captcha = $this->Rock->captcha;
-        $captcha->display();
+        Rock::$app->captcha->display();
     }
 } 

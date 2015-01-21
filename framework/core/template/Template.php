@@ -159,6 +159,8 @@ class Template implements ComponentsInterface
     /** @var \rock\cache\CacheInterface|null */
     public $cache = 'cache';
     public $cachePlaceholders = [];
+    /** @var  string|callable */
+    public $locale = 'en';
     /**
      * Array local placeholders of variables template engine
      *
@@ -167,6 +169,14 @@ class Template implements ComponentsInterface
     protected $localPlaceholders = [];
     protected $oldPlaceholders = [];
     protected $path;
+
+    public function init()
+    {
+        if (is_callable($this->locale)) {
+            call_user_func($this->locale, $this);
+        }
+    }
+
 
     /**
      * Rendering layout.
@@ -516,7 +526,7 @@ class Template implements ComponentsInterface
      */
     public function hasChunk($path)
     {
-        $path = Rock::getAlias($path, ['lang' => $this->Rock->language]);
+        $path = Rock::getAlias($path, ['lang' => $this->locale]);
         if (!pathinfo($path, PATHINFO_EXTENSION)) {
             $path .= '.' . $this->engines[$this->defaultEngine];
         }
@@ -1531,7 +1541,7 @@ class Template implements ComponentsInterface
                 $snippet->setProperties($params);
             }
         } else {
-            $class = ltrim(Rock::getAlias($snippet, ['lang' => $this->Rock->language]), '\\');
+            $class = ltrim(Rock::getAlias($snippet, ['lang' => $this->locale]), '\\');
             $params['class'] = $class;
             /** @var \rock\base\Snippet $snippet */
             $snippet = Rock::factory($params);

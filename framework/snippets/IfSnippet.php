@@ -2,6 +2,8 @@
 namespace rock\snippets;
 
 use rock\base\Snippet;
+use rock\di\Container;
+use rock\execute\Execute;
 use rock\helpers\Helper;
 use rock\helpers\StringHelper;
 
@@ -36,6 +38,17 @@ class IfSnippet extends Snippet
      * @var array
      */
     public $addPlaceholders = [];
+    /** @var  Execute */
+    protected $execute;
+
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        parent::init();
+        $this->execute = Container::load('execute');
+    }
 
     public function get()
     {
@@ -75,6 +88,6 @@ class IfSnippet extends Snippet
                 : null
             );
 
-        return $this->Rock->eval->get(StringHelper::removeSpaces($value), $paramsTpl, $data);
+        return $this->execute->get(StringHelper::removeSpaces($value), $paramsTpl, $data);
     }
 }

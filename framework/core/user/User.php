@@ -8,6 +8,9 @@ use rock\base\ComponentsTrait;
 use rock\cookie\Cookie;
 use rock\di\Container;
 use rock\helpers\ArrayHelper;
+use rock\request\Request;
+use rock\Rock;
+use rock\session\Session;
 use rock\session\SessionInterface;
 
 class User implements \ArrayAccess, CollectionInterface, ComponentsInterface
@@ -29,10 +32,16 @@ class User implements \ArrayAccess, CollectionInterface, ComponentsInterface
      * value of @see getReturnUrl() .
      */
     public $returnUrlParam = '__returnUrl';
-
+    /** @var  Request */
+    private $_request;
+    /** @var  Session */
+    private $_session;
 
     public function init()
     {
+        $this->_request = Container::load('request');
+        $this->_session = Container::load('session');
+
         if (!is_object($this->storage)) {
             $this->storage = Container::load($this->storage);
         }
@@ -293,7 +302,7 @@ class User implements \ArrayAccess, CollectionInterface, ComponentsInterface
     public function logout($destroy = true)
     {
         if ($destroy === true) {
-            $this->Rock->session->destroy();
+            $this->_session->destroy();
             return;
         }
 
@@ -316,7 +325,7 @@ class User implements \ArrayAccess, CollectionInterface, ComponentsInterface
         if ($allowCaching && empty($params) && isset(static::$access[$roleName])) {
             return static::$access[$roleName];
         }
-        return static::$access[$roleName] = $this->Rock->rbac->check($this->get('id'), $roleName, $params);
+        return static::$access[$roleName] =  Rock::$app->rbac->check($this->get('id'), $roleName, $params);
     }
 
     /**
@@ -377,9 +386,9 @@ class User implements \ArrayAccess, CollectionInterface, ComponentsInterface
      */
     public function getReturnUrl($defaultUrl = null)
     {
-        $url = $this->Rock->session->get($this->returnUrlParam, $defaultUrl);
+        $url = $this->_session->get($this->returnUrlParam, $defaultUrl);
 
-        return $url === null ? $this->Rock->request->getHomeUrl() : $url;
+        return $url === null ?  $this->_request->getHomeUrl() : $url;
     }
 
     protected function prepareKeys($keys)

@@ -32,7 +32,7 @@ abstract class Controller implements ComponentsInterface
     {
         $this->parentInit();
         if (!isset($this->template)) {
-            $this->template = $this->Rock->template;
+            $this->template = Rock::$app->template;
             $this->template->context = $this;
             if (!$this->template->hasResource('context')) {
                 Rock::$app->controller = $this;
@@ -87,7 +87,7 @@ abstract class Controller implements ComponentsInterface
      */
     public function notPage($layout = null)
     {
-        $this->Rock->response->status404();
+        Rock::$app->response->status404();
         $this->template->title = StringHelper::upperFirst( Rock::t('notPage'));
         if (!isset($layout)) {
             $layout = '@common.views/layouts/notPage';

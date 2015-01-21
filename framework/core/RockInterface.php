@@ -26,7 +26,7 @@ namespace rock;
  * @property-read \rock\mail\Mail                                               $mail
  * @property-read \rock\route\Route                                             $route
  * @property-read \rock\csrf\CSRF                                             $csrf
- * @property-read \rock\execute\Execute                                         $eval
+ * @property-read \rock\execute\Execute                                         $execute
  * @property-read \rock\helpers\Trace                                             $trace
  * @property-read \rock\captcha\Captcha                                         $captcha
  * @property-read \rock\date\DateTime                                               $date

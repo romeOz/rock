@@ -4,6 +4,8 @@ namespace rock\snippets;
 
 
 use rock\base\Snippet;
+use rock\captcha\Captcha;
+use rock\di\Container;
 use rock\helpers\FileHelper;
 use rock\Rock;
 
@@ -12,10 +14,19 @@ use rock\Rock;
  */
 class CaptchaView extends Snippet
 {
+    /** @var  Captcha */
+    protected $captcha;
+
+    public function init()
+    {
+        parent::init();
+        $this->captcha = Container::load('captcha');
+    }
+
 
     public function get()
     {
-        if (!$dataImage = $this->Rock->captcha->get()) {
+        if (!$dataImage = $this->captcha->get()) {
             return '#';
         }
 

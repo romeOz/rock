@@ -24,7 +24,6 @@ class BaseLoginForm extends Model
     public $_csrf;
 
     public $redirectUrl;
-//    public $enableCsrfToken = true;
     public $isLogged = false;
 
 
@@ -58,64 +57,6 @@ class BaseLoginForm extends Model
             ],
         ];
     }
-//    public function rules()
-//    {
-//        //$timestamp = time();
-//        return [
-//            [
-//                self::RULE_VALIDATION,
-//                function(array $attributes){
-//
-//                    if ($this->enableCsrfToken) {
-//                        if ($this->Rock->validation
-//                                ->notEmpty()
-//                                ->token($this->formName())
-//                                ->setName(Rock::t('token'))
-//                                ->setPlaceholders('e_login')
-//                                ->setModel($this)
-//                                ->validate($attributes[$this->Rock->csrf->csrfParam]) === false
-//                        ) {
-//                            return false;
-//                        }
-//                    }
-//                    if ($this->Rock->validation
-//                            ->key(
-//                                'email',
-//                                Validation::notEmpty()
-//                                    ->length(4, 80, true)
-//                                    ->email()
-//                            //->setName($this->Rock->i18n->get('email'))
-//                            )
-//                            ->key(
-//                                'password',
-//                                Validation::notEmpty()
-//                                    ->length(6, 20, true)
-//                                    ->regex('/^[a-z\d\-\_\.]+$/i')
-//                                    ->setName(Rock::t('password'))
-//                            )
-//                            ->setModel($this)
-//                            ->setPlaceholders(['email.first', 'password.first'])
-//                            ->validate($attributes) === false) {
-//                        return false;
-//                    }
-//
-//                    if (!$this->validatePassword()) {
-//                        return false;
-//                    }
-//
-//                    return $this->validateStatus();
-//
-//                }],
-//            [
-//                self::RULE_BEFORE_FILTERS,
-//                [
-//                    Sanitize::ANY => [Sanitize::STRIP_TAGS, 'trim'],
-//                    'email' => [(object)['mb_strtolower', [Rock::$app->charset]]],
-//                ],
-//
-//            ],
-//        ];
-//    }
 
     public function safeAttributes()
     {

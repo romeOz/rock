@@ -10,7 +10,9 @@ use rock\event\Event;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\StringHelper;
+use rock\request\Request;
 use rock\request\RequestInterface;
+use rock\response\Response;
 use rock\Rock;
 use rock\sanitize\Sanitize;
 
@@ -43,9 +45,16 @@ class Route implements RequestInterface, ErrorsInterface, ObjectInterface
     public static $defaultFilters = ['removeTags', 'trim', ['call' => 'urldecode'],'toType'];
 
     protected $errors = 0;
+    /** @var  Request */
+    private $_request;
+    /** @var  Response */
+    private $_response;
 
     public function init()
     {
+        $this->_request = Container::load('request');
+        $this->_response = Container::load('response');
+
         $this->calculateData();
         $handlers = $this->defaultRESTHandlers();
         $this->RESTHandlers = empty($this->RESTHandlers) ? $handlers : array_merge($handlers, $this->RESTHandlers);
@@ -377,7 +386,7 @@ class Route implements RequestInterface, ErrorsInterface, ObjectInterface
             return true;
         }
 
-        return $this->Rock->request->isMethods($verbs);
+        return $this->_request->isMethods($verbs);
     }
 
     protected function initSuccess()
@@ -542,7 +551,7 @@ class Route implements RequestInterface, ErrorsInterface, ObjectInterface
 
         // echo other format json, xml...
         if (isset($result)) {
-            Rock::$app->response->data = $result;
+            $this->_response->data = $result;
         }
     }
 
@@ -553,7 +562,7 @@ class Route implements RequestInterface, ErrorsInterface, ObjectInterface
 
     protected function calculateData()
     {
-        $this->data = parse_url($this->Rock->request->getAbsoluteUrl());
+        $this->data = parse_url($this->_request->getAbsoluteUrl());
         $this->defaultScope();
     }
 }

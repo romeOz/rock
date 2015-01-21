@@ -10,6 +10,7 @@ class Mail extends \PHPMailer implements ComponentsInterface
     use ComponentsTrait {
         ComponentsTrait::__construct as parentConstruct;
     }
+    public $charset = 'utf-8';
 
     public function __construct($configs = [])
     {
@@ -19,7 +20,10 @@ class Mail extends \PHPMailer implements ComponentsInterface
 
     public function init()
     {
-        $this->CharSet = $this->Rock->charset;
+        if (is_callable($this->charset)) {
+            $this->charset = call_user_func($this->charset, $this);
+        }
+        $this->CharSet = $this->charset;
         $this->isHTML();
     }
 

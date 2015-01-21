@@ -1,6 +1,8 @@
 <?php
 namespace rock\snippets;
 use rock\base\Snippet;
+use rock\di\Container;
+use rock\execute\Execute;
 use rock\helpers\Helper;
 use rock\helpers\StringHelper;
 
@@ -22,6 +24,18 @@ class Formula extends Snippet
      */
     public $subject;
     public $operands;
+    /** @var  Execute */
+    protected $execute;
+
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        parent::init();
+        $this->execute = Container::load('execute');
+    }
+
 
     public function get()
     {
@@ -40,7 +54,7 @@ class Formula extends Snippet
             $data[$keyParam] = $valueParam;
         }
 
-        return $this->Rock->eval->get(
+        return $this-> execute->get(
             StringHelper::removeSpaces('return ' . preg_replace('/:([\\w]+)/', '$data[\'$1\']', $this->subject) . ';'),
             [
                 'subject'   => $this->subject,

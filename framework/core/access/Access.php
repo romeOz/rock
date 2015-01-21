@@ -2,9 +2,13 @@
 namespace rock\access;
 
 use rock\base\ObjectTrait;
+use rock\di\Container;
 use rock\helpers\Helper;
+use rock\request\Request;
+use rock\response\Response;
 use rock\route\ErrorsInterface;
 use rock\route\ErrorsTrait;
+use rock\user\User;
 
 class Access implements ErrorsInterface
 {
@@ -55,7 +59,19 @@ class Access implements ErrorsInterface
      * @var int
      */
     public $errors = 0;
+    /** @var  Request */
+    private $_request;
+    /** @var  Response */
+    private $_response;
+    /** @var  User */
+    private $_user;
 
+    public function init()
+    {
+        $this->_request = Container::load(Request::className());
+        $this->_response = Container::load(Response::className());
+        $this->_user = Container::load(User::className());
+    }
 
     /**
      * Check Access
@@ -159,18 +175,18 @@ class Access implements ErrorsInterface
         // All users
         if (in_array('*', $users)) {
             return true;
-        // guest
-        } elseif (in_array('?', $users) && $this->Rock->user->isGuest()) {
+            // guest
+        } elseif (in_array('?', $users) && $this->_user->isGuest()) {
             return true;
-        // Authenticated
-        } elseif (in_array('@', $users) && !$this->Rock->user->isGuest()) {
+            // Authenticated
+        } elseif (in_array('@', $users) && !$this->_user->isGuest()) {
             return true;
-        // username
-        } elseif (in_array($this->Rock->user->get('username'), $users)) {
+            // username
+        } elseif (in_array($this->_user->get('username'), $users)) {
             return true;
         }
         if ($this->sendHeaders) {
-            $this->Rock->response->status403();
+            $this->_response->status403();
         }
         return false;
     }
@@ -187,9 +203,9 @@ class Access implements ErrorsInterface
         if (in_array('*', $ips)) {
             return true;
         }
-        $result = $this->Rock->request->isIps($ips);
+        $result = $this->_request->isIps($ips);
         if (!$result && $this->sendHeaders) {
-            $this->Rock->response->status403();
+            $this->_response->status403();
         }
         return $result;
     }
@@ -207,14 +223,13 @@ class Access implements ErrorsInterface
             return true;
         }
 
-        if ($this->Rock->request->isMethods($verbs)) {
+        if ($this->_request->isMethods($verbs)) {
             return true;
         }
         if ($this->sendHeaders) {
-            $response = $this->Rock->response;
             // http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.7
-            $response->getHeaders()->set('Allow', implode(', ', $verbs));
-            $response->setStatusCode(405);
+            $this->_response->getHeaders()->set('Allow', implode(', ', $verbs));
+            $this->_response->setStatusCode(405);
         }
         return false;
     }
@@ -231,17 +246,17 @@ class Access implements ErrorsInterface
         if (in_array('*', $roles)) {
 
             return true;
-        } elseif (in_array('?', $roles) && $this->Rock->user->isGuest()) {
+        } elseif (in_array('?', $roles) && $this->_user->isGuest()) {
             return true;
-        // Authenticated
-        } elseif (in_array('@', $roles) && !$this->Rock->user->isGuest()) {
+            // Authenticated
+        } elseif (in_array('@', $roles) && !$this->_user->isGuest()) {
             return true;
         }
 
         foreach ($roles as $role) {
-            if (!$this->Rock->user->check($role)) {
+            if (!$this->_user->check($role)) {
                 if ($this->sendHeaders) {
-                    $this->Rock->response->status403();
+                    $this->_response->status403();
                 }
                 return false;
             }
@@ -266,7 +281,7 @@ class Access implements ErrorsInterface
             array_merge(['owner' => $this->owner/*, 'action' => $this->action*/], $args)
         );
         if (!$result && $this->sendHeaders) {
-            $this->Rock->response->status403();
+            $this->_response->status403();
         }
         return $result;
     }

@@ -2,6 +2,8 @@
 namespace rock\snippets;
 
 use rock\base\Snippet;
+use rock\csrf\CSRF;
+use rock\di\Container;
 use rock\template\Template;
 use rock\url\UrlInterface;
 
@@ -96,6 +98,14 @@ class Url extends Snippet implements UrlInterface
      * @inheritdoc
      */
     public $autoEscape = Template::STRIP_TAGS;
+    /** @var  CSRF */
+    private $_csrf;
+
+    public function init()
+    {
+        parent::init();
+        $this->_csrf = Container::load('csrf');
+    }
 
     /**
      * @inheritdoc
@@ -126,8 +136,7 @@ class Url extends Snippet implements UrlInterface
             $urlBuilder->replacePath($search, $replace);
         }
         if ($this->csrf) {
-            $token = $this->Rock->csrf;
-            $this->addArgs[$token->csrfParam] = $token->get();
+            $this->addArgs[$this->_csrf->csrfParam] = $this->_csrf->get();
         }
         if (!empty($this->args)) {
             $urlBuilder->setArgs($this->args);

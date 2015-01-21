@@ -4,13 +4,14 @@ namespace rock\db;
 
 use rock\base\ComponentsTrait;
 use rock\base\Model;
+use rock\di\Container;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\Pagination;
 use rock\request\Request;
 use rock\response\Response;
-use rock\Rock;
 use rock\sanitize\Sanitize;
+use rock\url\Url;
 
 /**
  * ActiveDataProvider implements a data provider based on {@see \rock\db\Query} and {@see \rock\db\ActiveQuery}.
@@ -64,17 +65,14 @@ class ActiveDataProvider
      * @var array|QueryInterface
      */
     public $query;
-
     /**
      * @var array
      */
     public $pagination;
-
     /**
      * @var callable
      */
     public $callback;
-
     public $only = [];
     public $exclude = [];
     public $expand = [];
@@ -89,7 +87,6 @@ class ActiveDataProvider
      * @see getKeys()
      */
     public $key;
-
     /**
      * @var array
      */
@@ -99,12 +96,19 @@ class ActiveDataProvider
      */
     protected $totalCount = 0;
     private $_keys;
+    /** @var  Url */
+    protected $url;
+    /** @var  Response */
+    protected $response;
 
     public function init()
     {
         if (!isset($this->pagination['pageCurrent'])) {
             $this->pagination['pageCurrent'] = Request::get(self::PAGE_VAR, null, Sanitize::positive()->int());
         }
+        
+        $this->response = Container::load('response');
+        $this->url = Container::load('url');
     }
 
 
@@ -304,33 +308,32 @@ class ActiveDataProvider
 
     protected function addHeaders($total, array $data)
     {
-        $response = Rock::$app->response;
-        if ($response->format == Response::FORMAT_HTML || empty($data)) {
+        if ($this->response->format == Response::FORMAT_HTML || empty($data)) {
             return;
         }
 
-        $absoluteUrl = $this->Rock->url->removeAllArgs()->getAbsoluteUrl(true);
+        $absoluteUrl = $this->url->removeAllArgs()->getAbsoluteUrl(true);
         $links = [];
         $links[] = "<{$absoluteUrl}?{$data['pageVar']}={$data['pageCurrent']}>; rel=self";
-        $response->content['_links']['self'] = "{$absoluteUrl}?{$data['pageVar']}={$data['pageCurrent']}";
+        $this->response->content['_links']['self'] = "{$absoluteUrl}?{$data['pageVar']}={$data['pageCurrent']}";
         if (!empty($data['pagePrev'])) {
             $links[] = "<{$absoluteUrl}?{$data['pageVar']}={$data['pagePrev']}>; rel=prev";
-            $response->content['_links']['prev'] = "{$absoluteUrl}?{$data['pageVar']}={$data['pagePrev']}";
+            $this->response->content['_links']['prev'] = "{$absoluteUrl}?{$data['pageVar']}={$data['pagePrev']}";
         }
         if (!empty($data['pageNext'])) {
             $links[] = "<{$absoluteUrl}?{$data['pageVar']}={$data['pageNext']}>; rel=next";
-            $response->content['_links']['next'] = "{$absoluteUrl}?{$data['pageVar']}={$data['pageNext']}";
+            $this->response->content['_links']['next'] = "{$absoluteUrl}?{$data['pageVar']}={$data['pageNext']}";
         }
         if (!empty($data['pageFirst'])) {
             $links[] = "<{$absoluteUrl}?{$data['pageVar']}={$data['pageFirst']}>; rel=first";
-            $response->content['_links']['first'] = "{$absoluteUrl}?{$data['pageVar']}={$data['pageFirst']}";
+            $this->response->content['_links']['first'] = "{$absoluteUrl}?{$data['pageVar']}={$data['pageFirst']}";
         }
         if (!empty($data['pageLast'])) {
             $links[] = "<{$absoluteUrl}?{$data['pageVar']}={$data['pageLast']}>; rel=last";
-            $response->content['_links']['last'] = "{$absoluteUrl}?{$data['pageVar']}={$data['pageLast']}";
+            $this->response->content['_links']['last'] = "{$absoluteUrl}?{$data['pageVar']}={$data['pageLast']}";
         }
 
-        $response->getHeaders()
+        $this->response->getHeaders()
             ->set('X-Pagination-Total-Count', $total)
             ->set('X-Pagination-Page-Count', $data['pageCount'])
             ->set('X-Pagination-Current-Page', $data['pageCurrent'])

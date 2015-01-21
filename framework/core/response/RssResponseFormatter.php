@@ -75,7 +75,7 @@ class RssResponseFormatter implements ResponseFormatterInterface, ObjectInterfac
         $data = $response->data;
 
         if (!isset($data['language'])) {
-            $this->_feedWriter->setChannelElement('language', $this->Rock->language);
+            $this->_feedWriter->setChannelElement('language', $response->locale);
         }
         if (!isset($data['pubDate'])) {
             $this->_feedWriter->setChannelElement('pubDate', date(DATE_RSS, time()));

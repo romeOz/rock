@@ -4,9 +4,11 @@ namespace rock\widgets;
 
 use rock\base\Model;
 use rock\base\Widget;
+use rock\csrf\CSRF;
 use rock\di\Container;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Html;
+use rock\request\Request;
 
 class ActiveForm extends Widget
 {
@@ -101,12 +103,20 @@ class ActiveForm extends Widget
      */
     private $_fields = [];
 
+    /** @var  CSRF */
+    protected $csrf;
+    /** @var  Request */
+    protected $request;
+
     /**
      * Initializes the widget.
      * This renders the form open tag.
      */
     public function init()
     {
+        $this->csrf = Container::load('csrf');
+        $this->request = Container::load('request');
+
         if (!isset($this->options['id'])) {
             $this->options['id'] = $this->getId();
         }
@@ -139,19 +149,19 @@ class ActiveForm extends Widget
         if (!isset($options['data-ng-submit'])) {
             $options['data-ng-submit'] = 'submit($event)';
         }
-        $request = $this->Rock->request;
+
         $options['hiddenMethod'] = array_merge(
             [
-                'data-ng-model' =>  (isset($this->modelName) ? $this->modelName : 'form').".values.{$request->methodVar}",
-                'data-simple-name' => $request->methodVar
+                'data-ng-model' =>  (isset($this->modelName) ? $this->modelName : 'form').".values.{$this->request->methodVar}",
+                'data-simple-name' => $this->request->methodVar
             ],
             ArrayHelper::getValue($options, 'hiddenMethod', [])
         );
-        $token = $this->Rock->csrf;
+
         $options['hiddenCsrf'] = array_merge(
             [
-                'data-ng-model' => (isset($this->modelName) ? $this->modelName : 'form') . '.values.'. $token->csrfParam,
-                'data-simple-name' => $token->csrfParam,
+                'data-ng-model' => (isset($this->modelName) ? $this->modelName : 'form') . ".values.{$this->csrf->csrfParam}",
+                'data-simple-name' => $this->csrf->csrfParam,
                 'data-rock-form-add-csrf' => '',
                 'data-ng-value' => 'rock.csrf.getToken()'
 

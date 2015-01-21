@@ -5,6 +5,7 @@ namespace rock\authclient\snippets;
 
 use rock\authclient\Collection;
 use rock\base\Snippet;
+use rock\di\Container;
 use rock\helpers\Json;
 
 class AuthClient extends Snippet
@@ -15,23 +16,29 @@ class AuthClient extends Snippet
      * @var string
      */
     public $tpl;
-
     /**
      * name of wrapper template
      * @var string
      */
     public $wrapperTpl;
-
     public $autoEscape = false;
+    /** @var  Collection */
+    protected $authClientCollection;
+
+    public function init()
+    {
+        parent::init();
+
+        $this->authClientCollection = Container::load('authClientCollection');
+    }
 
     public function get()
     {
-        $collection = $this->Rock->authClientCollection;
         if (!empty($this->tpl)) {
-            return $this->renderWithTpl($collection);
+            return $this->renderWithTpl($this->authClientCollection);
         }
 
-        return $this->renderWithoutTpl($collection);
+        return $this->renderWithoutTpl($this->authClientCollection);
     }
 
     protected function renderWithTpl(Collection $collection)

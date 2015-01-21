@@ -4,8 +4,10 @@ namespace rock\search;
 
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
+use rock\di\Container;
 use rock\exception\BaseException;
 use rock\Rock;
+use rock\template\Template;
 
 class PHPMorphy implements ObjectInterface
 {
@@ -14,8 +16,9 @@ class PHPMorphy implements ObjectInterface
      * @var \phpMorphy
      */
     protected static $morphy;
-
     public $tpl = '@common.views\elements\highlight-yellow';
+    /** @var  Template */
+    protected $template;
 
 
     public function init()
@@ -36,6 +39,7 @@ class PHPMorphy implements ObjectInterface
                 throw new BaseException($e->getMessage(), [], $e);
             }
         }
+        $this->template = Container::load('template');
     }
 
 
@@ -158,7 +162,7 @@ class PHPMorphy implements ObjectInterface
 
         return preg_replace(
             array_reverse($highlightWords),
-            $this->Rock->template->replaceByPrefix($this->tpl),
+            $this->template->replaceByPrefix($this->tpl),
             $content
         );
     }

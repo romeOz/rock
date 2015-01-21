@@ -41,7 +41,6 @@ class Collection implements ComponentsInterface
 {
     use ComponentsTrait;
 
-
     /**
      * @var array list of Auth clients with their configuration in format: 'clientId' => [...]
      */

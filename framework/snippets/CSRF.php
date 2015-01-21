@@ -1,6 +1,7 @@
 <?php
 namespace rock\snippets;
 use rock\base\Snippet;
+use rock\di\Container;
 
 class CSRF extends Snippet
 {
@@ -16,7 +17,8 @@ class CSRF extends Snippet
         if (empty($this->name)) {
             return false;
         }
-        $token = $this->Rock->csrf;
-        return $token->get();
+        /** @var \rock\csrf\CSRF $csrf */
+        $csrf = Container::load('csrf');
+        return $csrf->get();
     }
 }

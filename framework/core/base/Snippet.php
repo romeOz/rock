@@ -26,7 +26,7 @@ abstract class Snippet implements ComponentsInterface
         $this->parentInit();
 
         if (!isset($this->template)) {
-            $this->template = $this->Rock->template;
+            $this->template = Rock::$app->template;
         }
     }
 

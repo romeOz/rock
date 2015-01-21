@@ -4,6 +4,7 @@ namespace rock\widgets;
 
 
 use rock\captcha\CaptchaInterface;
+use rock\di\Container;
 use rock\helpers\Html;
 use rock\url\Url;
 
@@ -35,6 +36,8 @@ class Captcha extends InputWidget implements CaptchaInterface
      * @see \rock\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
      */
     public $options = ['class' => 'form-control'];
+    /** @var  \rock\captcha\Captcha */
+    protected $captcha;
 
     /**
      * Initializes the widget.
@@ -42,6 +45,7 @@ class Captcha extends InputWidget implements CaptchaInterface
     public function init()
     {
         parent::init();
+        $this->captcha = Container::load('captcha');
 
         $this->checkRequirements();
         if (!isset($this->imageOptions['id'])) {
@@ -65,8 +69,7 @@ class Captcha extends InputWidget implements CaptchaInterface
         }
 
         if ($this->output === self::BASE64) {
-            $captcha = $this->Rock->captcha;
-            $src = $captcha->getDataUri();
+            $src = $this->captcha->getDataUri();
         } else {
             $urlBuilder = Url::set($this->captchaAction);
             $src = $urlBuilder->addArgs(['v' => uniqid()])->getAbsoluteUrl(true);

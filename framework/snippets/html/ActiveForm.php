@@ -5,19 +5,20 @@ namespace rock\snippets\html;
 
 use rock\base\Model;
 use rock\base\Snippet;
+use rock\di\Container;
 use rock\file\UploadedFile;
 use rock\helpers\Helper;
 use rock\helpers\Html;
 use rock\helpers\Serialize;
 use rock\request\Request;
 use rock\Rock;
+use rock\user\User;
 
 class ActiveForm extends Snippet
 {
     public $config = [];
-    /** @var  Model */
+    /** @var  Model|string|array */
     public $model;
-    public $configModel = [];
     public $fields = [];
     public $submitButton = [];
     public $load;
@@ -39,19 +40,36 @@ class ActiveForm extends Snippet
      */
     public $toPlaceholder;
     /**
-     * @var int|bool|null
+     * @inheritdoc
      */
     public $autoEscape = false;
+    /** @var  User */
+    protected $user;
 
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        parent::init();
+
+        $this->user = Container::load('user');
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function get()
     {
         if (empty($this->model)) {
             return null;
         }
         $this->unserialize();
-        if (is_string($this->model)) {
-            $configModel = array_merge(['class' => Rock::getAlias($this->model)], $this->configModel);
-            $this->model = Rock::factory($configModel);
+        if (!is_object($this->model)) {
+            if (is_string($this->model)) {
+                $this->model = ['class' => Rock::getAlias($this->model)];
+            }
+            $this->model = Container::load($this->model);
         }
 
         $this->calculateLoad();
@@ -64,7 +82,7 @@ class ActiveForm extends Snippet
                         continue;
                     }
                     if (isset($params['options']['rateLimiter'])) {
-                        $this->Rock->user->removeAllowance(get_class($this->model) . '::' . $attributeName);
+                        $this->user->removeAllowance(get_class($this->model) . '::' . $attributeName);
                     }
                 }
                 if (isset($this->after)) {
@@ -188,8 +206,8 @@ class ActiveForm extends Snippet
         if (is_string($this->config)) {
             $this->config = Serialize::unserialize($this->config);
         }
-        if (is_string($this->configModel)) {
-            $this->configModel = Serialize::unserialize($this->configModel);
+        if (is_string($this->model)) {
+            $this->model = Serialize::unserialize($this->model, false);
         }
 
         if (is_string($this->fields)) {

@@ -65,6 +65,9 @@ return array_merge(
 //        ],
         'template' => [
             'class' => Template::className(),
+            'locale' => function(){
+                return Rock::$app->language;
+            },
             'autoEscape' => Template::ESCAPE | Template::TO_TYPE,
             'handlerLink' => function($link, Template $template)
                 {
@@ -225,7 +228,7 @@ return array_merge(
             ],
         ],
 
-        'eval' => [
+        'execute' => [
             'class' => \rock\execute\CacheExecute::className(),
         ],
 
@@ -247,6 +250,9 @@ return array_merge(
         ],
         'date' => [
             'class' => \rock\date\DateTime::className(),
+            'locale' => function(){
+                return Rock::$app->language;
+            },
             'formats' => [
                 'dmy'   => function(\rock\date\DateTime $dateTime){
                         $nowYear  = date('Y');
@@ -280,6 +286,9 @@ return array_merge(
         'response' => [
             'class' => \rock\response\Response::className(),
             'singleton' => true,
+            'locale' => function(){
+                return Rock::$app->language;
+            }
         ],
         'htmlResponseFormatter' => [
             'class' => \rock\response\HtmlResponseFormatter::className(),

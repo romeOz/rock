@@ -1,8 +1,10 @@
 <?php
 namespace rock\base;
 
+use rock\di\Container;
 use rock\helpers\Inflector;
 use rock\Rock;
+use rock\template\Template;
 use rock\validate\ValidateModel;
 
 /**
@@ -67,13 +69,19 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable, ComponentsIn
      * @var string current scenario
      */
     protected $_scenario = self::DEFAULT_SCENARIO;
-
     /**
      * @var array validation errors (attribute name => array of errors)
      */
     protected $_errors = [];
-
     protected $useLabelsAsPlaceholders = true;
+    /** @var  Template */
+    private $_template;
+
+    public function init()
+    {
+        $this->_template = Container::load('template');
+    }
+
 
     /**
      * Returns the validation rules for attributes.
@@ -524,7 +532,9 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable, ComponentsIn
             $placeholderName = 'e_' . $this->formName();
         }
         $this->_errors[$placeholderName][] = $error;
-        $this->Rock->template->addPlaceholder($placeholderName, [$error], true);
+        if (isset($this->_template)) {
+            $this->_template->addPlaceholder($placeholderName, [$error], true);
+        }
     }
 
     /**
@@ -814,8 +824,9 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable, ComponentsIn
         if (!isset($placeholder)) {
             $placeholder = 'e_' . $this->formName();
         }
-
-        $this->Rock->template->addPlaceholder($placeholder, $msg, true);
+        if (isset($this->_template)) {
+            $this->_template->addPlaceholder($placeholder, $msg, true);
+        }
     }
 
 

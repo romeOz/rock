@@ -4,11 +4,14 @@ namespace rock\response;
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
 use rock\csrf\CSRF;
+use rock\di\Container;
 use rock\exception\BaseException;
 use rock\helpers\FileHelper;
 use rock\helpers\StringHelper;
+use rock\request\Request;
 use rock\Rock;
 use rock\url\Url;
+use rock\user\User;
 
 /**
  * The web Response class represents an HTTP response.
@@ -244,6 +247,8 @@ class Response implements ComponentsInterface
         510 => 'Not Extended',
         511 => 'Network Authentication Required',
     ];
+    /** @var string|callable  */
+    public $locale = 'en';
 
     /**
      * @var integer the HTTP status code to send with the response.
@@ -253,12 +258,26 @@ class Response implements ComponentsInterface
      * @var HeaderCollection
      */
     private $_headers;
+    /** @var  CSRF */
+    private $_csrf;
+    /** @var  User */
+    private $_user;
+    /** @var  Request */
+    private $_request;
 
     /**
      * Initializes this component.
      */
     public function init()
     {
+        $this->_csrf = Container::load('csrf');
+        $this->_user = Container::load('user');
+        $this->_request = Container::load('request');
+
+        if (is_callable($this->locale)) {
+            $this->locale = call_user_func($this->locale, $this);
+        }
+
         if ($this->version === null) {
             $this->version =
                 isset($_SERVER['SERVER_PROTOCOL']) && $_SERVER['SERVER_PROTOCOL'] === 'HTTP/1.0'
@@ -777,16 +796,15 @@ class Response implements ComponentsInterface
      */
     public function redirect($url, $statusCode = 302, $checkAjax = true)
     {
-        $request = $this->Rock->request;
         $urlBuilder = Url::set($url);
         $url = $urlBuilder->getAbsoluteUrl();
         if (strpos($url, '/') === 0 && strpos($url, '//') !== 0) {
-            $url = $request->getHostInfo() . $url;
+            $url = $this->_request->getHostInfo() . $url;
         }
         if ($checkAjax) {
-            if ($request->isPjax()) {
+            if ($this->_request->isPjax()) {
                 $this->getHeaders()->set('X-Pjax-Url', $url);
-            } elseif ($request->isAjax()) {
+            } elseif ($this->_request->isAjax()) {
                 $this->getHeaders()->set('X-Redirect', $url);
             } else {
                 $this->getHeaders()->set('Location', $url);
@@ -819,7 +837,7 @@ class Response implements ComponentsInterface
      */
     public function refresh($anchor = '', $removeArgs = false)
     {
-        $url = $this->Rock->url;
+        $url = Url::set();
         if ($removeArgs) {
             $url->removeAllArgs();
         }
@@ -841,7 +859,7 @@ class Response implements ComponentsInterface
      */
     public function goHome()
     {
-        return $this->redirect($this->Rock->request->getHomeUrl());
+        return $this->redirect($this->_request->getHomeUrl());
     }
 
     /**
@@ -860,7 +878,7 @@ class Response implements ComponentsInterface
      */
     public function goBack($defaultUrl = null)
     {
-        return $this->redirect($this->Rock->user->getReturnUrl($defaultUrl));
+        return $this->redirect($this->_user->getReturnUrl($defaultUrl));
     }
 
     /**
@@ -1022,11 +1040,10 @@ class Response implements ComponentsInterface
         if (!$this->sendCSRF) {
             return;
         }
-        $csrf = $this->Rock->csrf;
-        $csrfToken = $csrf->get();
+        $csrfToken = $this->_csrf->get();
         if ($csrfToken) {
             if (is_array($this->data)) {
-                $this->data[$csrf->csrfParam] = $csrfToken;
+                $this->data[$this->_csrf->csrfParam] = $csrfToken;
             }
             $this->getHeaders()->add(CSRF::CSRF_HEADER, $csrfToken);
         }

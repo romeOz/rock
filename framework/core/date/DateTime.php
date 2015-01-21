@@ -34,9 +34,9 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface, Ob
     public $format = self::DEFAULT_FORMAT;
     /**
      * Current locale.
-     * @var  string
+     * @var string|callable
      */
-    public $locale;
+    public $locale = i18nInterface::EN;
     /**
      * Locales.
      * @var array
@@ -46,7 +46,6 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface, Ob
 
     /** @var  array */
     protected  static $formatsOption;
-
     protected static $defaultFormats = array(
         self::USER_DATE_FORMAT => 'm/d/Y',
         self::USER_TIME_FORMAT => 'g:i A',
@@ -66,7 +65,6 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface, Ob
     protected static $formatOptionsPlaceholders = [];
     protected static $formatOptionsCallbacks = [];
 
-
     /**
      * @param string|int          $time
      * @param string|\DateTimeZone $timezone
@@ -81,9 +79,10 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface, Ob
 
         parent::__construct($time, $this->calculateTimezone($timezone));
 
-        if (!isset($this->locale)) {
-            $this->locale = $this->Rock->language;
+        if (is_callable($this->locale)) {
+            $this->locale = call_user_func($this->locale, $this);
         }
+
         $this->formats = array_merge(static::$defaultFormats, $this->formats);
         $this->locales = array_merge($this->defaultLocales(), $this->locales);
         $this->initCustomFormatOptions();
