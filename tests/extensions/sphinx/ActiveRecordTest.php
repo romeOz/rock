@@ -466,7 +466,7 @@ class ActiveRecordTest extends SphinxTestCase
         $this->assertEmpty($query->one());
 
         // success
-        $_POST['_method'] = 'POST';
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.2';
         $query = ArticleFilterIndex::find()
             ->where(['id' => 1]);
         $this->assertEquals($query->one()->author_id, 1);
@@ -475,7 +475,7 @@ class ActiveRecordTest extends SphinxTestCase
     }
 
 
-       public function testInsertWithRule()
+    public function testInsertWithRule()
     {
         // fail
         $runtime = new  RuntimeRulesIndex();
