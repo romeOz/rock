@@ -29,7 +29,6 @@ class BaseUsers extends ActiveRecord
         return 'users';
     }
 
-
     /**
      * @inheritdoc
      * @return BaseUsersQuery
@@ -38,8 +37,6 @@ class BaseUsers extends ActiveRecord
     {
         return new BaseUsersQuery(get_called_class());
     }
-
-
 
     /**
      * Creates a new user
@@ -65,9 +62,6 @@ class BaseUsers extends ActiveRecord
         }
     }
 
-
-
-
     public static function existsByUsernameOrEmail($email, $username)
     {
         return static::find()
@@ -80,7 +74,6 @@ class BaseUsers extends ActiveRecord
                 [':username' => $username]
             )->exists();
     }
-
 
     /**
      * Finds url by `username`
