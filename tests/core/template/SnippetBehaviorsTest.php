@@ -147,44 +147,5 @@ class SnippetBehaviorsTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame('bar', $result);
         $this->expectOutputString('1success_11success_2');
     }
-
-    public function testCheckAccessTrue()
-    {
-        $snippet = Rock::$app->template
-            ->checkAccess(
-                [
-                    'allow'     => true,
-                    'verbs'   => ['GET'],
-                ],
-                function(Access $access){
-                    echo $access->owner instanceof Template, 'success';
-                },
-                [function(Access $access){
-                    echo $access->owner instanceof Template, 'fail';
-                }]
-            );
-        $this->assertEquals(-5, $snippet->getSnippet(TestSnippet::className()));
-        $this->expectOutputString('1success');
-    }
-
-
-    public function testCheckAccessFalse()
-    {
-        $snippet = Rock::$app->template
-            ->checkAccess(
-                [
-                    'allow'     => true,
-                    'verbs'   => ['POST'],
-                ],
-                [function(Access $access){
-                    echo $access->owner instanceof Template, 'success';
-                }],
-                [function(Access $access){
-                    echo $access->owner instanceof Template, 'fail';
-                }]
-            );
-        $this->assertNull($snippet->getSnippet(TestSnippet::className()));
-        $this->expectOutputString('1fail');
-    }
 }
  

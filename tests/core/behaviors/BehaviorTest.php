@@ -104,20 +104,6 @@ class BehaviorTest extends \PHPUnit_Framework_TestCase
         $controller->on('test', function(Event $event){
             echo 'test ' . $event->result;
         });
-        $controller->checkAccess(
-            [
-                 'allow' => true,
-                 'verbs' => ['POST'],
-             ],
-            function (Access $access) {
-                $this->assertTrue($access->owner instanceof FooController);
-                echo 'success';
-            },
-            function (Access $access) {
-                $this->assertTrue($access->owner instanceof FooController);
-                echo 'fail';
-            }
-        );
         $controller->detachBehaviors();
         $this->assertSame('view', $controller->actionView());
         $this->expectOutputString('test view');

@@ -96,21 +96,6 @@ trait ComponentsTrait
     }
 
     /**
-     * Check Access.
-     *
-     * @param array      $rules
-     * @param array|\Closure|null $success
-     * @param array|\Closure|null $fail
-     * @return $this
-     */
-    public function checkAccess(array $rules, $success = null, $fail = null)
-    {
-        $behavior = ['class' => AccessFilter::className(), 'rules' => $rules, 'success' => $success, 'fail' => $fail];
-        $this->_attachBehaviorInternal(1, $behavior);
-        return $this;
-    }
-
-    /**
      * Makes sure that the behaviors declared in {@see \rock\base\ComponentsInterface::behaviors()} are attached to this component.
      */
     public function ensureBehaviors()

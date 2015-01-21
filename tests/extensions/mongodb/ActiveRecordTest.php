@@ -155,60 +155,6 @@ class ActiveRecordTest extends MongoDbTestCase
         $this->assertTrue($customers['2-2'] instanceof Customer);
     }
 
-    public function testFindCheckAccessFail()
-    {
-        $query = Customer::find()
-            ->checkAccess(
-                [
-                    'allow' => true,
-                    'verbs' => ['POST'],
-                ],
-                [
-                    function (Access $access) {
-                        $this->assertTrue($access->owner instanceof ActiveQuery);
-                        echo 'success';
-                    }
-                ],
-                [
-                    function (Access $access) {
-                        $this->assertTrue($access->owner instanceof ActiveQuery);
-                        echo 'fail';
-                    }
-                ]
-            );
-        $this->assertEmpty($query->one());
-        $this->assertEmpty(Event::getAll());
-        $this->assertEmpty($query->all());
-        $this->expectOutputString('failfail');
-    }
-
-    public function testFindCheckAccessSuccess()
-    {
-        $query = Customer::find()
-            ->checkAccess(
-                [
-                    'allow' => true,
-                    'verbs' => ['GET'],
-                ],
-                [
-                    function (Access $access) {
-                        $this->assertTrue($access->owner instanceof ActiveQuery);
-                        echo 'success';
-                    }
-                ],
-                [
-                    function (Access $access) {
-                        $this->assertTrue($access->owner instanceof ActiveQuery);
-                        echo 'fail';
-                    }
-                ]
-            );
-        $this->assertNotEmpty($query->one());
-        $this->assertEmpty(Event::getAll());
-        $this->assertNotEmpty($query->all());
-        $this->expectOutputString('successsuccess');
-    }
-
     public function testInsert()
     {
         $record = new Customer;
@@ -223,37 +169,6 @@ class ActiveRecordTest extends MongoDbTestCase
 
         $this->assertTrue($record->_id instanceof \MongoId);
         $this->assertFalse($record->isNewRecord);
-    }
-
-    public function testInsertCheckAccessFail()
-    {
-        $record = new Customer;
-        $record->checkAccess(
-            [
-                'allow' => true,
-                'verbs' => ['POST'],
-            ],
-            [
-                function (Access $access) {
-                    $this->assertTrue($access->owner instanceof Customer);
-                    echo 'success';
-                }
-            ],
-            [
-                function (Access $access) {
-                    $this->assertTrue($access->owner instanceof Customer);
-                    echo 'fail';
-                }
-            ]
-        );
-        $record->name = 'new name';
-        $record->email = 'new email';
-        $record->address = 'new address';
-        $record->status = 7;
-
-        $this->assertTrue($record->isNewRecord);
-        $this->assertFalse($record->save());
-        $this->expectOutputString('fail');
     }
 
     /**

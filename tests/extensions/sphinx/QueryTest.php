@@ -414,63 +414,6 @@ class QueryTest extends SphinxTestCase
         static::disableCache();
     }
 
-    public function testCheckAccessFail()
-    {
-        $connection = $this->getConnection();
-        $query = new Query();
-        $query->from('article_index');
-        $query->checkAccess(
-            [
-                'allow' => true,
-                'verbs' => ['POST'],
-            ],
-            [
-                function (Access $access) {
-                    $this->assertTrue($access->owner instanceof Query);
-                    echo 'success';
-                }
-            ],
-            [
-                function (Access $access) {
-                    $this->assertTrue($access->owner instanceof Query);
-                    echo 'fail';
-                }
-            ]
-        );
-        $this->assertEmpty($query->one($connection));
-        $this->assertEmpty(Event::getAll());
-        $this->expectOutputString('fail');
-    }
-
-    public function testCheckAccessSuccess()
-    {
-        $connection = $this->getConnection();
-        $query = new Query();
-        $query->from('article_index');
-        $query->checkAccess(
-            [
-                'allow' => true,
-                'verbs' => ['GET'],
-            ],
-            function (Access $access) {
-                $this->assertTrue($access->owner instanceof Query);
-                echo 'success';
-            }
-            ,
-            [
-                function (Access $access) {
-                    $this->assertTrue($access->owner instanceof Query);
-                    echo 'fail';
-                }
-            ]
-        );
-        $this->assertNotEmpty($query->one($connection));
-        $this->assertEmpty(Event::getAll());
-        $this->assertNotEmpty($query->all($connection));
-        $this->assertEmpty(Event::getAll());
-        $this->expectOutputString('successsuccess');
-    }
-
     protected function setUp()
     {
         unset($_POST['_method']);

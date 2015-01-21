@@ -42,16 +42,6 @@ interface ComponentsInterface extends ObjectInterface
     public function off($name);
 
     /**
-     * Check Access
-     *
-     * @param array         $rules
-     * @param array|\Closure|null $success
-     * @param array|\Closure|null $fail
-     * @return static|ActiveQueryInterface
-     */
-    public function checkAccess(array $rules, $success = null, $fail = null);
-
-    /**
      * Returns the named behavior object.
      *
      * @param string $name the behavior name
