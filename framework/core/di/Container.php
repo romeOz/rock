@@ -1,14 +1,13 @@
 <?php
 namespace rock\di;
 
-use rock\base\CollectionStaticInterface;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\helpers\ArrayHelper;
 use rock\helpers\ObjectHelper;
 use rock\Rock;
 
-class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterface
+class Container implements \ArrayAccess, ObjectInterface
 {
     use ObjectTrait;
 
@@ -99,9 +98,9 @@ class Container implements \ArrayAccess, CollectionStaticInterface, ObjectInterf
     /**
      * @inheritdoc
      */
-    public function getIterator(array $only = [], array $exclude = [],$alias = false)
+    public function getIterator(array $only = [], array $exclude = [], $alias = false)
     {
-        return new \ArrayIterator($this->getAll($only, $exclude));
+        return new \ArrayIterator($this->getAll($only, $exclude, $alias));
     }
 
     /**
