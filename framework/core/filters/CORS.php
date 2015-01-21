@@ -89,7 +89,7 @@ class CORS extends ActionFilter
         $this->overrideDefaultSettings($action);
 
         $requestCorsHeaders = $this->extractHeaders();
-        $responseCorsHeaders = $this->prepareHeaders($requestCorsHeaders);
+        $responseCorsHeaders = $this->prepareHeaders($this->request, $requestCorsHeaders);
         $this->addCorsHeaders($this->response, $responseCorsHeaders);
 
         return true;
@@ -132,10 +132,12 @@ class CORS extends ActionFilter
 
     /**
      * For each CORS headers create the specific response
+     *
+     * @param Request      $request
      * @param array $requestHeaders CORS headers we have detected
      * @return array CORS headers ready to be sent
      */
-    public function prepareHeaders($requestHeaders)
+    public function prepareHeaders($request, $requestHeaders)
     {
         $responseHeaders = [];
         // handle Origin
@@ -157,7 +159,7 @@ class CORS extends ActionFilter
             $responseHeaders['Access-Control-Allow-Credentials'] = $this->cors['Access-Control-Allow-Credentials'] ? 'true' : 'false';
         }
 
-        if (isset($this->cors['Access-Control-Max-Age']) && Rock::$app->request->isOptions()) {
+        if (isset($this->cors['Access-Control-Max-Age']) && $request->isOptions()) {
             $responseHeaders['Access-Control-Max-Age'] = $this->cors['Access-Control-Max-Age'];
         }
 
