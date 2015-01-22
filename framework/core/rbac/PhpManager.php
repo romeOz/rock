@@ -14,19 +14,19 @@ class PhpManager extends RBAC
      * This can be either a file path or a path alias to the file.
      * Make sure this file is writable by the Web server process if the authorization needs to be changed online.
      */
-    public static $path = '@common/configs/rbac/rbac.php';
-    public static $pathAssignments = '@common/configs/rbac/assignments.php';
+    public $path = '@common/configs/rbac/rbac.php';
+    public $pathAssignments = '@common/configs/rbac/assignments.php';
 
     public function init()
     {
-        static::$path = Rock::getAlias(static::$path);
-        static::$pathAssignments = Rock::getAlias(static::$pathAssignments);
+        $this->path = Rock::getAlias($this->path);
+        $this->pathAssignments = Rock::getAlias($this->pathAssignments);
 
         if (empty(static::$items)) {
-            static::$items = $this->load(static::$path);
+            static::$items = $this->load($this->path);
         }
         if (empty(static::$assignments)) {
-            static::$assignments = $this->load(static::$pathAssignments);
+            static::$assignments = $this->load($this->pathAssignments);
         }
     }
 
@@ -86,7 +86,7 @@ class PhpManager extends RBAC
             'data' => $item->className(),
         ];
 
-        $this->saveToFile(static::$items, static::$path);
+        $this->saveToFile(static::$items, $this->path);
         return true;
     }
 
@@ -101,7 +101,7 @@ class PhpManager extends RBAC
 
         static::$items[$role->name]['items'] = Helper::getValueIsset(static::$items[$role->name]['items'], []);
         static::$items[$role->name]['items'][] = $item->name;
-        $this->saveToFile(static::$items, static::$path);
+        $this->saveToFile(static::$items, $this->path);
         unset(static::$roles[$role->name], static::$permissions[$role->name]);
 
         return true;
@@ -122,7 +122,7 @@ class PhpManager extends RBAC
 
         static::$items[$role->name]['items'] =
             array_merge(Helper::getValueIsset(static::$items[$role->name]['items'], []), $names);
-        $this->saveToFile(static::$items, static::$path);
+        $this->saveToFile(static::$items, $this->path);
         unset(static::$roles[$role->name], static::$permissions[$role->name]);
 
         return true;
@@ -136,7 +136,7 @@ class PhpManager extends RBAC
     {
         if (!empty(static::$items[$role->name]['items'])) {
             static::$items[$role->name]['items'] = array_diff(static::$items[$role->name]['items'], [$item->name]);
-            $this->saveToFile(static::$items, static::$path);
+            $this->saveToFile(static::$items, $this->path);
             unset(static::$roles[$role->name], static::$permissions[$role->name]);
         }
 
@@ -157,7 +157,7 @@ class PhpManager extends RBAC
             $names[] = $item->name;
         }
         static::$items[$role->name]['items'] = array_diff(static::$items[$role->name]['items'], $names);
-        $this->saveToFile(static::$items, static::$path);
+        $this->saveToFile(static::$items, $this->path);
         unset(static::$roles[$role->name], static::$permissions[$role->name]);
         return true;
     }
@@ -167,7 +167,7 @@ class PhpManager extends RBAC
     {
         $this->detachLoop($itemName);
         unset(static::$items[$itemName], static::$roles[$itemName],static::$permissions[$itemName]);
-        $this->saveToFile(static::$items, static::$path);
+        $this->saveToFile(static::$items, $this->path);
         return true;
     }
 
@@ -178,14 +178,14 @@ class PhpManager extends RBAC
             unset(static::$items[$name], static::$roles[$name], static::$permissions[$name]);
         }
 
-        $this->saveToFile(static::$items, static::$path);
+        $this->saveToFile(static::$items, $this->path);
         return true;
     }
 
     public function removeAll()
     {
         static::$items = static::$roles = static::$permissions =  null;
-        $this->saveToFile([], static::$path);
+        $this->saveToFile([], $this->path);
         return true;
     }
 
@@ -222,7 +222,7 @@ class PhpManager extends RBAC
         }
 
         static::$assignments[$userId] = array_unique(static::$assignments[$userId]);
-        $this->saveToFile(static::$assignments, static::$pathAssignments);
+        $this->saveToFile(static::$assignments, $this->pathAssignments);
         return true;
     }
 
@@ -247,7 +247,7 @@ class PhpManager extends RBAC
             unset(static::$assignments[$userId]);
         }
 
-        $this->saveToFile(static::$assignments, static::$pathAssignments);
+        $this->saveToFile(static::$assignments, $this->pathAssignments);
         return true;
     }
 
@@ -260,7 +260,7 @@ class PhpManager extends RBAC
     public function revokeAll($userId)
     {
         unset(static::$assignments[$userId]);
-        $this->saveToFile([], static::$pathAssignments);
+        $this->saveToFile([], $this->pathAssignments);
         return true;
     }
 

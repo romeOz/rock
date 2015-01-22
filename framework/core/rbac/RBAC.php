@@ -13,10 +13,10 @@ abstract class RBAC implements RBACInterface, ObjectInterface
 {
     use ObjectTrait;
 
-    //public $throwException = true;
     protected static $items = [];
     protected static $assignments = [];
-
+    protected static $roles;
+    protected static $permissions;
 
     /**
      * @param string $itemName
@@ -31,7 +31,6 @@ abstract class RBAC implements RBACInterface, ObjectInterface
 
         return  $this->processData($itemName);
     }
-
 
     /**
      * @inheritdoc
@@ -66,8 +65,6 @@ abstract class RBAC implements RBACInterface, ObjectInterface
         }
         throw new RBACException(RBACException::UNKNOWN_PERMISSION, ['name' => serialize($data)]);
     }
-
-
 
     /**
      * Checks whether there is a loop in the authorization item hierarchy.
@@ -195,9 +192,6 @@ abstract class RBAC implements RBACInterface, ObjectInterface
         return $permission;
     }
 
-
-    protected static $roles;
-
     /**
      * @param $roleName
      * @return array|null
@@ -233,9 +227,6 @@ abstract class RBAC implements RBACInterface, ObjectInterface
                 )
         ]);
     }
-
-
-    protected static $permissions;
 
     /**
      * @param $roleName
@@ -274,72 +265,6 @@ abstract class RBAC implements RBACInterface, ObjectInterface
     }
 
     /**
-     * @param       $itemName
-     * @param array $params
-     * @return bool
-     * @throws RBACException
-     */
-    protected function checkRecursive($itemName, array $params = null)
-    {
-        if (!$this->has($itemName)) {
-            return false;
-        }
-
-        $item = $this->processData($itemName);
-
-        if ($item instanceof Permission) {
-            return true;
-            //return $item->execute($params);
-        } elseif ($item instanceof Role){
-            if (!$item->execute($params)) {
-                return false;
-            }
-
-            if (isset(static::$items[$itemName]['items'])) {
-                foreach (static::$items[$itemName]['items'] as $value) {
-                    if (!$this->checkRecursive($value/*, $params*/)) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-
-        throw new RBACException(RBACException::UNKNOWN_TYPE, [
-            'name' => Helper::getValueIsset(
-                    static::$items[$itemName]['type']
-                )
-        ]);
-    }
-
-    protected function checkRole($roleName, array $params = null)
-    {
-        if (!$this->has($roleName)) {
-            return false;
-        }
-        $role = $this->processData($roleName);
-        if (!$role instanceof Role) {
-            throw new RBACException(RBACException::UNKNOWN_TYPE, ['name' => serialize($role)]);
-        }
-
-        return $role->execute($params);
-    }
-
-    protected function checkPermission($permissionName, array $params = null)
-    {
-        if (!$this->has($permissionName)) {
-            return false;
-        }
-        $permission = $this->processData($permissionName);
-        if (!$permission instanceof Permission) {
-            throw new RBACException(RBACException::UNKNOWN_TYPE, ['name' => serialize($permission)]);
-        }
-
-        return $permission->execute($params);
-    }
-
-
-    /**
      * @inheritdoc
      */
     public function check($userId, $itemName, array $params = null)
@@ -376,9 +301,6 @@ abstract class RBAC implements RBACInterface, ObjectInterface
         return false;
     }
 
-
-
-
     /**
      * @inheritdoc
      */
@@ -388,6 +310,37 @@ abstract class RBAC implements RBACInterface, ObjectInterface
         return isset($assignments[$roleName]);
     }
 
+    public function refresh()
+    {
+        static::$items = [];
+        static::$assignments = [];
+    }
+
+    protected function checkRole($roleName, array $params = null)
+    {
+        if (!$this->has($roleName)) {
+            return false;
+        }
+        $role = $this->processData($roleName);
+        if (!$role instanceof Role) {
+            throw new RBACException(RBACException::UNKNOWN_TYPE, ['name' => serialize($role)]);
+        }
+
+        return $role->execute($params);
+    }
+
+    protected function checkPermission($permissionName, array $params = null)
+    {
+        if (!$this->has($permissionName)) {
+            return false;
+        }
+        $permission = $this->processData($permissionName);
+        if (!$permission instanceof Permission) {
+            throw new RBACException(RBACException::UNKNOWN_TYPE, ['name' => serialize($permission)]);
+        }
+
+        return $permission->execute($params);
+    }
 
     /**
      * @param string $itemName
@@ -412,9 +365,42 @@ abstract class RBAC implements RBACInterface, ObjectInterface
         throw new RBACException(RBACException::UNKNOWN_TYPE, ['name' => serialize($data)]);
     }
 
-    public function refresh()
+    /**
+     * @param       $itemName
+     * @param array $params
+     * @return bool
+     * @throws RBACException
+     */
+    protected function checkRecursive($itemName, array $params = null)
     {
-        static::$items = [];
-        static::$assignments = [];
+        if (!$this->has($itemName)) {
+            return false;
+        }
+
+        $item = $this->processData($itemName);
+
+        if ($item instanceof Permission) {
+            return true;
+            //return $item->execute($params);
+        } elseif ($item instanceof Role){
+            if (!$item->execute($params)) {
+                return false;
+            }
+
+            if (isset(static::$items[$itemName]['items'])) {
+                foreach (static::$items[$itemName]['items'] as $value) {
+                    if (!$this->checkRecursive($value/*, $params*/)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        throw new RBACException(RBACException::UNKNOWN_TYPE, [
+            'name' => Helper::getValueIsset(
+                static::$items[$itemName]['type']
+            )
+        ]);
     }
 }

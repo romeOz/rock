@@ -8,82 +8,33 @@ use apps\common\models\users\access\RolesItems;
 use apps\common\models\users\access\UsersItems;
 use rock\db\Connection;
 use rock\db\SelectBuilder;
+use rock\di\Container;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
-use rock\Rock;
 
 class DBManager extends RBAC
 {
     /**
-     * @var Connection|string the DB connection object or the application component ID of the DB connection.
+     * @var Connection|string|array the DB connection object or the application component ID of the DB connection.
      * After the DbManager object is created, if you want to change this property, you should only assign it
      * with a DB connection object.
      */
-    public static $connection = 'db';
-
+    public $connection = 'db';
     protected static $items = [];
     protected static $assignments = [];
 
-    //protected static $oldData;
-
     public function init()
-    {
-        $this->load();
-    }
-
-    protected function load()
     {
         if (!empty(static::$items)) {
             return;
         }
 
-        if (is_string(static::$connection)) {
-            static::$connection = Rock::factory(static::$connection);
+        if (!is_object($this->connection)) {
+            $this->connection = Container::load($this->connection);
         }
 
-        Items::$connection = Roles::$connection = RolesItems::$connection = UsersItems::$connection = static::$connection;
-
-        if (!$dataItems = Items::find()
-            ->fields()
-            ->sortByMenuIndex()
-            ->indexBy('name')
-            ->beginCache()
-            ->asArray()
-            ->all(static::$connection)) {
-
-            throw new RBACException('Items is empty.');
-        }
-        static::$items = $dataItems;
-        if (!$dataRolesItems = RolesItems::find()
-            ->select(SelectBuilder::selects([Roles::find()->fields(), [Items::find()->fields(), 'items']]))
-            ->innerJoinWith(
-                ['items', 'roles'],
-                false
-            )
-            ->beginCache()
-            ->asArray()
-            ->all(static::$connection, true)
-        ) {
-            return;
-        }
-        $result = [];
-        foreach ($dataRolesItems as $value) {
-            if (isset($result[$value['name']])) {
-                $result[$value['name']]['items'] =
-                    array_merge($result[$value['name']]['items'], (array)$value['items']['name']);
-                continue;
-            }
-            $value['items'] = [$value['items']['name']];
-            $result[$value['name']] = $value;
-        }
-        static::$items = ArrayHelper::toType(
-            ArrayHelper::filterRecursive(
-                $result + static::$items,
-                function ($value, $key) {
-                    return !in_array($key, ['name'], true);
-                }
-            )
-        );
+        Items::$connection = Roles::$connection = RolesItems::$connection = UsersItems::$connection = $this->connection;
+        $this->load();
     }
 
     /**
@@ -121,7 +72,7 @@ class DBManager extends RBAC
             throw new RBACException("Cannot attach '{$role->name}' as a item of '{$item->name}'. A has been detected.");
         }
 
-        $result = static::$connection->createCommand()
+        $result = $this->connection->createCommand()
             ->insert(RolesItems::tableName(), ['role' => $role->name, 'item' => $item->name])
             ->execute();
 
@@ -131,7 +82,6 @@ class DBManager extends RBAC
 
         return (bool)$result;
     }
-
 
     /**
      * @inheritdoc
@@ -147,7 +97,7 @@ class DBManager extends RBAC
             $rows[] = [$role->name, $item->name];
             $itemNames[] = $item->name;
         }
-        $result = static::$connection
+        $result = $this->connection
             ->createCommand()
             ->batchInsert(RolesItems::tableName(), ['role', 'item'], $rows)
             ->execute();
@@ -157,7 +107,6 @@ class DBManager extends RBAC
 
         return (bool)$result;
     }
-
 
     /**
      * @inheritdoc
@@ -192,8 +141,6 @@ class DBManager extends RBAC
         return (bool)$result;
     }
 
-
-
     public function remove($itemName)
     {
         $result = Items::deleteAll(Items::find()->byItem($itemName)->where);
@@ -223,7 +170,6 @@ class DBManager extends RBAC
         return (bool)$result;
     }
 
-
     /**
      * @inheritdoc
      */
@@ -251,18 +197,15 @@ class DBManager extends RBAC
             $rows[] =[$userId, $role->name];
             static::$assignments[$userId][] = $role->name;
         }
-        //unset(static::$assignments[$userId]);
 
-        return (bool)static::$connection->createCommand()->batchInsert(UsersItems::tableName(), ['user_id', 'item'], $rows)->execute();
+        return (bool)$this->connection->createCommand()->batchInsert(UsersItems::tableName(), ['user_id', 'item'], $rows)->execute();
     }
-
 
     /**
      * @inheritdoc
      */
     public function revoke($userId, array $roles)
     {
-        //unset(static::$assignments[$userId]);
         $names = [];
         foreach ($roles as $role) {
             if (!$role instanceof Role) {
@@ -293,7 +236,6 @@ class DBManager extends RBAC
         $this->init();
     }
 
-
     protected function detachLoop($itemName)
     {
         if (empty(static::$items)) {
@@ -312,5 +254,50 @@ class DBManager extends RBAC
                 }
             }
         }
+    }
+
+    protected function load()
+    {
+        if (!$dataItems = Items::find()
+            ->fields()
+            ->sortByMenuIndex()
+            ->indexBy('name')
+            ->beginCache()
+            ->asArray()
+            ->all($this->connection)) {
+
+            throw new RBACException('Items is empty.');
+        }
+        static::$items = $dataItems;
+        if (!$dataRolesItems = RolesItems::find()
+            ->select(SelectBuilder::selects([Roles::find()->fields(), [Items::find()->fields(), 'items']]))
+            ->innerJoinWith(
+                ['items', 'roles'],
+                false
+            )
+            ->beginCache()
+            ->asArray()
+            ->all($this->connection, true)
+        ) {
+            return;
+        }
+        $result = [];
+        foreach ($dataRolesItems as $value) {
+            if (isset($result[$value['name']])) {
+                $result[$value['name']]['items'] =
+                    array_merge($result[$value['name']]['items'], (array)$value['items']['name']);
+                continue;
+            }
+            $value['items'] = [$value['items']['name']];
+            $result[$value['name']] = $value;
+        }
+        static::$items = ArrayHelper::toType(
+            ArrayHelper::filterRecursive(
+                $result + static::$items,
+                function ($value, $key) {
+                    return !in_array($key, ['name'], true);
+                }
+            )
+        );
     }
 }
