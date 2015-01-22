@@ -41,7 +41,6 @@ trait ObjectTrait
     {
     }
 
-
     /**
      * Set properties
      *

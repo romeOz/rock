@@ -15,7 +15,6 @@ class ObjectHelper
      */
     protected static $caching = [];
     protected static $objects = [];
-    protected static $staticProperties;
 
     /**
      * Set value.
@@ -32,13 +31,9 @@ class ObjectHelper
         if (count($keys) > 1) {
             $property = array_shift($keys);
             if (!isset($object->$property) && $throwException === true) {
-                throw new ObjectHelperException(
-                    ObjectHelperException::SETTING_UNKNOWN_PROPERTY, [
-                                                                       'class' => get_class(
-                                                                           $object
-                                                                       ), 'property' => $property
-                                                                   ]
-                );
+                $placeholders = ['class' => get_class($object), 'property' => $property];
+
+                throw new ObjectHelperException(ObjectHelperException::SETTING_UNKNOWN_PROPERTY, $placeholders);
             } else {
                 $object->$property = new \stdClass();
             }
@@ -46,13 +41,9 @@ class ObjectHelper
         } else {
             $property = array_shift($keys);
             if (!isset($object->$property) && $throwException === true) {
-                throw new ObjectHelperException(
-                    ObjectHelperException::SETTING_UNKNOWN_PROPERTY, [
-                                                                       'class' => get_class(
-                                                                           $object
-                                                                       ), 'property' => $property
-                                                                   ]
-                );
+                $placeholders = ['class' => get_class($object), 'property' => $property];
+
+                throw new ObjectHelperException(ObjectHelperException::SETTING_UNKNOWN_PROPERTY, $placeholders);
             } else {
                 $object->$property = new \stdClass();
             }
@@ -121,19 +112,10 @@ class ObjectHelper
      */
     public static function setProperties($object, array $properties)
     {
-        $className = get_class($object);
         foreach ($properties as $name => $value) {
-            if (isset($object::${$name})) {
-                if (!isset(static::$staticProperties[$className][$name])) {
-                    $className::${$name} = $value;
-                    static::$staticProperties[$className][$name] = true;
-                }
-                continue;
-            }
             $object->$name = $value;
         }
     }
-
 
     /**
      * @param array  $data
