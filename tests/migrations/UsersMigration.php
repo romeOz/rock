@@ -14,9 +14,6 @@ class UsersMigration extends Migration
     public function up()
     {
         $table = static::$table;
-        //if ((bool)$this->db->createCommand("SHOW TABLES LIKE '{$table}'")->execute()) {
-            //$this->down();
-        //}
 
         $tableOptions = null;
         if ($this->connection->driverName === 'mysql') {
@@ -61,8 +58,6 @@ class UsersMigration extends Migration
 
     public function down()
     {
-//        $table = AccessUsersItemsMigration::$table;
-//        $this->dropForeignKey("fk_{$table}_user", $table);
         $table = static::$table;
         $this->connection->createCommand("SET FOREIGN_KEY_CHECKS=0")->execute();
         $this->dropTable($table, true);

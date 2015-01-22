@@ -12,34 +12,24 @@ class AccessUsersItemsMigration extends Migration
     public function up()
     {
         $table = static::$table;
-        //if ((bool)$this->db->createCommand("SHOW TABLES LIKE '{$table}'")->execute()) {
-            //$this->down();
-        //}
 
         $tableOptions = null;
         if ($this->connection->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
         }
 
-        //try {
-            $this->createTable(
-                $table,
-                [
-                    'user_id' => Schema::TYPE_INTEGER . ' unsigned NOT NULL',
-                    'item' => Schema::TYPE_STRING . '(64) NOT NULL',
-                ],
-                $tableOptions,
-                true
-            );
-            $this->addPrimaryKey('',$table,['user_id', 'item']);
-            $this->addForeignKey("fk_{$table}_user", $table,'user_id', 'users', 'id', 'CASCADE', 'CASCADE');
-            $this->addForeignKey("fk_{$table}_item", $table,'item', 'access_items', 'name', 'CASCADE', 'CASCADE');
-
-//        } catch (\Exception $e) {
-//            return;
-//        }
-
-
+        $this->createTable(
+            $table,
+            [
+                'user_id' => Schema::TYPE_INTEGER . ' unsigned NOT NULL',
+                'item' => Schema::TYPE_STRING . '(64) NOT NULL',
+            ],
+            $tableOptions,
+            true
+        );
+        $this->addPrimaryKey('',$table,['user_id', 'item']);
+        $this->addForeignKey("fk_{$table}_user", $table,'user_id', 'users', 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey("fk_{$table}_item", $table,'item', 'access_items', 'name', 'CASCADE', 'CASCADE');
 
         $this->batchInsert(
             $table,
@@ -50,7 +40,6 @@ class AccessUsersItemsMigration extends Migration
             ]
         );
     }
-
 
     public function down()
     {

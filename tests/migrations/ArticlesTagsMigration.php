@@ -52,7 +52,6 @@ class ArticlesTagsMigration extends Migration
         );
     }
 
-
     public function down()
     {
         $this->dropTable($this->table, true);

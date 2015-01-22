@@ -16,33 +16,24 @@ class AccessItemsMigration extends Migration
     public function up()
     {
         $table = static::$table;
-        //if ((bool)$this->db->createCommand("SHOW TABLES LIKE '{$table}'")->execute()) {
-        //$this->down();
-        //}
         $tableOptions = null;
         if ($this->connection->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
         }
-        //try {
-            $this->createTable(
-                $table,
-                [
-                    'name' => Schema::TYPE_STRING . '(64) NOT NULL',
-                    'type' => Schema::TYPE_BOOLEAN . '(2) unsigned NOT NULL DEFAULT 1',
-                    'description' => Schema::TYPE_STRING . '(255) NOT NULL DEFAULT \'\'',
-                    'data' => Schema::TYPE_TEXT . ' NOT NULL',
-                    'order_index' => Schema::TYPE_INTEGER . ' unsigned NOT NULL DEFAULT 0',
-                ],
-                $tableOptions,
-                true
-            );
-            $this->addPrimaryKey('', $table, 'name');
-            $this->createIndex("idx_{$table}_type", $table, 'type');
-//        } catch (\Exception $e) {
-//            return;
-//        }
-
-
+        $this->createTable(
+            $table,
+            [
+                'name' => Schema::TYPE_STRING . '(64) NOT NULL',
+                'type' => Schema::TYPE_BOOLEAN . '(2) unsigned NOT NULL DEFAULT 1',
+                'description' => Schema::TYPE_STRING . '(255) NOT NULL DEFAULT \'\'',
+                'data' => Schema::TYPE_TEXT . ' NOT NULL',
+                'order_index' => Schema::TYPE_INTEGER . ' unsigned NOT NULL DEFAULT 0',
+            ],
+            $tableOptions,
+            true
+        );
+        $this->addPrimaryKey('', $table, 'name');
+        $this->createIndex("idx_{$table}_type", $table, 'type');
 
         $this->batchInsert(
             $table,

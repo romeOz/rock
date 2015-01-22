@@ -52,7 +52,6 @@ class NewsMigration extends Migration
         );
     }
 
-
     public function down()
     {
         $this->dropTable($this->table);

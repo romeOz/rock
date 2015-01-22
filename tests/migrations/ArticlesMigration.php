@@ -49,7 +49,6 @@ class ArticlesMigration extends Migration
         );
     }
 
-
     public function down()
     {
         $this->dropTable($this->table);

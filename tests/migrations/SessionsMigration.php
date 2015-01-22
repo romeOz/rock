@@ -33,7 +33,6 @@ class SessionsMigration extends Migration
         $this->addPrimaryKey('',$this->table, 'id');
     }
 
-
     public function down()
     {
         $this->dropTable($this->table);

@@ -5,40 +5,29 @@ namespace rockunit\migrations;
 
 use rock\db\Migration;
 use rock\db\Schema;
-use rock\Rock;
 
 class AccessRolesItemsMigration extends Migration
 {
     public $table = 'access_roles_items';
     public function up()
     {
-        //if ((bool)$this->db->createCommand("SHOW TABLES LIKE '{$this->table}'")->execute()) {
-            //$this->down();
-        //}
         $tableOptions = null;
         if ($this->connection->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
         }
 
-        //try {
-            $this->createTable(
-                $this->table,
-                [
-                    'role' => Schema::TYPE_STRING . '(64) NOT NULL',
-                    'item' => Schema::TYPE_STRING . '(64) NOT NULL',
-                ],
-                $tableOptions,
-                true
-            );
-            $this->addPrimaryKey('',$this->table,['role', 'item']);
-            $this->addForeignKey("fk_{$this->table}_role", $this->table,'role', 'access_items', 'name', 'CASCADE', 'CASCADE');
-            $this->addForeignKey("fk_{$this->table}_item", $this->table,'item', 'access_items', 'name', 'CASCADE', 'CASCADE');
-
-//        } catch (\Exception $e) {
-//            return;
-//        }
-
-
+        $this->createTable(
+            $this->table,
+            [
+                'role' => Schema::TYPE_STRING . '(64) NOT NULL',
+                'item' => Schema::TYPE_STRING . '(64) NOT NULL',
+            ],
+            $tableOptions,
+            true
+        );
+        $this->addPrimaryKey('',$this->table,['role', 'item']);
+        $this->addForeignKey("fk_{$this->table}_role", $this->table,'role', 'access_items', 'name', 'CASCADE', 'CASCADE');
+        $this->addForeignKey("fk_{$this->table}_item", $this->table,'item', 'access_items', 'name', 'CASCADE', 'CASCADE');
 
         $this->batchInsert(
             $this->table,
@@ -56,7 +45,6 @@ class AccessRolesItemsMigration extends Migration
             ]
         );
     }
-
 
     public function down()
     {
