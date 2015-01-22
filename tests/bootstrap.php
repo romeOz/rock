@@ -1,10 +1,5 @@
 <?php
-use rock\execute\CacheExecute;
-use rock\log\Log;
-use rock\rbac\PhpManager;
 use rock\Rock;
-use rockunit\core\session\mocks\SessionMock;
-use rockunit\mocks\CookieMock;
 
 $composerAutoload = dirname(__DIR__) . '/vendor/autoload.php';
 if (is_file($composerAutoload)) {
@@ -38,31 +33,10 @@ Rock::$app->language = \rock\i18n\i18nInterface::EN;
 
 require(dirname(__DIR__) . '/framework/polyfills.php');
 
+$componetns = require(__DIR__ . '/data/config.php');
 $config['components'] = \rock\helpers\ArrayHelper::merge(
     $config['components'] ? : [],
-    [
-        'log' => [
-            'class' => Log::className(),
-            'path' => __DIR__ . '/runtime/logs'
-        ],
-        'cache' => [
-            'class' => \rock\cache\CacheStub::className()
-        ],
-        'session' => [
-            'class' => SessionMock::className(),
-        ],
-        'cookie' => [
-            'class' => CookieMock::className(),
-        ],
-        'execute' => [
-            'class' => CacheExecute::className(),
-            'path' => '@tests/runtime/cache/_execute'
-        ],
-        'rbac' => [
-            'class' => PhpManager::className(),
-            'path' => '@tests/core/rbac/src/rbac.php'
-        ]
-    ]
+    $componetns['claseses']
 );
 
 Rock::$components = $config['components'];
