@@ -60,7 +60,6 @@ class Thumb extends Snippet implements ThumbInterface
         $this->_imageProvider = Container::load('imageProvider');
     }
 
-
     public function get()
     {
         if (empty($this->src)) {
