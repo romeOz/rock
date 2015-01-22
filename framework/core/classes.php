@@ -453,24 +453,27 @@ return array_merge(
                         ]
                     );
                 },
-            'calculatePathname' => function(\rock\file\UploadedFile $file, FileManager $fileManager) {
-                    $pathname = [];
-                    $num = floor(
-                        count(
-                            $fileManager
-                                ->listContents(
-                                    "~/^\\d+\//",
-                                    true,
-                                    FileManager::TYPE_FILE
-                                )
-                        ) / 500);
+            'calculatePathname' => function(\rock\file\UploadedFile $upload, $path, FileManager $fileManager = null) {
+                    $pathname = !empty($path) ? [$path] : [];
 
-                    if (isset($num)) {
-                        $pathname[] =$num;
+                    if (isset($fileManager)) {
+                        $num = floor(
+                            count(
+                                $fileManager
+                                    ->listContents(
+                                        "~/^\\d+\//",
+                                        true,
+                                        FileManager::TYPE_FILE
+                                    )
+                            ) / 500);
+
+                        if (isset($num)) {
+                            $pathname[] =$num;
+                        }
                     }
 
-                    $pathname[] = str_shuffle(md5_file($file->tempName));
-                    return implode(DS, $pathname) . '.' . $file->extension;
+                    $pathname[] = str_shuffle(md5_file($upload->tempName));
+                    return implode(DS, $pathname) . ".{$upload->extension}";
                 }
         ],
         'security' => [

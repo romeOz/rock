@@ -2,9 +2,10 @@
 
 namespace rock\snippets;
 use rock\base\Snippet;
+use rock\di\Container;
 use rock\helpers\Html;
+use rock\image\DataProvider;
 use rock\image\ThumbInterface;
-use rock\Rock;
 
 /**
  * Snippet "Thumb" 
@@ -49,7 +50,16 @@ class Thumb extends Snippet implements ThumbInterface
     public $dummy;
     public $const = 1;
     public $autoEscape = false;
-    
+
+    /** @var  DataProvider */
+    private $_imageProvider;
+
+    public function init()
+    {
+        parent::init();
+        $this->_imageProvider = Container::load('dataImage');
+    }
+
 
     public function get()
     {
@@ -66,12 +76,11 @@ class Thumb extends Snippet implements ThumbInterface
             'title' => $this->title,
         ];
 
-        $dataImage = Rock::$app->dataImage;
-        $src = $dataImage->get($this->src, $this->w, $this->h);
+        $src = $this->_imageProvider->get($this->src, $this->w, $this->h);
 
         if (!((int)$this->const & self::WITHOUT_WIDTH_HEIGHT)) {
-            $options['width'] = $dataImage->width;
-            $options['height'] = $dataImage->height;
+            $options['width'] = $this->_imageProvider->width;
+            $options['height'] = $this->_imageProvider->height;
         }
 
         return (int)$this->const & self::OUTPUT_IMG ? Html::img($src, $options) : $src;
