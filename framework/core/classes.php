@@ -45,7 +45,7 @@ return array_merge(
 //        'cache' => [
 //            'class' => \rock\cache\CacheFile::className(),
 //            'adapter' => function () {
-//                    return Rock::factory(
+//                    return \rock\di\Container::load(
 //                        [
 //                            'class' => FileManager::className(),
 //                            'adapter' =>
@@ -207,7 +207,7 @@ return array_merge(
                         } elseif (function_exists($class) && !$class instanceof \Closure){
                             return call_user_func_array($class, $params);
                         } else {
-                            $object = Rock::factory(Rock::getAlias($class));
+                            $object = \rock\di\Container::load(Rock::getAlias($class));
                             if (!method_exists($object, $method)) {
                                 throw new \rock\exception\BaseException(\rock\exception\BaseException::UNKNOWN_METHOD, ['method' => "{$class}::{$method}"]);
                             }
@@ -334,7 +334,7 @@ return array_merge(
         'imageProvider' => [
             'class' => \rock\image\ImageProvider::className(),
             'adapterImage' => function () {
-                    return Rock::factory(
+                    return \rock\di\Container::load(
                         [
                             'class' => FileManager::className(),
                             'adapter' =>
@@ -351,7 +351,7 @@ return array_merge(
                     );
                 },
             'adapterCache' => function () {
-                    return Rock::factory(
+                    return \rock\di\Container::load(
                         [
                             'class' => FileManager::className(),
                             'adapter' =>
@@ -437,7 +437,7 @@ return array_merge(
         'uploadedFile' =>[
             'class' => \rock\file\UploadedFile::className(),
             'adapter' => function () {
-                    return Rock::factory(
+                    return \rock\di\Container::load(
                         [
                             'class' => FileManager::className(),
                             'adapter' =>
