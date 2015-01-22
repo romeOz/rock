@@ -18,7 +18,7 @@ class Log implements LoggerInterface, ObjectInterface
         ObjectTrait::__construct as parentConstruct;
     }
 
-    public static $path = '@runtime/logs';
+    public $path = '@runtime/logs';
 
     /** @var Logger  */
     protected static $logger;
@@ -29,7 +29,7 @@ class Log implements LoggerInterface, ObjectInterface
 
         static::$logger = new Logger('Rock');
 
-        $path = Rock::getAlias(static::$path);
+        $path = Rock::getAlias($this->path);
         FileHelper::createDirectory($path);
         $formatter = new LineFormatter("[%datetime%]\t%level_name%\t%extra.hash%\t%message%\t%extra.user_id%\t%extra.user_ip%\t%extra.user_agent%\n");
         static::$logger->pushProcessor(function ($record) {
@@ -47,11 +47,6 @@ class Log implements LoggerInterface, ObjectInterface
         static::$logger->pushHandler((new StreamHandler("{$path}/error.log", self::CRITICAL, false))->setFormatter($formatter));
         static::$logger->pushHandler((new StreamHandler("{$path}/error.log", self::ALERT, false))->setFormatter($formatter));
         static::$logger->pushHandler((new StreamHandler("{$path}/error.log", self::EMERGENCY, false))->setFormatter($formatter));
-    }
-
-    public static function setPath($path)
-    {
-        static::$path = $path;
     }
 
     /**
