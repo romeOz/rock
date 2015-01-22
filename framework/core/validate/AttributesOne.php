@@ -21,21 +21,24 @@ class AttributesOne implements ObjectInterface
         $this->parentConstruct($config);
     }
 
-    public function validate($value)
+    public function validate($input)
     {
-        if (is_object($value)) {
-            $value = (array)$value;
+        if (is_object($input)) {
+            $input = (array)$input;
+        }
+        if ($this->attributes instanceof Validate) {
+            $this->each($input);
         }
         foreach ($this->attributes as $attribute => $validate) {
             if (!$validate instanceof Validate) {
                 throw new ValidateException("`{$attribute}` is not `".Validate::className()."`");
             }
-            if (!isset($value[$attribute])) {
-                $value[$attribute] = null;
+            if (!isset($input[$attribute])) {
+                $input[$attribute] = null;
             }
 
             $validate->valid = $this->valid;
-            if ($validate->validate($value[$attribute])) {
+            if ($validate->validate($input[$attribute])) {
                 continue;
             }
 
@@ -49,5 +52,14 @@ class AttributesOne implements ObjectInterface
     public function getErrors()
     {
         return $this->errors;
+    }
+
+    protected function each($input)
+    {
+        $validate = $this->attributes;
+        $this->attributes = [];
+        foreach($input as $key => $value) {
+            $this->attributes[$key] = $validate;
+        }
     }
 } 

@@ -65,8 +65,8 @@ use rock\validate\rules\Writable;
 /**
  * Class Validate
  *
- * @method static Validate attributes(array $attributes)
- * @method static Validate attributesOne(array $attributes)
+ * @method static Validate attributes($attributes)
+ * @method static Validate attributesOne($attributes)
  * @method static Validate notOf(Validate $validate)
  * @method static Validate oneOf(Validate $validate)
  * @method static Validate when(Validate $if, Validate $then, Validate $else = null)
@@ -293,9 +293,6 @@ class Validate implements i18nInterface, ObjectInterface
                 break;
             }
 
-//            if ($input === '' && $ruleName !== 'required') {
-//                continue;
-//            }
             if ($this->skipOnEmpty && $rule->skipOnEmpty && $this->isEmpty($input, $rule)) {
                 continue;
             }
@@ -417,14 +414,14 @@ class Validate implements i18nInterface, ObjectInterface
         }
     }
 
-    protected function attributesInternal(array $attributes)
+    protected function attributesInternal($attributes)
     {
         $this->_rules = [];
         $this->_rules['attributes'] = new Attributes(['attributes' => $attributes, 'valid' => $this->valid]);
         return $this;
     }
 
-    protected function attributesOneInternal(array $attributes)
+    protected function attributesOneInternal($attributes)
     {
         $this->_rules = [];
         $this->_rules['attributesOne'] = new AttributesOne(['attributes' => $attributes, 'valid' => $this->valid]);

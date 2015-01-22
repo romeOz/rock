@@ -505,6 +505,64 @@ class ValidateTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $validate->getErrors());
     }
 
+    public function testEach()
+    {
+        // success
+        $input = [
+            'email' => 'tom@site.com',
+            'name' => 'Tom'
+        ];
+        $validate = Validate::attributes(Validate::required()->string());
+        $this->assertTrue($validate->validate($input));
+        $this->assertEmpty($validate->getErrors());
+
+        // fail
+        $input = [
+            'email' => '',
+            'name' => 5
+        ];
+        $validate = Validate::attributes(Validate::required()->string());
+        $this->assertFalse($validate->validate($input));
+        $expected = [
+            'email' => [
+                'required' => 'value must not be empty',
+            ],
+            'name' =>
+                [
+                    'string' => 'value must be string',
+                ],
+        ];
+        $this->assertSame($expected, $validate->getErrors());
+    }
+
+    public function testEachOne()
+    {
+        // success
+        $input = [
+            'email' => 'tom@site.com',
+            'name' => 'Tom'
+        ];
+        $validate = Validate::attributesOne(Validate::required()->string());
+        $this->assertTrue($validate->validate($input));
+        $this->assertEmpty($validate->getErrors());
+
+        // fail
+        $input = [
+            'email' => '',
+            'name' => 5
+        ];
+        $validate = Validate::attributesOne(Validate::required()->string());
+        $this->assertFalse($validate->validate($input));
+        $expected = [
+            'email' => [
+                'required' => 'value must not be empty',
+            ],
+        ];
+        $this->assertSame($expected, $validate->getErrors());
+    }
+
+
+
     /**
      * @expectedException \rock\validate\ValidateException
      */
