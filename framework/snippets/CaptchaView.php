@@ -15,18 +15,17 @@ use rock\Rock;
 class CaptchaView extends Snippet
 {
     /** @var  Captcha */
-    protected $captcha;
+    protected $_captcha;
 
     public function init()
     {
         parent::init();
-        $this->captcha = Container::load('captcha');
+        $this->_captcha = Container::load('captcha');
     }
-
 
     public function get()
     {
-        if (!$dataImage = $this->captcha->get()) {
+        if (!$dataImage = $this->_captcha->get()) {
             return '#';
         }
 
