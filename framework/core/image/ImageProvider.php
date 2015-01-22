@@ -21,10 +21,11 @@ class ImageProvider implements ObjectInterface
     /** @var  callable */
     public $handler;
     /** @var FileManager|array */
-    public $adapterImage ;
+    public $adapter ;
     /** @var FileManager|array */
     public $adapterCache;
     protected $resource;
+    /** @var  string */
     protected $src;
     
     public function init()
@@ -32,8 +33,8 @@ class ImageProvider implements ObjectInterface
         $this->srcImage = Rock::getAlias($this->srcImage);
         $this->srcCache = Rock::getAlias($this->srcCache);
 
-        if (!is_object($this->adapterImage)) {
-            $this->adapterImage = Container::load($this->adapterImage);
+        if (!is_object($this->adapter)) {
+            $this->adapter = Container::load($this->adapter);
         }
 
         if (!is_object($this->adapterCache)) {
@@ -41,16 +42,14 @@ class ImageProvider implements ObjectInterface
         }
     }
 
-
-
     public function get($path, $width = null, $height = null)
     {
         $path = $this->preparePath($path);
-        if (!$this->adapterImage->has($path)) {
+        if (!$this->adapter->has($path)) {
             return $this->srcImage . '/'. ltrim($path, '/');
         }
 
-        $this->resource = $this->adapterImage->readStream($path);
+        $this->resource = $this->adapter->readStream($path);
 
         if ((empty($width) && empty($height)) || empty($this->adapterCache)) {
             return $this->srcImage . '/'. ltrim($path, '/');
@@ -72,7 +71,6 @@ class ImageProvider implements ObjectInterface
         return str_replace($this->srcImage , '', $path);
     }
 
-
     protected function calculateDimensions($width = null, $height = null)
     {
         if (empty($width)) {
@@ -88,7 +86,7 @@ class ImageProvider implements ObjectInterface
 
     protected function prepareImage($path)
     {
-        $metadata = $this->adapterImage->getMetadata($path);
+        $metadata = $this->adapter->getMetadata($path);
         $path = implode(DIRECTORY_SEPARATOR, [trim($metadata['dirname'], DIRECTORY_SEPARATOR), "{$this->width}x{$this->height}", $metadata['basename']]);
         $this->src = $this->srcCache . '/'. ltrim($path, '/');
         if ($this->adapterCache->has($path)) {

@@ -333,7 +333,7 @@ return array_merge(
 
         'imageProvider' => [
             'class' => \rock\image\ImageProvider::className(),
-            'adapterImage' => [
+            'adapter' => [
                 'class' => FileManager::className(),
                 'adapter' =>
                     function () {
