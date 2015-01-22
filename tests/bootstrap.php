@@ -28,7 +28,7 @@ if (!$config = require(dirname(__DIR__) . '/apps/common/configs/configs.php')) {
     die('configs is empty/not found');
 }
 
-Log::setPath(__DIR__ . '/runtime/logs');
+
 Rock::setAlias('tests', __DIR__);
 Rock::setAlias('rockunit', __DIR__);
 Rock::setAlias('runtime', '@tests/runtime');
@@ -38,37 +38,39 @@ Rock::$app->language = \rock\i18n\i18nInterface::EN;
 
 require(dirname(__DIR__) . '/framework/polyfills.php');
 
-Rock::$components = $config['components'] ? : [];
+$config['components'] = \rock\helpers\ArrayHelper::merge(
+    $config['components'] ? : [],
+    [
+        'log' => [
+            'class' => Log::className(),
+            'path' => __DIR__ . '/runtime/logs'
+        ],
+        'cache' => [
+            'class' => \rock\cache\CacheStub::className()
+        ],
+        'session' => [
+            'class' => SessionMock::className(),
+        ],
+        'cookie' => [
+            'class' => CookieMock::className(),
+        ],
+        'execute' => [
+            'class' => CacheExecute::className(),
+            'path' => '@tests/runtime/cache/_execute'
+        ],
+        'rbac' => [
+            'class' => PhpManager::className(),
+            'path' => '@tests/core/rbac/src/rbac.php'
+        ]
+    ]
+);
+
+Rock::$components = $config['components'];
 unset($config['components']);
 Rock::$config = $config;
 \rock\di\Container::addMulti(Rock::$components);
 
-
 \rock\exception\BaseException::$logged = false;
 
-Rock::$app->di['cache'] = [
-    'class' => \rock\cache\CacheStub::className()
-];
-
-Rock::$app->di['session'] = [
-    'class' => SessionMock::className(),
-    //'singleton' => true
-];
 Rock::$app->session->open();
-Rock::$app->di['cookie'] = [
-    'class' => CookieMock::className(),
-    //'singleton' => true
-];
 
-
-Rock::$app->di['execute'] = [
-    'class' => CacheExecute::className(),
-    'path' => '@tests/runtime/cache/_execute'
-];
-
-Rock::$app->di['rbac'] = [
-    'class' => PhpManager::className(),
-    'path' => '@tests/core/rbac/src/rbac.php'
-];
-
-//(new SessionsMigration())->up();

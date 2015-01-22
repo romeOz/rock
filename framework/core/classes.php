@@ -1,8 +1,5 @@
 <?php
 
-/**
- * Container "Models"
- */
 use apps\common\rbac\UserRole;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Cache\Adapter;
