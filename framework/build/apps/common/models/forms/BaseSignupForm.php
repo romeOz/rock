@@ -5,14 +5,25 @@ namespace apps\common\models\forms;
 use apps\common\models\users\BaseUsers;
 use rock\base\Model;
 use rock\base\ModelEvent;
+use rock\captcha\Captcha;
+use rock\csrf\CSRF;
+use rock\date\DateTime;
 use rock\db\Connection;
+use rock\di\Container;
 use rock\event\Event;
+use rock\exception\BaseException;
 use rock\exception\ErrorHandler;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\String;
+use rock\helpers\StringHelper;
+use rock\mail\Mail;
+use rock\response\Response;
 use rock\Rock;
+use rock\session\Session;
+use rock\template\Template;
 use rock\url\Url;
+use rock\user\User;
 use rock\validate\Validate;
 
 class BaseSignupForm extends Model
@@ -39,6 +50,34 @@ class BaseSignupForm extends Model
     /** @var Connection */
     protected $connection;
 
+    /** @var  CSRF */
+    protected $_csrfInstance;
+    /** @var  Response */
+    protected $_response;
+    /** @var  Captcha */
+    protected $_captcha;
+    /** @var  Template */
+    protected $_template;
+    /** @var  Mail */
+    protected $_mail;
+    /** @var  Session */
+    protected $_session;
+    /** @var  User */
+    protected $_user;
+
+    public function init()
+    {
+        parent::init();
+
+        $this->_csrfInstance = Container::load('csrf');
+        $this->_response = Container::load('response');
+        $this->_captcha = Container::load('captcha');
+        $this->_template = Container::load('template');
+        $this->_mail = Container::load('mail');
+        $this->_session = Container::load('session');
+        $this->_user = Container::load('user');
+    }
+
     public function rules()
     {
         return [
@@ -64,7 +103,7 @@ class BaseSignupForm extends Model
                 self::RULE_VALIDATE, 'password_confirm', 'confirm' => [$this->password]
             ],
             [
-                self::RULE_VALIDATE, 'captcha', 'captcha' => [$this->Rock->captcha->getSession()]
+                self::RULE_VALIDATE, 'captcha', 'captcha' => [$this->_captcha->getSession()]
             ],
             [
                 self::RULE_SANITIZE, 'email', 'lowercase'
@@ -81,7 +120,7 @@ class BaseSignupForm extends Model
 
     public function safeAttributes()
     {
-        return ['email', 'username', 'password', 'password_confirm', 'captcha', $this->Rock->csrf->csrfParam];
+        return ['email', 'username', 'password', 'password_confirm', 'captcha', $this->_csrfInstance->csrfParam];
     }
 
     public function attributeLabels()
@@ -131,9 +170,9 @@ class BaseSignupForm extends Model
             return;
         }
 
-        $this->Rock->session->setFlash('successSignup', ['email' => String::replaceRandChars($this->email)]);
+        $this->_session->setFlash('successSignup', ['email' => StringHelper::replaceRandChars($this->email)]);
 
-        $response = $this->Rock->response;
+        $response = $this->_response;
         if (!isset($url) && isset($this->redirectUrl)) {
             $url = $this->redirectUrl;
         }
@@ -160,7 +199,7 @@ class BaseSignupForm extends Model
                 ->getAbsoluteUrl(true);
         }
 
-        return $this->Rock->template->getChunk($chunk, $data);
+        return $this->_template->getChunk($chunk, $data);
     }
 
     /**
@@ -180,30 +219,29 @@ class BaseSignupForm extends Model
         $body = $this->prepareBody($this->getUsers()->toArray(['username', 'email','token']), Helper::getValue($chunkBody, $this->emailBodyTpl));
 
         try {
-            $this->Rock->mail
+            $this->_mail
                 ->address($this->email)
                 ->subject($subject)
                 ->body($body)
                 ->send();
         } catch (\Exception $e) {
             $this->addErrorAsPlaceholder(Rock::t('failSendEmail'), 'e_signup');
-            Rock::warning(ErrorHandler::convertExceptionToString($e));
+            Rock::warning(BaseException::convertExceptionToString($e));
         }
     }
 
     public function login()
     {
         $users = $this->getUsers();
-        $users->login_last = $this->Rock->date->isoDatetime();
+        $users->login_last = DateTime::set()->isoDatetime();
         if (!$users->save()) {
             $this->addErrorAsPlaceholder(Rock::t('failSignup'), 'e_signup');
             return;
         }
 
         $data = $users->toArray();
-        $user = $this->Rock->user;
-        $user->addMulti(ArrayHelper::intersectByKeys($data, ['id', 'username', 'url']));
-        $user->login();
+        $this->_user->addMulti(ArrayHelper::intersectByKeys($data, ['id', 'username', 'url']));
+        $this->_user->login();
     }
 
     public function beforeSignup()

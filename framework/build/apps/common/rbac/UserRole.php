@@ -4,11 +4,12 @@ namespace apps\common\rbac;
 
 
 use rock\rbac\Role;
+use rock\Rock;
 
 class UserRole extends Role
 {
     public function execute(array $params = null)
     {
-        return !$this->Rock->user->isGuest();
+        return !Rock::$app->user->isGuest();
     }
 }

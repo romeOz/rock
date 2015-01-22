@@ -6,11 +6,18 @@ namespace apps\common\models\forms;
 use apps\common\models\users\BaseUsers;
 use rock\base\Model;
 use rock\base\ModelEvent;
-use rock\exception\ErrorHandler;
+use rock\captcha\Captcha;
+use rock\csrf\CSRF;
+use rock\db\Session;
+use rock\di\Container;
+use rock\exception\BaseException;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
-use rock\helpers\String;
+use rock\helpers\StringHelper;
+use rock\mail\Mail;
+use rock\response\Response;
 use rock\Rock;
+use rock\template\Template;
 use rock\validate\Validate;
 
 class BaseRecoveryForm extends Model
@@ -33,6 +40,31 @@ class BaseRecoveryForm extends Model
 
     public $isRecovery = false;
 
+    /** @var  CSRF */
+    protected $_csrfInstance;
+    /** @var  Response */
+    protected $_response;
+    /** @var  Captcha */
+    protected $_captcha;
+    /** @var  Template */
+    protected $_template;
+    /** @var  Mail */
+    protected $_mail;
+    /** @var  Session */
+    protected $_session;
+
+    public function init()
+    {
+        parent::init();
+
+        $this->_csrfInstance = Container::load('csrf');
+        $this->_response = Container::load('response');
+        $this->_captcha = Container::load('captcha');
+        $this->_template = Container::load('template');
+        $this->_mail = Container::load('mail');
+        $this->_session = Container::load('session');
+    }
+    
     public function rules()
     {
         return [
@@ -49,7 +81,7 @@ class BaseRecoveryForm extends Model
                 self::RULE_VALIDATE, 'email', 'length' => [4, 80, true], 'email'
             ],
             [
-                self::RULE_VALIDATE, 'captcha', 'captcha' => [$this->Rock->captcha->getSession()]
+                self::RULE_VALIDATE, 'captcha', 'captcha' => [$this->_captcha->getSession()]
             ],
             [
                 self::RULE_SANITIZE, 'email', 'lowercase'
@@ -65,7 +97,7 @@ class BaseRecoveryForm extends Model
 
     public function safeAttributes()
     {
-        return ['email', 'captcha', $this->Rock->csrf->csrfParam];
+        return ['email', 'captcha', $this->_csrfInstance->csrfParam];
     }
 
     public function attributeLabels()
@@ -115,7 +147,7 @@ class BaseRecoveryForm extends Model
         $data['fullname'] = $name;
         $data['password'] = $this->password;
         $data['email'] = $this->email;
-        return $this->Rock->template->getChunk($chunk, $data);
+        return $this->_template->getChunk($chunk, $data);
     }
 
     public function sendMail($subject = null, $chunkBody = null)
@@ -131,14 +163,14 @@ class BaseRecoveryForm extends Model
         $body = $this->prepareBody(Helper::getValue($chunkBody, $this->emailBodyTpl));
 
         try {
-            $this->Rock->mail
+            $this->_mail
                 ->address($this->email)
                 ->subject($subject)
                 ->body($body)
                 ->send();
         } catch (\Exception $e) {
             $this->addErrorAsPlaceholder(Rock::t('failSendEmail'), 'e_recovery');
-            Rock::warning(ErrorHandler::convertExceptionToString($e));
+            Rock::warning(BaseException::convertExceptionToString($e));
         }
 
         return $this;
@@ -152,9 +184,9 @@ class BaseRecoveryForm extends Model
         if ($this->isRecovery === false) {
             return;
         }
-        $this->Rock->session->setFlash('successRecovery', ['email' => String::replaceRandChars($this->email)]);
+        $this->_session->setFlash('successRecovery', ['email' => StringHelper::replaceRandChars($this->email)]);
 
-        $response = $this->Rock->response;
+        $response = $this->_response;
         if (!isset($url) && isset($this->redirectUrl)) {
             $url = $this->redirectUrl;
         }

@@ -6,8 +6,13 @@ namespace apps\common\models\forms;
 use apps\common\models\users\BaseUsers;
 use rock\base\Model;
 use rock\base\ModelEvent;
+use rock\csrf\CSRF;
+use rock\date\DateTime;
+use rock\di\Container;
 use rock\helpers\ArrayHelper;
+use rock\response\Response;
 use rock\Rock;
+use rock\user\User;
 use rock\validate\Validate;
 
 class BaseLoginForm extends Model
@@ -26,6 +31,21 @@ class BaseLoginForm extends Model
     public $redirectUrl;
     public $isLogged = false;
 
+    /** @var  CSRF */
+    protected $_csrfInstance;
+    /** @var  User */
+    protected $_user;
+    /** @var  Response */
+    protected $_response;
+
+    public function init()
+    {
+        parent::init();
+
+        $this->_csrfInstance = Container::load('csrf');
+        $this->_user = Container::load('user');
+        $this->_response = Container::load('response');
+    }
 
 
     public function rules()
@@ -60,7 +80,7 @@ class BaseLoginForm extends Model
 
     public function safeAttributes()
     {
-        return ['email', 'password', $this->Rock->csrf->csrfParam];
+        return ['email', 'password', $this->_csrfInstance->csrfParam];
     }
 
 
@@ -99,7 +119,7 @@ class BaseLoginForm extends Model
         }
 
         $users = $this->getUsers();
-        $users->login_last = $this->Rock->date->isoDatetime();
+        $users->login_last = DateTime::set()->isoDatetime();
         if (!$users->save()) {
             $this->addErrorAsPlaceholder(Rock::t('failLogin'), 'e_login');
             return false;
@@ -107,8 +127,8 @@ class BaseLoginForm extends Model
 
         $this->isLogged = true;
         $data = $users->toArray();
-        $this->Rock->user->addMulti(ArrayHelper::intersectByKeys($data, ['id', 'username', 'url']));
-        $this->Rock->user->login();
+        $this->_user->addMulti(ArrayHelper::intersectByKeys($data, ['id', 'username', 'url']));
+        $this->_user->login();
 
         $this->afterLogin($data);
 
@@ -125,14 +145,13 @@ class BaseLoginForm extends Model
         if (!$this->isLogged) {
             return;
         }
-        $response = $this->Rock->response;
         if (!isset($url) && isset($this->redirectUrl)) {
             $url = $this->redirectUrl;
         }
         if (!isset($url)) {
-            $response->refresh()->send(true);
+            $this->_response->refresh()->send(true);
         }
-        $response->redirect($url)->send(true);
+        $this->_response->redirect($url)->send(true);
     }
 
     public function beforeLogin()

@@ -4,6 +4,7 @@ namespace apps\common\models\users;
 
 use rock\db\ActiveRecord;
 use rock\helpers\NumericHelper;
+use rock\Rock;
 
 /**
  * @property int id
@@ -246,7 +247,7 @@ class BaseUsers extends ActiveRecord
      */
     public function validatePassword($password)
     {
-        return $this->Rock->security->validatePassword($password, $this->password);
+        return Rock::$app->security->validatePassword($password, $this->password);
     }
 
     /**
@@ -266,7 +267,7 @@ class BaseUsers extends ActiveRecord
      */
     public function setPassword($password)
     {
-        $this->password = $this->Rock->security->generatePasswordHash($password);
+        $this->password = Rock::$app->security->generatePasswordHash($password);
     }
 
     /**
@@ -286,7 +287,7 @@ class BaseUsers extends ActiveRecord
      */
     public function generateToken()
     {
-        $this->token = $this->Rock->security->generateRandomKey() . '_' . time();
+        $this->token = Rock::$app->security->generateRandomKey() . '_' . time();
     }
 
     /**
