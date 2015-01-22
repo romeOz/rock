@@ -2,14 +2,12 @@
 
 namespace rock\markdown;
 
-
 use cebe\markdown\MarkdownExtra;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\di\Container;
 use rock\helpers\Helper;
 use rock\image\ImageProvider;
-use rock\Rock;
 
 class Markdown extends MarkdownExtra implements ObjectInterface
 {
@@ -43,17 +41,12 @@ class Markdown extends MarkdownExtra implements ObjectInterface
      * @var int
      */
     public $dummy = 0;
-
     public $specialAttributesDummy = '.dummy-video';
     public $defaultWidthVideo = 560;
     public $defaultHeightVideo = 315;
-
     /** @var string|array|ImageProvider  */
     public $imageProvider = 'imageProvider';
-
-
     private $_specialAttributesRegex = '\{((?:[#\.][\\w-]+\\s*)+)\}';
-
     private $_tableCellTag = 'td';
     private $_tableCellCount = 0;
     private $_tableCellAlign = [];
@@ -70,12 +63,10 @@ class Markdown extends MarkdownExtra implements ObjectInterface
         return trim(parent::parse($text));
     }
 
-
     protected function renderCode($block)
     {
         return $this->isTag('code') ? parent::renderCode($block) : '';
     }
-
 
     /**
      * @marker @
