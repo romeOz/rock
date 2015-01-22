@@ -8,12 +8,6 @@ namespace rock\helpers;
  */
 class ObjectHelper
 {
-    /**
-     * Array of data optimization.
-     *
-     * @var array
-     */
-    protected static $caching = [];
     protected static $objects = [];
 
     /**
@@ -193,7 +187,6 @@ class ObjectHelper
         return (bool)strstr($value, '\\');
     }
 
-
     /**
      * Get result method (dynamic args).
      *
@@ -219,37 +212,5 @@ class ObjectHelper
         }
 
         return $reflection->invokeArgs($object, $pass);
-    }
-
-    public static function instanceOfTrait($class, $trait, $recursive = true)
-    {
-        return $recursive === true
-            ? isset(ObjectHelper::getTraitsRecursive($class)[$trait])
-            : isset(class_uses($class)[$trait]);
-    }
-
-    public static function getTraitsRecursive($class, $autoload = true)
-    {
-        $traits = [];
-        do {
-            $traits = array_merge(class_uses($class, $autoload), $traits);
-        } while ($class = get_parent_class($class));
-        foreach ($traits as $trait => $same) {
-            $traits = array_merge(class_uses($trait, $autoload), $traits);
-        }
-
-        return array_unique($traits);
-    }
-
-    public static function calculateArgsConstructor($args)
-    {
-        $configs = current(array_slice($args, -1, 1));
-        $args = array_slice($args, 0, count($args) - 1);
-        if (!empty($configs) && !is_array($configs)) {
-            $args = [$configs];
-            $configs = [];
-        }
-
-        return [$configs ? $configs : [], $args];
     }
 }
