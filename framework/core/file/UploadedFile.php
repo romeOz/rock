@@ -11,6 +11,30 @@ use rock\Rock;
 /**
  * UploadedFile represents the information for an uploaded file.
  *
+ * ```php
+ * $model = new UploadModel;
+ * if (!empty($_FILES)) {
+ *   $model->file = UploadedFile::getInstances($model, 'file');
+ *
+ *   // Validation
+ *   $validate = Validate::attributes(Validate::uploaded()
+ *          ->fileSizeMax('5k', true)
+ *          ->fileExtensions(['gif', 'jpeg']));
+ *   if ($validate->validate($model->file)) {
+ *      foreach ($model->file as $file) {
+ *          $file->saveAs('/upload/');
+ *      }
+ *   }
+ * }
+ *
+ * // Render html-form
+ * $form = ActiveForm::begin(['options' => ['id' => 'form-upload','enctype'=>'multipart/form-data'], 'model'=> $model]);
+ * echo $form->field($model, 'file[]')->fileInput();
+ * echo $form->field($model, 'file[]')->fileInput();
+ * echo Html::submitButton();
+ * ActiveForm::end();
+ * ```
+ *
  * You can call {@see \rock\file\UploadedFile::getInstance()} to retrieve the instance of an uploaded file,
  * and then use {@see \rock\file\UploadedFile::saveAs()} to save it on the server.
  * You may also query other information about the file, including {@see \rock\file\UploadedFile::$name},
@@ -21,32 +45,6 @@ use rock\Rock;
  * @property boolean $hasError Whether there is an error with the uploaded file. Check {@see \rock\file\UploadedFile::$error} for detailed
  * error code information. This property is read-only.
  *
- * ```php
- * $model = new UploadModel;
- * if (!empty($_FILES)) {
- *   $model->file = UploadedFile::getInstances($model, 'file');
- *
- *   // Validation
- *   if ($this->Rock->validation
- *          ->key(
- *              'file',
- *              Validation::arr()->each(Validation::uploaded()->fileSizeMax('5k', true)->fileExtensions(['gif', 'jpeg'])->fileMimeTypes('image/png'))
- *          )
- *          ->validate(['file' => $model->file]) === false)
- *   {
- *      foreach ($model->file as $file) {
- *          $file->saveAs('/upload/');
- *      }
- *   }
- * }
- *
- * // Render html-form
- * $form = \rock\classes\html\ActiveForm::begin(['options' => ['id' => 'form-upload','enctype'=>'multipart/form-data'], 'model'=> $model]);
- * echo $form->field($model, 'file[]')->fileInput();
- * echo $form->field($model, 'file[]')->fileInput();
- * echo Html::submitButton();
- * ActiveForm::end();
- * ```
  */
 class UploadedFile implements ComponentsInterface
 {
@@ -194,9 +192,13 @@ class UploadedFile implements ComponentsInterface
     public static  function getSizeLimit($maxSize = null)
     {
         $limit = FileHelper::sizeToBytes(ini_get('upload_max_filesize'));
-        if ($maxSize !== null && $limit > 0 && $maxSize < $limit) {
-            $limit = $maxSize;
+        if ($maxSize !== null) {
+            $maxSize = FileHelper::sizeToBytes($maxSize);
+            if ($limit > 0 && $maxSize < $limit) {
+                $limit = $maxSize;
+            }
         }
+
         if (isset($_POST['MAX_FILE_SIZE']) && $_POST['MAX_FILE_SIZE'] > 0 && $_POST['MAX_FILE_SIZE'] < $limit) {
             $limit = (int) $_POST['MAX_FILE_SIZE'];
         }
@@ -217,38 +219,39 @@ class UploadedFile implements ComponentsInterface
      * Saves the uploaded file.
      * Note that this method uses php's move_uploaded_file() method. If the target file `$file`
      * already exists, it will be overwritten.
-     * @param string $file the file path used to save the uploaded file
+     *
+     * @param string  $file           the file path used to save the uploaded file
      * @param boolean $deleteTempFile whether to delete the temporary file after saving.
-     * If true, you will not be able to save the uploaded file again in the current request.
-     * @return boolean true whether the file is saved successfully
+     *                                If true, you will not be able to save the uploaded file again in the current request.
+     * @param bool    $createDir
+     * @return bool true whether the file is saved successfully
+     * @throws \Exception
      * @see error
      */
-    public function saveAs($file, $deleteTempFile = true)
+    public function saveAs($file, $deleteTempFile = true, $createDir = false)
     {
         if ($this->error !== UPLOAD_ERR_OK) {
             return false;
         }
-        if (!$adapter = $this->getAdapter()) {
-            if ($this->calculatePathname instanceof \Closure) {
-                $file = call_user_func($this->calculatePathname, $this);
-            }
-            if ($deleteTempFile) {
-                return move_uploaded_file($this->tempName, $file);
-            } elseif (is_uploaded_file($this->tempName)) {
-                return copy($this->tempName, $file);
-            }
-
-            return false;
-        }
+        $file = Rock::getAlias($file);
         if ($this->calculatePathname instanceof \Closure) {
-            $file = call_user_func($this->calculatePathname, $this, $adapter);
-        }
-        $result = $adapter->put($file, file_get_contents($this->tempName));
-        if ($deleteTempFile) {
-            @unlink($this->tempName);
-        }
-        return $result;
+            if ($adapter = $this->getAdapter()) {
+                $file = call_user_func($this->calculatePathname, $this, $file, $adapter);
+            } else {
+                $file = call_user_func($this->calculatePathname, $this, $file);
+            }
 
+        }
+        if ($createDir) {
+            FileHelper::createDirectory(dirname($file));
+        }
+        if ($deleteTempFile) {
+            return move_uploaded_file($this->tempName, $file);
+        } elseif (is_uploaded_file($this->tempName)) {
+            return copy($this->tempName, $file);
+        }
+
+        return false;
     }
 
     /**
