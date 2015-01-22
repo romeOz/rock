@@ -4,6 +4,7 @@ namespace rock\file;
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
 use rock\base\Model;
+use rock\di\Container;
 use rock\helpers\FileHelper;
 use rock\helpers\Html;
 use rock\Rock;
@@ -76,28 +77,16 @@ class UploadedFile implements ComponentsInterface
      * @see http://www.php.net/manual/en/features.file-upload.errors.php
      */
     public $error;
-
-
-    /** @var FileManager|\Closure */
-    public static $adapter = '';
-
-    /** @var  \Closure */
+    /** @var FileManager|callable|array */
+    public $adapter;
+    /** @var  callable */
     public $calculatePathname;
 
-    /**
-     * @return FileManager
-     * @throws FileException
-     */
-    protected function getAdapter()
+    public function init()
     {
-        if (static::$adapter instanceof FileManager) {
-            return static::$adapter;
+        if (!is_object($this->adapter)) {
+            $this->adapter = Container::load($this->adapter);
         }
-        if (static::$adapter instanceof \Closure) {
-            return static::$adapter = call_user_func(static::$adapter, $this);
-        }
-
-        return null;
     }
 
     /**
@@ -235,12 +224,7 @@ class UploadedFile implements ComponentsInterface
         }
         $file = Rock::getAlias($file);
         if ($this->calculatePathname instanceof \Closure) {
-            if ($adapter = $this->getAdapter()) {
-                $file = call_user_func($this->calculatePathname, $this, $file, $adapter);
-            } else {
-                $file = call_user_func($this->calculatePathname, $this, $file);
-            }
-
+            $file = call_user_func($this->calculatePathname, $this, $file, $this->adapter);
         }
         if ($createDir) {
             FileHelper::createDirectory(dirname($file));

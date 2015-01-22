@@ -436,23 +436,19 @@ return array_merge(
         ],
         'uploadedFile' =>[
             'class' => \rock\file\UploadedFile::className(),
-            'adapter' => function () {
-                    return \rock\di\Container::load(
-                        [
-                            'class' => FileManager::className(),
-                            'adapter' =>
-                                function () {
-                                    return new Local(Rock::getAlias('@assets/images'));
-                                },
-                            'cache' => function () {
-                                    $local = new Local(Rock::getAlias('@common.runtime/filesystem'));
-                                    $cache = new Adapter($local, 'images.tmp');
+            'adapter' => [
+                'class' => FileManager::className(),
+                'adapter' =>
+                    function () {
+                        return new Local(Rock::getAlias('@assets/images'));
+                    },
+                'cache' => function () {
+                    $local = new Local(Rock::getAlias('@common.runtime/filesystem'));
+                    $cache = new Adapter($local, 'images.tmp');
 
-                                    return $cache;
-                                }
-                        ]
-                    );
-                },
+                    return $cache;
+                }
+            ],
             'calculatePathname' => function(\rock\file\UploadedFile $upload, $path, FileManager $fileManager = null) {
                     $pathname = !empty($path) ? [$path] : [];
 
