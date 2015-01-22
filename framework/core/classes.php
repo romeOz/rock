@@ -333,40 +333,32 @@ return array_merge(
 
         'imageProvider' => [
             'class' => \rock\image\ImageProvider::className(),
-            'adapterImage' => function () {
-                    return \rock\di\Container::load(
-                        [
-                            'class' => FileManager::className(),
-                            'adapter' =>
-                                function () {
-                                    return new Local(Rock::getAlias('@assets/images'));
-                                },
-                            'cache' => function () {
-                                    $local = new Local(Rock::getAlias('@common.runtime/filesystem'));
-                                    $cache = new Adapter($local, 'images.tmp');
+            'adapterImage' => [
+                'class' => FileManager::className(),
+                'adapter' =>
+                    function () {
+                        return new Local(Rock::getAlias('@assets/images'));
+                    },
+                'cache' => function () {
+                    $local = new Local(Rock::getAlias('@common.runtime/filesystem'));
+                    $cache = new Adapter($local, 'images.tmp');
 
-                                    return $cache;
-                                }
-                        ]
-                    );
-                },
-            'adapterCache' => function () {
-                    return \rock\di\Container::load(
-                        [
-                            'class' => FileManager::className(),
-                            'adapter' =>
-                                function () {
-                                    return new Local(Rock::getAlias('@assets/cache'));
-                                },
-                            'cache' => function () {
-                                    $local = new Local(Rock::getAlias('@common.runtime/filesystem'));
-                                    $cache = new Adapter($local, 'image_cache.tmp');
+                    return $cache;
+                }
+            ],
+            'adapterCache' => [
+                'class' => FileManager::className(),
+                'adapter' =>
+                    function () {
+                        return new Local(Rock::getAlias('@assets/cache'));
+                    },
+                'cache' => function () {
+                    $local = new Local(Rock::getAlias('@common.runtime/filesystem'));
+                    $cache = new Adapter($local, 'image_cache.tmp');
 
-                                    return $cache;
-                                }
-                        ]
-                    );
-                },
+                    return $cache;
+                }
+            ],
         ],
         'csrf' => [
             'class' => \rock\csrf\CSRF::className(),

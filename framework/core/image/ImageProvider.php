@@ -4,6 +4,7 @@ namespace rock\image;
 
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
+use rock\di\Container;
 use rock\file\FileManager;
 use rock\imagine\Image;
 use rock\Rock;
@@ -17,73 +18,40 @@ class ImageProvider implements ObjectInterface
     public $maxFiles = 100;
     public $srcImage = '@web/images';
     public $srcCache = '@web/cache';
-
     public $handler;
-
-    /** @var FileManager|\Closure */
-    public static $adapterImage = '';
-    /** @var FileManager|\Closure */
-    public static $adapterCache = '';
+    /** @var FileManager|array */
+    public $adapterImage ;
+    /** @var FileManager|array */
+    public $adapterCache;
+    protected $resource;
+    protected $src;
     
     public function init()
     {
         $this->srcImage = Rock::getAlias($this->srcImage);
         $this->srcCache = Rock::getAlias($this->srcCache);
-    }
 
-    /**
-     * @return FileManager
-     * @throws ImageException
-     */
-    public function getAdapterImage()
-    {
-        if (static::$adapterImage instanceof FileManager) {
-            return static::$adapterImage;
-        }
-        if (static::$adapterImage instanceof \Closure) {
-            static::$adapterImage = call_user_func(static::$adapterImage, $this);
-        } else {
-            static::$adapterImage = Rock::factory(static::$adapterImage);
-        }
-        if (!static::$adapterImage instanceof FileManager) {
-            throw new ImageException(ImageException::UNKNOWN_CLASS, ['class' => static::$adapterImage]);
-        }
-        return static::$adapterImage;
-    }
-
-    /**
-     * @return FileManager
-     * @throws ImageException
-     */
-    public function getAdapterCache()
-    {
-        if (static::$adapterCache instanceof FileManager) {
-            return static::$adapterCache;
-        }
-        if (static::$adapterCache instanceof \Closure) {
-            static::$adapterCache = call_user_func(static::$adapterCache, $this);
-        } else {
-            static::$adapterCache = Rock::factory(static::$adapterCache);
-        }
-        if (!static::$adapterCache instanceof FileManager) {
-            throw new ImageException(ImageException::UNKNOWN_CLASS, ['class' => static::$adapterCache]);
+        if (!is_object($this->adapterImage)) {
+            $this->adapterImage = Container::load($this->adapterImage);
         }
 
-        return static::$adapterCache;
+        if (!is_object($this->adapterCache)) {
+            $this->adapterCache = Container::load($this->adapterCache);
+        }
     }
 
 
-    protected $resource;
+
     public function get($path, $width = null, $height = null)
     {
         $path = $this->preparePath($path);
-        if (!$this->getAdapterImage()->has($path)) {
+        if (!$this->adapterImage->has($path)) {
             return $this->srcImage . '/'. ltrim($path, '/');
         }
 
-        $this->resource = $this->getAdapterImage()->readStream($path);
+        $this->resource = $this->adapterImage->readStream($path);
 
-        if ((empty($width) && empty($height)) || empty(static::$adapterCache)) {
+        if ((empty($width) && empty($height)) || empty($this->adapterCache)) {
             return $this->srcImage . '/'. ltrim($path, '/');
         }
 
@@ -117,14 +85,12 @@ class ImageProvider implements ObjectInterface
         $this->height = $height;
     }
 
-
-    protected $src;
     protected function prepareImage($path)
     {
-        $metadata = $this->getAdapterImage()->getMetadata($path);
+        $metadata = $this->adapterImage->getMetadata($path);
         $path = implode(DIRECTORY_SEPARATOR, [trim($metadata['dirname'], DIRECTORY_SEPARATOR), "{$this->width}x{$this->height}", $metadata['basename']]);
         $this->src = $this->srcCache . '/'. ltrim($path, '/');
-        if ($this->getAdapterCache()->has($path)) {
+        if ($this->adapterCache->has($path)) {
             return;
         }
         if ($this->handler instanceof \Closure) {
@@ -132,7 +98,7 @@ class ImageProvider implements ObjectInterface
             return;
         }
 
-        if (!$this->getAdapterCache()->write($path, Image::thumbnail($this->resource, $this->width, $this->height)->get('jpg'))) {
+        if (!$this->adapterCache->write($path, Image::thumbnail($this->resource, $this->width, $this->height)->get('jpg'))) {
             new ImageException(ImageException::NOT_CREATE_FILE, ['path' => $path]);
         }
     }
