@@ -3,12 +3,8 @@
 namespace rock\rbac;
 
 
-use rock\base\Arrayable;
-
 interface RBACInterface extends \IteratorAggregate, \Countable, ItemInterface
 {
-
-
     /**
      * @param string $itemName
      * @return Item
@@ -31,7 +27,7 @@ interface RBACInterface extends \IteratorAggregate, \Countable, ItemInterface
     /**
      * Get Role
      *
-*@param string $name - name of role
+     * @param string $name name of role
      * @return Role|null
      * @throws RBACException
      */
@@ -39,7 +35,7 @@ interface RBACInterface extends \IteratorAggregate, \Countable, ItemInterface
     /**
      * Get permission
      *
-*@param string    $name - name of permission
+     * @param string    $name name of permission
      * @return Permission|null
      * @throws RBACException
      */
@@ -153,9 +149,6 @@ interface RBACInterface extends \IteratorAggregate, \Countable, ItemInterface
      */
     public function removeAll();
 
-
-
-
     /**
      * @param int      $userId
      * @param string $itemName
@@ -163,7 +156,6 @@ interface RBACInterface extends \IteratorAggregate, \Countable, ItemInterface
      * @return bool
      */
     public function check($userId, $itemName, array $params = null);
-
 
     /**
      * Assigns a role to a user.
@@ -183,9 +175,6 @@ interface RBACInterface extends \IteratorAggregate, \Countable, ItemInterface
      * returned if there is no item assigned to the user.
      */
     public function getAssignments($userId);
-
-
-
 
     /**
      * Returns a value indicating whether the item has been assigned to the user.

@@ -25,15 +25,13 @@ class DBManager extends RBAC
 
     public function init()
     {
-        if (!empty(static::$items)) {
-            return;
-        }
-
         if (!is_object($this->connection)) {
             $this->connection = Container::load($this->connection);
         }
-
         Items::$connection = Roles::$connection = RolesItems::$connection = UsersItems::$connection = $this->connection;
+        if (!empty(static::$items)) {
+            return;
+        }
         $this->load();
     }
 
