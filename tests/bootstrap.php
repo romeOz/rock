@@ -61,7 +61,7 @@ Rock::$app->di['cookie'] = [
 ];
 
 
-Rock::$app->di['eval'] = [
+Rock::$app->di['execute'] = [
     'class' => CacheExecute::className(),
     'path' => '@tests/runtime/cache/_execute'
 ];
