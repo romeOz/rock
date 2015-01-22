@@ -18,6 +18,7 @@ class ImageProvider implements ObjectInterface
     public $maxFiles = 100;
     public $srcImage = '@web/images';
     public $srcCache = '@web/cache';
+    /** @var  callable */
     public $handler;
     /** @var FileManager|array */
     public $adapterImage ;
@@ -99,7 +100,7 @@ class ImageProvider implements ObjectInterface
         }
 
         if (!$this->adapterCache->write($path, Image::thumbnail($this->resource, $this->width, $this->height)->get('jpg'))) {
-            new ImageException(ImageException::NOT_CREATE_FILE, ['path' => $path]);
+            Rock::warning(ImageException::NOT_CREATE_FILE, ['path' => $path]);
         }
     }
 }
