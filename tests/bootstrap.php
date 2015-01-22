@@ -33,10 +33,10 @@ Rock::$app->language = \rock\i18n\i18nInterface::EN;
 
 require(dirname(__DIR__) . '/framework/polyfills.php');
 
-$componetns = require(__DIR__ . '/data/config.php');
+$components = require(__DIR__ . '/data/config.php');
 $config['components'] = \rock\helpers\ArrayHelper::merge(
     $config['components'] ? : [],
-    $componetns['claseses']
+    $components['classes']
 );
 
 Rock::$components = $config['components'];

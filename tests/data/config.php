@@ -1,4 +1,9 @@
 <?php
+use rock\execute\CacheExecute;
+use rock\log\Log;
+use rock\rbac\PhpManager;
+use rockunit\core\session\mocks\SessionMock;
+use rockunit\mocks\CookieMock;
 use rockunit\migrations\AccessItemsMigration;
 use rockunit\migrations\AccessRolesItemsMigration;
 use rockunit\migrations\AccessUsersItemsMigration;
@@ -60,5 +65,28 @@ return [
         'dsn' => 'mongodb://travis:test@localhost:27017',
         'defaultDatabaseName' => 'rocktest',
         'options' => [],
+    ],
+    'classes' => [
+        'log' => [
+            'class' => Log::className(),
+            'path' => __DIR__ . '/runtime/logs'
+        ],
+        'cache' => [
+            'class' => \rock\cache\CacheStub::className()
+        ],
+        'session' => [
+            'class' => SessionMock::className(),
+        ],
+        'cookie' => [
+            'class' => CookieMock::className(),
+        ],
+        'execute' => [
+            'class' => CacheExecute::className(),
+            'path' => '@tests/runtime/cache/_execute'
+        ],
+        'rbac' => [
+            'class' => PhpManager::className(),
+            'path' => '@tests/core/rbac/src/rbac.php'
+        ]
     ]
 ];
