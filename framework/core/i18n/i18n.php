@@ -20,12 +20,6 @@ class i18n implements ObjectInterface, i18nInterface
     public $locale = self::EN;
     public $category = 'lang';
     public $removeBraces = true;
-    public static $aliases = [
-        self::UK => self::EN,
-        self::EN_US => self::EN,
-        self::RU_RU => self::RU,
-    ];
-
     protected static $data = [];
 
     public function init()
@@ -193,14 +187,5 @@ class i18n implements ObjectInterface, i18nInterface
         }
 
         return StringHelper::replace($result, $placeholders, $this->removeBraces);
-    }
-
-    public static function getLanguage($locale)
-    {
-        if (isset(static::$aliases[$locale])) {
-            return static::$aliases[$locale];
-        }
-
-        return $locale;
     }
 }
