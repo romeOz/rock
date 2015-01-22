@@ -31,7 +31,7 @@ namespace rock;
  * @property-read \rock\captcha\Captcha                                         $captcha
  * @property-read \rock\date\DateTime                                               $date
  * @property-read \rock\db\ActiveDataProvider                                 $activeData
- * @property-read \rock\image\DataProvider                                       $dataImage
+ * @property-read \rock\image\ImageProvider                                       $imageProvider
  * @property-read \rock\response\Response                                       $response
  * @property-read \rock\log\Log                                                 $log
  * @property-read \rock\validate\Validate                                                $validate

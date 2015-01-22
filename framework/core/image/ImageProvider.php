@@ -8,7 +8,7 @@ use rock\file\FileManager;
 use rock\imagine\Image;
 use rock\Rock;
 
-class DataProvider implements ObjectInterface
+class ImageProvider implements ObjectInterface
 {
     use ObjectTrait;
 

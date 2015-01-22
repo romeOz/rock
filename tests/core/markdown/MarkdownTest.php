@@ -5,7 +5,7 @@ namespace rockunit\core\markdown;
 
 use League\Flysystem\Adapter\Local;
 use rock\file\FileManager;
-use rock\image\DataProvider;
+use rock\image\ImageProvider;
 use rock\markdown\Markdown;
 use rock\Rock;
 use rockunit\core\db\DatabaseTestCase;
@@ -117,14 +117,14 @@ Test</p>',
     public function testThumbSuccess()
     {
         $mark = Rock::$app->markdown;
-        $dataImage = new DataProvider(
+        $imageProvider = new ImageProvider(
             [
                 'srcImage' => '/src',
                 'srcCache' => '/src/cache',
             ]
         );
 
-        $dataImage::$adapterImage = Rock::factory(
+        $imageProvider::$adapterImage = Rock::factory(
             [
                 'class' => FileManager::className(),
                 'adapter' =>
@@ -133,7 +133,7 @@ Test</p>',
                     },
             ]
         );
-        $dataImage::$adapterCache = Rock::factory(
+        $imageProvider::$adapterCache = Rock::factory(
             [
                 'class' => FileManager::className(),
                 'adapter' =>
@@ -142,7 +142,7 @@ Test</p>',
                     },
             ]
         );
-        $mark->dataImage = $dataImage;
+        $mark->imageProvider = $imageProvider;
         $this->assertSame(
             '<p><img src="/src/cache/50x50/play.png" alt="" class="class2 class" id="id2" /></p>',
             $mark->parse('![:thumb 50x50](/src/play.png){.class2 #id2 .class}')
@@ -156,14 +156,14 @@ Test</p>',
     public function testThumbFail()
     {
         $mark = Rock::$app->markdown;
-        $dataImage = new DataProvider(
+        $imageProvider = new ImageProvider(
             [
                 'srcImage' => '/src',
                 'srcCache' => '/src/cache',
             ]
         );
 
-        $dataImage::$adapterImage = Rock::factory(
+        $imageProvider::$adapterImage = Rock::factory(
             [
                 'class' => FileManager::className(),
                 'adapter' =>
@@ -172,7 +172,7 @@ Test</p>',
                     },
             ]
         );
-        $dataImage::$adapterCache = Rock::factory(
+        $imageProvider::$adapterCache = Rock::factory(
             [
                 'class' => FileManager::className(),
                 'adapter' =>
@@ -181,7 +181,7 @@ Test</p>',
                     },
             ]
         );
-        $mark->dataImage = $dataImage;
+        $mark->imageProvider = $imageProvider;
         $this->assertSame(
             $mark->parse('![:thumb 50x50](/src/foo.png){.class2 #id2 .class}'),
             '<p><img src="/src/foo.png" alt="" class="class2 class" id="id2" /></p>'

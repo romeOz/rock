@@ -3,11 +3,13 @@ namespace rock\template\filters;
 
 use rock\base\ClassName;
 use rock\date\DateTime;
+use rock\di\Container;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\Html;
 use rock\helpers\Json;
 use rock\helpers\Serialize;
+use rock\image\ImageProvider;
 use rock\image\ThumbInterface;
 use rock\Rock;
 use rock\template\Template;
@@ -195,11 +197,12 @@ class BaseFilter implements ThumbInterface
             $path = $params['dummy'];
         }
         $const = Helper::getValueIsset($params['const'], 1);
-        $dataImage = Rock::$app->dataImage;
-        $src = $dataImage->get($path, Helper::getValue($params['w']), Helper::getValue($params['h']));
+        /** @var ImageProvider $imageProvider */
+        $imageProvider = Container::load('imageProvider');
+        $src = $imageProvider->get($path, Helper::getValue($params['w']), Helper::getValue($params['h']));
         if (!($const & self::WITHOUT_WIDTH_HEIGHT)) {
-            $params['width'] = $dataImage->width;
-            $params['height'] = $dataImage->height;
+            $params['width'] = $imageProvider->width;
+            $params['height'] = $imageProvider->height;
         }
         unset($params['h'], $params['w'], $params['type'], $params['const']);
 

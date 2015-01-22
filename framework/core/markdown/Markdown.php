@@ -6,8 +6,9 @@ namespace rock\markdown;
 use cebe\markdown\MarkdownExtra;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
+use rock\di\Container;
 use rock\helpers\Helper;
-use rock\image\DataProvider;
+use rock\image\ImageProvider;
 use rock\Rock;
 
 class Markdown extends MarkdownExtra implements ObjectInterface
@@ -47,8 +48,8 @@ class Markdown extends MarkdownExtra implements ObjectInterface
     public $defaultWidthVideo = 560;
     public $defaultHeightVideo = 315;
 
-    /** @var string|DataProvider  */
-    public $dataImage = 'dataImage';
+    /** @var string|array|ImageProvider  */
+    public $imageProvider = 'imageProvider';
 
 
     private $_specialAttributesRegex = '\{((?:[#\.][\\w-]+\\s*)+)\}';
@@ -59,8 +60,8 @@ class Markdown extends MarkdownExtra implements ObjectInterface
 
     public function init()
     {
-        if (is_string($this->dataImage)) {
-            $this->dataImage = Rock::factory($this->dataImage);
+        if (!is_object($this->imageProvider)) {
+            $this->imageProvider = Container::load($this->imageProvider);
         }
     }
 
@@ -219,7 +220,7 @@ class Markdown extends MarkdownExtra implements ObjectInterface
             list($text, $url, $title, $offset, $key, $data) = $parts;
             if (isset($data['macros'])) {
                 if ($this->isTag('thumb') && $data['macros'] === 'thumb' && isset($data['width'])) {
-                    $url = $this->dataImage->get( '/' . ltrim($url, '/'), $data['width'], $data['height']);
+                    $url = $this->imageProvider->get( '/' . ltrim($url, '/'), $data['width'], $data['height']);
                 } elseif ($this->isTag('video') && $data['macros'] !== 'thumb') {
                     $video = $this->calculateVideo(
                         $url,

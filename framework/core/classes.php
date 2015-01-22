@@ -331,8 +331,8 @@ return array_merge(
             //'singleton' => true,
         ],
 
-        'dataImage' => [
-            'class' => \rock\image\DataProvider::className(),
+        'imageProvider' => [
+            'class' => \rock\image\ImageProvider::className(),
             'adapterImage' => function () {
                     return Rock::factory(
                         [

@@ -4,7 +4,7 @@ namespace rock\snippets;
 use rock\base\Snippet;
 use rock\di\Container;
 use rock\helpers\Html;
-use rock\image\DataProvider;
+use rock\image\ImageProvider;
 use rock\image\ThumbInterface;
 
 /**
@@ -51,13 +51,13 @@ class Thumb extends Snippet implements ThumbInterface
     public $const = 1;
     public $autoEscape = false;
 
-    /** @var  DataProvider */
+    /** @var  ImageProvider */
     private $_imageProvider;
 
     public function init()
     {
         parent::init();
-        $this->_imageProvider = Container::load('dataImage');
+        $this->_imageProvider = Container::load('imageProvider');
     }
 
 
