@@ -2,7 +2,6 @@
 namespace rock\snippets;
 
 use rock\base\Snippet;
-use rock\csrf\CSRF;
 use rock\di\Container;
 use rock\template\Template;
 use rock\url\UrlInterface;
@@ -98,7 +97,7 @@ class Url extends Snippet implements UrlInterface
      * @inheritdoc
      */
     public $autoEscape = Template::STRIP_TAGS;
-    /** @var  CSRF */
+    /** @var  \rock\csrf\CSRF */
     private $_csrf;
 
     public function init()
