@@ -3,6 +3,7 @@
 namespace rockunit\core\widgets;
 
 
+use rock\di\Container;
 use rock\widgets\ActiveField;
 use rock\widgets\ActiveForm;
 use rockunit\core\widgets\mocks\ModelMock;
@@ -234,6 +235,9 @@ class ActiveFieldExtend extends ActiveField
 
     public function __construct()
     {
+        if (!is_object($this->cache)) {
+            $this->cache = Container::load($this->cache);
+        }
     }
 }
 
