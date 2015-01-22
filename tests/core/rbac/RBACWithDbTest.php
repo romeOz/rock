@@ -11,18 +11,12 @@ use rock\rbac\RBAC;
  */
 class RBACWithDbTest extends RBACTest
 {
-    public function setUp()
-    {
-        parent::setUp();
-        DBManager::$connection = $this->getConnection();
-    }
-
     /**
      * @return RBAC
      */
     protected function getRBAC()
     {
-        $rbac = new DBManager();
+        $rbac = new DBManager(['connection' => $this->getConnection()]);
         //$rbac->refresh();
         return $rbac;
     }
