@@ -18,9 +18,13 @@ use rockunit\core\db\models\Users;
  */
 class MarkdownTest extends DatabaseTestCase
 {
+    protected function getMarkdown(array $config = [])
+    {
+        return new Markdown($config);
+    }
     public function testVideoInline()
     {
-        $result = Rock::$app->markdown->parseParagraph('![:youtube 480x360](6JvDSwFtEC0 "title"){.class1 #id1 .class2}');
+        $result = $this->getMarkdown()->parseParagraph('![:youtube 480x360](6JvDSwFtEC0 "title"){.class1 #id1 .class2}');
         $this->assertSame(
             '<iframe src="//youtube.com/embed/6JvDSwFtEC0/" title="title" width="480" height="360" allowfullscreen="allowfullscreen" frameborder="0" class="class1 class2" id="id1"></iframe>',
             $result
@@ -29,8 +33,7 @@ class MarkdownTest extends DatabaseTestCase
 
     public function testVideoSuccess()
     {
-        $markdown = Rock::$app->markdown;
-        $result = $markdown->parse('![:youtube 480x360][video]
+        $result = $this->getMarkdown()->parse('![:youtube 480x360][video]
 Test
 
 [video]: 6JvDSwFtEC0 {.class1 #id1 .class2}');
@@ -43,9 +46,10 @@ Test</p>',
 
     public function testVideoFail()
     {
-        $markdown = Rock::$app->markdown;
-        $markdown->denyTags = ['video'];
-        $result = $markdown->parse('![:youtube 480x360](6JvDSwFtEC0){.class1 #id1 .class2}');
+        $config = [
+            'denyTags' => ['video']
+        ];
+        $result = $this->getMarkdown($config)->parse('![:youtube 480x360](6JvDSwFtEC0){.class1 #id1 .class2}');
         $this->assertSame(
             $result,
             '<p><img src="6JvDSwFtEC0" alt="" class="class1 class2" id="id1" /></p>'
@@ -54,11 +58,12 @@ Test</p>',
 
     public function testVideoDummy()
     {
-        $markdown = Rock::$app->markdown;
-        $markdown->dummy = Markdown::DUMMY;
-        $markdown->specialAttributesDummy = '.dummy-video';
-        //$markdown->denyTags = ['code'];
-        $result = $markdown->parse('![:youtube 480x360][video]
+        $config = [
+            'dummy' => Markdown::DUMMY,
+            'specialAttributesDummy' => '.dummy-video'
+            //'denyTags' => ['code']
+        ];
+        $result = $this->getMarkdown($config)->parse('![:youtube 480x360][video]
 Test
 
 [video]: 6JvDSwFtEC0 {.class1 #id1 .class2}');
@@ -71,7 +76,7 @@ Test</p>',
 
     public function testTable()
     {
-        $result = Rock::$app->markdown->parse('
+        $result = $this->getMarkdown()->parse('
 {.class1 #id1 .class1}
 | header_1 | header_2 | header_3 |
 |:--| :--- | :---: |
@@ -94,7 +99,7 @@ Test</p>',
 
     public function testLinkInline()
     {
-        $result = Rock::$app->markdown->parseParagraph('[text](http://test/ "title text"){.class1 #id1 .class2}');
+        $result = $this->getMarkdown()->parseParagraph('[text](http://test/ "title text"){.class1 #id1 .class2}');
         $this->assertSame(
             '<a href="http://test/" title="title text" class="class1 class2" id="id1"  rel="nofollow" target="_blank">text</a>',
             $result
@@ -103,7 +108,7 @@ Test</p>',
 
     public function testLink()
     {
-        $result = Rock::$app->markdown->parse('[text][link]
+        $result = $this->getMarkdown()->parse('[text][link]
 Test
 
 [link]: http://test/ {.class1 #id1 .class2}');
@@ -114,35 +119,33 @@ Test</p>',
         );
     }
 
-    public function testThumbSuccess()
+    protected function getImageProvider()
     {
-        $mark = Rock::$app->markdown;
-        $imageProvider = new ImageProvider(
+        return new ImageProvider(
             [
                 'srcImage' => '/src',
                 'srcCache' => '/src/cache',
+                'adapter' =>   [
+                    'class' => FileManager::className(),
+                    'adapter' =>
+                        function () {
+                            return new Local(Rock::getAlias('@tests/core/markdown/src'));
+                        },
+                ],
+                'adapterCache' => [
+                    'class' => FileManager::className(),
+                    'adapter' =>
+                        function () {
+                            return new Local(Rock::getAlias('@tests/core/markdown/src/cache'));
+                        },
+                ]
             ]
         );
+    }
 
-        $imageProvider::$adapterImage = Rock::factory(
-            [
-                'class' => FileManager::className(),
-                'adapter' =>
-                    function () {
-                        return new Local(Rock::getAlias('@tests/core/markdown/src'));
-                    },
-            ]
-        );
-        $imageProvider::$adapterCache = Rock::factory(
-            [
-                'class' => FileManager::className(),
-                'adapter' =>
-                    function () {
-                        return new Local(Rock::getAlias('@tests/core/markdown/src/cache'));
-                    },
-            ]
-        );
-        $mark->imageProvider = $imageProvider;
+    public function testThumbSuccess()
+    {
+        $mark = $this->getMarkdown(['imageProvider' => $this->getImageProvider()]);
         $this->assertSame(
             '<p><img src="/src/cache/50x50/play.png" alt="" class="class2 class" id="id2" /></p>',
             $mark->parse('![:thumb 50x50](/src/play.png){.class2 #id2 .class}')
@@ -155,33 +158,7 @@ Test</p>',
     }
     public function testThumbFail()
     {
-        $mark = Rock::$app->markdown;
-        $imageProvider = new ImageProvider(
-            [
-                'srcImage' => '/src',
-                'srcCache' => '/src/cache',
-            ]
-        );
-
-        $imageProvider::$adapterImage = Rock::factory(
-            [
-                'class' => FileManager::className(),
-                'adapter' =>
-                    function () {
-                        return new Local(Rock::getAlias('@tests/core/markdown/src'));
-                    },
-            ]
-        );
-        $imageProvider::$adapterCache = Rock::factory(
-            [
-                'class' => FileManager::className(),
-                'adapter' =>
-                    function () {
-                        return new Local(Rock::getAlias('@tests/core/markdown/src/cache'));
-                    },
-            ]
-        );
-        $mark->imageProvider = $imageProvider;
+        $mark = $this->getMarkdown(['imageProvider' => $this->getImageProvider()]);
         $this->assertSame(
             $mark->parse('![:thumb 50x50](/src/foo.png){.class2 #id2 .class}'),
             '<p><img src="/src/foo.png" alt="" class="class2 class" id="id2" /></p>'
@@ -197,10 +174,11 @@ Test</p>',
     public function testUsernameLinkSuccess()
     {
         ActiveRecord::$connection = $this->getConnection();
-        $markdown = Rock::$app->markdown;
-        $markdown->handlerLinkByUsername = function($username){
-            return Users::findUrlByUsername($username);
-        };
+        $markdown = $this->getMarkdown(['handlerLinkByUsername' =>
+            function($username){
+                return Users::findUrlByUsername($username);
+            }
+        ]);
         $result = $markdown->parse('@Linda');
         $this->assertSame('<p><a href="/linda/" title="Linda">@Linda</a></p>', $result);
 
@@ -211,19 +189,19 @@ Test</p>',
     public function testUsernameLinkFail()
     {
         ActiveRecord::$connection = $this->getConnection();
-        $markdown = Rock::$app->markdown;
-        $markdown->handlerLinkByUsername = function($username){
+        $markdown = $this->getMarkdown(['handlerLinkByUsername' =>
+        function($username){
             return Users::findUrlByUsername($username);
-        };
+        }
+                                                    ]);
         $result = $markdown->parse('@Tom');
         $this->assertSame('<p><a href="#" title="Tom">@Tom</a></p>', $result);
     }
 
     public function testDenyTags()
     {
-        $markdown = Rock::$app->markdown;
-        $markdown->denyTags = ['class'];
-        $result = $markdown->parse('h1 {.class1 #id1 .class2}
+        $config = ['denyTags' => ['class']];
+        $result = $this->getMarkdown($config)->parse('h1 {.class1 #id1 .class2}
 ==
 
 text');
@@ -234,11 +212,9 @@ text');
         );
     }
 
-
     public function testCodeFail()
     {
-        $markdown = Rock::$app->markdown;
-        $markdown->denyTags = ['code'];
+        $markdown = $this->getMarkdown(['denyTags' => ['code']]);
         $this->assertSame($markdown->parse('     foo'), '');
         $this->assertSame(
             '<p>foo</p>
