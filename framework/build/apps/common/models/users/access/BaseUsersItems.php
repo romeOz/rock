@@ -9,12 +9,12 @@ class BaseUsersItems extends ActiveRecord
 {
     public static $connection;
 
-    public static function getDb()
+    public static function getConnection()
     {
         if (static::$connection instanceof Connection) {
             return static::$connection;
         }
-        return parent::getDb();
+        return parent::getConnection();
     }
 
     public static function tableName()

@@ -13,8 +13,6 @@ abstract class BaseUsersItemsQuery extends ActiveQuery
         return UsersItems::tableName();
     }
 
-
-
     public function byUserId($id)
     {
         return $this->andWhere([static::tableName() . '.user_id' =>  $id]);

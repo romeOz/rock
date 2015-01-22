@@ -5,15 +5,12 @@ namespace apps\common\models\users\access;
 
 use rock\db\ActiveQuery;
 
-
-
 abstract class BaseRolesItemsQuery extends ActiveQuery
 {
     public static function tableName()
     {
         return RolesItems::tableName();
     }
-
 
     /**
      * @param $roleId
