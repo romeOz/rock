@@ -77,7 +77,7 @@ class UploadedFile implements ComponentsInterface
      * @see http://www.php.net/manual/en/features.file-upload.errors.php
      */
     public $error;
-    /** @var FileManager|callable|array */
+    /** @var FileManager|array */
     public $adapter;
     /** @var  callable */
     public $calculatePathname;
