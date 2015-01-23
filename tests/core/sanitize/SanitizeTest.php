@@ -6,23 +6,6 @@ namespace rockunit\core\sanitize;
 use rock\sanitize\rules\Rule;
 use rock\sanitize\Sanitize;
 
-class Round extends Rule
-{
-    protected $precision = 0;
-    public function __construct($precision = 0)
-    {
-        $this->precision= $precision;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function sanitize($input)
-    {
-        return round($input, $this->precision);
-    }
-}
-
 class SanitizeTest extends \PHPUnit_Framework_TestCase
 {
     public function testScalar()
@@ -341,4 +324,21 @@ class SanitizeTest extends \PHPUnit_Framework_TestCase
             $sanitize->sanitize($input)
         );
     }
-} 
+}
+
+class Round extends Rule
+{
+    protected $precision = 0;
+    public function __construct($precision = 0)
+    {
+        $this->precision= $precision;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function sanitize($input)
+    {
+        return round($input, $this->precision);
+    }
+}

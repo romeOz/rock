@@ -143,9 +143,8 @@ class Sanitize implements ObjectInterface
 
     public function __call($name, $arguments)
     {
-        if ($name === 'attributes' || $name === 'allOf' || $name === 'nested' || $name === 'rules') {
-            call_user_func_array([$this, "{$name}Internal"], $arguments);
-            return $this;
+        if (method_exists($this, "{$name}Internal")) {
+            return call_user_func_array([$this, "{$name}Internal"], $arguments);
         }
 
         if (!isset($this->rules[$name])) {
