@@ -2,7 +2,8 @@
 namespace rock\mq;
 
 
-use rock\Rock;
+use rock\base\BaseException;
+use rock\log\Log;
 
 class ZeroQueue extends Queue implements QueueInterface
 {
@@ -67,7 +68,10 @@ class ZeroQueue extends Queue implements QueueInterface
             sleep($this->timeout);
         }
 
-        Rock::error('The receive timed out.');
+        if (class_exists('\rock\log\Log')) {
+            $message = BaseException::convertExceptionToString(new MQException('The receive timed out.'));
+            Log::err($message);
+        }
         return null;
     }
 
@@ -141,7 +145,10 @@ class ZeroQueue extends Queue implements QueueInterface
             sleep($this->timeout);
         }
 
-        Rock::error('The receive timed out.');
+        if (class_exists('\rock\log\Log')) {
+            $message = BaseException::convertExceptionToString(new MQException('The receive timed out.'));
+            Log::err($message);
+        }
         return null;
     }
 

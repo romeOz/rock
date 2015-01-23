@@ -1,12 +1,13 @@
 <?php
 namespace rock\db;
 
+use rock\base\BaseException;
 use rock\di\Container;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\Inflector;
 use rock\helpers\ObjectHelper;
-use rock\Rock;
+use rock\log\Log;
 
 /**
  * ActiveRecord is the base class for classes representing relational data in terms of objects.
@@ -445,7 +446,10 @@ class ActiveRecord extends BaseActiveRecord
     public function insert($runValidation = true, $attributes = null)
     {
         if ($runValidation && !$this->validate($attributes)) {
-            Rock::info('Model not inserted due to validation error.');
+            if (class_exists('\rock\log\Log')) {
+                $message = BaseException::convertExceptionToString(new DbException('Model not inserted due to validation error.'));
+                Log::info($message);
+            }
             return false;
         }
         if (!$this->isTransactional(self::OP_INSERT)) {
@@ -561,7 +565,10 @@ class ActiveRecord extends BaseActiveRecord
     public function update($runValidation = true, $attributeNames = null)
     {
         if ($runValidation && !$this->validate($attributeNames)) {
-            Rock::info('Model not updated due to validation error.');
+            if (class_exists('\rock\log\Log')) {
+                $message = BaseException::convertExceptionToString(new DbException('Model not updated due to validation error.'));
+                Log::info($message);
+            }
             return false;
         }
 

@@ -3,7 +3,7 @@
 namespace rock\security;
 
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class SecurityException extends BaseException
 {

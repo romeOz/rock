@@ -3,7 +3,7 @@
 namespace rock\session;
 
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class SessionException extends BaseException
 {

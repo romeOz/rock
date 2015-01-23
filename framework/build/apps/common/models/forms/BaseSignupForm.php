@@ -3,6 +3,7 @@
 namespace apps\common\models\forms;
 
 use apps\common\models\users\BaseUsers;
+use rock\base\BaseException;
 use rock\base\Model;
 use rock\base\ModelEvent;
 use rock\captcha\Captcha;
@@ -10,13 +11,11 @@ use rock\csrf\CSRF;
 use rock\date\DateTime;
 use rock\db\Connection;
 use rock\di\Container;
-use rock\event\Event;
-use rock\exception\BaseException;
-use rock\exception\ErrorHandler;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\String;
 use rock\helpers\StringHelper;
+use rock\log\Log;
 use rock\mail\Mail;
 use rock\response\Response;
 use rock\Rock;
@@ -226,7 +225,7 @@ class BaseSignupForm extends Model
                 ->send();
         } catch (\Exception $e) {
             $this->addErrorAsPlaceholder(Rock::t('failSendEmail'), 'e_signup');
-            Rock::warning(BaseException::convertExceptionToString($e));
+            Log::warn(BaseException::convertExceptionToString($e));
         }
     }
 

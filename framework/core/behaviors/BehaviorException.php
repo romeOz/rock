@@ -3,7 +3,7 @@
 namespace rock\behaviors;
 
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class BehaviorException extends BaseException
 {

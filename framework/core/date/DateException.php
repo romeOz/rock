@@ -3,7 +3,7 @@
 namespace rock\date;
 
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class DateException extends BaseException
 {

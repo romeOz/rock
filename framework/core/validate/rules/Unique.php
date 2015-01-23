@@ -2,9 +2,11 @@
 
 namespace rock\validate\rules;
 
+use rock\base\BaseException;
 use rock\base\Model;
 use rock\db\ActiveRecordInterface;
-use rock\Rock;
+use rock\log\Log;
+use rock\validate\ValidateException;
 
 /**
  * UniqueValidator validates that the attribute value is unique in the specified database table.
@@ -79,7 +81,10 @@ class Unique extends Rule
         }
         foreach ($params as $value) {
             if (is_array($value)) {
-                Rock::error("{$targetClass}::{$targetAttribute} is invalid: type array()");
+                if (class_exists('\rock\log\Log')) {
+                    $message = BaseException::convertExceptionToString(new ValidateException("{$targetClass}::{$targetAttribute} is invalid: type array()"));
+                    Log::err($message);
+                }
                 return false;
             }
         }

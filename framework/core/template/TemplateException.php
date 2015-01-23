@@ -3,7 +3,7 @@
 namespace rock\template;
 
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class TemplateException extends BaseException
 {

@@ -3,7 +3,7 @@
 namespace rock\imagine;
 
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class ImagineException extends BaseException
 {

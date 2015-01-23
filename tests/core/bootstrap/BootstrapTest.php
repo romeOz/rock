@@ -146,7 +146,7 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \rock\exception\BaseException
+     * @expectedException \rock\base\BaseException
      */
     public function testGetterThrowException()
     {
@@ -155,7 +155,7 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \rock\exception\BaseException
+     * @expectedException \rock\base\BaseException
      */
     public function testBarGetterThrowException()
     {
@@ -174,7 +174,7 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \rock\exception\BaseException
+     * @expectedException \rock\base\BaseException
      */
     public function testSetterThrowException()
     {
@@ -183,7 +183,7 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \rock\exception\BaseException
+     * @expectedException \rock\base\BaseException
      */
     public function testBarSetterThrowException()
     {

@@ -1,7 +1,7 @@
 <?php
 namespace rock\csrf;
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class CSRFException extends BaseException
 {

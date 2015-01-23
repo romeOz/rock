@@ -1,7 +1,7 @@
 <?php
 namespace rock\captcha;
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class CaptchaException extends BaseException
 {

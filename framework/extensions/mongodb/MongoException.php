@@ -1,7 +1,7 @@
 <?php
 namespace rock\mongodb;
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class MongoException extends BaseException
 {

@@ -44,7 +44,7 @@ unset($config['components']);
 Rock::$config = $config;
 \rock\di\Container::addMulti(Rock::$components);
 
-\rock\exception\BaseException::$logged = false;
+\rock\exception\ErrorHandler::$logged = false;
 
 Rock::$app->session->open();
 

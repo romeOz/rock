@@ -3,7 +3,7 @@
 namespace rock\authclient;
 
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class AuthclientException extends BaseException
 {

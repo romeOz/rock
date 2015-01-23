@@ -1,5 +1,4 @@
 <?php
-
 use apps\common\rbac\UserRole;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Cache\Adapter;
@@ -206,7 +205,7 @@ return array_merge(
                         } else {
                             $object = \rock\di\Container::load(Rock::getAlias($class));
                             if (!method_exists($object, $method)) {
-                                throw new \rock\exception\BaseException(\rock\exception\BaseException::UNKNOWN_METHOD, ['method' => "{$class}::{$method}"]);
+                                throw new \rock\base\BaseException(\rock\base\BaseException::UNKNOWN_METHOD, ['method' => "{$class}::{$method}"]);
                             }
                             $function = [$object, $method];
                         }

@@ -2,10 +2,10 @@
 
 namespace rock\request;
 
+use rock\base\BaseException;
 use rock\base\CollectionInterface;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
-use rock\exception\BaseException;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 

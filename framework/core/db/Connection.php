@@ -2,10 +2,12 @@
 namespace rock\db;
 
 use PDO;
+use rock\base\BaseException;
 use rock\base\ComponentsTrait;
 use rock\base\ObjectInterface;
 use rock\cache\CacheInterface;
 use rock\di\Container;
+use rock\log\Log;
 use rock\Rock;
 
 /**
@@ -833,7 +835,9 @@ class Connection implements ObjectInterface
                 $connection->open();
                 return $connection;
             } catch (\Exception $e) {
-                Rock::warning("Connection ({$config['dsn']}) failed: " . $e->getMessage(), __METHOD__);
+                if (class_exists('\rock\log\Log')) {
+                    Log::warn(BaseException::convertExceptionToString($e));
+                }
                 if ($cache instanceof CacheInterface) {
                     // mark this server as dead and only retry it after the specified interval
                     $cache->set($key, 1, $this->serverRetryInterval);

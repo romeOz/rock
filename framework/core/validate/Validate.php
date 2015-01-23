@@ -4,6 +4,7 @@ namespace rock\validate;
 
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
+use rock\di\Container;
 use rock\helpers\StringHelper;
 use rock\i18n\i18nInterface;
 use rock\Rock;
@@ -391,7 +392,7 @@ class Validate implements i18nInterface, ObjectInterface
     public static function __callStatic($name, $arguments)
     {
         /** @var static $self */
-        $self = Rock::factory(static::className());
+        $self = Container::load(static::className());
         return call_user_func_array([$self, $name], $arguments);
     }
 

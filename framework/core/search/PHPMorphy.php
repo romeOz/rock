@@ -2,10 +2,10 @@
 namespace rock\search;
 
 
+use rock\base\BaseException;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\di\Container;
-use rock\exception\BaseException;
 use rock\Rock;
 use rock\template\Template;
 

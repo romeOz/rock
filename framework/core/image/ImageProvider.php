@@ -2,11 +2,13 @@
 
 namespace rock\image;
 
+use rock\base\BaseException;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\di\Container;
 use rock\file\FileManager;
 use rock\imagine\Image;
+use rock\log\Log;
 use rock\Rock;
 
 class ImageProvider implements ObjectInterface
@@ -98,7 +100,10 @@ class ImageProvider implements ObjectInterface
         }
 
         if (!$this->adapterCache->write($path, Image::thumbnail($this->resource, $this->width, $this->height)->get('jpg'))) {
-            Rock::warning(ImageException::NOT_CREATE_FILE, ['path' => $path]);
+            if (class_exists('\rock\log\Log')) {
+                $message = BaseException::convertExceptionToString(new ImageException(ImageException::NOT_CREATE_FILE, ['path' => $path]));
+                Log::warn($message);
+            }
         }
     }
 }

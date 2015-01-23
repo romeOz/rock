@@ -1,7 +1,7 @@
 <?php
 namespace rock\cache;
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class CacheException extends BaseException
 {

@@ -1,7 +1,9 @@
 <?php
 namespace rock\db;
 
+use rock\base\BaseException;
 use rock\base\ObjectTrait;
+use rock\log\Log;
 use rock\Rock;
 
 /**
@@ -78,7 +80,7 @@ class Transaction
     /**
      * Begins a transaction.
      *
-*@param string|null $isolationLevel The [isolation level][] to use for this transaction.
+     * @param string|null $isolationLevel The [isolation level][] to use for this transaction.
      * This can be one of {@see \rock\db\Transaction::READ_UNCOMMITTED}, {@see \rock\db\Transaction::READ_COMMITTED}, {@see \rock\db\Transaction::REPEATABLE_READ} and {@see \rock\db\Transaction::SERIALIZABLE} but
      * also a string containing DBMS specific syntax to be used after `SET TRANSACTION ISOLATION LEVEL`.
      * If not specified (`null`) the isolation level will not be set explicitly and the DBMS default will be used.
@@ -130,7 +132,10 @@ class Transaction
             );
             $schema->createSavepoint('LEVEL' . $this->_level);
         } else {
-            Rock::info('Transaction not started: nested transaction not supported');
+            if (class_exists('\rock\log\Log')) {
+                $message = BaseException::convertExceptionToString(new DbException('Transaction not started: nested transaction not supported'));
+                Log::info($message);
+            }
         }
         $this->_level++;
     }
@@ -138,7 +143,7 @@ class Transaction
     /**
      * Commits a transaction.
      *
-*@throws DbException if the transaction is not active
+     * @throws DbException if the transaction is not active
      */
     public function commit()
     {
@@ -171,14 +176,17 @@ class Transaction
             );
             $schema->releaseSavepoint('LEVEL' . $this->_level);
         } else {
-            Rock::info('Transaction not committed: nested transaction not supported');
+            if (class_exists('\rock\log\Log')) {
+                $message = BaseException::convertExceptionToString(new DbException('Transaction not committed: nested transaction not supported'));
+                Log::info($message);
+            }
         }
     }
 
     /**
      * Rolls back a transaction.
      *
-*@throws DbException if the transaction is not active
+     * @throws DbException if the transaction is not active
      */
     public function rollBack()
     {
@@ -225,7 +233,7 @@ class Transaction
      * However this is not supported by all DBMS so you might rather specify the isolation level directly
      * when calling {@see \rock\db\Transaction::begin()}.
      *
-*@param string $level The transaction isolation level to use for this transaction.
+     * @param string $level The transaction isolation level to use for this transaction.
      * This can be one of {@see \rock\db\Transaction::READ_UNCOMMITTED}, {@see \rock\db\Transaction::READ_COMMITTED}, {@see \rock\db\Transaction::REPEATABLE_READ} and {@see \rock\db\Transaction::SERIALIZABLE} but
      * also a string containing DBMS specific syntax to be used after `SET TRANSACTION ISOLATION LEVEL`.
      * @throws DbException if the transaction is not active

@@ -3,7 +3,7 @@
 namespace rock\sanitize;
 
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class SanitizeException extends BaseException
 {

@@ -2,8 +2,6 @@
 namespace rock\base;
 
 use rock\event\Event;
-use rock\exception\BaseException;
-use rock\filters\AccessFilter;
 use rock\Rock;
 
 trait ComponentsTrait

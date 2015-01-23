@@ -1,7 +1,7 @@
 <?php
 namespace rock\di;
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class ContainerException extends BaseException
 {

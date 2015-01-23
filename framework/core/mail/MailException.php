@@ -3,7 +3,7 @@
 namespace rock\mail;
 
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class MailException extends BaseException
 {

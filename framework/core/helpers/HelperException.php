@@ -5,6 +5,7 @@ namespace rock\helpers;
 
 use rock\base\BaseException;
 
-class ObjectHelperException extends BaseException
+class HelperException extends BaseException
 {
+
 }

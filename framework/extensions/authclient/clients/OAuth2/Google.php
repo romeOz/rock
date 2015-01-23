@@ -7,11 +7,12 @@ use OAuth\Common\Consumer\Credentials;
 use OAuth\ServiceFactory;
 use rock\authclient\ClientInterface;
 use rock\authclient\storages\Session;
+use rock\base\BaseException;
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
-use rock\exception\BaseException;
 use rock\helpers\Json;
 use rock\helpers\JsonException;
+use rock\log\Log;
 use rock\request\Request;
 use rock\Rock;
 use rock\url\Url;
@@ -88,7 +89,9 @@ class Google implements ComponentsInterface, ClientInterface
         try {
             return Json::decode($this->service->request($this->apiUrl));
         } catch (JsonException $e) {
-            Rock::error($e->getMessage(), [], BaseException::getTracesByException($e));
+            if (class_exists('\rock\log\Log')) {
+                Log::err(BaseException::convertExceptionToString($e));
+            }
         }
 
         return [];

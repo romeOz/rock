@@ -4,7 +4,8 @@ namespace rock\mq;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPConnection;
 use PhpAmqpLib\Message\AMQPMessage;
-use rock\Rock;
+use rock\base\BaseException;
+use rock\log\Log;
 
 class RabbitQueue extends Queue implements QueueInterface
 {
@@ -120,7 +121,10 @@ class RabbitQueue extends Queue implements QueueInterface
                 }
                 ++$count;
             }
-            Rock::error(__METHOD__ .': The receive timed out.');
+            if (class_exists('\rock\log\Log')) {
+                $message = BaseException::convertExceptionToString(new MQException('The receive timed out.'));
+                Log::err($message);
+            }
         }
 
         return $result;
@@ -245,7 +249,10 @@ class RabbitQueue extends Queue implements QueueInterface
                 }
                 ++$count;
             }
-            Rock::error(__METHOD__ .': The receive timed out.');
+            if (class_exists('\rock\log\Log')) {
+                $message = BaseException::convertExceptionToString(new MQException('The receive timed out.'));
+                Log::err($message);
+            }
         }
 
         return $result;

@@ -3,7 +3,7 @@
 namespace rock\route;
 
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class RouteException extends BaseException
 {

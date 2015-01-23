@@ -2,7 +2,8 @@
 
 namespace rock\cache;
 
-use rock\Rock;
+use rock\base\BaseException;
+use rock\log\Log;
 
 class Memcache extends Memcached
 {
@@ -133,7 +134,10 @@ class Memcache extends Memcached
         while (!$this->storage->add(self::LOCK_PREFIX . $key, $value, MEMCACHE_COMPRESSED, 5)) {
             $iteration++;
             if ($iteration > $max) {
-                Rock::error(CacheException::INVALID_SAVE, ['key' => $key]);
+                if (class_exists('\rock\log\Log')) {
+                    $message = BaseException::convertExceptionToString(new CacheException(CacheException::INVALID_SAVE, ['key' => $key]));
+                    Log::err($message);
+                }
                 return false;
             }
             usleep(1000);

@@ -2,16 +2,17 @@
 
 namespace rock\widgets;
 
+use rock\base\BaseException;
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
 use rock\base\Model;
 use rock\base\Widget;
 use rock\cache\CacheInterface;
 use rock\di\Container;
-use rock\exception\BaseException;
 use rock\filters\RateLimiter;
 use rock\helpers\Html;
 use rock\helpers\Json;
+use rock\log\Log;
 use rock\Rock;
 
 class ActiveField implements ComponentsInterface
@@ -172,9 +173,10 @@ class ActiveField implements ComponentsInterface
         try {
             return $this->render();
         } catch (\Exception $e) {
-            Rock::error($e->getMessage(), [], BaseException::getTracesByException($e));
+            if (class_exists('\rock\log\Log')) {
 
-            //BaseException::convertExceptionToError($e);
+                Log::err(BaseException::convertExceptionToString($e));
+            }
             return '';
         }
     }

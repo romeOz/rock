@@ -3,7 +3,7 @@
 namespace rock\access;
 
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class AccessException extends BaseException
 {

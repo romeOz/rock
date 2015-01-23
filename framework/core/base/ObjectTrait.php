@@ -3,7 +3,6 @@
 namespace rock\base;
 
 
-use rock\exception\BaseException;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\ObjectHelper;
@@ -93,7 +92,6 @@ trait ObjectTrait
             ]);
         }
     }
-
 
     /**
      * Sets value of an object property.
@@ -204,7 +202,6 @@ trait ObjectTrait
     {
         return $this->canGetProperty($name, $checkVars) || $this->canSetProperty($name, false);
     }
-
 
     /**
      * Returns a value indicating whether a property can be read.

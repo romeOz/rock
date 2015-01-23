@@ -2,8 +2,10 @@
 
 namespace rock\validate\rules;
 
+use rock\base\BaseException;
 use rock\file\UploadedFile;
-use rock\Rock;
+use rock\log\Log;
+use rock\validate\ValidateException;
 
 /**
  * Uploaded rule.
@@ -32,16 +34,28 @@ class Uploaded extends Rule
                                    //$this->addRule(new FileSizeMax(UploadedFile::getSizeLimit()));
                                    return false;*/
                 case UPLOAD_ERR_PARTIAL:
-                    Rock::warning('File was only partially uploaded: '. $input->name);
+                    if (class_exists('\rock\log\Log')) {
+                        $message = BaseException::convertExceptionToString(new ValidateException('File was only partially uploaded: '. $input->name));
+                        Log::warn($message);
+                    }
                     return false;
                 case UPLOAD_ERR_NO_TMP_DIR:
-                    Rock::warning('Missing the temporary folder to store the uploaded file: '. $input->name);
+                    if (class_exists('\rock\log\Log')) {
+                        $message = BaseException::convertExceptionToString(new ValidateException('Missing the temporary folder to store the uploaded file: '. $input->name));
+                        Log::warn($message);
+                    }
                     return false;
                 case UPLOAD_ERR_CANT_WRITE:
-                    Rock::warning('Failed to write the uploaded file to disk: '. $input->name);
+                    if (class_exists('\rock\log\Log')) {
+                        $message = BaseException::convertExceptionToString(new ValidateException('Failed to write the uploaded file to disk: '. $input->name));
+                        Log::warn($message);
+                    }
                     return false;
                 case UPLOAD_ERR_EXTENSION:
-                    Rock::warning('File upload was stopped by some PHP extension: '. $input->name);
+                    if (class_exists('\rock\log\Log')) {
+                        $message = BaseException::convertExceptionToString(new ValidateException('File upload was stopped by some PHP extension: '. $input->name));
+                        Log::warn($message);
+                    }
                     return false;
                 default:
                     break;

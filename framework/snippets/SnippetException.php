@@ -3,7 +3,7 @@
 namespace rock\snippets;
 
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class SnippetException extends BaseException
 {

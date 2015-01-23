@@ -2,8 +2,10 @@
 
 namespace rock\db;
 
-use rock\exception\BaseException;
-use rock\Rock;
+use rock\base\BaseException;
+use rock\di\Container;
+use rock\log\Log;
+
 use rock\session\SessionException;
 
 /**
@@ -65,7 +67,7 @@ class Session extends \rock\session\Session
     public function init()
     {
         if (!$this->connection instanceof Connection) {
-            $this->connection = Rock::factory($this->connection);
+            $this->connection = Container::load($this->connection);
         }
     }
 
@@ -181,7 +183,7 @@ class Session extends \rock\session\Session
                     ->execute();
             }
         } catch (\Exception $e) {
-            Rock::info($e->getMessage(), [], BaseException::getTracesByException($e));
+            Log::warn(BaseException::convertExceptionToString($e));
             return false;
         }
 

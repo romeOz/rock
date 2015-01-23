@@ -3,7 +3,7 @@
 namespace rock\response;
 
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class ResponseException extends BaseException
 {

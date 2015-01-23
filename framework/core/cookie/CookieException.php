@@ -2,7 +2,7 @@
 
 namespace rock\cookie;
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class CookieException extends BaseException
 {

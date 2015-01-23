@@ -1,7 +1,7 @@
 <?php
 namespace rock\mq;
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class MQException extends BaseException
 {

@@ -3,7 +3,7 @@
 namespace rock\validate;
 
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class ValidateException extends BaseException
 {

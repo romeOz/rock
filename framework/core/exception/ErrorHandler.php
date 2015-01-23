@@ -2,10 +2,21 @@
 
 namespace rock\exception;
 
+use rock\base\BaseException;
+use rock\di\Container;
+use rock\log\Log;
 use rock\log\LoggerInterface;
+use rock\response\Response;
+use rock\Rock;
+use Whoops\Handler\JsonResponseHandler;
+use Whoops\Handler\PrettyPageHandler;
+use Whoops\Handler\XmlResponseHandler;
 
 class ErrorHandler implements LoggerInterface
 {
+    public static $logged = true;
+    public static $pathFatal = '@common.views/layouts/fatal.html';
+
     /**
      * Error handler
      *
@@ -56,9 +67,7 @@ class ErrorHandler implements LoggerInterface
              $error['type'] == E_COMPILE_ERROR ||
              $error['type'] == E_CORE_ERROR)
         ) {
-            /**
-             * Clean buffer, complete work buffer
-             */
+            // Clean buffer, complete work buffer
             ob_end_clean();
             //header($_SERVER['SERVER_PROTOCOL'].' 500 Internal Server Error');
             $type = "";
@@ -79,9 +88,7 @@ class ErrorHandler implements LoggerInterface
             static::log(self::CRITICAL, $type . $error['message'], $error['file'], $error['line']);
         } else {
             if (ob_get_length() !== false) {
-                /**
-                 * Display buffer, complete work buffer
-                 */
+                // Display buffer, complete work buffer
                 ob_end_flush();
             }
         }
@@ -92,37 +99,90 @@ class ErrorHandler implements LoggerInterface
      */
     public static function run()
     {
-        /**
-         * Start buffer
-         */
+        // Start buffer
         ob_start();
         $self = new static;
-        /**
-         * Catch errors
-         */
+        // Catch errors
         set_error_handler([$self, 'handleError']);
-        /**
-         * Without try ... catch
-         */
+        // Without try ... catch
         set_exception_handler(
             function () {
             }
         );
-        /**
-         * Catch fatal errors
-         */
+        // Catch fatal errors
         register_shutdown_function([$self, 'handleShutdown']);
+    }
+
+    public static function display(\Exception $exception, $level = Log::CRITICAL)
+    {
+        // append log
+        if (static::$logged) {
+            Log::log($level, BaseException::convertExceptionToString($exception));
+        }
+
+        // display Whoops
+        if (DEBUG === true) {
+            static::debuger()->handleException($exception);
+            return;
+        }
+
+        // else display fatal
+        static::displayFatal();
+    }
+
+    /**
+     * Display fatal error
+     */
+    public static function displayFatal()
+    {
+        /** @var Response $response */
+        $response = Container::load('response');
+        if ($response->getStatusCode() === 200) {
+            $response->status500();
+        }
+        $response->send();
+        if ($response->format !== Response::FORMAT_HTML) {
+            echo 0;
+            return;
+        }
+        if (!isset(static::$pathFatal) ||
+            !file_exists(Rock::getAlias(static::$pathFatal))) {
+            die('This site is temporarily unavailable. Please, visit the page later.');
+        }
+
+        die(file_get_contents(Rock::getAlias(static::$pathFatal)));
+    }
+
+    /**
+     * Run mode debug.
+     *
+     * @return \rock\exception\Run
+     */
+    protected static function debuger()
+    {
+        $run = new Run();
+        /** @var Response $response */
+        $response = Container::load('response');
+        switch ($response->format) {
+            case Response::FORMAT_JSON:
+                $handler = new JsonResponseHandler();
+                break;
+            case Response::FORMAT_XML:
+                $handler = new XmlResponseHandler();
+                break;
+            default:
+                $handler = new PrettyPageHandler();
+        }
+        if ($response->getStatusCode() !== 200) {
+            $run->setSendHttpCode($response->getStatusCode());
+        }
+        $run->pushHandler($handler);
+        //$run->register();
+        return $run;
     }
 
     protected static function log($level, $msg, $file, $line)
     {
-        BaseException::log($level, $msg, ['file' => $file, 'line' => $line, 'stack' => $file . ' on line ' . $line]);
-        if (DEBUG === true) {
-
-            BaseException::debuger()->handleException(new \ErrorException($msg, $level, 0, $file, $line));
-        }
-        if ($level > self::ERROR) {
-            BaseException::displayFatal();
-        }
+        static::display(new \ErrorException($msg, $level, 0, $file, $line), $level);
     }
 }

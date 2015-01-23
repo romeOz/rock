@@ -2,7 +2,7 @@
 
 namespace rock\helpers;
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class ArrayException extends BaseException
 {

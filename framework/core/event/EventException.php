@@ -1,7 +1,7 @@
 <?php
 namespace rock\event;
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class EventException extends BaseException
 {

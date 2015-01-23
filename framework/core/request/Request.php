@@ -1,10 +1,12 @@
 <?php
 namespace rock\request;
 
+use rock\base\BaseException;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\helpers\Helper;
 use rock\helpers\Json;
+use rock\log\Log;
 use rock\Rock;
 use rock\sanitize\Sanitize;
 
@@ -498,7 +500,10 @@ class Request implements RequestInterface, ObjectInterface
             if ($throw === true) {
                 throw new RequestException("Invalid domain: {$_SERVER['HTTP_HOST']}");
             } else {
-                Rock::error("Invalid domain: {$_SERVER['HTTP_HOST']}");
+                if (class_exists('\rock\log\Log')) {
+                    $message = BaseException::convertExceptionToString(new RequestException("Invalid domain: {$_SERVER['HTTP_HOST']}"));
+                    Log::err($message);
+                }
             }
 
             return false;

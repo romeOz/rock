@@ -1,11 +1,11 @@
 <?php
 namespace rock\response;
 
+use rock\base\BaseException;
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
 use rock\csrf\CSRF;
 use rock\di\Container;
-use rock\exception\BaseException;
 use rock\helpers\FileHelper;
 use rock\helpers\StringHelper;
 use rock\request\Request;
@@ -481,7 +481,7 @@ class Response implements ComponentsInterface
      *     meaning a download dialog will pop up.
      *
      * @return static the response object itself
-     * @throws BaseException if the requested range is not satisfiable
+     * @throws \rock\base\BaseException if the requested range is not satisfiable
      */
     public function sendContentAsFile($content, $attachmentName, $options = [])
     {

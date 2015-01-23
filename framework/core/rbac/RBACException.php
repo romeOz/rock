@@ -3,7 +3,7 @@
 namespace rock\rbac;
 
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class RBACException extends BaseException
 {

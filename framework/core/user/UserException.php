@@ -3,7 +3,7 @@
 namespace rock\user;
 
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class UserException extends BaseException
 {

@@ -3,7 +3,7 @@
 namespace rock\i18n;
 
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class i18nException extends BaseException
 {

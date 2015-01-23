@@ -3,7 +3,7 @@
 namespace rock\request;
 
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class RequestException extends BaseException
 {

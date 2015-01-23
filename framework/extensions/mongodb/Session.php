@@ -1,9 +1,9 @@
 <?php
 namespace rock\mongodb;
 
+use rock\base\BaseException;
 use rock\di\Container;
-use rock\exception\BaseException;
-use rock\Rock;
+use rock\log\Log;
 
 /**
  * Session extends {@see \rock\session\Session} by using MongoDB as session data storage.
@@ -146,7 +146,7 @@ class Session extends \rock\session\Session
                 ['upsert' => true]
             );
         } catch (\Exception $e) {
-            Rock::info($e->getMessage(), [], BaseException::getTracesByException($e));
+            Log::warn(BaseException::convertExceptionToString($e));
 
             return false;
         }

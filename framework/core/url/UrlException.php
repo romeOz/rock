@@ -1,7 +1,7 @@
 <?php
 namespace rock\url;
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class UrlException extends BaseException
 {

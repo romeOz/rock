@@ -1,7 +1,7 @@
 <?php
 namespace rock\file;
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class FileException extends BaseException
 {

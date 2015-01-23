@@ -1,7 +1,7 @@
 <?php
 namespace rock\db;
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class DbException extends BaseException
 {

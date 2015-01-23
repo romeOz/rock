@@ -1,6 +1,8 @@
 <?php
 namespace rock\mq;
 
+use rock\base\BaseException;
+use rock\log\Log;
 use rock\Rock;
 
 class GearmanQueue extends Queue implements QueueInterface
@@ -90,7 +92,10 @@ class GearmanQueue extends Queue implements QueueInterface
             }
         }
 
-        Rock::error('The receive timed out.');
+        if (class_exists('\rock\log\Log')) {
+            $message = BaseException::convertExceptionToString(new MQException('The receive timed out.'));
+            Log::err($message);
+        }
         return null;
     }
 

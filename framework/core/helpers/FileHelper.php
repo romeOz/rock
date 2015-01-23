@@ -2,7 +2,9 @@
 namespace rock\helpers;
 
 use League\Flysystem\Util;
+use rock\base\BaseException;
 use rock\file\FileException;
+use rock\log\Log;
 use rock\Rock;
 
 /**
@@ -36,7 +38,10 @@ class FileHelper extends Util
             }
         }
         if (!file_put_contents($pathFile, $value, $const)) {
-            Rock::warning(FileException::NOT_CREATE_FILE, ['name' => $pathFile]);
+            if (class_exists('\rock\log\Log')) {
+                $message = BaseException::convertExceptionToString(new FileException(FileException::NOT_CREATE_FILE, ['name' => $pathFile]));
+                Log::warn($message);
+            }
 
             return false;
         }
@@ -67,8 +72,10 @@ class FileHelper extends Util
             static::createDirectory($parentDir, $mode, true);
         }
         if (!$result = mkdir($path, $mode)) {
-            Rock::warning(FileException::NOT_CREATE_DIR, ['name' => $path]);
-
+            if (class_exists('\rock\log\Log')) {
+                $message = BaseException::convertExceptionToString(new FileException(FileException::NOT_CREATE_DIR, ['name' => $path]));
+                Log::warn($message);
+            }
             return false;
         }
         chmod($path, $mode);
@@ -102,7 +109,10 @@ class FileHelper extends Util
     public static function rename($oldPath, $newPath)
     {
         if (!rename($oldPath, $newPath)) {
-            Rock::error("Error when renaming file: {$oldPath}");
+            if (class_exists('\rock\log\Log')) {
+                $message = BaseException::convertExceptionToString(new FileHelperException("Error when renaming file: {$oldPath}"));
+                Log::err($message);
+            }
 
             return false;
         }

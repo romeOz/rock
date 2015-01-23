@@ -1,12 +1,13 @@
 <?php
 namespace rock\captcha;
 
+use rock\base\BaseException;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\di\Container;
 use rock\helpers\Helper;
+use rock\log\Log;
 use rock\response\Response;
-use rock\Rock;
 use rock\session\Session;
 
 /**
@@ -440,7 +441,10 @@ class Captcha implements ObjectInterface, CaptchaInterface
         }
         $return['image'] = ob_get_clean();
         if (empty($return['image'])) {
-            Rock::warning(CaptchaException::UNKNOWN_VAR, ['name' => '$return[\'image\']']);
+            if (class_exists('\rock\log\Log')) {
+                $message = BaseException::convertExceptionToString(new CaptchaException(CaptchaException::UNKNOWN_VAR, ['name' => '$return[\'image\']']));
+                Log::warn($message);
+            }
             return [];
         }
         if ($session) {

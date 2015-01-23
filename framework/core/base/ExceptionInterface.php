@@ -1,6 +1,6 @@
 <?php
 
-namespace rock\exception;
+namespace rock\base;
 
 
 interface ExceptionInterface

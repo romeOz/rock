@@ -3,7 +3,7 @@
 namespace rock\markdown;
 
 
-use rock\exception\BaseException;
+use rock\base\BaseException;
 
 class MarkdownException extends BaseException
 {
