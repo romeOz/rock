@@ -371,9 +371,8 @@ class Validate implements i18nInterface, ObjectInterface
 
     public function __call($name, $arguments)
     {
-        if ($name === 'notOf' || $name === 'oneOf' || $name === 'attributes' || $name === 'attributesOne' || $name === 'when' || $name === 'locale') {
-            call_user_func_array([$this, "{$name}Internal"], $arguments);
-            return $this;
+        if (method_exists($this, "{$name}Internal")) {
+            return call_user_func_array([$this, "{$name}Internal"], $arguments);
         }
 
         if (!isset($this->rules[$name])) {
