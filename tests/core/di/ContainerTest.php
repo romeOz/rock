@@ -2,10 +2,145 @@
 
 namespace rockunit\core\di;
 
-
 use rock\base\ObjectTrait;
 use rock\di\Container;
-use rock\Rock;
+
+/**
+ * @group base
+ */
+class ContainerTest extends \PHPUnit_Framework_TestCase
+{
+    protected function setUp()
+    {
+        $container = new Container;
+        unset($container['bar'], $container['foo'], $container['baz']);
+    }
+
+    public function testGetData()
+    {
+        $container = new Container;
+        $container['bar'] = ['class' => Bar::className(), 'singleton' => true];
+        $this->assertSame($container->get('bar')['class'], Bar::className());
+    }
+
+    public function testRemove()
+    {
+        $container = new Container;
+        $container['bar'] = ['class' => Bar::className(), 'singleton' => true];
+        $this->assertTrue(Container::has('bar'));
+        $container->remove('bar');
+        $this->assertNull($container->get('bar'));
+
+        $container->bar = ['class' => Bar::className()];
+        $this->assertTrue(Container::has('bar'));
+        unset($container->bar);
+        $this->assertFalse(Container::has('bar'));
+    }
+
+    public function testLoad()
+    {
+        $container = new Container;
+        $container['bar'] = ['class' => Bar::className(), 'singleton' => true];
+        $this->assertTrue($container::load(['class' => Bar::className()]) instanceof Bar);
+
+        $container->bar = ['class' => Bar::className(), 'singleton' => true];
+        $this->assertTrue(Container::load(['class' => Bar::className()]) instanceof Bar);
+
+        // Singleton
+        $container['bar'] = ['class' => Bar::className(), 'singleton' => true];
+        $this->assertSame($container::load('bar'), $container::load('bar'));
+
+        // new instance
+        $container['bar'] = ['class' => Bar::className()];
+        $this->assertTrue($container::load('bar') !== $container::load('bar'));
+
+        // as Closure
+        $container['bar'] =
+            function($data = null){
+                $this->assertSame($data[0], 'test');
+                return new Bar();
+            };
+        $this->assertTrue(Container::load('test','bar') instanceof Bar);
+        $this->assertTrue(Container::load('test',['class' => 'bar']) instanceof Bar);
+    }
+
+    public function testNewCustomArgsConstruct()
+    {
+        $foo = new Foo(new Bar, null, null, ['baz' => new Baz]);
+        $this->assertTrue($foo->bar instanceof Bar);
+        $this->assertTrue($foo->baz instanceof Baz);
+        $this->assertNull($foo->baz->bar);
+
+        $foo = Container::load(['class'=>Foo::className(), 'baz' => new Baz]);
+        $this->assertTrue($foo->bar instanceof Bar);
+        $this->assertTrue($foo->baz instanceof Baz);
+        $this->assertTrue($foo->baz2 instanceof Baz);
+        $this->assertNull($foo->param);
+
+        $foo = Container::load(new Bar, 'test', ['class'=>Foo::className(), 'baz' => new Baz]);
+        $this->assertTrue($foo->bar instanceof Bar);
+        $this->assertTrue($foo->baz instanceof Baz);
+        $this->assertTrue($foo->baz2 instanceof Baz);
+        $this->assertSame('test', $foo->param);
+
+        // inline class
+        $foo = Container::load(new Bar, ['test'], new Baz, Foo::className());
+        $this->assertTrue($foo->bar instanceof Bar);
+        $this->assertTrue($foo->baz2 instanceof Baz);
+        $this->assertSame(['test'], $foo->param);
+
+    }
+
+    public function testIoCCustomArgsConstruct()
+    {
+        Container::add('foo', ['class'=>Foo::className(), 'baz' => new Baz]);
+        $foo = Container::load(['class'=>Foo::className(), 'baz' => new Baz]);
+        $this->assertTrue($foo->bar instanceof Bar);
+        $this->assertTrue($foo->baz instanceof Baz);
+        $this->assertTrue($foo->baz2 instanceof Baz);
+        $this->assertNull($foo->param);
+
+        Container::add('foo', ['class'=>Foo::className(), 'singleton' =>true, 'baz' => new Baz]);
+        $foo = Container::load(new Bar, 'test', ['class'=>Foo::className(), 'baz' => new Baz]);
+        $this->assertTrue($foo->bar instanceof Bar);
+        $this->assertTrue($foo->baz instanceof Baz);
+        $this->assertTrue($foo->baz2 instanceof Baz);
+        $this->assertSame('test', $foo->param);
+
+        $foo = Container::load(new Bar, 'test', ['class'=>Foo::className(), 'baz' => Container::load(Baz::className())]);
+        $this->assertTrue($foo->bar instanceof Bar);
+        $this->assertTrue($foo->baz instanceof Baz);
+        $this->assertTrue($foo->baz2 instanceof Baz);
+        $this->assertSame('test', $foo->param);
+
+        // inline class
+        Container::add('foo', ['class'=>Foo::className(), 'singleton' =>true, 'baz' => new Baz]);
+        $foo = Container::load(new Bar, ['test'], new Baz, Foo::className());
+        $this->assertTrue($foo->bar instanceof Bar);
+        $this->assertTrue($foo->baz2 instanceof Baz);
+        $this->assertSame(['test'], $foo->param);
+    }
+
+    public function testExceptionIsThrown()
+    {
+        try {
+            Container::load(Test::className());
+        } catch (\Exception $e) {
+            $this->assertSame($e->getMessage(), 'Unknown class: rockunit\core\di\BarInterface.');
+        }
+
+        $test = Container::load(new Bar, Test::className());
+        $this->assertTrue($test->bar instanceof Bar);
+
+        Container::load(Test2::className());
+    }
+
+    public static function tearDownAfterClass()
+    {
+        Container::removeMulti(['foo', 'bar', 'baz']);
+    }
+}
+
 
 class Foo
 {
@@ -80,153 +215,3 @@ class Test2
         $this->setProperties($configs);
     }
 }
-
-/**
- * @group base
- */
-class ContainerTest extends \PHPUnit_Framework_TestCase
-{
-    protected function setUp()
-    {
-        unset(Rock::$app->di['bar'], Rock::$app->di['foo'], Rock::$app->di['baz']);
-    }
-
-    public function testGetData()
-    {
-        Rock::$app->di['bar'] = ['class' => Bar::className(), 'singleton' => true];
-        $this->assertSame(Rock::$app->di->get('bar')['class'], Bar::className());
-    }
-
-    public function testRemove()
-    {
-        Rock::$app->di['bar'] = ['class' => Bar::className(), 'singleton' => true];
-        $this->assertTrue(Container::has('bar'));
-        Rock::$app->di->remove('bar');
-        $this->assertNull(Rock::$app->di->get('bar'));
-
-        Rock::$app->di->bar = ['class' => Bar::className()];
-        $this->assertTrue(Container::has('bar'));
-        unset(Rock::$app->di->bar);
-        $this->assertFalse(Container::has('bar'));
-    }
-
-    public function testLoad()
-    {
-        Rock::$app->di['bar'] = ['class' => Bar::className(), 'singleton' => true];
-        $this->assertTrue(Rock::$app->di->load(['class' => Bar::className()]) instanceof Bar);
-
-        Rock::$app->di->bar = ['class' => Bar::className(), 'singleton' => true];
-        $this->assertTrue(Rock::factory(['class' => Bar::className()]) instanceof Bar);
-
-        /** Singleton */
-        Rock::$app->di['bar'] = ['class' => Bar::className(), 'singleton' => true];
-        $this->assertSame(Rock::$app->bar, Rock::$app->bar);
-
-        /** new instance */
-        Rock::$app->di['bar'] = ['class' => Bar::className()];
-        $this->assertTrue(Rock::$app->bar !== Rock::$app->bar);
-
-        /** as Closure */
-        Rock::$app->di['bar'] =
-            function($data = null){
-                $this->assertSame($data[0], 'test');
-                return new Bar();
-            };
-        $this->assertTrue(Rock::factory('test','bar') instanceof Bar);
-        $this->assertTrue(Rock::factory('test',['class' => 'bar']) instanceof Bar);
-    }
-
-
-
-    public function testNewCustomArgsConstruct()
-    {
-        $foo = new Foo(new Bar, null, null, ['baz' => new Baz]);
-        $this->assertTrue($foo->bar instanceof Bar);
-        $this->assertTrue($foo->baz instanceof Baz);
-        $this->assertNull($foo->baz->bar);
-
-        $foo = Rock::factory(['class'=>Foo::className(), 'baz' => new Baz]);
-        $this->assertTrue($foo->bar instanceof Bar);
-        $this->assertTrue($foo->baz instanceof Baz);
-        $this->assertTrue($foo->baz2 instanceof Baz);
-        $this->assertNull($foo->param);
-
-        $foo = Rock::factory(new Bar, 'test', ['class'=>Foo::className(), 'baz' => new Baz]);
-        $this->assertTrue($foo->bar instanceof Bar);
-        $this->assertTrue($foo->baz instanceof Baz);
-        $this->assertTrue($foo->baz2 instanceof Baz);
-        $this->assertSame($foo->param, 'test');
-
-        /** inline class */
-        $foo = Rock::factory(new Bar, ['test'], new Baz, Foo::className());
-        $this->assertTrue($foo->bar instanceof Bar);
-        $this->assertTrue($foo->baz2 instanceof Baz);
-        $this->assertSame($foo->param, ['test']);
-
-    }
-
-
-    public function testIoCCustomArgsConstruct()
-    {
-
-        Container::add('foo', ['class'=>Foo::className(), 'baz' => new Baz]);
-        $foo = Rock::factory(['class'=>Foo::className(), 'baz' => new Baz]);
-        $this->assertTrue($foo->bar instanceof Bar);
-        $this->assertTrue($foo->baz instanceof Baz);
-        $this->assertTrue($foo->baz2 instanceof Baz);
-        $this->assertNull($foo->param);
-
-        Container::add('foo', ['class'=>Foo::className(), 'singleton' =>true, 'baz' => new Baz]);
-        $foo = Rock::factory(new Bar, 'test', ['class'=>Foo::className(), 'baz' => new Baz]);
-        $this->assertTrue($foo->bar instanceof Bar);
-        $this->assertTrue($foo->baz instanceof Baz);
-        $this->assertTrue($foo->baz2 instanceof Baz);
-        $this->assertSame($foo->param, 'test');
-
-        $foo = Rock::factory(new Bar, 'test', ['class'=>Foo::className(), 'baz' => Rock::factory(Baz::className())]);
-        $this->assertTrue($foo->bar instanceof Bar);
-        $this->assertTrue($foo->baz instanceof Baz);
-        $this->assertTrue($foo->baz2 instanceof Baz);
-        $this->assertSame($foo->param, 'test');
-
-
-        /** inline class */
-        Container::add('foo', ['class'=>Foo::className(), 'singleton' =>true, 'baz' => new Baz]);
-        $foo = Rock::factory(new Bar, ['test'], new Baz, Foo::className());
-        $this->assertTrue($foo->bar instanceof Bar);
-        $this->assertTrue($foo->baz2 instanceof Baz);
-        $this->assertSame($foo->param, ['test']);
-    }
-
-
-
-    public function testExceptionIsThrown()
-    {
-        try {
-            Rock::factory(Test::className());
-        } catch (\Exception $e) {
-            $this->assertSame($e->getMessage(), 'Unknown class: rockunit\core\di\BarInterface.');
-        }
-
-        $test = Rock::factory(new Bar, Test::className());
-        $this->assertTrue($test->bar instanceof Bar);
-
-        Rock::factory(Test2::className());
-    }
-
-
-    public function testGetStaticProperty()
-    {
-        Rock::$app->di['bar'] = ['class' => Bar::className(), 'singleton' => true, 'staticFoo' => 'foo'];
-        $this->assertEquals(Rock::$app->bar->getStatic(), 'foo');
-        $this->assertEquals(Bar::$staticFoo, 'foo');
-        Bar::$staticFoo = 'baz';
-        $this->assertEquals(Rock::$app->bar->getStatic(), 'baz');
-    }
-
-    public static function tearDownAfterClass()
-    {
-        Container::removeMulti(['foo', 'bar', 'baz']);
-    }
-}
- 
