@@ -4,10 +4,10 @@ namespace rockunit\core\markdown;
 
 
 use League\Flysystem\Adapter\Local;
+use rock\base\Alias;
 use rock\file\FileManager;
 use rock\image\ImageProvider;
 use rock\markdown\Markdown;
-use rock\Rock;
 use rockunit\core\db\DatabaseTestCase;
 use rockunit\core\db\models\ActiveRecord;
 use rockunit\core\db\models\Users;
@@ -129,14 +129,14 @@ Test</p>',
                     'class' => FileManager::className(),
                     'adapter' =>
                         function () {
-                            return new Local(Rock::getAlias('@tests/core/markdown/src'));
+                            return new Local(Alias::getAlias('@tests/core/markdown/src'));
                         },
                 ],
                 'adapterCache' => [
                     'class' => FileManager::className(),
                     'adapter' =>
                         function () {
-                            return new Local(Rock::getAlias('@tests/core/markdown/src/cache'));
+                            return new Local(Alias::getAlias('@tests/core/markdown/src/cache'));
                         },
                 ]
             ]

@@ -2,11 +2,12 @@
 namespace rock\search;
 
 
+use rock\base\Alias;
 use rock\base\BaseException;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\di\Container;
-use rock\Rock;
+
 use rock\template\Template;
 
 class PHPMorphy implements ObjectInterface
@@ -25,7 +26,7 @@ class PHPMorphy implements ObjectInterface
     {
         if (!isset(static::$morphy)) {
             try {
-                $dictBundle    = new \phpMorphy_FilesBundle(Rock::getAlias('@extensions/phpmorphy/dicts'), 'rus');
+                $dictBundle    = new \phpMorphy_FilesBundle(Alias::getAlias('@extensions/phpmorphy/dicts'), 'rus');
                 static::$morphy = new \phpMorphy(
                     $dictBundle,
                     [
@@ -61,8 +62,8 @@ class PHPMorphy implements ObjectInterface
         $words = preg_split('/\s|[,.:;!?"\'()]/', $words, -1, PREG_SPLIT_NO_EMPTY);
         $bulkWords = [];
         foreach ($words as $res) {
-            if (mb_strlen($res, Rock::$app->charset) > 2) {
-                $bulkWords[] = mb_strtoupper($res, Rock::$app->charset);
+            if (mb_strlen($res, 'utf-8') > 2) {
+                $bulkWords[] = mb_strtoupper($res, 'utf-8');
             }
         }
         //$this->_Morphy->getEncoding();
@@ -72,13 +73,13 @@ class PHPMorphy implements ObjectInterface
             foreach ($baseForm as $key => $arr_res) {
                 if (is_array($arr_res)) {
                     foreach ($arr_res as $val_res) {
-                        if (mb_strlen($val_res, Rock::$app->charset) > 2) {
+                        if (mb_strlen($val_res, 'utf-8') > 2) {
                             $dataWords[$val_res] = 1;
                         }
                     }
                     /* те слова, что отсутсвуют в словаре */
                 } else {
-                    if (!empty($res) && mb_strlen($res, Rock::$app->charset) > 2) {
+                    if (!empty($res) && mb_strlen($res, 'utf-8') > 2) {
                         $dataWords[$key] = 1;
                     }
                 }
@@ -124,8 +125,8 @@ class PHPMorphy implements ObjectInterface
         $words = preg_split('/\s|[,.:;!?"\'()]/', $content, -1, PREG_SPLIT_NO_EMPTY);
         $bulk_words = [];
         foreach ($words as $res_words) {
-            if (mb_strlen($res_words, Rock::$app->charset) > 2) {
-                $bulk_words[] = mb_strtoupper($res_words, Rock::$app->charset);
+            if (mb_strlen($res_words, 'utf-8') > 2) {
+                $bulk_words[] = mb_strtoupper($res_words, 'utf-8');
             }
         }
 

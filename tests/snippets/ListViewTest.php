@@ -4,6 +4,7 @@ namespace rockunit\snippets;
 
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Cache\Adapter;
+use rock\base\Alias;
 use rock\cache\CacheFile;
 use rock\file\FileManager;
 use rock\helpers\Pagination;
@@ -215,10 +216,10 @@ class ListViewTest extends TemplateCommon
             [
                 'adapter' =>
                     function () {
-                        return new Local(Rock::getAlias('@runtime/cache'));
+                        return new Local(Alias::getAlias('@runtime/cache'));
                     },
                 'cache' => function () {
-                        $local = new Local(Rock::getAlias('@runtime'));
+                        $local = new Local(Alias::getAlias('@runtime'));
                         $cache = new Adapter($local, 'cache.tmp');
 
                         return $cache;

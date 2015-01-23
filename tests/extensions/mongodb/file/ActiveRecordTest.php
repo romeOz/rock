@@ -3,8 +3,8 @@
 namespace rockunit\extensions\mongodb\file;
 
 
+use rock\base\Alias;
 use rock\helpers\FileHelper;
-use rock\Rock;
 use rockunit\extensions\mongodb\MongoDbTestCase;
 use rock\mongodb\file\ActiveQuery;
 use rockunit\extensions\mongodb\models\file\ActiveRecord;
@@ -46,7 +46,7 @@ class ActiveRecordTest extends MongoDbTestCase
      */
     protected function getTestFilePath()
     {
-        return Rock::getAlias('@rockunit/runtime') . DIRECTORY_SEPARATOR . basename(get_class($this)) . '_' . getmypid();
+        return Alias::getAlias('@rockunit/runtime') . DIRECTORY_SEPARATOR . basename(get_class($this)) . '_' . getmypid();
     }
 
     /**

@@ -4,10 +4,10 @@ namespace rockunit\core\cache;
 
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Cache\Adapter;
+use rock\base\Alias;
 use rock\cache\CacheFile;
 use rock\cache\CacheInterface;
 use rock\file\FileManager;
-use rock\Rock;
 use rockunit\common\CommonTestTrait;
 
 /**
@@ -54,10 +54,10 @@ class CacheFileTest extends \PHPUnit_Framework_TestCase
                 [
                     'adapter' =>
                         function () {
-                            return new Local(Rock::getAlias('@tests/runtime/cache'));
+                            return new Local(Alias::getAlias('@tests/runtime/cache'));
                         },
                     'cache' => function () {
-                            $local = new Local(Rock::getAlias('@tests/runtime'));
+                            $local = new Local(Alias::getAlias('@tests/runtime'));
                             $cache = new Adapter($local, 'cache.tmp');
 
                             return $cache;

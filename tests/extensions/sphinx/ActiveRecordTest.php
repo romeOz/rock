@@ -4,6 +4,7 @@ namespace rockunit\extensions\sphinx;
 
 
 use League\Flysystem\Adapter\Local;
+use rock\base\Alias;
 use rock\cache\CacheFile;
 use rock\event\Event;
 use rock\file\FileManager;
@@ -292,7 +293,7 @@ class ActiveRecordTest extends SphinxTestCase
             'adapter' => function (){
                     return new FileManager([
                                                'adapter' => function(){
-                                                       return new Local(Rock::getAlias('@tests/runtime/cache'));
+                                                       return new Local(Alias::getAlias('@tests/runtime/cache'));
                                                    },
                                            ]);
                 }

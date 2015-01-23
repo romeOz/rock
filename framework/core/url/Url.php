@@ -2,13 +2,13 @@
 
 namespace rock\url;
 
+use rock\base\Alias;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\di\Container;
 use rock\helpers\Helper;
 use rock\helpers\StringHelper;
 use rock\request\Request;
-use rock\Rock;
 
 /**
  * Class Url.
@@ -351,6 +351,6 @@ class Url implements UrlInterface, ObjectInterface
         if (!isset($url)) {
             return $this->defaultUrl === self::DEFAULT_ABSOLUTE ? $this->_request->getAbsoluteUrl() : $this->_request->getReferrer();
         }
-        return Rock::getAlias($url);
+        return Alias::getAlias($url);
     }
 }

@@ -4,8 +4,8 @@ namespace rockunit\core\file;
 
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Cache\Adapter;
+use rock\base\Alias;
 use rock\file\FileManager;
-use rock\Rock;
 use rockunit\common\CommonTestTrait;
 
 
@@ -31,7 +31,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $this->fileManager = new FileManager([
              'adapter' =>
                  function () {
-                     return new Local(Rock::getAlias('@runtime/filesystem'));
+                     return new Local(Alias::getAlias('@runtime/filesystem'));
                  }
          ]);
         $this->fileManager->deleteAll();
@@ -346,10 +346,10 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             [
                 'adapter' =>
                     function () {
-                        return new Local(Rock::getAlias('@runtime/filesystem'));
+                        return new Local(Alias::getAlias('@runtime/filesystem'));
                     },
                 'cache' => function () {
-                        $local = new Local(Rock::getAlias('@runtime'));
+                        $local = new Local(Alias::getAlias('@runtime'));
                         $cache = new Adapter($local, 'filesystem.tmp');
 
                         return $cache;

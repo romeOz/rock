@@ -2,9 +2,8 @@
 
 namespace rockunit\extensions\imagine;
 
+use rock\base\Alias;
 use rock\imagine\Image;
-use rock\Rock;
-
 
 abstract class AbstractImageTest extends \PHPUnit_Framework_TestCase
 {
@@ -15,10 +14,10 @@ abstract class AbstractImageTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->imageFile = Rock::getAlias('@rockunit/data/imagine/large') . '.jpg';
-        $this->watermarkFile = Rock::getAlias('@rockunit/data/imagine/xparent') . '.gif';
-        $this->runtimeTextFile = Rock::getAlias('@rockunit/runtime/image-text-test') . '.png';
-        $this->runtimeWatermarkFile = Rock::getAlias('@rockunit/runtime/image-watermark-test') . '.png';
+        $this->imageFile = Alias::getAlias('@rockunit/data/imagine/large') . '.jpg';
+        $this->watermarkFile = Alias::getAlias('@rockunit/data/imagine/xparent') . '.gif';
+        $this->runtimeTextFile = Alias::getAlias('@rockunit/runtime/image-text-test') . '.png';
+        $this->runtimeWatermarkFile = Alias::getAlias('@rockunit/runtime/image-watermark-test') . '.png';
         parent::setUp();
     }
 
@@ -34,7 +33,7 @@ abstract class AbstractImageTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Skipping ImageGdTest Gd not installed');
         }
 
-        $fontFile = Rock::getAlias('@rockunit/data/imagine/GothamRnd-Light') . '.otf';
+        $fontFile = Alias::getAlias('@rockunit/data/imagine/GothamRnd-Light') . '.otf';
 
         $img = Image::text($this->imageFile, 'Yii-2 Image', $fontFile, [0, 0], [
             'size' => 12,

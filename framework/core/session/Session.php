@@ -1,9 +1,10 @@
 <?php
 namespace rock\session;
 
+use rock\base\Alias;
+use rock\di\Container;
 use rock\helpers\ArrayHelper;
 use rock\request\Request;
-use rock\Rock;
 
 /**
  * Session provides session data management and the related configurations.
@@ -124,7 +125,7 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
     {
         if ($this->handler !== null) {
             if (!is_object($this->handler)) {
-                $this->handler = Rock::factory($this->handler);
+                $this->handler = Container::load($this->handler);
             }
             if (!$this->handler instanceof \SessionHandlerInterface) {
                 throw new SessionException('"' . get_class($this) . '::handler" must implement the SessionHandlerInterface.');
@@ -267,7 +268,7 @@ class Session extends SessionFlash implements \ArrayAccess, SessionInterface
      */
     public function setSavePath($value)
     {
-        $path = Rock::getAlias($value);
+        $path = Alias::getAlias($value);
         if (is_dir($path)) {
             session_save_path($path);
         } else {

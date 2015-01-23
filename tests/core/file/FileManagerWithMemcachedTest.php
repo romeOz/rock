@@ -3,7 +3,7 @@
 namespace rockunit\core\file;
 
 use League\Flysystem\Adapter\Local;
-use rock\Rock;
+use rock\base\Alias;
 use rock\file\FileManager;
 use League\Flysystem\Cache\Memcached;
 
@@ -19,7 +19,7 @@ class FileManagerWithMemcachedTest extends FileManagerTest
             [
                 'adapter' =>
                     function () {
-                        return new Local(Rock::getAlias('@runtime/filesystem'));
+                        return new Local(Alias::getAlias('@runtime/filesystem'));
                     },
                 'cache' => function () {
                         $memcached = new \Memcached();

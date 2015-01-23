@@ -1,10 +1,10 @@
 <?php
 namespace rockunit\core\db\sqlite;
 
+use rock\base\Alias;
 use rock\db\Connection;
 use rock\db\Transaction;
 use rock\di\Container;
-use rock\Rock;
 use rockunit\core\db\ConnectionTest;
 use rockunit\core\db\models\ActiveRecord;
 use rockunit\core\db\models\Customer;
@@ -120,7 +120,7 @@ class SqliteConnectionTest extends ConnectionTest
     {
         $databases = self::getParam('databases');
         $fixture = $databases[$this->driverName]['fixture'];
-        $basePath = Rock::getAlias('@rockunit/runtime');
+        $basePath = Alias::getAlias('@rockunit/runtime');
 
         $config = [
             'class' => Connection::className(),

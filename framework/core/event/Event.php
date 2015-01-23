@@ -1,12 +1,12 @@
 <?php
 namespace rock\event;
 
+use rock\base\Alias;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\ObjectHelper;
-use rock\Rock;
 
 class Event implements ObjectInterface
 {
@@ -283,7 +283,7 @@ class Event implements ObjectInterface
     private static function _calculateHandler($function)
     {
         if (is_array($function) && is_string($function[0])) {
-            $function[0] = Rock::getAlias($function[0]);
+            $function[0] = Alias::getAlias($function[0]);
         }
 
         return $function;

@@ -2,6 +2,7 @@
 
 namespace rock\image;
 
+use rock\base\Alias;
 use rock\base\BaseException;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
@@ -9,7 +10,6 @@ use rock\di\Container;
 use rock\file\FileManager;
 use rock\imagine\Image;
 use rock\log\Log;
-use rock\Rock;
 
 class ImageProvider implements ObjectInterface
 {
@@ -32,8 +32,8 @@ class ImageProvider implements ObjectInterface
     
     public function init()
     {
-        $this->srcImage = Rock::getAlias($this->srcImage);
-        $this->srcCache = Rock::getAlias($this->srcCache);
+        $this->srcImage = Alias::getAlias($this->srcImage);
+        $this->srcCache = Alias::getAlias($this->srcCache);
 
         if (!is_object($this->adapter)) {
             $this->adapter = Container::load($this->adapter);

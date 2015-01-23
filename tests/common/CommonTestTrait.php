@@ -4,6 +4,7 @@ namespace rockunit\common;
 
 
 use League\Flysystem\Adapter\Local;
+use rock\base\Alias;
 use rock\cache\CacheFile;
 use rock\cache\CacheStub;
 use rock\file\FileManager;
@@ -54,7 +55,7 @@ trait CommonTestTrait
 
     protected static function clearRuntime()
     {
-        $runtime = Rock::getAlias('@runtime');
+        $runtime = Alias::getAlias('@runtime');
 //        @rmdir("{$runtime}/cache");
 //        @rmdir("{$runtime}/filesystem");
         FileHelper::deleteDirectory("{$runtime}/cache");
@@ -85,7 +86,7 @@ trait CommonTestTrait
             'adapter' => function (){
                 return new FileManager([
                    'adapter' => function(){
-                       return new Local(Rock::getAlias('@tests/runtime/cache'));
+                       return new Local(Alias::getAlias('@tests/runtime/cache'));
                    },
                ]);
             }

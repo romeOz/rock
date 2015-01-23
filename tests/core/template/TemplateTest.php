@@ -5,6 +5,7 @@ namespace rockunit\core\template;
 
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Cache\Adapter;
+use rock\base\Alias;
 use rock\cache\CacheFile;
 use rock\file\FileManager;
 use rock\helpers\StringHelper;
@@ -16,21 +17,6 @@ use rock\url\Url;
 use rockunit\core\template\controllers\TestController;
 use rockunit\core\template\snippets\NullSnippet;
 use rockunit\core\template\snippets\TestSnippet;
-
-class Foo{
-    public $foo = 'foo';
-    private $bar = 'bar';
-
-    public function getFoo()
-    {
-        return $this->getBar();
-    }
-
-    private function getBar()
-    {
-        return $this->bar;
-    }
-}
 
 /**
  * @group base
@@ -640,10 +626,10 @@ class TemplateTest extends TemplateCommon
             [
                 'adapter' =>
                     function () {
-                        return new Local(Rock::getAlias('@runtime/cache'));
+                        return new Local(Alias::getAlias('@runtime/cache'));
                     },
                 'cache' => function () {
-                        $local = new Local(Rock::getAlias('@runtime'));
+                        $local = new Local(Alias::getAlias('@runtime'));
                         $cache = new Adapter($local, 'cache.tmp');
 
                         return $cache;
@@ -651,5 +637,20 @@ class TemplateTest extends TemplateCommon
             ]
         );
         return new CacheFile(['adapter' => $adapter]);
+    }
+}
+
+class Foo{
+    public $foo = 'foo';
+    private $bar = 'bar';
+
+    public function getFoo()
+    {
+        return $this->getBar();
+    }
+
+    private function getBar()
+    {
+        return $this->bar;
     }
 }

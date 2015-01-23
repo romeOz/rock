@@ -1,10 +1,12 @@
 <?php
 namespace rock\template;
 
+use rock\base\Alias;
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
 use rock\base\Snippet;
 use rock\cache\CacheInterface;
+use rock\di\Container;
 use rock\event\Event;
 use rock\helpers\ArrayHelper;
 use rock\helpers\FileHelper;
@@ -156,7 +158,7 @@ class Template implements ComponentsInterface
      * @var object
      */
     public $context;
-    /** @var \rock\cache\CacheInterface|null */
+    /** @var \rock\cache\CacheInterface|string|array */
     public $cache = 'cache';
     public $cachePlaceholders = [];
     /** @var  string|callable */
@@ -174,6 +176,10 @@ class Template implements ComponentsInterface
     {
         if (is_callable($this->locale)) {
             call_user_func($this->locale, $this);
+        }
+
+        if (!is_object($this->cache)) {
+            $this->cache = Container::load($this->cache);
         }
     }
 
@@ -243,7 +249,6 @@ class Template implements ComponentsInterface
      */
     protected function getCache($key = null)
     {
-        $this->cache = is_string($this->cache) ? Rock::factory($this->cache) : $this->cache;
         if ($this->cache instanceof CacheInterface && isset($key) &&
             ($returnCache = $this->cache->get($key)) !== false
         ) {
@@ -268,7 +273,6 @@ class Template implements ComponentsInterface
      */
     protected function setCache($key = null, $value = null, $expire = 0, array $tags = [])
     {
-        $this->cache = is_string($this->cache) ? Rock::factory($this->cache) : $this->cache;
         if ($this->cache instanceof CacheInterface && isset($key)) {
             if (!empty($this->cachePlaceholders)) {
                 $result = $value;
@@ -311,7 +315,7 @@ class Template implements ComponentsInterface
      */
     protected function renderInternal($path, array $placeholders = [])
     {
-        $path = Rock::getAlias($path, ['lang' => Rock::$app->language]);
+        $path = Alias::getAlias($path, ['lang' => $this->locale]);
         if (!pathinfo($path, PATHINFO_EXTENSION)) {
             $path .= '.' . $this->engines[$this->defaultEngine];
         }
@@ -526,7 +530,7 @@ class Template implements ComponentsInterface
      */
     public function hasChunk($path)
     {
-        $path = Rock::getAlias($path, ['lang' => $this->locale]);
+        $path = Alias::getAlias($path, ['lang' => $this->locale]);
         if (!pathinfo($path, PATHINFO_EXTENSION)) {
             $path .= '.' . $this->engines[$this->defaultEngine];
         }
@@ -1017,7 +1021,7 @@ class Template implements ComponentsInterface
      */
     public function registerCssFile($url, $options = [], $key = null)
     {
-        $url = Rock::getAlias($url);
+        $url = Alias::getAlias($url);
         $key = $key ?: $url;
         $position = isset($options['position']) ? $options['position'] : self::POS_HEAD;
         unset($options['position']);
@@ -1063,7 +1067,7 @@ class Template implements ComponentsInterface
      */
     public function registerJsFile($url, $options = [], $key = null)
     {
-        $url = Rock::getAlias($url);
+        $url = Alias::getAlias($url);
         $key = $key ?: $url;
         $position = isset($options['position']) ? $options['position'] : self::POS_END;
         unset($options['position']);
@@ -1202,7 +1206,7 @@ class Template implements ComponentsInterface
             $result = ArrayHelper::getValue(Rock::$config, explode('.', $matches['name']));
             // get alias
         } elseif ($matches['type'] === '$$') {
-            $result = Rock::getAlias("@{$matches['name']}");
+            $result = Alias::getAlias("@{$matches['name']}");
             // local placeholder
         } elseif ($matches['type'] === '+') {
             $result = $this->getPlaceholder(
@@ -1541,7 +1545,7 @@ class Template implements ComponentsInterface
                 $snippet->setProperties($params);
             }
         } else {
-            $class = ltrim(Rock::getAlias($snippet, ['lang' => $this->locale]), '\\');
+            $class = ltrim(Alias::getAlias($snippet, ['lang' => $this->locale]), '\\');
             $params['class'] = $class;
             /** @var \rock\base\Snippet $snippet */
             $snippet = Rock::factory($params);

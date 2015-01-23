@@ -2,11 +2,9 @@
 
 namespace rockunit\extensions\mongodb;
 
-
-
+use rock\base\Alias;
 use rock\mongodb\Connection;
 use rock\mongodb\MongoException;
-use rock\Rock;
 
 class MongoDbTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -137,7 +135,7 @@ class MongoDbTestCase extends \PHPUnit_Framework_TestCase
     public static function getParam($name, $default = null)
     {
         if (static::$params === null) {
-            static::$params = require(Rock::getAlias('@tests/data/config.php'));
+            static::$params = require(Alias::getAlias('@tests/data/config.php'));
         }
 
         return isset(static::$params[$name]) ? static::$params[$name] : $default;

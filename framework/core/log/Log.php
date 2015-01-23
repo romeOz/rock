@@ -6,12 +6,12 @@ namespace rock\log;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use rock\base\Alias;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\di\Container;
 use rock\helpers\FileHelper;
 use rock\helpers\StringHelper;
-use rock\Rock;
 
 /**
  * @method static Log log(int $level, string $message, array $placeholders = [])
@@ -42,7 +42,7 @@ class Log implements LoggerInterface, ObjectInterface
 
         static::$logger = new Logger('Rock');
 
-        $path = Rock::getAlias($this->path);
+        $path = Alias::getAlias($this->path);
         FileHelper::createDirectory($path);
         $formatter = new LineFormatter("[%datetime%]\t%level_name%\t%extra.hash%\t%message%\t%extra.user_id%\t%extra.user_ip%\t%extra.user_agent%\n");
         static::$logger->pushProcessor(function ($record) {

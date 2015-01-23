@@ -1,6 +1,7 @@
 <?php
 namespace rockunit\core;
 
+use rock\base\Alias;
 use rock\base\Controller;
 use rock\helpers\Json;
 use rock\helpers\StringHelper;
@@ -105,7 +106,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     {
         /** @var Response $response */
         $response = new Response();
-        $dataFile = Rock::getAlias('@rockunit/data/response/data.txt');
+        $dataFile = Alias::getAlias('@rockunit/data/response/data.txt');
         $fullContent = file_get_contents($dataFile);
         $_SERVER['HTTP_RANGE'] = 'bytes=' . $rangeHeader;
         ob_start();
@@ -142,7 +143,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         /** @var Response $response */
         $response = new Response();
 
-        $dataFile = Rock::getAlias('@rockunit/data/response/data.txt');
+        $dataFile = Alias::getAlias('@rockunit/data/response/data.txt');
         $_SERVER['HTTP_RANGE'] = 'bytes=' . $rangeHeader;
         $response->sendFile($dataFile);
     }

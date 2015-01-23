@@ -2,12 +2,12 @@
 
 namespace rock\exception;
 
+use rock\base\Alias;
 use rock\base\BaseException;
 use rock\di\Container;
 use rock\log\Log;
 use rock\log\LoggerInterface;
 use rock\response\Response;
-use rock\Rock;
 use Whoops\Handler\JsonResponseHandler;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Handler\XmlResponseHandler;
@@ -146,11 +146,11 @@ class ErrorHandler implements LoggerInterface
             return;
         }
         if (!isset(static::$pathFatal) ||
-            !file_exists(Rock::getAlias(static::$pathFatal))) {
+            !file_exists(Alias::getAlias(static::$pathFatal))) {
             die('This site is temporarily unavailable. Please, visit the page later.');
         }
 
-        die(file_get_contents(Rock::getAlias(static::$pathFatal)));
+        die(file_get_contents(Alias::getAlias(static::$pathFatal)));
     }
 
     /**

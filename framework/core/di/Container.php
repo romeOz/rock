@@ -1,11 +1,11 @@
 <?php
 namespace rock\di;
 
+use rock\base\Alias;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\helpers\ArrayHelper;
 use rock\helpers\ObjectHelper;
-use rock\Rock;
 
 class Container implements \ArrayAccess, ObjectInterface
 {
@@ -432,10 +432,10 @@ class Container implements \ArrayAccess, ObjectInterface
     protected static function prepareConfig($config)
     {
         if (is_string($config)) {
-            $class = Rock::getAlias($config);
+            $class = Alias::getAlias($config);
             $config = [];
         } elseif (isset($config['class'])) {
-            $class = Rock::getAlias($config['class']);
+            $class = Alias::getAlias($config['class']);
             unset($config['class'], $config['singleton']);
         } else {
             throw new ContainerException(ContainerException::ARGS_NOT_ARRAY);

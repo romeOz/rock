@@ -1,13 +1,13 @@
 <?php
 namespace rock\file;
 
+use rock\base\Alias;
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
 use rock\base\Model;
 use rock\di\Container;
 use rock\helpers\FileHelper;
 use rock\helpers\Html;
-use rock\Rock;
 
 /**
  * UploadedFile represents the information for an uploaded file.
@@ -222,7 +222,7 @@ class UploadedFile implements ComponentsInterface
         if ($this->error !== UPLOAD_ERR_OK) {
             return false;
         }
-        $file = Rock::getAlias($file);
+        $file = Alias::getAlias($file);
         if ($this->calculatePathname instanceof \Closure) {
             $file = call_user_func($this->calculatePathname, $this, $file, $this->adapter);
         }
@@ -297,7 +297,7 @@ class UploadedFile implements ComponentsInterface
             }
         } else {
             /** @var self $self */
-            $self = Rock::factory(static::className());
+            $self = Container::load(static::className());
             $self->setProperties([
                 'name' => $names,
                 'tempName' => $tempNames,

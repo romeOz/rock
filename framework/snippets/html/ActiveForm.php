@@ -3,6 +3,7 @@
 namespace rock\snippets\html;
 
 
+use rock\base\Alias;
 use rock\base\Model;
 use rock\base\Snippet;
 use rock\di\Container;
@@ -11,7 +12,6 @@ use rock\helpers\Helper;
 use rock\helpers\Html;
 use rock\helpers\Serialize;
 use rock\request\Request;
-use rock\Rock;
 use rock\user\User;
 
 class ActiveForm extends Snippet
@@ -67,7 +67,7 @@ class ActiveForm extends Snippet
         $this->unserialize();
         if (!is_object($this->model)) {
             if (is_string($this->model)) {
-                $this->model = ['class' => Rock::getAlias($this->model)];
+                $this->model = ['class' => Alias::getAlias($this->model)];
             }
             $this->model = Container::load($this->model);
         }

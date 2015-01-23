@@ -3,8 +3,8 @@
 namespace rock\execute;
 
 
+use rock\base\Alias;
 use rock\helpers\FileHelper;
-use rock\Rock;
 
 class CacheExecute extends Execute
 {
@@ -28,7 +28,7 @@ class CacheExecute extends Execute
      */
     protected function preparePath($value)
     {
-        return Rock::getAlias($this->path) . DIRECTORY_SEPARATOR . md5($value) . '.php';
+        return Alias::getAlias($this->path) . DIRECTORY_SEPARATOR . md5($value) . '.php';
     }
 
 

@@ -1,4 +1,5 @@
 <?php
+use rock\base\Alias;
 use rock\Rock;
 
 $composerAutoload = dirname(__DIR__) . '/vendor/autoload.php';
@@ -24,9 +25,9 @@ if (!$config = require(dirname(__DIR__) . '/apps/common/configs/configs.php')) {
 }
 
 
-Rock::setAlias('tests', __DIR__);
-Rock::setAlias('rockunit', __DIR__);
-Rock::setAlias('runtime', '@tests/runtime');
+Alias::setAlias('tests', __DIR__);
+Alias::setAlias('rockunit', __DIR__);
+Alias::setAlias('runtime', '@tests/runtime');
 
 Rock::$app = new Rock();
 Rock::$app->language = \rock\i18n\i18nInterface::EN;

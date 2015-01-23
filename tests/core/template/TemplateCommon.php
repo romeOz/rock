@@ -3,7 +3,8 @@
 namespace rockunit\core\template;
 
 
-use rock\Rock;
+use rock\base\Alias;
+use rock\di\Container;
 use rock\template\Template;
 use rockunit\common\CommonTestTrait;
 
@@ -24,9 +25,9 @@ abstract class TemplateCommon extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
         $this->calculatePath();
-        Rock::setAlias('rockunit.tpl', $this->path);
+        Alias::setAlias('rockunit.tpl', $this->path);
 
-        $this->template = Rock::$app->template;
+        $this->template = Container::load('template');
         $this->template->autoEscape = Template::ESCAPE | Template::TO_TYPE;
         $this->template->removeAllPlaceholders(true);
         $this->template->removeAllResource();

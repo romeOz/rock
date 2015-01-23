@@ -62,10 +62,10 @@ abstract class Controller implements ComponentsInterface
      */
     public function render($layout, array $placeholders = [],$defaultPathLayout = '@views'){
 
-        $layout = FileHelper::normalizePath(Rock::getAlias($layout));
+        $layout = FileHelper::normalizePath(Alias::getAlias($layout));
         if (!strstr($layout, DS)) {
             $class = explode('\\', get_class($this));
-            $layout = Rock::getAlias($defaultPathLayout). DS . 'layouts' . DS .
+            $layout = Alias::getAlias($defaultPathLayout). DS . 'layouts' . DS .
                       strtolower(str_replace('Controller', '', array_pop($class))) . DS .
                       $layout;
         }

@@ -3,6 +3,7 @@
 namespace rock\route;
 
 
+use rock\base\Alias;
 use rock\base\ComponentsTrait;
 use rock\base\ObjectInterface;
 use rock\di\Container;
@@ -77,7 +78,7 @@ class Route implements RequestInterface, ErrorsInterface, ObjectInterface
      */
     public static function setConfigScope($path, $clear = true)
     {
-        $path = Rock::getAlias($path);
+        $path = Alias::getAlias($path);
         if (!file_exists($path) || (!$config = require($path))) {
             throw new RouteException(RouteException::UNKNOWN_FILE, ['path' => $path]);
         }
@@ -557,7 +558,7 @@ class Route implements RequestInterface, ErrorsInterface, ObjectInterface
 
     protected function defaultScope()
     {
-        $this->data['scope'] = str_replace('\\', '', strstr(Rock::getAlias('@ns'), '\\'));
+        $this->data['scope'] = str_replace('\\', '', strstr(Alias::getAlias('@ns'), '\\'));
     }
 
     protected function calculateData()

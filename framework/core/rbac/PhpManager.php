@@ -2,8 +2,8 @@
 
 namespace rock\rbac;
 
+use rock\base\Alias;
 use rock\helpers\Helper;
-use rock\Rock;
 
 class PhpManager extends RBAC
 {
@@ -19,8 +19,8 @@ class PhpManager extends RBAC
 
     public function init()
     {
-        $this->path = Rock::getAlias($this->path);
-        $this->pathAssignments = Rock::getAlias($this->pathAssignments);
+        $this->path = Alias::getAlias($this->path);
+        $this->pathAssignments = Alias::getAlias($this->pathAssignments);
 
         if (empty(static::$items)) {
             static::$items = $this->load($this->path);

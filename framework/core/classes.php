@@ -2,6 +2,7 @@
 use apps\common\rbac\UserRole;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Cache\Adapter;
+use rock\base\Alias;
 use rock\db\BatchQueryResult;
 use rock\file\FileManager;
 use rock\helpers\ArrayHelper;
@@ -46,11 +47,11 @@ return array_merge(
 //                            'class' => FileManager::className(),
 //                            'adapter' =>
 //                                function () {
-//                                    return new Local(Rock::getAlias('@common/runtime/cache'));
+//                                    return new Local(Alias::getAlias('@common/runtime/cache'));
 //                                },
 //                            'config' => ['visibility' => FileManager::VISIBILITY_PRIVATE],
 //                            'cache' => function () {
-//                                    $local = new Local(Rock::getAlias('@common/runtime/filesystem'));
+//                                    $local = new Local(Alias::getAlias('@common/runtime/filesystem'));
 //                                    $cache = new Adapter($local, 'cache.tmp');
 //
 //                                    return $cache;
@@ -203,7 +204,7 @@ return array_merge(
                         } elseif (function_exists($class) && !$class instanceof \Closure){
                             return call_user_func_array($class, $params);
                         } else {
-                            $object = \rock\di\Container::load(Rock::getAlias($class));
+                            $object = \rock\di\Container::load(Alias::getAlias($class));
                             if (!method_exists($object, $method)) {
                                 throw new \rock\base\BaseException(\rock\base\BaseException::UNKNOWN_METHOD, ['method' => "{$class}::{$method}"]);
                             }
@@ -333,10 +334,10 @@ return array_merge(
                 'class' => FileManager::className(),
                 'adapter' =>
                     function () {
-                        return new Local(Rock::getAlias('@assets/images'));
+                        return new Local(Alias::getAlias('@assets/images'));
                     },
                 'cache' => function () {
-                    $local = new Local(Rock::getAlias('@common.runtime/filesystem'));
+                    $local = new Local(Alias::getAlias('@common.runtime/filesystem'));
                     $cache = new Adapter($local, 'images.tmp');
 
                     return $cache;
@@ -346,10 +347,10 @@ return array_merge(
                 'class' => FileManager::className(),
                 'adapter' =>
                     function () {
-                        return new Local(Rock::getAlias('@assets/cache'));
+                        return new Local(Alias::getAlias('@assets/cache'));
                     },
                 'cache' => function () {
-                    $local = new Local(Rock::getAlias('@common.runtime/filesystem'));
+                    $local = new Local(Alias::getAlias('@common.runtime/filesystem'));
                     $cache = new Adapter($local, 'image_cache.tmp');
 
                     return $cache;
@@ -428,10 +429,10 @@ return array_merge(
                 'class' => FileManager::className(),
                 'adapter' =>
                     function () {
-                        return new Local(Rock::getAlias('@assets/images'));
+                        return new Local(Alias::getAlias('@assets/images'));
                     },
                 'cache' => function () {
-                    $local = new Local(Rock::getAlias('@common.runtime/filesystem'));
+                    $local = new Local(Alias::getAlias('@common.runtime/filesystem'));
                     $cache = new Adapter($local, 'images.tmp');
 
                     return $cache;

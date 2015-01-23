@@ -1,12 +1,12 @@
 <?php
 namespace rock\i18n;
 
+use rock\base\Alias;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\StringHelper;
-use rock\Rock;
 
 class i18n implements ObjectInterface, i18nInterface
 {
@@ -38,7 +38,7 @@ class i18n implements ObjectInterface, i18nInterface
         foreach ($dicts as $lang => $paths) {
             $total = [];
             foreach ($paths as $path) {
-                $path = Rock::getAlias($path);
+                $path = Alias::getAlias($path);
                 if (!file_exists($path) || (!$data = require($path)) || !is_array($data)) {
                     throw new i18nException(i18nException::UNKNOWN_FILE, ['path' => $path]);
                     break 2;

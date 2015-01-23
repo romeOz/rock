@@ -2,10 +2,10 @@
 
 namespace rockunit\extensions\sphinx;
 
+use rock\base\Alias;
 use rock\db\Migration;
 use rock\di\Container;
 use rock\helpers\ArrayHelper;
-use rock\Rock;
 use rock\sphinx\Connection;
 
 /**
@@ -162,7 +162,7 @@ class SphinxTestCase extends \PHPUnit_Framework_TestCase
     public static function getParam($name, $default = null)
     {
         if (static::$params === null) {
-            static::$params = require(Rock::getAlias('@tests/data/config.php'));
+            static::$params = require(Alias::getAlias('@tests/data/config.php'));
         }
 
         return isset(static::$params[$name]) ? static::$params[$name] : $default;

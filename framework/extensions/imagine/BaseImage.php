@@ -10,9 +10,9 @@ use Imagine\Image\ImagineInterface;
 use Imagine\Image\ManipulatorInterface;
 use Imagine\Image\Palette\RGB;
 use Imagine\Image\Point;
+use rock\base\Alias;
 use rock\base\ClassName;
 use rock\helpers\ArrayHelper;
-use rock\Rock;
 
 class BaseImage
 {
@@ -117,7 +117,7 @@ class BaseImage
         }
 
         return static::getImagine()
-                     ->open(Rock::getAlias($filename))
+                     ->open(Alias::getAlias($filename))
                      ->copy()
                      ->crop(new Point($start[0], $start[1]), new Box($width, $height));
     }
@@ -140,7 +140,7 @@ class BaseImage
         /** @var ImageInterface $img */
         $img = is_resource($pathOrResource)
             ? static::getImagine()->read($pathOrResource)
-            : static::getImagine()->open(Rock::getAlias($pathOrResource));
+            : static::getImagine()->open(Alias::getAlias($pathOrResource));
 
         if (($img->getSize()->getWidth() <= $box->getWidth() && $img->getSize()->getHeight() <= $box->getHeight()) || (!$box->getWidth() && !$box->getHeight())) {
             return $img->copy();
@@ -183,10 +183,10 @@ class BaseImage
             throw new ImagineException('$start must be an array of two elements.');
         }
 
-        $img = is_resource($pathOrResource) ? static::getImagine()->read($pathOrResource) : static::getImagine()->open(Rock::getAlias($pathOrResource));
+        $img = is_resource($pathOrResource) ? static::getImagine()->read($pathOrResource) : static::getImagine()->open(Alias::getAlias($pathOrResource));
         $watermark = is_resource($watermarkPathOrResource)
             ? static::getImagine()->read($watermarkPathOrResource)
-            : static::getImagine()->open(Rock::getAlias($watermarkPathOrResource));
+            : static::getImagine()->open(Alias::getAlias($watermarkPathOrResource));
         $img->paste($watermark, new Point($start[0], $start[1]));
         return $img;
     }
@@ -217,8 +217,8 @@ class BaseImage
         $fontColor = ArrayHelper::getValue($fontOptions, ['color'], 'fff');
         $fontAngle = ArrayHelper::getValue($fontOptions, ['angle'], 0);
 
-        $img = static::getImagine()->open(Rock::getAlias($filename));
-        $font = static::getImagine()->font(Rock::getAlias($fontFile), $fontSize,(new RGB())->color($fontColor));
+        $img = static::getImagine()->open(Alias::getAlias($filename));
+        $font = static::getImagine()->font(Alias::getAlias($fontFile), $fontSize,(new RGB())->color($fontColor));
 
         $img->draw()->text($text, $font, new Point($start[0], $start[1]), $fontAngle);
 
@@ -239,7 +239,7 @@ class BaseImage
         /** @var ImageInterface $img */
         $img = is_resource($pathOrResource)
             ? static::getImagine()->read($pathOrResource)
-            : static::getImagine()->open(Rock::getAlias($pathOrResource));
+            : static::getImagine()->open(Alias::getAlias($pathOrResource));
         $size = $img->getSize();
         $pasteTo = new Point($margin, $margin);
         $box = new Box($size->getWidth() + ceil($margin * 2), $size->getHeight() + ceil($margin * 2));
