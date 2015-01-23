@@ -8,14 +8,27 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
+use rock\di\Container;
 use rock\helpers\FileHelper;
 use rock\helpers\StringHelper;
 use rock\Rock;
 
+/**
+ * @method static Log log(int $level, string $message, array $placeholders = [])
+ * @method static Log debug(string $message, array $placeholders = [])
+ * @method static Log info(string $message, array $placeholders = [])
+ * @method static Log notice(string $message, array $placeholders = [])
+ * @method static Log warn(string $message, array $placeholders = [])
+ * @method static Log err(string $message, array $placeholders = [])
+ * @method static Log crit(string $message, array $placeholders = [])
+ * @method static Log alert(string $message, array $placeholders = [])
+ * @method static Log emerg(string $message, array $placeholders = [])
+ */
 class Log implements LoggerInterface, ObjectInterface
 {
     use ObjectTrait {
         ObjectTrait::__construct as parentConstruct;
+        ObjectTrait::__call as parentCall;
     }
 
     public $path = '@runtime/logs';
@@ -49,17 +62,33 @@ class Log implements LoggerInterface, ObjectInterface
         static::$logger->pushHandler((new StreamHandler("{$path}/error.log", self::EMERGENCY, false))->setFormatter($formatter));
     }
 
+    public function __call($name, $arguments)
+    {
+        if (method_exists($this, "{$name}Internal")) {
+            return call_user_func_array([$this, "{$name}Internal"], $arguments);
+        }
+
+        return $this->parentCall($name, $arguments);
+    }
+
+    public static function __callStatic($name, $arguments)
+    {
+        /** @var static $self */
+        $self = Container::load(static::className());
+        return call_user_func_array([$self, $name], $arguments);
+    }
+
     /**
      * Adds a log record at an arbitrary level.
      *
      * This method allows for compatibility with common interfaces.
      *
-     * @param  mixed   $level  log level
+     * @param  int   $level  log level
      * @param  string  $message log message
      * @param  array   $placeholders placeholders for replacement
      * @return bool Whether the record has been processed
      */
-    public function log($level, $message, array $placeholders = [])
+    protected function logInternal($level, $message, array $placeholders = [])
     {
         return static::$logger->log($level, StringHelper::replace($message, $placeholders, false), $placeholders);
     }
@@ -73,7 +102,7 @@ class Log implements LoggerInterface, ObjectInterface
      * @param  array   $placeholders placeholders for replacement
      * @return bool Whether the record has been processed
      */
-    public function debug($message, array $placeholders = [])
+    protected function debugInternal($message, array $placeholders = [])
     {
         return static::$logger->debug(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
@@ -87,7 +116,7 @@ class Log implements LoggerInterface, ObjectInterface
      * @param  array   $placeholders placeholders for replacement
      * @return bool Whether the record has been processed
      */
-    public function info($message, array $placeholders = [])
+    protected function infoInternal($message, array $placeholders = [])
     {
         return static::$logger->info(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
@@ -101,7 +130,7 @@ class Log implements LoggerInterface, ObjectInterface
      * @param  array   $placeholders placeholders for replacement
      * @return bool Whether the record has been processed
      */
-    public function notice($message, array $placeholders = [])
+    protected function noticeInternal($message, array $placeholders = [])
     {
         return static::$logger->notice(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
@@ -115,21 +144,7 @@ class Log implements LoggerInterface, ObjectInterface
      * @param  array   $placeholders placeholders for replacement
      * @return bool Whether the record has been processed
      */
-    public function warn($message, array $placeholders = [])
-    {
-        return static::$logger->warn(StringHelper::replace($message, $placeholders, false), $placeholders);
-    }
-
-    /**
-     * Adds a log record at the `WARNING` level.
-     *
-     * This method allows for compatibility with common interfaces.
-     *
-     * @param  string  $message log message
-     * @param  array   $placeholders placeholders for replacement
-     * @return bool Whether the record has been processed
-     */
-    public function warning($message, array $placeholders = [])
+    protected function warnInternal($message, array $placeholders = [])
     {
         return static::$logger->warn(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
@@ -143,24 +158,9 @@ class Log implements LoggerInterface, ObjectInterface
      * @param  array   $placeholders placeholders for replacement
      * @return bool Whether the record has been processed
      */
-    public function err($message, array $placeholders = [])
+    protected function errInternal($message, array $placeholders = [])
     {
-
         return static::$logger->err(StringHelper::replace($message, $placeholders, false), $placeholders);
-    }
-
-    /**
-     * Adds a log record at the ERROR level.
-     *
-     * This method allows for compatibility with common interfaces.
-     *
-     * @param  string  $message The log message
-     * @param  array   $dataReplace The log context
-     * @return Boolean Whether the record has been processed
-     */
-    public function error($message, array $dataReplace = [])
-    {
-        return static::$logger->err(StringHelper::replace($message, $dataReplace, false), $dataReplace);
     }
 
     /**
@@ -172,21 +172,7 @@ class Log implements LoggerInterface, ObjectInterface
      * @param  array   $placeholders placeholders for replacement
      * @return bool Whether the record has been processed
      */
-    public function crit($message, array $placeholders = [])
-    {
-        return static::$logger->crit(StringHelper::replace($message, $placeholders, false), $placeholders);
-    }
-
-    /**
-     * Adds a log record at the `CRITICAL` level.
-     *
-     * This method allows for compatibility with common interfaces.
-     *
-     * @param  string  $message The log message
-     * @param  array   $placeholders placeholders for replacement
-     * @return bool Whether the record has been processed
-     */
-    public function critical($message, array $placeholders = [])
+    protected function critInternal($message, array $placeholders = [])
     {
         return static::$logger->crit(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
@@ -200,7 +186,7 @@ class Log implements LoggerInterface, ObjectInterface
      * @param  array   $placeholders placeholders for replacement
      * @return bool Whether the record has been processed
      */
-    public function alert($message, array $placeholders = [])
+    protected function alertInternal($message, array $placeholders = [])
     {
         return static::$logger->alert(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
@@ -214,21 +200,7 @@ class Log implements LoggerInterface, ObjectInterface
      * @param  array   $placeholders placeholders for replacement
      * @return bool Whether the record has been processed
      */
-    public function emerg($message, array $placeholders = [])
-    {
-        return static::$logger->emerg(StringHelper::replace($message, $placeholders, false), $placeholders);
-    }
-
-    /**
-     * Adds a log record at the `EMERGENCY` level.
-     *
-     * This method allows for compatibility with common interfaces.
-     *
-     * @param  string  $message log message
-     * @param  array   $placeholders placeholders for replacement
-     * @return bool Whether the record has been processed
-     */
-    public function emergency($message, array $placeholders = [])
+    protected function emergInternal($message, array $placeholders = [])
     {
         return static::$logger->emerg(StringHelper::replace($message, $placeholders, false), $placeholders);
     }

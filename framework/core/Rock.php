@@ -7,7 +7,7 @@ use rock\base\ClassName;
 use rock\base\Controller;
 use rock\di\Container;
 use rock\event\Event;
-use rock\exception\BaseException;
+use rock\exception\ErrorHandler;
 use rock\helpers\ObjectHelper;
 use rock\helpers\StringHelper;
 use rock\helpers\Trace;
@@ -65,7 +65,7 @@ class Rock
      * Bootstrap
      *
      * @param array $configs
-     * @throws BaseException
+     * @throws \rock\base\BaseException
      */
     public static function bootstrap(array $configs)
     {
@@ -90,7 +90,7 @@ class Rock
             Rock::$app->route->run();
 
         } catch (\Exception $e) {
-            throw new BaseException($e->getMessage(), [], $e);
+            ErrorHandler::display($e);
         }
         //var_dump(Trace::getTime(Trace::APP_TIME));
         \rock\helpers\Trace::endProfile(\rock\helpers\Trace::APP, \rock\helpers\Trace::TOKEN_APP_RUNTIME);
@@ -375,11 +375,10 @@ class Rock
      *
      * @param string $message
      * @param array  $placeholders placeholders for replacement
-     * @param array  $traces
      */
-    public static function info($message, array $placeholders = [], array $traces = [])
+    public static function info($message, array $placeholders = [])
     {
-        static::log(Log::INFO, $message, $placeholders, $traces);
+        Log::log(Log::INFO, $message, $placeholders);
     }
 
     /**
@@ -387,11 +386,10 @@ class Rock
      *
      * @param string $message
      * @param array  $placeholders placeholders for replacement
-     * @param array  $traces
      */
-    public static function debug($message, array $placeholders = [], array $traces = [])
+    public static function debug($message, array $placeholders = [])
     {
-        static::log(Log::DEBUG, $message, $placeholders, $traces);
+        Log::log(Log::DEBUG, $message, $placeholders);
     }
 
     /**
@@ -399,11 +397,10 @@ class Rock
      *
      * @param string $message
      * @param array  $placeholders placeholders for replacement
-     * @param array  $traces
      */
-    public static function warning($message, array $placeholders = [], array $traces = [])
+    public static function warning($message, array $placeholders = [])
     {
-        static::log(Log::WARNING, $message, $placeholders, $traces);
+        Log::log(Log::WARNING, $message, $placeholders);
     }
 
     /**
@@ -411,11 +408,10 @@ class Rock
      *
      * @param string $message
      * @param array  $placeholders placeholders for replacement
-     * @param array  $traces
      */
-    public static function error($message, array $placeholders = [], array $traces = [])
+    public static function error($message, array $placeholders = [])
     {
-        static::log(Log::ERROR, $message, $placeholders, $traces);
+        Log::log(Log::ERROR, $message, $placeholders);
     }
 
     /**
@@ -423,19 +419,9 @@ class Rock
      *
      * @param string $message
      * @param array  $placeholders placeholders for replacement
-     * @param array  $traces
      */
-    public static function crit($message, array $placeholders = [], array $traces = [])
+    public static function crit($message, array $placeholders = [])
     {
-        static::log(Log::CRITICAL, $message, $placeholders, $traces);
-    }
-
-    public static function log($level, $message, array $placeholders = [], array $traces = [])
-    {
-        if (empty($traces)) {
-            $traces = BaseException::getTraces(3);
-        }
-        $message = BaseException::replace($message, $traces, BaseException::$asStack);
-        static::$app->log->log($level, $message, $placeholders);
+        Log::log(Log::CRITICAL, $message, $placeholders);
     }
 }
