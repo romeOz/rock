@@ -5,7 +5,7 @@ namespace rock\sanitize;
 
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
-use rock\Rock;
+use rock\di\Container;
 use rock\sanitize\rules\Abs;
 use rock\sanitize\rules\BasicTags;
 use rock\sanitize\rules\Boolean;
@@ -163,7 +163,7 @@ class Sanitize implements ObjectInterface
     public static function __callStatic($name, $arguments)
     {
         /** @var static $self */
-        $self = Rock::factory(static::className());
+        $self = Container::load(static::className());
         return call_user_func_array([$self, $name], $arguments);
     }
 

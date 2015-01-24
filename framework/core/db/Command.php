@@ -3,10 +3,10 @@ namespace rock\db;
 
 use rock\base\ObjectTrait;
 use rock\cache\CacheInterface;
+use rock\di\Container;
 use rock\helpers\ArrayHelper;
 use rock\helpers\ObjectHelper;
 use rock\helpers\Trace;
-use rock\Rock;
 
 /**
  * Command represents a SQL statement to be executed against a database.
@@ -795,21 +795,21 @@ class Command
 
         $this->prepare(false);
         try {
-            Rock::beginProfile('db.query', $token);
+            Trace::beginProfile('db.query', $token);
 
             $this->pdoStatement->execute();
             $n = $this->pdoStatement->rowCount();
 
-            Rock::endProfile('db.query', $token);
+            Trace::endProfile('db.query', $token);
 
             return $n;
         } catch (\Exception $e) {
-            Rock::endProfile('db.query', $token);
+            Trace::endProfile('db.query', $token);
             $message = $e->getMessage() . "\nThe SQL being executed was: $rawSql";
 
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e: $message;
-            Rock::trace('db.query', $token);
+            Trace::trace('db.query', $token);
             throw new DbException($message, [], $e);
         }
     }
@@ -834,11 +834,13 @@ class Command
             'valid' => true,
             'cache' => false,
         ];
-        Rock::beginProfile('db.query', $token);
+        Trace::beginProfile('db.query', $token);
         $cache = null;
         /** @var $cache CacheInterface */
         if ($connection->enableQueryCache && $method !== '') {
-            $cache = is_string($connection->queryCache) ? Rock::factory($connection->queryCache) : $connection->queryCache;
+            $cache = is_string($connection->queryCache)
+                ? Container::load($connection->queryCache)
+                : $connection->queryCache;
         }
 
         if ($cache instanceof CacheInterface) {
@@ -851,9 +853,9 @@ class Command
                                     ]);
             if (($result = $cache->get($cacheKey)) !== false) {
                 Trace::increment('cache.db', 'Cache query DB connection: ' . $connection->dsn);
-                Rock::endProfile('db.query', $token);
+                Trace::endProfile('db.query', $token);
                 $token['cache'] = true;
-                Rock::trace('db.query', $token);
+                Trace::trace('db.query', $token);
 
                 return $result;
             }
@@ -885,16 +887,16 @@ class Command
                             $connection->queryCacheTags ? : $this->getRawEntityNames()
                 );
             }
-            Rock::endProfile('db.query', $token);
-            Rock::trace('db.query', $token);
+            Trace::endProfile('db.query', $token);
+            Trace::trace('db.query', $token);
 
             return $result;
         } catch (\Exception $e) {
             $message = $e->getMessage() . "\nThe SQL being executed was: $rawSql";
-            Rock::endProfile('db.query', $token);
+            Trace::endProfile('db.query', $token);
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
-            Rock::trace('db.query', $token);
+            Trace::trace('db.query', $token);
             throw new DbException($message, [], $e);
         }
     }

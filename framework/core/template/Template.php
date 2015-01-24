@@ -1548,7 +1548,7 @@ class Template implements ComponentsInterface
             $class = ltrim(Alias::getAlias($snippet, ['lang' => $this->locale]), '\\');
             $params['class'] = $class;
             /** @var \rock\base\Snippet $snippet */
-            $snippet = Rock::factory($params);
+            $snippet = Container::load($params);
             if (!$snippet instanceof Snippet) {
                 throw new TemplateException(TemplateException::UNKNOWN_SNIPPET, ['name' => $snippet::className()]);
             }

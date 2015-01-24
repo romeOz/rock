@@ -6,10 +6,10 @@ namespace rockunit\extensions\sphinx;
 use League\Flysystem\Adapter\Local;
 use rock\base\Alias;
 use rock\cache\CacheFile;
+use rock\di\Container;
 use rock\event\Event;
 use rock\file\FileManager;
 use rock\helpers\Trace;
-use rock\Rock;
 use rock\sphinx\ActiveQuery;
 use rock\sphinx\Connection;
 use rockunit\common\CommonTestTrait;
@@ -432,7 +432,7 @@ class ActiveRecordTest extends SphinxTestCase
 
         // beginCache and endCache
         $cacheConfig['enabled'] = true;
-        Rock::$app->di['cache'] = $cacheConfig;
+        Container::add('cache', $cacheConfig);
         $connection->enableQueryCache = false;
         ActiveRecord::$db = $connection;
         ArticleIndex::find()
@@ -455,7 +455,7 @@ class ActiveRecordTest extends SphinxTestCase
         $this->assertTrue($trace->current()['cache']);
 
         $cacheConfig['enabled'] = false;
-        Rock::$app->di['cache'] = $cacheConfig;
+        Container::add('cache', $cacheConfig);
     }
 
     public function testBeforeFind()

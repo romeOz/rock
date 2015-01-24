@@ -10,58 +10,61 @@ use rock\di\Container;
  */
 class ContainerTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
+    public static function setUpBeforeClass()
     {
-        $container = new Container;
-        unset($container['bar'], $container['foo'], $container['baz']);
+        Container::removeMulti(['bar', 'foo' , 'baz']);
     }
 
-    public function testGetData()
+    public static function tearDownAfterClass()
     {
-        $container = new Container;
-        $container['bar'] = ['class' => Bar::className(), 'singleton' => true];
-        $this->assertSame($container->get('bar')['class'], Bar::className());
+        static::setUpBeforeClass();
     }
 
+    public function testAddAndGet()
+    {
+        $config = ['class' => Bar::className(), 'singleton' => true];
+        Container::add('bar', $config);
+        $this->assertSame(Container::get('bar')['class'], Bar::className());
+    }
+
+    /**
+     * @depends testAddAndGet
+     */
+    public function testExists()
+    {
+        $this->assertTrue(Container::exists('bar'));
+    }
+
+    /**
+     * @depends testAddAndGet
+     */
     public function testRemove()
     {
-        $container = new Container;
-        $container['bar'] = ['class' => Bar::className(), 'singleton' => true];
-        $this->assertTrue(Container::has('bar'));
-        $container->remove('bar');
-        $this->assertNull($container->get('bar'));
-
-        $container->bar = ['class' => Bar::className()];
-        $this->assertTrue(Container::has('bar'));
-        unset($container->bar);
-        $this->assertFalse(Container::has('bar'));
+        Container::remove('bar');
+        $this->assertNull(Container::get('bar'));
+        $this->assertFalse(Container::exists('bar'));
     }
 
     public function testLoad()
     {
-        $container = new Container;
-        $container['bar'] = ['class' => Bar::className(), 'singleton' => true];
-        $this->assertTrue($container::load(['class' => Bar::className()]) instanceof Bar);
-
-        $container->bar = ['class' => Bar::className(), 'singleton' => true];
+        // Singleton
+        $config = ['class' => Bar::className(), 'singleton' => true];
+        Container::add('bar', $config);
         $this->assertTrue(Container::load(['class' => Bar::className()]) instanceof Bar);
 
-        // Singleton
-        $container['bar'] = ['class' => Bar::className(), 'singleton' => true];
-        $this->assertSame($container::load('bar'), $container::load('bar'));
-
         // new instance
-        $container['bar'] = ['class' => Bar::className()];
-        $this->assertTrue($container::load('bar') !== $container::load('bar'));
+        $config = ['class' => Bar::className()];
+        Container::add('bar', $config);
+        $this->assertTrue(Container::load('bar') !== Container::load('bar'));
 
         // as Closure
-        $container['bar'] =
-            function($data = null){
-                $this->assertSame($data[0], 'test');
-                return new Bar();
-            };
+        $config = function($data = null){
+            $this->assertSame($data[0], 'test');
+            return new Bar();
+        };
+        Container::add('bar', $config);
         $this->assertTrue(Container::load('test','bar') instanceof Bar);
-        $this->assertTrue(Container::load('test',['class' => 'bar']) instanceof Bar);
+        $this->assertTrue(Container::load('test', ['class' => 'bar']) instanceof Bar);
     }
 
     public function testNewCustomArgsConstruct()
@@ -121,12 +124,18 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(['test'], $foo->param);
     }
 
-    public function testExceptionIsThrown()
+    public function testThrowException()
     {
         try {
             Container::load(Test::className());
         } catch (\Exception $e) {
-            $this->assertSame($e->getMessage(), 'Unknown class: rockunit\core\di\BarInterface.');
+            $this->assertNotEmpty($e->getMessage());
+        }
+
+        try {
+            Container::load('unknown');
+        } catch (\Exception $e) {
+            $this->assertNotEmpty($e->getMessage());
         }
 
         $test = Container::load(new Bar, Test::className());
@@ -135,9 +144,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         Container::load(Test2::className());
     }
 
-    public static function tearDownAfterClass()
+    public function testThrowExceptionDisable()
     {
-        Container::removeMulti(['foo', 'bar', 'baz']);
+        $this->assertNull(Container::load('unknown', false));
     }
 }
 

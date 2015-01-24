@@ -7,8 +7,8 @@ use rock\base\ComponentsTrait;
 use rock\base\ObjectInterface;
 use rock\cache\CacheInterface;
 use rock\di\Container;
+use rock\helpers\Trace;
 use rock\log\Log;
-use rock\Rock;
 
 /**
  * Connection represents a connection to a database via [PDO](http://www.php.net/manual/en/book.pdo.php).
@@ -274,7 +274,7 @@ class Connection implements ObjectInterface
     /**
      * @var array mapping between PDO driver names and {@see \rock\db\Schema} classes.
      * The keys of the array are PDO driver names while the values the corresponding
-     * schema class name or configuration. Please refer to {@see \rock\Rock::factory()} for
+     * schema class name or configuration. Please refer to {@see \rock\di\Container::load()} for
      * details on how to specify a configuration.
      *
      * This property is mainly used by {@see \rock\db\Connection::getSchema()} when fetching the database schema information.
@@ -422,13 +422,13 @@ class Connection implements ObjectInterface
         }
         $token = 'Opening DB connection: ' . $this->dsn;
         try {
-            Rock::trace('db', $token);
-            Rock::beginProfile('db', $token);
+            Trace::trace('db', $token);
+            Trace::beginProfile('db', $token);
             $this->pdo = $this->createPdoInstance();
             $this->initConnection();
-            Rock::endProfile('db', $token);
+            Trace::endProfile('db', $token);
         } catch (\PDOException $e) {
-            Rock::endProfile('db', $token);
+            Trace::endProfile('db', $token);
             throw new DbException($e->getMessage(), [], $e);
         }
     }
@@ -440,7 +440,7 @@ class Connection implements ObjectInterface
     public function close()
     {
         if ($this->pdo !== null) {
-            Rock::trace('db', 'Closing DB connection: ' . $this->dsn);
+            Trace::trace('db', 'Closing DB connection: ' . $this->dsn);
             $this->pdo = null;
             $this->_schema = null;
             $this->_transaction = null;

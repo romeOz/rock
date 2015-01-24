@@ -1,6 +1,7 @@
 <?php
 namespace rock\base;
 
+use rock\di\Container;
 use rock\helpers\ArrayHelper;
 use rock\helpers\FileHelper;
 use rock\helpers\StringHelper;
@@ -25,14 +26,14 @@ abstract class Controller implements ComponentsInterface
      */
     const EVENT_AFTER_ACTION = 'afterAction';
 
-    /** @var  Template */
-    protected $template;
+    /** @var  Template|string|array */
+    protected $template = 'template';
 
     public function init()
     {
         $this->parentInit();
-        if (!isset($this->template)) {
-            $this->template = Rock::$app->template;
+        if (!is_object($this->template)) {
+            $this->template = Container::load($this->template);
             $this->template->context = $this;
             if (!$this->template->hasResource('context')) {
                 Rock::$app->controller = $this;

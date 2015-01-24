@@ -1012,7 +1012,7 @@ class Response implements ComponentsInterface
         if (isset($this->formatters[$this->format])) {
             $formatter = $this->formatters[$this->format];
             if (!is_object($formatter)) {
-                $this->formatters[$this->format] = $formatter = Rock::factory($formatter);
+                $this->formatters[$this->format] = $formatter = Container::load($formatter);
             }
             if ($formatter instanceof ResponseFormatterInterface) {
                 $formatter->format($this);

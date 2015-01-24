@@ -8,7 +8,9 @@ use rock\helpers\Serialize;
 
 trait CommonTrait
 {
-    use ComponentsTrait;
+    use ComponentsTrait {
+        ComponentsTrait::init as parentInit;
+    }
 
     /**
      * Prefix of key

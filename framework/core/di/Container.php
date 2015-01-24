@@ -2,14 +2,13 @@
 namespace rock\di;
 
 use rock\base\Alias;
-use rock\base\ObjectInterface;
-use rock\base\ObjectTrait;
+use rock\base\ClassName;
 use rock\helpers\ArrayHelper;
 use rock\helpers\ObjectHelper;
 
-class Container implements \ArrayAccess, ObjectInterface
+class Container
 {
-    use ObjectTrait;
+    use ClassName;
 
     /**
      * Array of pointers to a single instance.
@@ -18,157 +17,92 @@ class Container implements \ArrayAccess, ObjectInterface
      */
     protected static $instances = [];
     /**
-     * Aliases of class by dependencies.
+     * Aliases of class.
      *
      * @var array
      */
     protected static $classAliases = [];
     /**
-     * Names of class by dependencies.
+     * Names of class.
      *
      * @var array
      */
     protected static $classNames = [];
 
     /**
-     * Get instance.
+     * Creates a new object using the given configuration.
      *
-     * @param string|array $configs the configuration. It can be either a string representing the class name
-     *                             or an array representing the object configuration.
-     * @param mixed ...,$configs arguments for object.
+     * The configuration can be either a string or an array.
+     * If a string, it is treated as the *object class*; if an array,
+     * it must contain a `class` element specifying the *object class*, and
+     * the rest of the name-value pairs in the array will be used to initialize
+     * the corresponding object properties.
+     *
+     * Below are some usage examples:
+     *
+     * ```php
+     * $object = Container::load('\rock\db\Connection');
+     * $object = Container::load(\rock\db\Connection::className());
+     * $object = Container::load([
+     *     'class' => '\rock\db\Connection',
+     *     'dsn' => $dsn,
+     *     'username' => $username,
+     *     'password' => $password,
+     * ]);
+     * $object = Container::load($arg1, $arg2, [
+     *     'class' => 'apps\frontend\FooController',
+     *     'test' => 'test',
+     * ]);
+     * ```
+     *
+     *
+     * This method can be used to create any object as long as the object's constructor is
+     * defined like the following:
+     *
+     * ```php
+     * public function __construct(..., $config = []) {
+     * }
+     * ```
+     *
+     * The method will pass the given configuration as the last parameter of the constructor,
+     * and any additional parameters to this method will be passed as the rest of the constructor parameters.
+     *
+     * @internal param mixed $args arguments for constructor.
+     * @param string|array $config         the configuration. It can be either a string representing the class name
+     *                                     or an array representing the object configuration.
+     * @param mixed        $throwException throws exception
+     * @return null|object the created object
      * @throws ContainerException
-     * @return null|ObjectInterface
      */
-    public static function load(/*$args...*/$configs)
+    public static function load(/*$args...*/$config, $throwException = true)
     {
         $args = func_get_args();
-        $configs = current(array_slice($args, -1, 1)) ? : [];
-        $args = array_slice($args, 0, count($args)-1);
-        list($class, $configs) = static::prepareConfig($configs);
+        list($config, $args) = static::calculateArgs($args);
+        list($class, $config) = static::calculateConfig($config);
 
-        if (!static::has($class)) {
+        if (!static::exists($class)) {
             if (!class_exists($class)) {
-                throw new ContainerException(ContainerException::UNKNOWN_CLASS, ['class' => $class]);
+                if ($throwException) {
+                    throw new ContainerException(ContainerException::UNKNOWN_CLASS, ['class' => $class]);
+                }
+                return null;
             }
-            return static::newInstance($class, [$configs], $args);
+            return static::newInstance($class, [$config], $args);
         }
         $data = static::_provide($class);
         // Lazy (single instance)
         if (static::isSingleton($class)) {
-            $instance = static::getSingleton($data, $configs, $args);
+            $instance = static::getSingleton($data, $config, $args);
 
             return $instance;
         }
-        $instance = static::getInstance($data, $configs, $args);
+        $instance = static::getInstance($data, $config, $args);
 
         return $instance;
     }
 
     /**
-     * Exists dependency.
-     *
-     * @param string $name name/alias of class.
-     * @return bool
-     */
-    public static function has($name)
-    {
-        return !empty(static::$classNames[$name]) || !empty(static::$classAliases[$name]);
-    }
-
-    /**
-     * Is single of class.
-     *
-     * @param string $name name/alias of class.
-     * @return null
-     */
-    public static function isSingleton($name)
-    {
-        if (!static::has($name)) {
-            return false;
-        }
-        if (empty(static::$classNames[$name]['singleton']) &&
-            empty(static::$classAliases[$name]['singleton'])
-        ) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getIterator(array $only = [], array $exclude = [], $alias = false)
-    {
-        return new \ArrayIterator($this->getAll($only, $exclude, $alias));
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function count()
-    {
-        return static::getCount();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function getCount()
-    {
-        return count(static::$classNames);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function removeAll()
-    {
-        static::$classAliases = static::$classNames = static::$instances = [];
-    }
-
-    /**
-     * Get data by classes.
-     *
-     * @param bool  $alias by alias
-     * @param array $only  list of items whose value needs to be returned.
-     * @param array $exclude list of items whose value should NOT be returned.
-     * @return array the array representation of the collection.
-     */
-    public static function getAll(array $only = [], array $exclude = [], $alias = false)
-    {
-        return $alias === true
-            ? ArrayHelper::only(static::$classAliases, $only, $exclude)
-            : ArrayHelper::only(static::$classNames, $only, $exclude);
-    }
-
-    public function __isset($name)
-    {
-        return static::has($name);
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function offsetExists($name)
-    {
-        return static::has($name);
-    }
-
-    /**
-     * Get data of class.
-     *
-     * @param string $name name/alias of class.
-     * @return null|array
-     */
-    public function offsetGet($name)
-    {
-        return static::get($name);
-    }
-
-    /**
-     * Get data of class.
+     * Get config of class.
      *
      * @param string $name name/alias of class.
      * @return null|array
@@ -184,33 +118,22 @@ class Container implements \ArrayAccess, ObjectInterface
     }
 
     /**
-     * Registry dependency.
+     * Get configs by classes.
      *
-     * @param string $alias alias of class.
-     * @param array  $config
+     * @param bool  $alias by alias
+     * @param array $only  list of items whose value needs to be returned.
+     * @param array $exclude list of items whose value should NOT be returned.
+     * @return array the array representation of the collection.
      */
-    public function offsetSet($alias, $config)
+    public static function getAll(array $only = [], array $exclude = [], $alias = false)
     {
-        static::add($alias, $config);
+        return $alias === true
+            ? ArrayHelper::only(static::$classAliases, $only, $exclude)
+            : ArrayHelper::only(static::$classNames, $only, $exclude);
     }
 
     /**
-     * Registry dependency.
-     *
-     * ```php
-     * ['class_alias' => $params]
-     * ```
-     * @param array $dependencies
-     */
-    public static function addMulti(array $dependencies)
-    {
-        foreach ($dependencies as $alias => $config) {
-            static::add($alias, $config);
-        }
-    }
-
-    /**
-     * Registry dependency.
+     * Registry class.
      *
      * @param string $alias alias of class.
      * @param array|\Closure  $config
@@ -234,68 +157,53 @@ class Container implements \ArrayAccess, ObjectInterface
         } elseif ($config instanceof \Closure) {
             static::$classAliases[$alias] = ['class' => $config, 'alias' => $alias, 'properties' => []];
         } else {
-            throw new ContainerException(ContainerException::INVALID_CONFIG);
+            throw new ContainerException('Configuration must be an array or callable.');
         }
 
         unset(static::$instances[$alias]);
     }
 
-
     /**
-     * @param string $name name/alias of class.
+     * Registry classes.
+     *
+     * ```php
+     * ['class_alias' => $params]
+     * ```
+     * @param array $dependencies
      */
-    public function offsetUnset($name)
+    public static function addMulti(array $dependencies)
     {
-        static::remove($name);
-    }
-
-    public function __unset($name)
-    {
-        static::remove($name);
+        foreach ($dependencies as $alias => $config) {
+            static::add($alias, $config);
+        }
     }
 
     /**
+     * Exists class.
+     *
+     * @param string $name name/alias of class.
+     * @return bool
+     */
+    public static function exists($name)
+    {
+        return !empty(static::$classNames[$name]) || !empty(static::$classAliases[$name]);
+    }
+
+    /**
+     * Get count classes
+     */
+    public static function count()
+    {
+        return count(static::$classNames);
+    }
+
+    /**
+     * Removes class and instance
      * @param string $name name/alias of class.
      */
     public static function remove($name)
     {
         unset(static::$classNames[$name], static::$classAliases[$name], static::$instances[$name]);
-    }
-
-    /**
-     * Get data of class.
-     *
-     * @param string $name name/alias of class.
-     * @return mixed
-     */
-    public function __get($name)
-    {
-        return static::get($name);
-    }
-
-    /**
-     * Registry dependency.
-     *
-     * @param string $alias alias of class.
-     * @param array $config
-     */
-    public function __set($alias, $config)
-    {
-        static::add($alias, $config);
-    }
-
-    /**
-     * @param array $names names/aliases of classes.
-     * @return mixed
-     */
-    public static function getMulti(array $names)
-    {
-        $result = [];
-        foreach ($names as $name) {
-            $result[$name] = static::get($name);
-        }
-
-        return $result;
     }
 
     /**
@@ -308,10 +216,38 @@ class Container implements \ArrayAccess, ObjectInterface
         }
     }
 
+    /**
+     * Removes all map classes and instances
+     */
+    public static function removeAll()
+    {
+        static::$classAliases = static::$classNames = static::$instances = [];
+    }
+
+    /**
+     * Is single of class.
+     *
+     * @param string $name name/alias of class.
+     * @return null
+     */
+    public static function isSingleton($name)
+    {
+        if (!static::exists($name)) {
+            return false;
+        }
+        if (empty(static::$classNames[$name]['singleton']) &&
+            empty(static::$classAliases[$name]['singleton'])
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
     protected static function getSingleton(array $data, array $configs = [], array $args = [])
     {
         if (isset(static::$instances[$data['alias']])) {
-            static::calculateArgs($data['class'], $args);
+            static::calculateArgsOfInstance($data['class'], $args);
             static::setProperty(static::$instances[$data['alias']], $data, $configs, $args);
 
             return static::$instances[$data['alias']];
@@ -324,33 +260,16 @@ class Container implements \ArrayAccess, ObjectInterface
         return null;
     }
 
-    /**
-     * Call SetProperty.
-     *
-     * @param ObjectInterface  $object
-     * @param array $data
-     * @param array $configs
-     * @param array $args
-     */
     protected static function setProperty($object, array $data, array $configs = [], array $args = [])
     {
         ObjectHelper::setProperties($object, !empty($configs) ? $configs : $data['properties']);
         call_user_func_array([$object, 'init'], $args);
     }
 
-    /**
-     * Get instance.
-     *
-     * @param array $data array data of dependency.
-     * @param array $configs
-     * @param array $args array args of class.
-     * @throws ContainerException
-     * @return object
-     */
     protected static function getInstance(array $data, array $configs = [], array $args = [])
     {
         $class = $data['class'];
-        // if is closure
+        // if is callable
         if ($data['class'] instanceof \Closure) {
             return call_user_func(
                 $data['class'],
@@ -373,15 +292,16 @@ class Container implements \ArrayAccess, ObjectInterface
         $reflect = new \ReflectionClass($class);
 
         static::getReflectionArgs($reflect);
-        static::calculateArgs($reflect->getName(), $args, $configs);
+        static::calculateArgsOfInstance($reflect->getName(), $args, $configs);
         $args = array_merge($args, $configs);
         return $reflect->newInstanceArgs($reflect->getConstructor() ? $args : []);
     }
 
-
     protected static $args = [];
+
     protected static function getReflectionArgs(\ReflectionClass $reflect)
     {
+        // lazy loading arguments
         if (isset(static::$args[$reflect->getName()])) {
             return static::$args[$reflect->getName()];
         }
@@ -392,7 +312,7 @@ class Container implements \ArrayAccess, ObjectInterface
         return static::$args[$reflect->getName()] = $params ? : [];
     }
 
-    protected static function calculateArgs($class, array &$args = [])
+    protected static function calculateArgsOfInstance($class, array &$args = [])
     {
         if (empty(static::$args[$class])) {
             return;
@@ -408,7 +328,7 @@ class Container implements \ArrayAccess, ObjectInterface
                     continue;
                 }
                 if ($param->isDefaultValueAvailable() && $param->getDefaultValue() === null) {
-                    if (!static::has($hint)) {
+                    if (!static::exists($hint)) {
                         if (!class_exists($hint)) {
                             $args[$i] = null;
                             continue;
@@ -429,7 +349,16 @@ class Container implements \ArrayAccess, ObjectInterface
         }
     }
 
-    protected static function prepareConfig($config)
+    protected static function calculateArgs(array $args)
+    {
+        $offset = is_bool(end($args)) ? -2 : -1;
+        $configs = current(array_slice($args, $offset, 1)) ? : [];
+        $args = array_slice($args, 0, count($args) + $offset);
+
+        return [$configs, $args];
+    }
+
+    protected static function calculateConfig($config)
     {
         if (is_string($config)) {
             $class = Alias::getAlias($config);
@@ -438,19 +367,13 @@ class Container implements \ArrayAccess, ObjectInterface
             $class = Alias::getAlias($config['class']);
             unset($config['class'], $config['singleton']);
         } else {
-            throw new ContainerException(ContainerException::ARGS_NOT_ARRAY);
+            throw new ContainerException('Object configuration must be an array containing a "class" element.');
         }
         $class = ltrim(str_replace(['\\', '_', '/'], '\\', $class), '\\');
 
         return [$class, $config];
     }
 
-    /**
-     * Get dependency.
-     *
-     * @param string $name name/alias of class.
-     * @return null|array|\Closure
-     */
     protected static function _provide($name)
     {
         if (!empty(static::$classNames[$name])) {

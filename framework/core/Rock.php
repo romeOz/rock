@@ -6,6 +6,7 @@ use League\Flysystem\Util;
 use rock\base\Alias;
 use rock\base\ClassName;
 use rock\base\Controller;
+use rock\base\ObjectInterface;
 use rock\di\Container;
 use rock\event\Event;
 use rock\exception\ErrorHandler;
@@ -136,12 +137,13 @@ class Rock extends Alias
      * The method will pass the given configuration as the last parameter of the constructor,
      * and any additional parameters to this method will be passed as the rest of the constructor parameters.
      *
-     * @param string|array $configs the configuration. It can be either a string representing the class name
+     * @param mixed ...$args arguments for constructor.
+     * @param string|array $config the configuration. It can be either a string representing the class name
      *                             or an array representing the object configuration.
-     * @param mixed ...,$configs arguments for object
-     * @return object|null the created object
+     * @param mixed $throwException throws exception
+     * @return ObjectInterface|null the created object
      */
-    public static function factory(/*$args...*/$configs)
+    public static function factory(/*$args...*/$config, $throwException = true)
     {
         return call_user_func_array([Container::className(), 'load'], func_get_args());
     }
@@ -180,7 +182,6 @@ class Rock extends Alias
      *
      * @param string $category
      * @param mixed  $token
-     * @param null   $data
      *
      * ```php
      * Rock::trace('db', ['dsn' => ..., 'query' => ...]);
@@ -188,9 +189,9 @@ class Rock extends Alias
      * Rock::trace(__METHOD__, 'text');
      * ```
      */
-    public static function trace($category, $token, $data = null)
+    public static function trace($category, $token)
     {
-        Trace::trace($category, $token, $data);
+        Trace::trace($category, $token);
     }
 
     public static function beginProfile($category, $token)

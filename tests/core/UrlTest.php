@@ -3,7 +3,6 @@
 namespace rockunit\core;
 
 
-use rock\Rock;
 use rock\url\Url;
 
 /**
@@ -149,11 +148,11 @@ class UrlTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('/?page=2#name',$url->getRelativeUrl());
 
         // https
-        $url = Rock::factory('http://site.com/?page=2#name', 'url');
+        $url = Url::set('http://site.com/?page=2#name');
         $this->assertSame('https://site.com/?page=2#name', $url->getHttpsUrl());
 
         // http
-        $url = Rock::factory('https://site.com/?page=2#name', Url::className());
+        $url = Url::set('https://site.com/?page=2#name');
         $this->assertSame('http://site.com/?page=2#name', $url->getHttpUrl());
 
         // removing anchor

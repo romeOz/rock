@@ -191,9 +191,7 @@ class BaseSignupForm extends Model
         $data['fullname'] = $name;
         $data['password'] = $this->password;
         if ($this->generateToken) {
-            /** @var Url $urlBuilder */
-            $urlBuilder = Rock::factory($this->activateUrl, Url::className());
-            $data['url'] = $urlBuilder
+            $data['url'] = Url::set($this->activateUrl)
                 ->addArgs(['token' => $data['token']])
                 ->getAbsoluteUrl(true);
         }

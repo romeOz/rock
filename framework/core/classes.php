@@ -401,9 +401,6 @@ return array_merge(
         'activeData' => [
             'class' => \rock\db\ActiveDataProvider::className(),
         ],
-        'di' => [
-            'class' => \rock\di\Container::className(),
-        ],
         'log' => [
             'class' => \rock\log\Log::className(),
         ],

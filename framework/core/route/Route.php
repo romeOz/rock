@@ -85,10 +85,13 @@ class Route implements RequestInterface, ErrorsInterface, ObjectInterface
         if ($clear) {
             Container::removeAll();
         }
-        Rock::$components = $config['components'] ? : [];
-        unset($config['components']);
-        Rock::$config = $config;
-        Container::addMulti(Rock::$components);
+        $components = $config['components'] ? : [];
+        if (class_exists('\rock\Rock')) {
+            unset($config['components']);
+            Rock::$components = $components;
+            Rock::$config = $config;
+        }
+        Container::addMulti($components);
     }
 
     /**
@@ -196,49 +199,49 @@ class Route implements RequestInterface, ErrorsInterface, ObjectInterface
                 self::GET,
                 '/{url}/',
                 function(array $dataRoute) {
-                    return call_user_func([Rock::factory($dataRoute['controller']), 'actionIndex'], $dataRoute);
+                    return call_user_func([Container::load($dataRoute['controller']), 'actionIndex'], $dataRoute);
                 }
             ],
             'create' => [
                 self::GET,
                 '/{url}/create/',
                 function(array $dataRoute) {
-                    return call_user_func([Rock::factory($dataRoute['controller']), 'actionCreate'], $dataRoute);
+                    return call_user_func([Container::load($dataRoute['controller']), 'actionCreate'], $dataRoute);
                 }
             ],
             'store' => [
                 self::POST,
                 '/{url}/',
                 function(array $dataRoute) {
-                    return call_user_func([Rock::factory($dataRoute['controller']), 'actionStore'], $dataRoute);
+                    return call_user_func([Container::load($dataRoute['controller']), 'actionStore'], $dataRoute);
                 }
             ],
             'show' => [
                 self::GET,
                 '~/^\/{url}\/(?P<id>[^\/]+)$/',
                 function(array $dataRoute) {
-                    return call_user_func([Rock::factory($dataRoute['controller']), 'actionShow'], $dataRoute);
+                    return call_user_func([Container::load($dataRoute['controller']), 'actionShow'], $dataRoute);
                 }
             ],
             'edit' => [
                 self::GET,
                 '~/^\/{url}\/(?P<id>[^\/]+)\/edit\/$/',
                 function(array $dataRoute) {
-                    return call_user_func([Rock::factory($dataRoute['controller']), 'actionEdit'], $dataRoute);
+                    return call_user_func([Container::load($dataRoute['controller']), 'actionEdit'], $dataRoute);
                 }
             ],
             'update' => [
                 [self::PUT, self::PATCH],
                 '~/^\/{url}\/(?P<id>[^\/]+)$/',
                 function(array $dataRoute) {
-                    return call_user_func([Rock::factory($dataRoute['controller']), 'actionUpdate'], $dataRoute);
+                    return call_user_func([Container::load($dataRoute['controller']), 'actionUpdate'], $dataRoute);
                 }
             ],
             'delete' => [
                 self::DELETE,
                 '~/^\/{url}\/(?P<id>[^\/]+)$/',
                 function(array $dataRoute) {
-                    return call_user_func([Rock::factory($dataRoute['controller']), 'actionDelete'], $dataRoute);
+                    return call_user_func([Container::load($dataRoute['controller']), 'actionDelete'], $dataRoute);
                 }
             ]
         ];

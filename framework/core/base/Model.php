@@ -4,6 +4,7 @@ namespace rock\base;
 use rock\di\Container;
 use rock\helpers\Inflector;
 use rock\Rock;
+use rock\sanitize\Sanitize;
 use rock\template\Template;
 use rock\validate\ValidateModel;
 
@@ -895,8 +896,8 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable, ComponentsIn
                     continue;
                 }
 
-                /** @var \rock\sanitize\Sanitize $sanitize */
-                $sanitize = Rock::factory(\rock\sanitize\Sanitize::className());
+                /** @var Sanitize $sanitize */
+                $sanitize = Container::load(Sanitize::className());
                 // function
                 if (function_exists($rule) && !$sanitize->existsRule($rule)) {
                     array_unshift($args, $attributes[$name]);
@@ -977,7 +978,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable, ComponentsIn
                 }
 
                 /** @var ValidateModel $validate */
-                $validate = Rock::factory(ValidateModel::className());
+                $validate = Container::load(ValidateModel::className());
                 // function
                 if (function_exists($ruleName) && !$validate->existsRule($ruleName)) {
                     if ($attributes[$name] === '') {

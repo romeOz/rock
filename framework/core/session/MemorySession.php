@@ -4,6 +4,7 @@ namespace rock\session;
 
 
 use rock\cache\CacheInterface;
+use rock\di\Container;
 use rock\Rock;
 
 /**
@@ -29,7 +30,7 @@ use rock\Rock;
 class MemorySession extends Session
 {
     /**
-     * @var CacheInterface|string the cache object or the application component ID of the cache object.
+     * @var CacheInterface|string|array the cache object or the application component ID of the cache object.
      * The session data will be stored using this cache object.
      *
      * After the CacheSession object is created, if you want to change this property,
@@ -37,15 +38,13 @@ class MemorySession extends Session
      */
     public $cache = 'cache';
 
-
     /**
      * Initializes the application component.
      */
     public function init()
     {
-        if (!$this->cache instanceof CacheInterface) {
-            $this->cache = Rock::factory($this->cache);
-            $this->cache->enabled();
+        if (!is_object($this->cache)) {
+            $this->cache = Container::load($this->cache);
         }
     }
 

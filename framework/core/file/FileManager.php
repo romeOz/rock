@@ -12,11 +12,11 @@ use rock\helpers\ArrayHelper;
 use rock\helpers\StringHelper;
 
 /**
- * @method bool deleteDir(StringHelper $dirname)
- * @method bool put(StringHelper $path, $contents, $config = null)
- * @method bool createDir(StringHelper $dirname)
- * @method bool putStream(StringHelper $path, $resource, $config = null)
- * @method false|resource readStream($path)
+ * @method bool deleteDir(string $dirname)
+ * @method bool put(string $path, $contents, $config = null)
+ * @method bool createDir(string $dirname)
+ * @method bool putStream(string $path, $resource, $config = null)
+ * @method false|resource readStream(string $path)
  * @method flushCache();
  * @method addPlugin(PluginInterface $plugin)
  * @method AdapterInterface getAdapter()

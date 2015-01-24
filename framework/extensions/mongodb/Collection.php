@@ -5,8 +5,8 @@ namespace rock\mongodb;
 use rock\base\ObjectTrait;
 use rock\cache\CacheInterface;
 use rock\db\CacheTrait;
+use rock\di\Container;
 use rock\helpers\Trace;
-use rock\Rock;
 
 /**
  * Collection represents the Mongo collection information.
@@ -187,21 +187,21 @@ class Collection
             'valid' => true,
             'cache' => false,
         ];
-        Rock::beginProfile('mongodb.query', $token);
+        Trace::beginProfile('mongodb.query', $token);
         //Rock::info($rawQuery);
         try {
             $result = $this->mongoCollection->drop();
             $this->tryResultError($result);
-            Rock::endProfile('mongodb.query', $token);
-            Rock::trace('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
 
             return true;
         } catch (\Exception $e) {
             $message = $e->getMessage() . "\nThe query being executed was: $rawQuery";
-            Rock::endProfile('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
-            Rock::trace('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
 
             throw new MongoException($message, [], $e);
         }
@@ -244,7 +244,7 @@ class Collection
 
         $options = array_merge(['w' => 1], $options);
         //Rock::info($rawQuery);
-        Rock::beginProfile('mongodb.query', $token);
+        Trace::beginProfile('mongodb.query', $token);
         try {
             if (method_exists($this->mongoCollection, 'createIndex')) {
                 $result = $this->mongoCollection->createIndex($keys, $options);
@@ -252,16 +252,16 @@ class Collection
                 $result = $this->mongoCollection->ensureIndex($keys, $options);
             }
             $this->tryResultError($result);
-            Rock::endProfile('mongodb.query', $token);
-            Rock::trace('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
 
             return true;
         } catch (\Exception $e) {
             $message = $e->getMessage() . "\nThe query being executed was: $rawQuery";
-            Rock::endProfile('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
-            Rock::trace('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
 
             throw new MongoException($message, [], $e);
         }
@@ -270,7 +270,7 @@ class Collection
     /**
      * Drop indexes for specified column(s).
      *
-*@param string|array $columns column name or list of column names.
+     * @param string|array $columns column name or list of column names.
      * If array is given, each element in the array has as key the field name, and as
      * value either 1 for ascending sort, or -1 for descending sort.
      * Use value 'text' to specify text index.
@@ -303,20 +303,20 @@ class Collection
             'cache' => false,
         ];
         //Rock::info($rawQuery);
-        Rock::beginProfile('mongodb.query', $token);
+        Trace::beginProfile('mongodb.query', $token);
         try {
             $result = $this->mongoCollection->deleteIndex($keys);
             $this->tryResultError($result);
-            Rock::endProfile('mongodb.query', $token);
-            Rock::trace('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
 
             return true;
         } catch (\Exception $e) {
             $message = $e->getMessage() . "\nThe query being executed was: $rawQuery";
-            Rock::endProfile('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
-            Rock::trace('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
 
             throw new MongoException($message, [], $e);
         }
@@ -356,20 +356,20 @@ class Collection
             'cache' => false,
         ];
         //Rock::info($rawQuery);
-        Rock::beginProfile('mongodb.query', $token);
+        Trace::beginProfile('mongodb.query', $token);
         try {
             $result = $this->mongoCollection->deleteIndexes();
             $this->tryResultError($result);
-            Rock::endProfile('mongodb.query', $token);
-            Rock::trace('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
 
             return $result['nIndexesWas'];
         } catch (\Exception $e) {
             $message = $e->getMessage() . "\nThe query being executed was: $rawQuery";
-            Rock::endProfile('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
-            Rock::trace('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
 
             throw new MongoException($message, [], $e);
         }
@@ -421,19 +421,19 @@ class Collection
             'cache' => false,
         ];
         //Rock::info($rawQuery);
-        Rock::beginProfile('mongodb.query', $token);
+        Trace::beginProfile('mongodb.query', $token);
         try {
             $result = $this->mongoCollection->findAndModify($condition, $update, $fields, $options);
-            Rock::endProfile('mongodb.query', $token);
-            Rock::trace('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
 
             return $result;
         } catch (\Exception $e) {
             $message = $e->getMessage() . "\nThe query being executed was: $rawQuery";
-            Rock::endProfile('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
-            Rock::trace('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
 
             throw new MongoException($message, [], $e);
         }
@@ -456,20 +456,20 @@ class Collection
             'cache' => false,
         ];
         //Rock::info($rawQuery);
-        Rock::beginProfile('mongodb.query', $token);
+        Trace::beginProfile('mongodb.query', $token);
         try {
             $options = array_merge(['w' => 1], $options);
             $this->tryResultError($this->mongoCollection->insert($data, $options));
-            Rock::endProfile('mongodb.query', $token);
-            Rock::trace('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
 
             return is_array($data) ? $data['_id'] : $data->_id;
         } catch (\Exception $e) {
             $message = $e->getMessage() . "\nThe query being executed was: $rawQuery";
-            Rock::endProfile('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
-            Rock::trace('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
 
             throw new MongoException($message, [], $e);
         }
@@ -492,20 +492,20 @@ class Collection
             'cache' => false,
         ];
         //Rock::info($rawQuery);
-        Rock::beginProfile('mongodb.query', $token);
+        Trace::beginProfile('mongodb.query', $token);
         try {
             $options = array_merge(['w' => 1], $options);
             $this->tryResultError($this->mongoCollection->batchInsert($rows, $options));
-            Rock::endProfile('mongodb.query', $token);
-            Rock::trace('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
 
             return $rows;
         } catch (\Exception $e) {
             $message = $e->getMessage() . "\nThe query being executed was: $rawQuery";
-            Rock::endProfile('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
-            Rock::trace('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
             throw new MongoException($message, [], $e);
         }
     }
@@ -538,12 +538,12 @@ class Collection
             'cache' => false,
         ];
         //Rock::info($rawQuery);
-        Rock::beginProfile('mongodb.query', $token);
+        Trace::beginProfile('mongodb.query', $token);
         try {
             $result = $this->mongoCollection->update($condition, $newData, $options);
             $this->tryResultError($result);
-            Rock::endProfile('mongodb.query', $token);
-            Rock::trace('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
             if (is_array($result) && array_key_exists('n', $result)) {
                 return $result['n'];
             } else {
@@ -551,10 +551,10 @@ class Collection
             }
         } catch (\Exception $e) {
             $message = $e->getMessage() . "\nThe query being executed was: $rawQuery";
-            Rock::endProfile('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
-            Rock::trace('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
             throw new MongoException($message, [], $e);
         }
     }
@@ -576,20 +576,20 @@ class Collection
             'cache' => false,
         ];
         //Rock::info($rawQuery);
-        Rock::beginProfile('mongodb.query', $token);
+        Trace::beginProfile('mongodb.query', $token);
         try {
             $options = array_merge(['w' => 1], $options);
             $this->tryResultError($this->mongoCollection->save($data, $options));
-            Rock::endProfile('mongodb.query', $token);
-            Rock::trace('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
 
             return is_array($data) ? $data['_id'] : $data->_id;
         } catch (\Exception $e) {
             $message = $e->getMessage() . "\nThe query being executed was: $rawQuery";
-            Rock::endProfile('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
-            Rock::trace('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
             throw new MongoException($message, [], $e);
         }
     }
@@ -614,12 +614,12 @@ class Collection
             'cache' => false,
         ];
         //Rock::info($rawQuery);
-        Rock::beginProfile('mongodb.query', $token);
+        Trace::beginProfile('mongodb.query', $token);
         try {
             $result = $this->mongoCollection->remove($condition, $options);
             $this->tryResultError($result);
-            Rock::endProfile('mongodb.query', $token);
-            Rock::trace('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
             if (is_array($result) && array_key_exists('n', $result)) {
                 return $result['n'];
             } else {
@@ -627,10 +627,10 @@ class Collection
             }
         } catch (\Exception $e) {
             $message = $e->getMessage() . "\nThe query being executed was: $rawQuery";
-            Rock::endProfile('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
-            Rock::trace('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
             throw new MongoException($message, [], $e);
         }
     }
@@ -653,7 +653,7 @@ class Collection
             'cache' => false,
         ];
         //Rock::info($rawQuery);
-        Rock::beginProfile('mongodb.query', $token);
+        Trace::beginProfile('mongodb.query', $token);
         $cache = $cacheKey = null;
         if (($result = $this->getCache($rawQuery, $token, $cache, $cacheKey)) !== false) {
             return $result;
@@ -661,16 +661,16 @@ class Collection
         try {
             $result = $this->mongoCollection->distinct($column, $condition);
             $this->setCache($result, $cache, $cacheKey);
-            Rock::endProfile('mongodb.query', $token);
-            Rock::trace('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
 
             return $result;
         } catch (\Exception $e) {
             $message = $e->getMessage() . "\nThe query being executed was: $rawQuery";
-            Rock::endProfile('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
-            Rock::trace('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
             throw new MongoException($message, [], $e);
         }
     }
@@ -695,7 +695,7 @@ class Collection
             'cache' => false,
         ];
         //Rock::info($rawQuery);
-        Rock::beginProfile('mongodb.query', $token);
+        Trace::beginProfile('mongodb.query', $token);
 
         $cache = $cacheKey = null;
         if (($result = $this->getCache($rawQuery, $token, $cache, $cacheKey)) !== false) {
@@ -705,16 +705,16 @@ class Collection
             $result = call_user_func_array([$this->mongoCollection, 'aggregate'], $args);
             $this->tryResultError($result);
             $this->setCache($result['result'], $cache, $cacheKey);
-            Rock::endProfile('mongodb.query', $token);
-            Rock::trace('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
 
             return $result['result'];
         } catch (\Exception $e) {
             $message = $e->getMessage() . "\nThe query being executed was: $rawQuery";
-            Rock::endProfile('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
-            Rock::trace('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
             throw new MongoException($message, [], $e);
         }
     }
@@ -756,7 +756,7 @@ class Collection
             'cache' => false,
         ];
         //Rock::info($rawQuery);
-        Rock::beginProfile('mongodb.query', $token);
+        Trace::beginProfile('mongodb.query', $token);
 
         $cache = $cacheKey = null;
         if (($result = $this->getCache($rawQuery, $token, $cache, $cacheKey)) !== false) {
@@ -771,8 +771,8 @@ class Collection
             }
             $this->tryResultError($result);
 
-            Rock::endProfile('mongodb.query', $token);
-            Rock::trace('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
             if (array_key_exists('retval', $result)) {
                 $this->setCache($result['retval'], $cache, $cacheKey);
                 return $result['retval'];
@@ -782,10 +782,10 @@ class Collection
             }
         } catch (\Exception $e) {
             $message = $e->getMessage() . "\nThe query being executed was: $rawQuery";
-            Rock::endProfile('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
-            Rock::trace('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
             throw new MongoException($message, [], $e);
         }
     }
@@ -859,7 +859,7 @@ class Collection
             'cache' => false,
         ];
         //Rock::info($rawQuery);
-        Rock::beginProfile('mongodb.query', $token);
+        Trace::beginProfile('mongodb.query', $token);
         $cache = $cacheKey = null;
         if (($result = $this->getCache($rawQuery, $token, $cache, $cacheKey)) !== false) {
             return $result;
@@ -868,8 +868,8 @@ class Collection
             $command = array_merge(['mapReduce' => $this->getName()], $command);
             $result = $this->mongoCollection->db->command($command);
             $this->tryResultError($result);
-            Rock::endProfile('mongodb.query', $token);
-            Rock::trace('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
 
             if (array_key_exists('results', $result)) {
                 $this->setCache($result['results'], $cache, $cacheKey);
@@ -879,10 +879,10 @@ class Collection
             return $result['result'];
         } catch (\Exception $e) {
             $message = $e->getMessage() . "\nThe query being executed was: $rawQuery";
-            Rock::endProfile('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
-            Rock::trace('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
             throw new MongoException($message, [], $e);
         }
     }
@@ -922,7 +922,7 @@ class Collection
             'cache' => false,
         ];
         //Rock::info($rawQuery);
-        Rock::beginProfile('mongodb.query', $token);
+        Trace::beginProfile('mongodb.query', $token);
         $cache = $cacheKey = null;
         if (($result = $this->getCache($rawQuery, $token, $cache, $cacheKey)) !== false) {
             return $result;
@@ -932,16 +932,16 @@ class Collection
             $result = $this->mongoCollection->db->command($command);
             $this->tryResultError($result);
             $this->setCache($result['results'], $cache, $cacheKey);
-            Rock::endProfile('mongodb.query', $token);
-            Rock::trace('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
 
             return $result['results'];
         } catch (\Exception $e) {
             $message = $e->getMessage() . "\nThe query being executed was: $rawQuery";
-            Rock::endProfile('mongodb.query', $token);
+            Trace::endProfile('mongodb.query', $token);
             $token['valid']     = false;
             $token['exception'] = DEBUG === true ? $e : $message;
-            Rock::trace('mongodb.query', $token);
+            Trace::trace('mongodb.query', $token);
             throw new MongoException($message, [], $e);
         }
     }
@@ -1274,7 +1274,7 @@ class Collection
         /** @var $cache CacheInterface */
         if ($this->connection->enableQueryCache) {
             $cache = is_string($this->connection->queryCache)
-                ? Rock::factory($this->connection->queryCache)
+                ? Container::load($this->connection->queryCache)
                 : $this->connection->queryCache;
         }
 
@@ -1282,9 +1282,9 @@ class Collection
             $cacheKey = json_encode([__METHOD__, $this->connection->dsn, $rawQuery]);
             if (($result = $cache->get($cacheKey)) !== false) {
                 Trace::increment('cache.mongodb', 'Cache query MongoDB connection: ' . $this->connection->dsn);
-                Rock::endProfile('mongodb.query', $token);
+                Trace::endProfile('mongodb.query', $token);
                 $token['cache'] = true;
-                Rock::trace('mongodb.query', $token);
+                Trace::trace('mongodb.query', $token);
 
                 return $result;
             }

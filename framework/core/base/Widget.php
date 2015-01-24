@@ -3,7 +3,7 @@
 namespace rock\base;
 
 
-use rock\Rock;
+use rock\di\Container;
 use rock\widgets\WidgetException;
 
 class Widget implements ComponentsInterface
@@ -39,7 +39,7 @@ class Widget implements ComponentsInterface
     {
         $config['class'] = get_called_class();
         /** @var Widget $widget */
-        $widget = Rock::factory($config);
+        $widget = Container::load($config);
 
         self::$stack[] = $widget;
 
@@ -81,7 +81,7 @@ class Widget implements ComponentsInterface
         ob_implicit_flush(false);
         /** @var Widget $widget */
         $config['class'] = get_called_class();
-        $widget = Rock::factory($config);
+        $widget = Container::load($config);
         $out = $widget->run();
 
         return ob_get_clean() . $out;

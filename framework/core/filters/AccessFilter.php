@@ -7,7 +7,7 @@ use rock\access\Access;
 use rock\base\ActionFilter;
 use rock\base\Controller;
 use rock\db\BaseActiveRecord;
-use rock\Rock;
+use rock\di\Container;
 use rock\route\Route;
 use rock\route\RouteEvent;
 use rock\template\Template;
@@ -99,7 +99,7 @@ class AccessFilter extends ActionFilter
     public function beforeAction($action)
     {
         /** @var Access $access */
-        $access = Rock::factory([
+        $access = Container::load([
             'class' => Access::className(),
             'owner' => $this->owner,
             'rules' => $this->rules,

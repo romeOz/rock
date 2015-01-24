@@ -7,9 +7,11 @@ use League\Flysystem\Adapter\Local;
 use rock\base\Alias;
 use rock\cache\CacheFile;
 use rock\cache\CacheStub;
+use rock\cookie\Cookie;
+use rock\di\Container;
 use rock\file\FileManager;
 use rock\helpers\FileHelper;
-use rock\Rock;
+
 use rockunit\core\session\mocks\SessionMock;
 
 trait CommonTestTrait
@@ -19,16 +21,21 @@ trait CommonTestTrait
     public static $post = [];
 
     /**
+     * @param array $config config of session
      * @return SessionMock
+     * @throws \rock\di\ContainerException
      */
-    public static function getSession()
+    public static function getSession(array $config = [])
     {
-        Rock::$app->di['session'] = [
-            'class' => SessionMock::className(),
-            //'singleton' => true
-        ];
+        if (empty($config)) {
+            $config = [
+                'class' => SessionMock::className(),
+                //'singleton' => true
+            ];
+        }
+        Container::add('session', $config);
 
-        return Rock::$app->session;
+        return Container::load('session');
     }
 
     public static function activeSession($active = true)
@@ -36,13 +43,14 @@ trait CommonTestTrait
         SessionMock::$isActive = $active;
     }
 
-
     protected static function sessionUp()
     {
         $_SESSION = static::$session;
         $_COOKIE = static::$cookie;
         $_POST = static::$post;
-        Rock::$app->cookie->removeAll();
+        /** @var Cookie $cookie */
+        $cookie = Container::load('cookie');
+        $cookie->removeAll();
         static::getSession()->removeAll();
     }
 
@@ -56,8 +64,6 @@ trait CommonTestTrait
     protected static function clearRuntime()
     {
         $runtime = Alias::getAlias('@runtime');
-//        @rmdir("{$runtime}/cache");
-//        @rmdir("{$runtime}/filesystem");
         FileHelper::deleteDirectory("{$runtime}/cache");
         FileHelper::deleteDirectory("{$runtime}/filesystem");
         @unlink("{$runtime}/cache.tmp");
@@ -77,28 +83,31 @@ trait CommonTestTrait
     }
 
     /**
+     * @param array $config
      * @return \rock\cache\CacheInterface
+     * @throws \rock\di\ContainerException
      */
-    protected static function getCache()
+    protected static function getCache(array $config = [])
     {
-        Rock::$app->di['cache'] = [
-            'class' => CacheFile::className(),
-            'adapter' => function (){
-                return new FileManager([
-                   'adapter' => function(){
-                       return new Local(Alias::getAlias('@tests/runtime/cache'));
-                   },
-               ]);
-            }
-        ];
-        return Rock::$app->cache;
+        if (empty($config)) {
+            $config = [
+                'class' => CacheFile::className(),
+                'adapter' => function (){
+                    return new FileManager([
+                                               'adapter' => function(){
+                                                   return new Local(Alias::getAlias('@tests/runtime/cache'));
+                                               },
+                                           ]);
+                }
+            ];
+        }
+        Container::add('cache', $config);
+        return Container::load('cache');
     }
 
 
     protected static function disableCache()
     {
-        Rock::$app->di['cache'] = [
-            'class' => CacheStub::className()
-        ];
+        static::getCache(['class' => CacheStub::className()]);
     }
 } 

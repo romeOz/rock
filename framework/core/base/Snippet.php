@@ -2,7 +2,6 @@
 namespace rock\base;
 
 use rock\di\Container;
-use rock\Rock;
 use rock\template\Template;
 
 abstract class Snippet implements ComponentsInterface
@@ -17,16 +16,15 @@ abstract class Snippet implements ComponentsInterface
      * @var int|bool
      */
     public $autoEscape = true;
-    /** @var  Template */
-    public $template;
-
+    /** @var  Template|string|array */
+    public $template = 'template';
 
     public function init()
     {
         $this->parentInit();
 
-        if (!isset($this->template)) {
-            $this->template = Rock::$app->template;
+        if (!is_object($this->template)) {
+            $this->template = Container::load($this->template);
         }
     }
 
@@ -127,8 +125,8 @@ abstract class Snippet implements ComponentsInterface
                 $function[0] = $this->template->context;
                 return call_user_func_array($function, $params);
             } elseif (is_string($function[0])) {
-                if (Container::has($function[0])) {
-                    $function[0] = Rock::factory($function[0]);
+                if (Container::exists($function[0])) {
+                    $function[0] = Container::load($function[0]);
                 }
                 return call_user_func_array($function, $params);
             }

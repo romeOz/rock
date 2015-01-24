@@ -1,8 +1,8 @@
 <?php
 namespace rock\base;
 
+use rock\di\Container;
 use rock\event\Event;
-use rock\Rock;
 
 trait ComponentsTrait
 {
@@ -11,7 +11,6 @@ trait ComponentsTrait
     /** @var Behavior[]  */
     private $_behaviors;
     private $_events = [];
-
 
     /**
      * Get data behaviors
@@ -119,7 +118,7 @@ trait ComponentsTrait
     {
         if (!($behavior instanceof Behavior)) {
             /** @var Behavior $behavior */
-            $behavior = Rock::factory($behavior);
+            $behavior = Container::load($behavior);
         }
         if (is_int($name)) {
             $behavior->attach($this);
@@ -169,7 +168,7 @@ trait ComponentsTrait
         } elseif (strncmp($name, 'as ', 3) === 0) {
             // as behavior: attach behavior
             $name = trim(substr($name, 3));
-            $this->attachBehavior($name, $value instanceof Behavior ? $value : Rock::factory($value));
+            $this->attachBehavior($name, $value instanceof Behavior ? $value : Container::load($value));
 
             return;
         } else {

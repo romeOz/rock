@@ -5,7 +5,7 @@ namespace rock\authclient;
 
 use rock\base\ComponentsInterface;
 use rock\base\ComponentsTrait;
-use rock\Rock;
+use rock\di\Container;
 
 /**
  * Collection is a storage for all auth clients in the application.
@@ -102,6 +102,6 @@ class Collection implements ComponentsInterface
      */
     protected function createClient($config)
     {
-        return Rock::factory($config);
+        return Container::load($config);
     }
 } 

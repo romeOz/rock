@@ -3,8 +3,8 @@ namespace rock\sphinx;
 
 use rock\base\ObjectTrait;
 use rock\cache\CacheInterface;
+use rock\di\Container;
 use rock\helpers\Helper;
-use rock\Rock;
 
 /**
  * Schema represents the Sphinx schema information.
@@ -125,7 +125,7 @@ class Schema
 
         if ($connection->enableSchemaCache === true && !in_array($name, $connection->schemaCacheExclude, true)) {
             /** @var CacheInterface $cache */
-            $cache = is_string($connection->schemaCache) ? Rock::factory($connection->schemaCache) : $connection->schemaCache;
+            $cache = is_string($connection->schemaCache) ? Container::load($connection->schemaCache) : $connection->schemaCache;
 
             if ($cache instanceof CacheInterface) {
                 $cacheKey = serialize($this->getCacheKey($name));
@@ -306,7 +306,7 @@ class Schema
     public function refresh()
     {
         /** @var CacheInterface $cache */
-        $cache = is_string($this->connection->schemaCache) ? Rock::factory($this->connection->schemaCache) : $this->connection->schemaCache;
+        $cache = is_string($this->connection->schemaCache) ? Container::load($this->connection->schemaCache) : $this->connection->schemaCache;
         if ($this->connection->enableSchemaCache && $cache instanceof CacheInterface) {
             $cache->removeTag($this->getCacheGroup());
         }

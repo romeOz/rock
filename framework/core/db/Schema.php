@@ -5,7 +5,6 @@ use rock\base\ObjectTrait;
 use rock\cache\CacheInterface;
 use rock\di\Container;
 use rock\helpers\Helper;
-use rock\Rock;
 
 /**
  * Schema is the base class for concrete DBMS-specific schema classes.
@@ -243,7 +242,7 @@ abstract class Schema
     {
         if ($this->connection->enableSchemaCache === true && isset($this->connection->schemaCache)) {
             /** @var CacheInterface $cache */
-            $cache = is_string($this->connection->schemaCache) ? Rock::factory($this->connection->schemaCache) : $this->connection->schemaCache;
+            $cache = is_string($this->connection->schemaCache) ? Container::load($this->connection->schemaCache) : $this->connection->schemaCache;
             if ($cache instanceof CacheInterface) {
                 $cache->removeTag($this->getCacheGroup());
             }
