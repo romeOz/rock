@@ -9,10 +9,7 @@ use rock\file\FileManager;
 use rockunit\common\CommonTestTrait;
 
 
-/**
- * @group base
- */
-class FileManagerTest extends \PHPUnit_Framework_TestCase
+abstract class FileManagerTest extends \PHPUnit_Framework_TestCase
 {
     use CommonTestTrait;
 
@@ -27,13 +24,11 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        parent::setUp(); 
-        $this->fileManager = new FileManager([
-             'adapter' =>
-                 function () {
-                     return new Local(Alias::getAlias('@runtime/filesystem'));
-                 }
-         ]);
+        parent::setUp();
+        $config = [
+            'adapter' => new Local(Alias::getAlias('@runtime/filesystem'))
+        ];
+        $this->fileManager = new FileManager($config);
         $this->fileManager->deleteAll();
     }
 
@@ -342,20 +337,12 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
 
     protected static function getFileManagerWithLocalCache()
     {
-        return                 new FileManager(
-            [
-                'adapter' =>
-                    function () {
-                        return new Local(Alias::getAlias('@runtime/filesystem'));
-                    },
-                'cache' => function () {
-                        $local = new Local(Alias::getAlias('@runtime'));
-                        $cache = new Adapter($local, 'filesystem.tmp');
-
-                        return $cache;
-                    }
-            ]
-        );
+        $local = new Local(Alias::getAlias('@runtime'));
+        $config = [
+            'adapter' => new Local(Alias::getAlias('@runtime/filesystem')),
+            'cache' => new Adapter($local, 'filesystem.tmp')
+        ];
+        return new FileManager($config);
     }
 
     public static function tearDownAfterClass()

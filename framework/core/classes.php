@@ -45,17 +45,9 @@ return array_merge(
 //                    return \rock\di\Container::load(
 //                        [
 //                            'class' => FileManager::className(),
-//                            'adapter' =>
-//                                function () {
-//                                    return new Local(Alias::getAlias('@common/runtime/cache'));
-//                                },
+//                            'adapter' => new Local(Alias::getAlias('@common/runtime/cache')),
 //                            'config' => ['visibility' => FileManager::VISIBILITY_PRIVATE],
-//                            'cache' => function () {
-//                                    $local = new Local(Alias::getAlias('@common/runtime/filesystem'));
-//                                    $cache = new Adapter($local, 'cache.tmp');
-//
-//                                    return $cache;
-//                                }
+//                            'cache' => new Adapter(new Local(Alias::getAlias('@common/runtime/filesystem')), 'cache.tmp')
 //                        ]
 //                    );
 //                }
@@ -325,29 +317,13 @@ return array_merge(
             'class' => \rock\image\ImageProvider::className(),
             'adapter' => [
                 'class' => FileManager::className(),
-                'adapter' =>
-                    function () {
-                        return new Local(Alias::getAlias('@assets/images'));
-                    },
-                'cache' => function () {
-                    $local = new Local(Alias::getAlias('@common.runtime/filesystem'));
-                    $cache = new Adapter($local, 'images.tmp');
-
-                    return $cache;
-                }
+                'adapter' => new Local(Alias::getAlias('@assets/images')),
+                'cache' => $cache = new Adapter(new Local(Alias::getAlias('@common.runtime/filesystem')), 'images.tmp')
             ],
             'adapterCache' => [
                 'class' => FileManager::className(),
-                'adapter' =>
-                    function () {
-                        return new Local(Alias::getAlias('@assets/cache'));
-                    },
-                'cache' => function () {
-                    $local = new Local(Alias::getAlias('@common.runtime/filesystem'));
-                    $cache = new Adapter($local, 'image_cache.tmp');
-
-                    return $cache;
-                }
+                'adapter' => new Local(Alias::getAlias('@assets/cache')),
+                'cache' => new Adapter(new Local(Alias::getAlias('@common.runtime/filesystem')), 'image_cache.tmp')
             ],
         ],
         'csrf' => [
@@ -413,16 +389,8 @@ return array_merge(
             'class' => \rock\file\UploadedFile::className(),
             'adapter' => [
                 'class' => FileManager::className(),
-                'adapter' =>
-                    function () {
-                        return new Local(Alias::getAlias('@assets/images'));
-                    },
-                'cache' => function () {
-                    $local = new Local(Alias::getAlias('@common.runtime/filesystem'));
-                    $cache = new Adapter($local, 'images.tmp');
-
-                    return $cache;
-                }
+                'adapter' => new Local(Alias::getAlias('@assets/images')),
+                'cache' => new Adapter(new Local(Alias::getAlias('@common.runtime/filesystem')), 'images.tmp')
             ],
             'calculatePathname' => function(\rock\file\UploadedFile $upload, $path, FileManager $fileManager = null) {
                     $pathname = !empty($path) ? [$path] : [];

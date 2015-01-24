@@ -13,22 +13,15 @@ use League\Flysystem\Cache\Memcached;
  */
 class FileManagerWithMemcachedTest extends FileManagerTest
 {
-     protected function setUp()
+    protected function setUp()
     {
-        $this->fileManager = new FileManager(
-            [
-                'adapter' =>
-                    function () {
-                        return new Local(Alias::getAlias('@runtime/filesystem'));
-                    },
-                'cache' => function () {
-                        $memcached = new \Memcached();
-                        $memcached->addServer('localhost', 11211);
-
-                        return new Memcached($memcached);
-                    }
-            ]
-        );
+        $memcached = new \Memcached();
+        $memcached->addServer('localhost', 11211);
+        $config = [
+            'adapter' => new Local(Alias::getAlias('@runtime/filesystem')),
+            'cache' => new Memcached($memcached)
+        ];
+        $this->fileManager = new FileManager($config);
         $this->fileManager->deleteAll();
     }
 }

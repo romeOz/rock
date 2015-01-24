@@ -50,20 +50,12 @@ class CacheFileTest extends \PHPUnit_Framework_TestCase
     protected static function getFileManager()
     {
         if (!isset(static::$fileManager)) {
-            static::$fileManager = new FileManager(
-                [
-                    'adapter' =>
-                        function () {
-                            return new Local(Alias::getAlias('@tests/runtime/cache'));
-                        },
-                    'cache' => function () {
-                            $local = new Local(Alias::getAlias('@tests/runtime'));
-                            $cache = new Adapter($local, 'cache.tmp');
-
-                            return $cache;
-                        }
-                ]
-            );
+            $local = new Local(Alias::getAlias('@tests/runtime'));
+            $config = [
+                'adapter' => new Local(Alias::getAlias('@tests/runtime/cache')),
+                'cache' => new Adapter($local, 'cache.tmp')
+            ];
+            static::$fileManager = new FileManager($config);
         }
 
         return static::$fileManager;

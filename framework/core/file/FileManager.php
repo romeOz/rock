@@ -3,29 +3,16 @@ namespace rock\file;
 
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\CacheInterface;
-use League\Flysystem\Config;
 use League\Flysystem\Filesystem;
-use League\Flysystem\PluginInterface;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\helpers\ArrayHelper;
 use rock\helpers\StringHelper;
 
-/**
- * @method bool deleteDir(string $dirname)
- * @method bool put(string $path, $contents, $config = null)
- * @method bool createDir(string $dirname)
- * @method bool putStream(string $path, $resource, $config = null)
- * @method false|resource readStream(string $path)
- * @method flushCache();
- * @method addPlugin(PluginInterface $plugin)
- * @method AdapterInterface getAdapter()
- * @method Config getConfig()
- * @method CacheInterface getCache()
- */
-class FileManager implements ObjectInterface
+class FileManager extends Filesystem implements ObjectInterface
 {
     use ObjectTrait {
+        ObjectTrait::__construct as parentConstruct;
         ObjectTrait::__call as parentCall;
     }
 
@@ -33,65 +20,36 @@ class FileManager implements ObjectInterface
     const TYPE_DIR = 'dir';
     const META_TIMESTAMP = 'timestamp';
     const META_MIMETYPE = 'mimetype';
-    const VISIBILITY_PRIVATE = Filesystem::VISIBILITY_PRIVATE;
-    const VISIBILITY_PUBLIC = Filesystem::VISIBILITY_PUBLIC;
-
-    /** @var  \Closure|AdapterInterface */
-    public $adapter;
-    /** @var  \Closure|CacheInterface|null */
-    public $cache;
-
-    public $config;
-    /** @var  Filesystem */
-    protected $filesystem;
 
     protected $errors = [];
 
-
     /**
-     * @return Filesystem
+     * @inheritdoc
      */
-    protected function getFilesystem()
+    public function __construct($config = [])
     {
-        if (!isset($this->filesystem)) {
-            if ($this->adapter instanceof \Closure) {
-                $this->adapter = call_user_func($this->adapter, $this);
-            }
-
-            if ($this->cache instanceof \Closure) {
-                $this->cache = call_user_func($this->cache, $this);
-            }
-
-            if ($this->cache instanceof CacheInterface) {
-                $this->cache->save();
-            }
-            $this->filesystem = new Filesystem($this->adapter, $this->cache, $this->config);
+        $this->parentConstruct($config);
+        if ($this->cache instanceof CacheInterface) {
+            $this->cache->save();
         }
+        parent::__construct($this->adapter, $this->cache, $this->config);
 
-        return $this->filesystem;
+
     }
 
-    /**
-     * Check whether a path exists
-     *
-     * ```php
-     * has('cache/file.tmp')
-     * has('~/file.tmp$/')
-     * ```
-     *
-     * @param  string $path path to check or regexp pattern
-     * @param null    $is
-     * @return boolean whether the path exists
-     */
-    public function has($path, $is = null)
+    public function setAdapter(AdapterInterface $adapter)
     {
-        if (StringHelper::isRegexp($path) && (!$path = $this->searchByPattern($path, false, $is))) {
-            return false;
-        }
+        $this->adapter = $adapter;
+    }
 
-        return isset($is)
-            ? $this->getFilesystem()->has($path) && $this->getFilesystem()->getMetadata($path)['type'] === $is
-            : $this->getFilesystem()->has($path);
+    public function setCache(CacheInterface $cache)
+    {
+        $this->cache = $cache;
+    }
+
+    public function setConfig($config = null)
+    {
+        $this->config = $config;
     }
 
     /**
@@ -113,7 +71,7 @@ class FileManager implements ObjectInterface
         }
 
         try {
-            return $this->getFilesystem()->read($path);
+            return parent::read($path);
         } catch (\Exception $e) {
             $this->errors[] = StringHelper::replace(FileException::UNKNOWN_FILE, ['path' => $path]);
         }
@@ -133,11 +91,34 @@ class FileManager implements ObjectInterface
         }
 
         try {
-            return $this->getFilesystem()->readAndDelete($path);
+            return parent::readAndDelete($path);
         } catch (\Exception $e) {
             $this->errors[] = StringHelper::replace(FileException::UNKNOWN_FILE, ['path' => $path]);
         }
         return false;
+    }
+
+    /**
+     * Check whether a path exists
+     *
+     * ```php
+     * has('cache/file.tmp')
+     * has('~/file.tmp$/')
+     * ```
+     *
+     * @param  string $path path to check or regexp pattern
+     * @param null    $is
+     * @return boolean whether the path exists
+     */
+    public function has($path, $is = null)
+    {
+        if (StringHelper::isRegexp($path) && (!$path = $this->searchByPattern($path, false, $is))) {
+            return false;
+        }
+
+        return isset($is)
+            ? parent::has($path) && parent::getMetadata($path)['type'] === $is
+            : parent::has($path);
     }
 
     /**
@@ -151,7 +132,7 @@ class FileManager implements ObjectInterface
     public function write($path, $contents, $config = null)
     {
         try {
-            return $this->getFilesystem()->write($path, $contents, $config);
+            return parent::write($path, $contents, $config);
         } catch (\Exception $e) {
             $this->errors[] = StringHelper::replace(FileException::FILE_EXISTS, ['path' => $path]);
         }
@@ -161,7 +142,7 @@ class FileManager implements ObjectInterface
     public function writeStream($path, $resource, $config = null)
     {
         try {
-            return $this->getFilesystem()->writeStream($path, $resource, $config);
+            return parent::writeStream($path, $resource, $config);
         } catch (\Exception $e) {
             $this->errors[] = $e->getMessage();
         }
@@ -169,27 +150,25 @@ class FileManager implements ObjectInterface
     }
 
     /**
-     * Update a file
-     *
-     * @param  string                $path     path to file
-     * @param  string                $contents file contents
-     * @param   mixed                $config   Config object or visibility setting
-     * @return boolean               success boolean
+     * @inheritdoc
      */
     public function update($path, $contents, $config = null)
     {
         try {
-            return $this->getFilesystem()->update($path, $contents, $config);
+            return parent::update($path, $contents, $config);
         } catch (\Exception $e) {
             $this->errors[] = StringHelper::replace(FileException::FILE_EXISTS, ['path' => $path]);
         }
         return false;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function updateStream($path, $resource, $config = null)
     {
         try {
-            return $this->getFilesystem()->updateStream($path, $resource, $config);
+            return parent::updateStream($path, $resource, $config);
         } catch (\Exception $e) {
             $this->errors[] = $e->getMessage();
         }
@@ -197,16 +176,52 @@ class FileManager implements ObjectInterface
     }
 
     /**
-     * Rename a file
+     * Delete a file
      *
-     * @param  string                $path    path to file
-     * @param  string                $newpath new path
+     * ```php
+     * delete('cache/file.tmp')
+     * delete('~/file.tmp$/')
+     * ```
+     *
+     * @param  string $path path to file or regexp pattern
      * @return boolean               success boolean
+     */
+    public function delete($path)
+    {
+        if (StringHelper::isRegexp($path) && (!$path = $this->searchByPattern($path))) {
+            return false;
+        }
+
+        try {
+            return parent::delete($path);
+        } catch (\Exception $e) {
+            $this->errors[] = StringHelper::replace(FileException::UNKNOWN_FILE, ['path' => $path]);
+        }
+        return false;
+    }
+
+    /**
+     * Clear current dir
+     */
+    public function deleteAll()
+    {
+        foreach (parent::listContents() as $value) {
+            if (!isset($value['type']) || $value['type'] === self::TYPE_DIR) {
+                parent::deleteDir($value['path']);
+                continue;
+            }
+
+            parent::delete($value['path']);
+        }
+    }
+
+    /**
+     * @inheritdoc
      */
     public function rename($path, $newpath)
     {
         try {
-            return $this->getFilesystem()->rename($path, $newpath);
+            return parent::rename($path, $newpath);
         } catch (\Exception $e) {
             $this->errors[] = $e->getMessage();
         }
@@ -228,7 +243,7 @@ class FileManager implements ObjectInterface
     public function renameByMask($path, $newpath, array $dataReplace = [])
     {
         try {
-            $metadata = $this->getFilesystem()->getWithMetadata($path, ['timestamp','mimetype']);
+            $metadata = parent::getWithMetadata($path, ['timestamp','mimetype']);
         } catch (\Exception $e) {
             $this->errors[] = $e->getMessage();
             return false;
@@ -247,7 +262,7 @@ class FileManager implements ObjectInterface
     public function copy($path, $newpath)
     {
         try {
-            return $this->getFilesystem()->copy($path, $newpath);
+            return parent::copy($path, $newpath);
         } catch (\Exception $e) {
             $this->errors[] = $e->getMessage();
         }
@@ -273,7 +288,7 @@ class FileManager implements ObjectInterface
         }
 
         try {
-            return $this->getFilesystem()->getMetadata($path);
+            return parent::getMetadata($path);
         } catch (\Exception $e) {
             $this->errors[] = $e->getMessage();
         }
@@ -290,7 +305,7 @@ class FileManager implements ObjectInterface
      *
      * @param  string $path path to file or regexp pattern
      * @param   array   $metadata  metadata keys
-     * @return  array   metadata
+     * @return  array|false   metadata
      */
     public function getWithMetadata($path, array $metadata)
     {
@@ -299,7 +314,11 @@ class FileManager implements ObjectInterface
         }
 
         try {
-            return $this->getFilesystem()->getWithMetadata($path, $metadata);
+            $result = parent::getWithMetadata($path, $metadata);
+            if (!array_filter($result)) {
+                return false;
+            }
+            return $result;
         } catch (\Exception $e) {
             $this->errors[] = $e->getMessage();
         }
@@ -325,7 +344,7 @@ class FileManager implements ObjectInterface
         }
 
         try {
-            return $this->getFilesystem()->getVisibility($path);
+            return parent::getVisibility($path);
         } catch (\Exception $e) {
             $this->errors[] = $e->getMessage();
         }
@@ -351,7 +370,7 @@ class FileManager implements ObjectInterface
         }
 
         try {
-            return $this->getFilesystem()->getTimestamp($path);
+            return parent::getTimestamp($path);
         } catch (\Exception $e) {
             $this->errors[] = $e->getMessage();
         }
@@ -377,7 +396,7 @@ class FileManager implements ObjectInterface
         }
 
         try {
-            return $this->getFilesystem()->getMimetype($path);
+            return parent::getMimetype($path);
         } catch (\Exception $e) {
             $this->errors[] = $e->getMessage();
         }
@@ -403,52 +422,11 @@ class FileManager implements ObjectInterface
         }
 
         try {
-            return $this->getFilesystem()->getSize($path);
+            return parent::getSize($path);
         } catch (\Exception $e) {
             $this->errors[] = $e->getMessage();
         }
         return false;
-    }
-
-    /**
-     * Delete a file
-     *
-     * ```php
-     * delete('cache/file.tmp')
-     * delete('~/file.tmp$/')
-     * ```
-     *
-     * @param  string $path path to file or regexp pattern
-     * @return boolean               success boolean
-     */
-    public function delete($path)
-    {
-        if (StringHelper::isRegexp($path) && (!$path = $this->searchByPattern($path))) {
-            return false;
-        }
-
-        try {
-            return $this->getFilesystem()->delete($path);
-        } catch (\Exception $e) {
-            $this->errors[] = StringHelper::replace(FileException::UNKNOWN_FILE, ['path' => $path]);
-        }
-        return false;
-    }
-
-
-    /**
-     * Clear current dir
-     */
-    public function deleteAll()
-    {
-        foreach ($this->getFilesystem()->listContents() as $value) {
-            if (!isset($value['type']) || $value['type'] === self::TYPE_DIR) {
-                $this->getFilesystem()->deleteDir($value['path']);
-                continue;
-            }
-
-            $this->getFilesystem()->delete($value['path']);
-        }
     }
 
     /**
@@ -472,7 +450,7 @@ class FileManager implements ObjectInterface
             }
         }
 
-        $result = $this->getFilesystem()->listContents($directory, $recursive);
+        $result = parent::listContents($directory, $recursive);
 
         return isset($is)
             ? array_filter(
@@ -501,10 +479,10 @@ class FileManager implements ObjectInterface
         }
 
         if (!isset($is)) {
-            return $this->getFilesystem()->listPaths($directory, $recursive);
+            return parent::listPaths($directory, $recursive);
         }
         $result = [];
-        foreach ($this->getFilesystem()->listContents($directory, $recursive) as $value) {
+        foreach (parent::listContents($directory, $recursive) as $value) {
             if ($value['type'] !== $is) {
                 continue;
             }
@@ -517,7 +495,7 @@ class FileManager implements ObjectInterface
     /**
      * List contents with metadata
      *
-     * @param array  $keys - metadata keys
+     * @param array  $keys metadata keys
      * @param string $directory
      * @param bool   $recursive
      * @param null   $is
@@ -531,7 +509,7 @@ class FileManager implements ObjectInterface
             }
         }
 
-        $result = $this->getFilesystem()->listWith($keys, $directory, $recursive);
+        $result = parent::listWith($keys, $directory, $recursive);
         return isset($is)
             ? array_filter(
                 $result,
@@ -551,19 +529,16 @@ class FileManager implements ObjectInterface
     }
 
     /**
-     * @param $name - name
-     * @param $params
-     * @return mixed
+     * @inheritdoc
      */
-    public function __call($name, $params)
+    public function __call($method, array $arguments)
     {
-        return call_user_func_array([$this->getFilesystem(), $name], $params);
+        return parent::__call($method, $arguments);
     }
-
 
     protected function searchByPattern($pattern, $error = true, $is = self::TYPE_FILE)
     {
-        foreach ($this->getFilesystem()->listContents('', true) as $data) {
+        foreach (parent::listContents('', true) as $data) {
             if (isset($is) && $data['type'] !== $is) {
                 continue;
             }
@@ -581,7 +556,7 @@ class FileManager implements ObjectInterface
     protected function searchDirByPattern($pattern, $recursive = false, $is = null)
     {
         $result =[];
-        foreach ($this->getFilesystem()->listContents('', $recursive) as $data) {
+        foreach (parent::listContents('', $recursive) as $data) {
             if (isset($is) && isset($data['type']) && $data['type'] !== $is) {
                 continue;
             }
@@ -597,7 +572,7 @@ class FileManager implements ObjectInterface
     protected function searchFilesWithByPattern(array $keys = [], $pattern, $recursive = false, $is = null)
     {
         $result =[];
-        foreach ($this->getFilesystem()->listWith($keys, '', $recursive) as $data) {
+        foreach (parent::listWith($keys, '', $recursive) as $data) {
             if (isset($is) && $data['type'] !== $is) {
                 continue;
             }
