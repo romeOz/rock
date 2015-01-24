@@ -20,6 +20,9 @@ $_SESSION = [];
 //$_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4';
 date_default_timezone_set('UTC');
 
+Rock::$app = new Rock();
+Rock::$app->language = 'en';
+
 if (!$config = require(dirname(__DIR__) . '/apps/common/configs/configs.php')) {
     die('configs is empty/not found');
 }
@@ -28,9 +31,6 @@ if (!$config = require(dirname(__DIR__) . '/apps/common/configs/configs.php')) {
 Alias::setAlias('tests', __DIR__);
 Alias::setAlias('rockunit', __DIR__);
 Alias::setAlias('runtime', '@tests/runtime');
-
-Rock::$app = new Rock();
-Rock::$app->language = \rock\i18n\i18nInterface::EN;
 
 require(dirname(__DIR__) . '/framework/polyfills.php');
 

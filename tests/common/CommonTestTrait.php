@@ -92,13 +92,11 @@ trait CommonTestTrait
         if (empty($config)) {
             $config = [
                 'class' => CacheFile::className(),
-                'adapter' => function (){
-                    return new FileManager([
-                                               'adapter' => function(){
-                                                   return new Local(Alias::getAlias('@tests/runtime/cache'));
-                                               },
-                                           ]);
-                }
+                'adapter' => new FileManager([
+                                                 'adapter' => function(){
+                                                     return new Local(Alias::getAlias('@tests/runtime/cache'));
+                                                 },
+                                             ])
             ];
         }
         Container::add('cache', $config);
