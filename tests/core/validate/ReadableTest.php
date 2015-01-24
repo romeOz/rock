@@ -15,8 +15,8 @@ class ReadableTest extends \PHPUnit_Framework_TestCase
                 'readable' => [
                     'class' => ReadableMock::className(),
                     'locales' => [
-                        Validate::EN => \rock\validate\locale\en\Readable::className(),
-                        Validate::RU => \rock\validate\locale\ru\Readable::className(),
+                        'en' => \rock\validate\locale\en\Readable::className(),
+                        'ru' => \rock\validate\locale\ru\Readable::className(),
                     ]
                 ],
             ]

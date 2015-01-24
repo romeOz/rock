@@ -18,8 +18,8 @@ class SymbolicLinkTest extends \PHPUnit_Framework_TestCase
                 'symbolicLink' => [
                     'class' => SymbolicLinkMock::className(),
                     'locales' => [
-                        Validate::EN => \rock\validate\locale\en\SymbolicLink::className(),
-                        Validate::RU => \rock\validate\locale\ru\SymbolicLink::className(),
+                        'en' => \rock\validate\locale\en\SymbolicLink::className(),
+                        'ru' => \rock\validate\locale\ru\SymbolicLink::className(),
                     ]
                 ],
             ]

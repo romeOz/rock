@@ -6,7 +6,6 @@ use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\di\Container;
 use rock\helpers\StringHelper;
-use rock\i18n\i18nInterface;
 use rock\Rock;
 use rock\validate\locale\Locale;
 use rock\validate\rules\Alnum;
@@ -71,10 +70,10 @@ use rock\validate\rules\Writable;
  * @method static Validate notOf(Validate $validate)
  * @method static Validate oneOf(Validate $validate)
  * @method static Validate when(Validate $if, Validate $then, Validate $else = null)
- * @method static Validate locale(StringHelper $locale)
+ * @method static Validate locale(string $locale)
  *
- * @method static Validate alnum(StringHelper $additionalChars = null)
- * @method static Validate alpha(StringHelper $additionalChars = null)
+ * @method static Validate alnum(string $additionalChars = null)
+ * @method static Validate alpha(string $additionalChars = null)
  * @method static Validate arr()
  * @method static Validate between(mixed $min = null, mixed $max = null, bool $inclusive = false)
  * @method static Validate bool()
@@ -85,8 +84,8 @@ use rock\validate\rules\Writable;
  * @method static Validate contains(mixed $containsValue, bool $identical = false)
  * @method static Validate confirm(mixed $compareTo)
  * @method static Validate csrf()
- * @method static Validate date(StringHelper $format = null)
- * @method static Validate digit(StringHelper $additionalChars = null)
+ * @method static Validate date(string $format = null)
+ * @method static Validate digit(string $additionalChars = null)
  * @method static Validate directory()
  * @method static Validate domain()
  * @method static Validate email()
@@ -100,7 +99,7 @@ use rock\validate\rules\Writable;
  * @method static Validate fileSizeMin(int $minValue, bool $inclusive = false)
  * @method static Validate fileSizeBetween(int $min = null, int $max = null, bool $inclusive = false)
  * @method static Validate float()
- * @method static Validate graph(StringHelper $additionalChars = null)
+ * @method static Validate graph(string $additionalChars = null)
  * @method static Validate in(array $haystack, bool $compareIdentical = false)
  * @method static Validate int()
  * @method static Validate ip(array $ipOptions = null)
@@ -119,7 +118,7 @@ use rock\validate\rules\Writable;
  * @method static Validate positive()
  * @method static Validate readable()
  * @method static Validate regex($regex)
- * @method static Validate space(StringHelper $additionalChars = null)
+ * @method static Validate space(string $additionalChars = null)
  * @method static Validate startsWith(mixed $startValue, bool $identical = false)
  * @method static Validate string()
  * @method static Validate symbolicLink()
@@ -129,7 +128,7 @@ use rock\validate\rules\Writable;
  * 
  * @package rock\validate
  */
-class Validate implements i18nInterface, ObjectInterface
+class Validate implements ObjectInterface
 {
     use ObjectTrait {
         ObjectTrait::__construct as parentConstruct;
@@ -497,372 +496,372 @@ class Validate implements i18nInterface, ObjectInterface
             'alnum' => [
                 'class' => Alnum::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Alnum::className(),
-                    self::RU => \rock\validate\locale\ru\Alnum::className(),
+                    'en' => \rock\validate\locale\en\Alnum::className(),
+                    'ru' => \rock\validate\locale\ru\Alnum::className(),
                 ]
             ],
             'alpha' => [
                 'class' => Alpha::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Alpha::className(),
-                    self::RU => \rock\validate\locale\ru\Alpha::className(),
+                    'en' => \rock\validate\locale\en\Alpha::className(),
+                    'ru' => \rock\validate\locale\ru\Alpha::className(),
                 ]
             ],
             'arr' => [
                 'class' => Arr::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Arr::className(),
-                    self::RU => \rock\validate\locale\ru\Arr::className(),
+                    'en' => \rock\validate\locale\en\Arr::className(),
+                    'ru' => \rock\validate\locale\ru\Arr::className(),
                 ]
             ],
             'between' => [
                 'class' => Between::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Between::className(),
-                    self::RU => \rock\validate\locale\ru\Between::className(),
+                    'en' => \rock\validate\locale\en\Between::className(),
+                    'ru' => \rock\validate\locale\ru\Between::className(),
                 ]
             ],
             'bool' => [
                 'class' => Bool::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Bool::className(),
-                    self::RU => \rock\validate\locale\ru\Bool::className(),
+                    'en' => \rock\validate\locale\en\Bool::className(),
+                    'ru' => \rock\validate\locale\ru\Bool::className(),
                 ]
             ],
             'call' => [
                 'class' => Call::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Call::className(),
-                    self::RU => \rock\validate\locale\ru\Call::className(),
+                    'en' => \rock\validate\locale\en\Call::className(),
+                    'ru' => \rock\validate\locale\ru\Call::className(),
                 ]
             ],
             'captcha' => [
                 'class' => Captcha::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Captcha::className(),
-                    self::RU => \rock\validate\locale\ru\Captcha::className(),
+                    'en' => \rock\validate\locale\en\Captcha::className(),
+                    'ru' => \rock\validate\locale\ru\Captcha::className(),
                 ]
             ],
             'closure' => [
                 'class' => Closure::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Closure::className(),
-                    self::RU => \rock\validate\locale\ru\Closure::className(),
+                    'en' => \rock\validate\locale\en\Closure::className(),
+                    'ru' => \rock\validate\locale\ru\Closure::className(),
                 ]
             ],
             'cntrl' => [
                 'class' => Cntrl::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Cntrl::className(),
-                    self::RU => \rock\validate\locale\ru\Cntrl::className(),
+                    'en' => \rock\validate\locale\en\Cntrl::className(),
+                    'ru' => \rock\validate\locale\ru\Cntrl::className(),
                 ]
             ],
             'confirm' => [
                 'class' => Confirm::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Confirm::className(),
-                    self::RU => \rock\validate\locale\ru\Confirm::className(),
+                    'en' => \rock\validate\locale\en\Confirm::className(),
+                    'ru' => \rock\validate\locale\ru\Confirm::className(),
                 ]
             ],
             'contains' => [
                 'class' => Contains::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Contains::className(),
-                    self::RU => \rock\validate\locale\ru\Contains::className(),
+                    'en' => \rock\validate\locale\en\Contains::className(),
+                    'ru' => \rock\validate\locale\ru\Contains::className(),
                 ]
             ],
             'csrf' => [
                 'class' => CSRF::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\CSRF::className(),
-                    self::RU => \rock\validate\locale\ru\CSRF::className(),
+                    'en' => \rock\validate\locale\en\CSRF::className(),
+                    'ru' => \rock\validate\locale\ru\CSRF::className(),
                 ]
             ],
             'date' => [
                 'class' => Date::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Date::className(),
-                    self::RU => \rock\validate\locale\ru\Date::className(),
+                    'en' => \rock\validate\locale\en\Date::className(),
+                    'ru' => \rock\validate\locale\ru\Date::className(),
                 ]
             ],
             'digit' => [
                 'class' => Digit::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Digit::className(),
-                    self::RU => \rock\validate\locale\ru\Digit::className(),
+                    'en' => \rock\validate\locale\en\Digit::className(),
+                    'ru' => \rock\validate\locale\ru\Digit::className(),
                 ]
             ],
             'directory' => [
                 'class' => Directory::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Directory::className(),
-                    self::RU => \rock\validate\locale\ru\Directory::className(),
+                    'en' => \rock\validate\locale\en\Directory::className(),
+                    'ru' => \rock\validate\locale\ru\Directory::className(),
                 ]
             ],
             'domain' => [
                 'class' => Domain::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Domain::className(),
-                    self::RU => \rock\validate\locale\ru\Domain::className(),
+                    'en' => \rock\validate\locale\en\Domain::className(),
+                    'ru' => \rock\validate\locale\ru\Domain::className(),
                 ]
             ],
             'email' => [
                 'class' => Email::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Email::className(),
-                    self::RU => \rock\validate\locale\ru\Email::className(),
+                    'en' => \rock\validate\locale\en\Email::className(),
+                    'ru' => \rock\validate\locale\ru\Email::className(),
                 ]
             ],
             'endsWith' => [
                 'class' => EndsWith::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\EndsWith::className(),
-                    self::RU => \rock\validate\locale\ru\EndsWith::className(),
+                    'en' => \rock\validate\locale\en\EndsWith::className(),
+                    'ru' => \rock\validate\locale\ru\EndsWith::className(),
                 ]
             ],
             'equals' => [
                 'class' => Equals::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Equals::className(),
-                    self::RU => \rock\validate\locale\ru\Equals::className(),
+                    'en' => \rock\validate\locale\en\Equals::className(),
+                    'ru' => \rock\validate\locale\ru\Equals::className(),
                 ]
             ],
             'file' => [
                 'class' => File::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\File::className(),
-                    self::RU => \rock\validate\locale\ru\File::className(),
+                    'en' => \rock\validate\locale\en\File::className(),
+                    'ru' => \rock\validate\locale\ru\File::className(),
                 ]
             ],
             'fileExists' => [
                 'class' => Exists::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Exists::className(),
-                    self::RU => \rock\validate\locale\ru\Exists::className(),
+                    'en' => \rock\validate\locale\en\Exists::className(),
+                    'ru' => \rock\validate\locale\ru\Exists::className(),
                 ]
             ],
             'fileExtensions' => [
                 'class' => FileExtensions::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\FileExtensions::className(),
-                    self::RU => \rock\validate\locale\ru\FileExtensions::className(),
+                    'en' => \rock\validate\locale\en\FileExtensions::className(),
+                    'ru' => \rock\validate\locale\ru\FileExtensions::className(),
                 ]
             ],
             'fileMimeTypes' => [
                 'class' => FileMimeTypes::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\FileMimeTypes::className(),
-                    self::RU => \rock\validate\locale\ru\FileMimeTypes::className(),
+                    'en' => \rock\validate\locale\en\FileMimeTypes::className(),
+                    'ru' => \rock\validate\locale\ru\FileMimeTypes::className(),
                 ]
             ],
             'fileSizeBetween' => [
                 'class' => FileSizeBetween::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\FileSizeBetween::className(),
-                    self::RU => \rock\validate\locale\ru\FileSizeBetween::className(),
+                    'en' => \rock\validate\locale\en\FileSizeBetween::className(),
+                    'ru' => \rock\validate\locale\ru\FileSizeBetween::className(),
                 ]
             ],
             'fileSizeMax' => [
                 'class' => FileSizeMax::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\FileSizeMax::className(),
-                    self::RU => \rock\validate\locale\ru\FileSizeMax::className(),
+                    'en' => \rock\validate\locale\en\FileSizeMax::className(),
+                    'ru' => \rock\validate\locale\ru\FileSizeMax::className(),
                 ]
             ],
             'fileSizeMin' => [
                 'class' => FileSizeMin::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\FileSizeMin::className(),
-                    self::RU => \rock\validate\locale\ru\FileSizeMin::className(),
+                    'en' => \rock\validate\locale\en\FileSizeMin::className(),
+                    'ru' => \rock\validate\locale\ru\FileSizeMin::className(),
                 ]
             ],
             'float' => [
                 'class' => Float::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Float::className(),
-                    self::RU => \rock\validate\locale\ru\Float::className(),
+                    'en' => \rock\validate\locale\en\Float::className(),
+                    'ru' => \rock\validate\locale\ru\Float::className(),
                 ]
             ],
             'graph' => [
                 'class' => Graph::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Graph::className(),
-                    self::RU => \rock\validate\locale\ru\Graph::className(),
+                    'en' => \rock\validate\locale\en\Graph::className(),
+                    'ru' => \rock\validate\locale\ru\Graph::className(),
                 ]
             ],
             'in' => [
                 'class' => In::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\In::className(),
-                    self::RU => \rock\validate\locale\ru\In::className(),
+                    'en' => \rock\validate\locale\en\In::className(),
+                    'ru' => \rock\validate\locale\ru\In::className(),
                 ]
             ],
             'int' => [
                 'class' => Int::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Int::className(),
-                    self::RU => \rock\validate\locale\ru\Int::className(),
+                    'en' => \rock\validate\locale\en\Int::className(),
+                    'ru' => \rock\validate\locale\ru\Int::className(),
                 ]
             ],
             'ip' => [
                 'class' => Ip::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Ip::className(),
-                    self::RU => \rock\validate\locale\ru\Ip::className(),
+                    'en' => \rock\validate\locale\en\Ip::className(),
+                    'ru' => \rock\validate\locale\ru\Ip::className(),
                 ]
             ],
             'json' => [
                 'class' => JSON::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\JSON::className(),
-                    self::RU => \rock\validate\locale\ru\JSON::className(),
+                    'en' => \rock\validate\locale\en\JSON::className(),
+                    'ru' => \rock\validate\locale\ru\JSON::className(),
                 ]
             ],
             'length' => [
                 'class' => Length::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Length::className(),
-                    self::RU => \rock\validate\locale\ru\Length::className(),
+                    'en' => \rock\validate\locale\en\Length::className(),
+                    'ru' => \rock\validate\locale\ru\Length::className(),
                 ]
             ],
             'lowercase' => [
                 'class' => Lowercase::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Lowercase::className(),
-                    self::RU => \rock\validate\locale\ru\Lowercase::className(),
+                    'en' => \rock\validate\locale\en\Lowercase::className(),
+                    'ru' => \rock\validate\locale\ru\Lowercase::className(),
                 ]
             ],
             'max' => [
                 'class' => Max::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Max::className(),
-                    self::RU => \rock\validate\locale\ru\Max::className(),
+                    'en' => \rock\validate\locale\en\Max::className(),
+                    'ru' => \rock\validate\locale\ru\Max::className(),
                 ]
             ],
             'min' => [
                 'class' => Min::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Min::className(),
-                    self::RU => \rock\validate\locale\ru\Min::className(),
+                    'en' => \rock\validate\locale\en\Min::className(),
+                    'ru' => \rock\validate\locale\ru\Min::className(),
                 ]
             ],
             'negative' => [
                 'class' => Negative::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Negative::className(),
-                    self::RU => \rock\validate\locale\ru\Negative::className(),
+                    'en' => \rock\validate\locale\en\Negative::className(),
+                    'ru' => \rock\validate\locale\ru\Negative::className(),
                 ]
             ],
             'required' => [
                 'class' => Required::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Required::className(),
-                    self::RU =>\rock\validate\locale\ru\Required::className(),
+                    'en' => \rock\validate\locale\en\Required::className(),
+                    'ru' =>\rock\validate\locale\ru\Required::className(),
                 ]
             ],
             'noWhitespace' => [
                 'class' => NoWhitespace::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\NoWhitespace::className(),
-                    self::RU =>\rock\validate\locale\ru\NoWhitespace::className(),
+                    'en' => \rock\validate\locale\en\NoWhitespace::className(),
+                    'ru' =>\rock\validate\locale\ru\NoWhitespace::className(),
                 ]
             ],
             'nullValue' => [
                 'class' => NullValue::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\NullValue::className(),
-                    self::RU =>\rock\validate\locale\ru\NullValue::className(),
+                    'en' => \rock\validate\locale\en\NullValue::className(),
+                    'ru' =>\rock\validate\locale\ru\NullValue::className(),
                 ]
             ],
             'numeric' => [
                 'class' => Numeric::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Numeric::className(),
-                    self::RU =>\rock\validate\locale\ru\Numeric::className(),
+                    'en' => \rock\validate\locale\en\Numeric::className(),
+                    'ru' =>\rock\validate\locale\ru\Numeric::className(),
                 ]
             ],
             'object' => [
                 'class' => Object::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Object::className(),
-                    self::RU =>\rock\validate\locale\ru\Object::className(),
+                    'en' => \rock\validate\locale\en\Object::className(),
+                    'ru' =>\rock\validate\locale\ru\Object::className(),
                 ]
             ],
             'odd' => [
                 'class' => Odd::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Odd::className(),
-                    self::RU =>\rock\validate\locale\ru\Odd::className(),
+                    'en' => \rock\validate\locale\en\Odd::className(),
+                    'ru' =>\rock\validate\locale\ru\Odd::className(),
                 ]
             ],
             'positive' => [
                 'class' => Positive::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Positive::className(),
-                    self::RU =>\rock\validate\locale\ru\Positive::className(),
+                    'en' => \rock\validate\locale\en\Positive::className(),
+                    'ru' =>\rock\validate\locale\ru\Positive::className(),
                 ]
             ],
             'readable' => [
                 'class' => Readable::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Readable::className(),
-                    self::RU =>\rock\validate\locale\ru\Readable::className(),
+                    'en' => \rock\validate\locale\en\Readable::className(),
+                    'ru' =>\rock\validate\locale\ru\Readable::className(),
                 ]
             ],
             'regex' => [
                 'class' => Regex::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Regex::className(),
-                    self::RU =>\rock\validate\locale\ru\Regex::className(),
+                    'en' => \rock\validate\locale\en\Regex::className(),
+                    'ru' =>\rock\validate\locale\ru\Regex::className(),
                 ]
             ],
             'space' => [
                 'class' => Space::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Space::className(),
-                    self::RU =>\rock\validate\locale\ru\Space::className(),
+                    'en' => \rock\validate\locale\en\Space::className(),
+                    'ru' =>\rock\validate\locale\ru\Space::className(),
                 ]
             ],
             'startsWith' => [
                 'class' => StartsWith::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\StartsWith::className(),
-                    self::RU =>\rock\validate\locale\ru\StartsWith::className(),
+                    'en' => \rock\validate\locale\en\StartsWith::className(),
+                    'ru' =>\rock\validate\locale\ru\StartsWith::className(),
                 ]
             ],
             'string' => [
                 'class' => \rock\validate\rules\String::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\String::className(),
-                    self::RU => \rock\validate\locale\ru\String::className(),
+                    'en' => \rock\validate\locale\en\String::className(),
+                    'ru' => \rock\validate\locale\ru\String::className(),
                 ]
             ],
             'symbolicLink' => [
                 'class' => SymbolicLink::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\SymbolicLink::className(),
-                    self::RU => \rock\validate\locale\ru\SymbolicLink::className(),
+                    'en' => \rock\validate\locale\en\SymbolicLink::className(),
+                    'ru' => \rock\validate\locale\ru\SymbolicLink::className(),
                 ]
             ],
             'uploaded' => [
                 'class' => Uploaded::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Uploaded::className(),
-                    self::RU => \rock\validate\locale\ru\Uploaded::className(),
+                    'en' => \rock\validate\locale\en\Uploaded::className(),
+                    'ru' => \rock\validate\locale\ru\Uploaded::className(),
                 ]
             ],
             'uppercase' => [
                 'class' => Uppercase::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Uppercase::className(),
-                    self::RU => \rock\validate\locale\ru\Uppercase::className(),
+                    'en' => \rock\validate\locale\en\Uppercase::className(),
+                    'ru' => \rock\validate\locale\ru\Uppercase::className(),
                 ]
             ],
             'writable' => [
                 'class' => Writable::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Writable::className(),
-                    self::RU => \rock\validate\locale\ru\Writable::className(),
+                    'en' => \rock\validate\locale\en\Writable::className(),
+                    'ru' => \rock\validate\locale\ru\Writable::className(),
                 ]
             ],
         ];

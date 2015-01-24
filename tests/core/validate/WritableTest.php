@@ -17,8 +17,8 @@ class WritableTest extends \PHPUnit_Framework_TestCase
                 'writable' => [
                     'class' => WritableMock::className(),
                     'locales' => [
-                        Validate::EN => \rock\validate\locale\en\Writable::className(),
-                        Validate::RU => \rock\validate\locale\ru\Writable::className(),
+                        'en' => \rock\validate\locale\en\Writable::className(),
+                        'ru' => \rock\validate\locale\ru\Writable::className(),
                     ]
                 ],
             ]

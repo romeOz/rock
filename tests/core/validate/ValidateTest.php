@@ -763,8 +763,8 @@ class ValidateTest extends \PHPUnit_Framework_TestCase
                 'bar' => [
                     'class' => 'bar',
                     'locales' => [
-                        Validate::EN => \rock\validate\locale\en\Writable::className(),
-                        Validate::RU => \rock\validate\locale\ru\Writable::className(),
+                        'en' => \rock\validate\locale\en\Writable::className(),
+                        'ru' => \rock\validate\locale\ru\Writable::className(),
                     ]
                 ],
             ]
@@ -784,8 +784,8 @@ class ValidateTest extends \PHPUnit_Framework_TestCase
                 'required' => [
                     'class' => 'bar',
                     'locales' => [
-                        Validate::EN => 'foo',
-                        Validate::RU => 'bar',
+                        'en' => 'foo',
+                        'ru' => 'bar',
                     ]
                 ],
             ]
@@ -797,7 +797,7 @@ class ValidateTest extends \PHPUnit_Framework_TestCase
 
     public function testI18N()
     {
-        $validate = Validate::locale(Validate::RU)->required();
+        $validate = Validate::locale('ru')->required();
         $this->assertFalse($validate->validate(''));
         $this->assertSame(['required' => 'значение не должно быть пустым'], $validate->getErrors());
     }
