@@ -166,7 +166,7 @@ class Validate implements i18nInterface, ObjectInterface
      * Default locale.
      * @var string
      */
-    public $locale = self::EN;
+    public $locale = 'en';
     /**
      * This is a group validator that acts as an OR operator (if only one condition is valid).
      * @var bool
@@ -193,9 +193,8 @@ class Validate implements i18nInterface, ObjectInterface
     public function __construct($config = [])
     {
         $this->parentConstruct($config);
-        if ($this->locale instanceof \Closure) {
-            $this->locale = call_user_func($this->locale, $this);
-        }
+
+        $this->locale = strtolower($this->locale);
         $this->rules = array_merge($this->defaultRules(), $this->rules);
     }
 

@@ -62,9 +62,7 @@ return array_merge(
 //        ],
         'template' => [
             'class' => Template::className(),
-            'locale' => function(){
-                return Rock::$app->language;
-            },
+            'locale' => Rock::$app->language,
             'autoEscape' => Template::ESCAPE | Template::TO_TYPE,
             'handlerLink' => function($link, Template $template)
                 {
@@ -241,15 +239,11 @@ return array_merge(
                     '@common/lang/en/validate.php',
                 ]
             ],
-            'locale' => function(){
-                return Rock::$app->language;
-            }
+            'locale' => Rock::$app->language
         ],
         'date' => [
             'class' => \rock\date\DateTime::className(),
-            'locale' => function(){
-                return Rock::$app->language;
-            },
+            'locale' => Rock::$app->language,
             'formats' => [
                 'dmy'   => function(\rock\date\DateTime $dateTime){
                         $nowYear  = date('Y');
@@ -276,6 +270,7 @@ return array_merge(
         ],
         'request' => [
             'class' => \rock\request\Request::className(),
+            'locale' => Rock::$app->language
         ],
         'requestCollection' => [
             'class' => \rock\request\RequestCollection::className(),
@@ -283,9 +278,7 @@ return array_merge(
         'response' => [
             'class' => \rock\response\Response::className(),
             'singleton' => true,
-            'locale' => function(){
-                return Rock::$app->language;
-            }
+            'locale' => Rock::$app->language
         ],
         'htmlResponseFormatter' => [
             'class' => \rock\response\HtmlResponseFormatter::className(),
@@ -365,15 +358,11 @@ return array_merge(
         ],
         'validate' => [
             'class' => \rock\validate\Validate::className(),
-            'locale' => function (){
-                return Rock::$app->language;
-            }
+            'locale' => Rock::$app->language
         ],
         \rock\validate\ValidateModel::className() => [
             'class' => \rock\validate\ValidateModel::className(),
-            'locale' => function (){
-                return Rock::$app->language;
-            }
+            'locale' => Rock::$app->language
         ],
         'captcha' => [
             'class' => \rock\captcha\Captcha::className(),

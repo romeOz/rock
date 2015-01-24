@@ -24,9 +24,7 @@ class i18n implements ObjectInterface, i18nInterface
 
     public function init()
     {
-        if ($this->locale instanceof \Closure) {
-            $this->locale = call_user_func($this->locale, $this);
-        }
+        $this->locale = strtolower($this->locale);
         $this->loadDicts($this->pathsDicts);
     }
 

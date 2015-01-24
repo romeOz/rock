@@ -7,7 +7,6 @@ use rock\base\ObjectTrait;
 use rock\helpers\Helper;
 use rock\helpers\Json;
 use rock\log\Log;
-use rock\Rock;
 use rock\sanitize\Sanitize;
 
 /**
@@ -64,12 +63,17 @@ class Request implements RequestInterface, ObjectInterface
      * @var boolean whether to show entry script name in the constructed URL. Defaults to true.
      */
     public $showScriptName = true;
+    /**
+     * Default locale.
+     * @var string
+     */
+    public $locale = 'en';
 
     public function __construct($config = [])
     {
         $this->parentConstruct($config);
+        $this->locale = strtolower($this->locale);
         $this->isSelfDomain(true);
-
         $this->parseRequest();
     }
 
@@ -360,7 +364,7 @@ class Request implements RequestInterface, ObjectInterface
     public function getPreferredLanguage(array $languages = [])
     {
         if (empty($languages)) {
-            return Rock::$app->language;
+            return $this->locale;
         }
         foreach (static::getAcceptableLanguages() as $acceptableLanguage) {
             $acceptableLanguage = str_replace('_', '-', strtolower($acceptableLanguage));

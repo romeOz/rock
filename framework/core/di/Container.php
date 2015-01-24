@@ -67,7 +67,7 @@ class Container
      * The method will pass the given configuration as the last parameter of the constructor,
      * and any additional parameters to this method will be passed as the rest of the constructor parameters.
      *
-     * @internal param mixed $args arguments for constructor.
+     * @param mixed ...$args arguments for constructor.
      * @param string|array $config         the configuration. It can be either a string representing the class name
      *                                     or an array representing the object configuration.
      * @param mixed        $throwException throws exception

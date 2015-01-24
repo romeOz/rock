@@ -161,7 +161,7 @@ class Template implements ComponentsInterface
     /** @var \rock\cache\CacheInterface|string|array */
     public $cache = 'cache';
     public $cachePlaceholders = [];
-    /** @var  string|callable */
+    /** @var  string */
     public $locale = 'en';
     /**
      * Array local placeholders of variables template engine
@@ -174,15 +174,11 @@ class Template implements ComponentsInterface
 
     public function init()
     {
-        if (is_callable($this->locale)) {
-            call_user_func($this->locale, $this);
-        }
-
+        $this->locale = strtolower($this->locale);
         if (!is_object($this->cache)) {
             $this->cache = Container::load($this->cache);
         }
     }
-
 
     /**
      * Rendering layout.

@@ -9,7 +9,7 @@ use rock\di\Container;
 use rock\helpers\FileHelper;
 use rock\helpers\StringHelper;
 use rock\request\Request;
-use rock\Rock;
+
 use rock\url\Url;
 use rock\user\User;
 
@@ -147,10 +147,9 @@ class Response implements ComponentsInterface
      */
     public $stream;
     /**
-     * @var string the charset of the text response. If not set, it will use
-     * the value of {@see \rock\Rock::$charset} .
+     * @var string the charset of the text response.
      */
-    public $charset;
+    public $charset = 'utf-8';
     /**
      * @var string the HTTP status description that comes together with the status code.
      * @see httpStatuses
@@ -247,9 +246,8 @@ class Response implements ComponentsInterface
         510 => 'Not Extended',
         511 => 'Network Authentication Required',
     ];
-    /** @var string|callable  */
+    /** @var string  */
     public $locale = 'en';
-
     /**
      * @var integer the HTTP status code to send with the response.
      */
@@ -273,19 +271,13 @@ class Response implements ComponentsInterface
         $this->_csrf = Container::load('csrf');
         $this->_user = Container::load('user');
         $this->_request = Container::load('request');
-
-        if (is_callable($this->locale)) {
-            $this->locale = call_user_func($this->locale, $this);
-        }
+        $this->locale = strtolower($this->locale);
 
         if ($this->version === null) {
             $this->version =
                 isset($_SERVER['SERVER_PROTOCOL']) && $_SERVER['SERVER_PROTOCOL'] === 'HTTP/1.0'
                     ? '1.0'
                     : '1.1';
-        }
-        if ($this->charset === null) {
-            $this->charset = Rock::$app->charset;
         }
 
         $formatters = $this->defaultFormatters();

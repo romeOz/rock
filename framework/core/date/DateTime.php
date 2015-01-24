@@ -12,14 +12,13 @@ use rock\date\locale\Locale;
 use rock\date\locale\Ru;
 use rock\date\locale\Ua;
 use rock\di\Container;
-use rock\i18n\i18nInterface;
 
 /**
  * @method  date()
  * @method  time()
  * @method  datetime()
  */
-class DateTime extends \DateTime implements i18nInterface, DateTimeInterface, ObjectInterface
+class DateTime extends \DateTime implements DateTimeInterface, ObjectInterface
 {
     use ObjectTrait {
         ObjectTrait::__construct as parentConstruct;
@@ -34,9 +33,9 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface, Ob
     public $format = self::DEFAULT_FORMAT;
     /**
      * Current locale.
-     * @var string|callable
+     * @var string
      */
-    public $locale = i18nInterface::EN;
+    public $locale = 'en';
     /**
      * Locales.
      * @var array
@@ -79,10 +78,7 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface, Ob
 
         parent::__construct($time, $this->calculateTimezone($timezone));
 
-        if (is_callable($this->locale)) {
-            $this->locale = call_user_func($this->locale, $this);
-        }
-
+        $this->locale = strtolower($this->locale);
         $this->formats = array_merge(static::$defaultFormats, $this->formats);
         $this->locales = array_merge($this->defaultLocales(), $this->locales);
         $this->initCustomFormatOptions();
@@ -120,7 +116,7 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface, Ob
         if (empty(static::$localeObject[$this->locale])) {
 
             if (!isset($this->locales[$this->locale])) {
-                $this->locale = self::EN;
+                $this->locale = 'en';
             }
             static::$localeObject[$this->locale] = new $this->locales[$this->locale];
         }
@@ -451,8 +447,10 @@ class DateTime extends \DateTime implements i18nInterface, DateTimeInterface, Ob
     {
         return [
             'en' => En::className(),
-            'en-UK' => EnUK::className(),
+            'en-us' => En::className(),
+            'en-uk' => EnUK::className(),
             'ru' => Ru::className(),
+            'ru-ru' => Ru::className(),
             'ua' => Ua::className(),
         ];
     }
