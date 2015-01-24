@@ -32,34 +32,32 @@ class Log implements LoggerInterface, ObjectInterface
     }
 
     public $path = '@runtime/logs';
-
     /** @var Logger  */
-    protected static $logger;
+    protected $logger;
 
     public function __construct($config = [])
     {
         $this->parentConstruct($config);
 
-        static::$logger = new Logger('Rock');
-
+        $this->logger = new Logger('Rock');
         $path = Alias::getAlias($this->path);
         FileHelper::createDirectory($path);
         $formatter = new LineFormatter("[%datetime%]\t%level_name%\t%extra.hash%\t%message%\t%extra.user_id%\t%extra.user_ip%\t%extra.user_agent%\n");
-        static::$logger->pushProcessor(function ($record) {
+        $this->logger->pushProcessor(function ($record) {
                 $record['extra']['hash'] = substr(md5($record['message']), -6);
                 $record['extra']['user_agent'] = strip_tags($_SERVER['HTTP_USER_AGENT']);
                 $record['extra']['user_ip'] = filter_input(INPUT_SERVER, 'REMOTE_ADDR', FILTER_VALIDATE_IP);
                 $record['extra']['user_id'] = isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 0;
                 return $record;
             });
-        static::$logger->pushHandler((new StreamHandler("{$path}/debug.log", self::DEBUG, false))->setFormatter($formatter));
-        static::$logger->pushHandler((new StreamHandler("{$path}/info.log", self::INFO, false))->setFormatter($formatter));
-        static::$logger->pushHandler((new StreamHandler("{$path}/error.log", self::NOTICE, false))->setFormatter($formatter));
-        static::$logger->pushHandler((new StreamHandler("{$path}/error.log", self::WARNING, false))->setFormatter($formatter));
-        static::$logger->pushHandler((new StreamHandler("{$path}/error.log", self::ERROR, false))->setFormatter($formatter));
-        static::$logger->pushHandler((new StreamHandler("{$path}/error.log", self::CRITICAL, false))->setFormatter($formatter));
-        static::$logger->pushHandler((new StreamHandler("{$path}/error.log", self::ALERT, false))->setFormatter($formatter));
-        static::$logger->pushHandler((new StreamHandler("{$path}/error.log", self::EMERGENCY, false))->setFormatter($formatter));
+        $this->logger->pushHandler((new StreamHandler("{$path}/debug.log", self::DEBUG, false))->setFormatter($formatter));
+        $this->logger->pushHandler((new StreamHandler("{$path}/info.log", self::INFO, false))->setFormatter($formatter));
+        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::NOTICE, false))->setFormatter($formatter));
+        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::WARNING, false))->setFormatter($formatter));
+        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::ERROR, false))->setFormatter($formatter));
+        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::CRITICAL, false))->setFormatter($formatter));
+        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::ALERT, false))->setFormatter($formatter));
+        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::EMERGENCY, false))->setFormatter($formatter));
     }
 
     public function __call($name, $arguments)
@@ -90,7 +88,7 @@ class Log implements LoggerInterface, ObjectInterface
      */
     protected function logInternal($level, $message, array $placeholders = [])
     {
-        return static::$logger->log($level, StringHelper::replace($message, $placeholders, false), $placeholders);
+        return $this->logger->log($level, StringHelper::replace($message, $placeholders, false), $placeholders);
     }
 
     /**
@@ -104,7 +102,7 @@ class Log implements LoggerInterface, ObjectInterface
      */
     protected function debugInternal($message, array $placeholders = [])
     {
-        return static::$logger->debug(StringHelper::replace($message, $placeholders, false), $placeholders);
+        return $this->logger->debug(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
 
     /**
@@ -118,7 +116,7 @@ class Log implements LoggerInterface, ObjectInterface
      */
     protected function infoInternal($message, array $placeholders = [])
     {
-        return static::$logger->info(StringHelper::replace($message, $placeholders, false), $placeholders);
+        return $this->logger->info(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
 
     /**
@@ -132,7 +130,7 @@ class Log implements LoggerInterface, ObjectInterface
      */
     protected function noticeInternal($message, array $placeholders = [])
     {
-        return static::$logger->notice(StringHelper::replace($message, $placeholders, false), $placeholders);
+        return $this->logger->notice(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
 
     /**
@@ -146,7 +144,7 @@ class Log implements LoggerInterface, ObjectInterface
      */
     protected function warnInternal($message, array $placeholders = [])
     {
-        return static::$logger->warn(StringHelper::replace($message, $placeholders, false), $placeholders);
+        return $this->logger->warn(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
 
     /**
@@ -160,7 +158,7 @@ class Log implements LoggerInterface, ObjectInterface
      */
     protected function errInternal($message, array $placeholders = [])
     {
-        return static::$logger->err(StringHelper::replace($message, $placeholders, false), $placeholders);
+        return $this->logger->err(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
 
     /**
@@ -174,7 +172,7 @@ class Log implements LoggerInterface, ObjectInterface
      */
     protected function critInternal($message, array $placeholders = [])
     {
-        return static::$logger->crit(StringHelper::replace($message, $placeholders, false), $placeholders);
+        return $this->logger->crit(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
 
     /**
@@ -188,7 +186,7 @@ class Log implements LoggerInterface, ObjectInterface
      */
     protected function alertInternal($message, array $placeholders = [])
     {
-        return static::$logger->alert(StringHelper::replace($message, $placeholders, false), $placeholders);
+        return $this->logger->alert(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
 
     /**
@@ -202,6 +200,6 @@ class Log implements LoggerInterface, ObjectInterface
      */
     protected function emergInternal($message, array $placeholders = [])
     {
-        return static::$logger->emerg(StringHelper::replace($message, $placeholders, false), $placeholders);
+        return $this->logger->emerg(StringHelper::replace($message, $placeholders, false), $placeholders);
     }
 }
