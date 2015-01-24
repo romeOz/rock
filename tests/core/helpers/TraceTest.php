@@ -174,7 +174,7 @@ class TraceTest extends \PHPUnit_Framework_TestCase
     {
         // true
         Rock::trace('test', 'test...');
-        $this->assertTrue(Trace::has('test'));
+        $this->assertTrue(Trace::exists('test'));
 
         // count
         $this->assertSame(Trace::count('test'), 1);
@@ -182,7 +182,7 @@ class TraceTest extends \PHPUnit_Framework_TestCase
 
         Trace::remove('test');
         // false
-        $this->assertFalse(Trace::has('test'));
+        $this->assertFalse(Trace::exists('test'));
 
         $this->assertSame(Trace::count('test'), 0);
         $this->assertSame(Trace::count(), 0);

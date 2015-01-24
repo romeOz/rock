@@ -51,7 +51,7 @@ class Trace
      * @param string $category
      * @return bool
      */
-    public static function has($category)
+    public static function exists($category)
     {
         return isset(static::$traces[$category]);
     }
@@ -62,7 +62,7 @@ class Trace
      */
     public static function count($category = null)
     {
-        return static::has($category) ? count(static::$traces[$category]) : count(static::$traces);
+        return static::exists($category) ? count(static::$traces[$category]) : count(static::$traces);
     }
 
     /**
