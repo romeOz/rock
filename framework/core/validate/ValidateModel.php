@@ -32,8 +32,8 @@ class ValidateModel extends Validate
             'unique' => [
                 'class' => Unique::className(),
                 'locales' => [
-                    self::EN => \rock\validate\locale\en\Unique::className(),
-                    self::RU => \rock\validate\locale\ru\Unique::className(),
+                    'en' => \rock\validate\locale\en\Unique::className(),
+                    'ru' => \rock\validate\locale\ru\Unique::className(),
                 ]
             ],
         ];
