@@ -1,7 +1,6 @@
 <?php
 namespace rockunit\core\db;
 
-use rock\access\Access;
 use rock\cache\CacheInterface;
 use rock\db\ActiveQuery;
 use rock\db\ActiveQueryInterface;
@@ -13,7 +12,6 @@ use rock\db\SelectBuilder;
 use rock\event\Event;
 use rock\helpers\Trace;
 use rockunit\core\db\models\Customer;
-use rockunit\core\db\models\CustomerRules;
 use rockunit\core\db\models\Order;
 
 /**
@@ -1269,6 +1267,11 @@ trait ActiveRecordTestTrait
 
     public function testCache()
     {
+        if (!interface_exists('\rock\cache\CacheInterface') || !class_exists('\League\Flysystem\Filesystem')) {
+            $this->markTestSkipped('Rock cache not installed.');
+            return;
+        }
+
         /* @var $customerClass ActiveRecordInterface|Customer */
         $customerClass = $this->getCustomerClass();
         /* @var $orderClass BaseActiveRecord */
@@ -1328,6 +1331,8 @@ trait ActiveRecordTestTrait
         $this->assertFalse($trace->current()['cache']);
         $trace->next();
         $this->assertFalse($trace->current()['cache']);
+
+        static::disableCache();
     }
 
     public function testBeforeFind()

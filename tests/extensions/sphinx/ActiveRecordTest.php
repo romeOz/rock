@@ -3,12 +3,7 @@
 namespace rockunit\extensions\sphinx;
 
 
-use League\Flysystem\Adapter\Local;
-use rock\base\Alias;
-use rock\cache\CacheFile;
-use rock\di\Container;
 use rock\event\Event;
-use rock\file\FileManager;
 use rock\helpers\Trace;
 use rock\sphinx\ActiveQuery;
 use rock\sphinx\Connection;
@@ -285,19 +280,12 @@ class ActiveRecordTest extends SphinxTestCase
 
     public function testCache()
     {
+        if (!interface_exists('\rock\cache\CacheInterface') || !class_exists('\League\Flysystem\Filesystem')) {
+            $this->markTestSkipped('Rock cache not installed.');
+        }
+
         $cache = static::getCache();
         $cache->flush();
-        $cacheConfig = [
-            'class' => CacheFile::className(),
-            'enabled' => false,
-            'adapter' => function (){
-                    return new FileManager([
-                                               'adapter' => function(){
-                                                       return new Local(Alias::getAlias('@tests/runtime/cache'));
-                                                   },
-                                           ]);
-                }
-        ];
 
         /* @var $connection Connection */
         $connection = $this->getConnection();
@@ -431,8 +419,6 @@ class ActiveRecordTest extends SphinxTestCase
         $connection->queryCache = $cache;
 
         // beginCache and endCache
-        $cacheConfig['enabled'] = true;
-        Container::add('cache', $cacheConfig);
         $connection->enableQueryCache = false;
         ActiveRecord::$db = $connection;
         ArticleIndex::find()
@@ -454,8 +440,7 @@ class ActiveRecordTest extends SphinxTestCase
         $trace->next();
         $this->assertTrue($trace->current()['cache']);
 
-        $cacheConfig['enabled'] = false;
-        Container::add('cache', $cacheConfig);
+        static::disableCache();
     }
 
     public function testBeforeFind()

@@ -580,6 +580,11 @@ class TemplateTest extends TemplateCommon
 
     public function testCacheSnippet()
     {
+        if (!interface_exists('\rock\cache\CacheInterface') || !class_exists('\League\Flysystem\Filesystem')) {
+            $this->markTestSkipped('Rock cache not installed.');
+            return;
+        }
+
         $cache = static::getCache();
         $className = TestSnippet::className();
         $this->template = new Template();
@@ -597,6 +602,11 @@ class TemplateTest extends TemplateCommon
 
     public function testCacheLayout()
     {
+        if (!interface_exists('\rock\cache\CacheInterface') || !class_exists('\League\Flysystem\Filesystem')) {
+            $this->markTestSkipped('Rock cache not installed.');
+            return;
+        }
+
         $cache = static::getCache();
         $this->template = new Template();
         $this->template->cache = $cache;
@@ -620,24 +630,6 @@ class TemplateTest extends TemplateCommon
         $this->assertSame($this->template->getChunk($this->path . '/subchunk.php', ['title'=> 'test']), '<b>subchunk</b>test');
     }
 
-    protected static function getCache()
-    {
-        $adapter = new FileManager(
-            [
-                'adapter' =>
-                    function () {
-                        return new Local(Alias::getAlias('@runtime/cache'));
-                    },
-                'cache' => function () {
-                        $local = new Local(Alias::getAlias('@runtime'));
-                        $cache = new Adapter($local, 'cache.tmp');
-
-                        return $cache;
-                    }
-            ]
-        );
-        return new CacheFile(['adapter' => $adapter]);
-    }
 }
 
 class Foo{

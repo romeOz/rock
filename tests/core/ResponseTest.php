@@ -3,6 +3,7 @@ namespace rockunit\core;
 
 use rock\base\Alias;
 use rock\base\Controller;
+use rock\di\Container;
 use rock\helpers\Json;
 use rock\helpers\StringHelper;
 use rock\response\Response;
@@ -12,47 +13,31 @@ use rock\route\Route;
 
 $_SERVER['HTTP_HOST'] = $_SERVER['SERVER_NAME'] = 'site.com';
 $_SERVER['REQUEST_URI'] = '/';
-class JsonController extends Controller
-{
-    public function actionIndex()
-    {
-        Rock::$app->response->format = Response::FORMAT_JSON;
-
-        return [
-            'foo' => 'text',
-            'bar'
-        ];
-    }
-}
-
-class XmlController extends Controller
-{
-    public function actionIndex()
-    {
-        Rock::$app->response->format = Response::FORMAT_XML;
-
-        return [
-            'foo' => 'text',
-            'bar'
-        ];
-    }
-}
 
 /**
  * @group base
  */
 class ResponseTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var  Response */
+    protected $response;
+
     public static function setUpBeforeClass()
     {
-        Rock::$app->response->format = Response::FORMAT_HTML;
+        Container::load('response')->format = Response::FORMAT_HTML;
     }
+
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->response = Container::load('response');
+    }
+
 
     protected function tearDown()
     {
-        $response = Rock::$app->response;
-        $response->format = Response::FORMAT_HTML;
-        $response->isSent = false;
+        $this->response->format = Response::FORMAT_HTML;
+        $this->response->isSent = false;
     }
 
 
@@ -64,7 +49,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
                 return (new JsonController())->actionIndex();
             }
         );
-        Rock::$app->response->send();
+        $this->response->send();
         $this->expectOutputString(
             Json::encode(
                 [
@@ -83,9 +68,9 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
                 return (new XmlController())->actionIndex();
             }
         );
-        Rock::$app->response->send();
+        $this->response->send();
         $this->expectOutputString(
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<response><foo>text</foo><item>bar</item></response>");
+            "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<response><foo>text</foo><item>bar</item></response>");
     }
 
 
@@ -146,5 +131,31 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $dataFile = Alias::getAlias('@rockunit/data/response/data.txt');
         $_SERVER['HTTP_RANGE'] = 'bytes=' . $rangeHeader;
         $response->sendFile($dataFile);
+    }
+}
+
+class JsonController extends Controller
+{
+    public function actionIndex()
+    {
+        Container::load('response')->format = Response::FORMAT_JSON;
+
+        return [
+            'foo' => 'text',
+            'bar'
+        ];
+    }
+}
+
+class XmlController extends Controller
+{
+    public function actionIndex()
+    {
+        Container::load('response')->format = Response::FORMAT_XML;
+
+        return [
+            'foo' => 'text',
+            'bar'
+        ];
     }
 }

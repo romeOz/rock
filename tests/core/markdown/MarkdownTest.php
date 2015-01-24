@@ -119,32 +119,13 @@ Test</p>',
         );
     }
 
-    protected function getImageProvider()
-    {
-        return new ImageProvider(
-            [
-                'srcImage' => '/src',
-                'srcCache' => '/src/cache',
-                'adapter' =>   [
-                    'class' => FileManager::className(),
-                    'adapter' =>
-                        function () {
-                            return new Local(Alias::getAlias('@tests/core/markdown/src'));
-                        },
-                ],
-                'adapterCache' => [
-                    'class' => FileManager::className(),
-                    'adapter' =>
-                        function () {
-                            return new Local(Alias::getAlias('@tests/core/markdown/src/cache'));
-                        },
-                ]
-            ]
-        );
-    }
-
     public function testThumbSuccess()
     {
+        if (!interface_exists('\rock\file\FileManager') || !class_exists('\League\Flysystem\Filesystem')) {
+            $this->markTestSkipped('FileManager not installed.');
+            return;
+        }
+
         $mark = $this->getMarkdown(['imageProvider' => $this->getImageProvider()]);
         $this->assertSame(
             '<p><img src="/src/cache/50x50/play.png" alt="" class="class2 class" id="id2" /></p>',
@@ -158,6 +139,11 @@ Test</p>',
     }
     public function testThumbFail()
     {
+        if (!interface_exists('\rock\file\FileManager') || !class_exists('\League\Flysystem\Filesystem')) {
+            $this->markTestSkipped('FileManager not installed.');
+            return;
+        }
+
         $mark = $this->getMarkdown(['imageProvider' => $this->getImageProvider()]);
         $this->assertSame(
             $mark->parse('![:thumb 50x50](/src/foo.png){.class2 #id2 .class}'),
@@ -228,6 +214,24 @@ foo
 ```
 
 bar')
+        );
+    }
+
+    protected function getImageProvider()
+    {
+        return new ImageProvider(
+            [
+                'srcImage' => '/src',
+                'srcCache' => '/src/cache',
+                'adapter' =>   [
+                    'class' => FileManager::className(),
+                    'adapter' => new Local(Alias::getAlias('@tests/core/markdown/src'))
+                ],
+                'adapterCache' => [
+                    'class' => FileManager::className(),
+                    'adapter' => new Local(Alias::getAlias('@tests/core/markdown/src/cache')),
+                ]
+            ]
         );
     }
 }

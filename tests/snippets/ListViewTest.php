@@ -2,11 +2,6 @@
 
 namespace rockunit\snippets;
 
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Cache\Adapter;
-use rock\base\Alias;
-use rock\cache\CacheFile;
-use rock\file\FileManager;
 use rock\helpers\Pagination;
 use rock\i18n\i18nInterface;
 use rock\Rock;
@@ -16,23 +11,10 @@ use rockunit\core\template\TemplateCommon;
 
 class ListViewTest extends TemplateCommon
 {
-    protected function calculatePath()
+    protected function setUp()
     {
-        $this->path = __DIR__ . '/data';
-    }
-
-    public static function setUpBeforeClass()
-    {
-        parent::setUpBeforeClass();
-        static::clearRuntime();
-        Rock::$app->language = i18nInterface::EN;
-    }
-
-
-    public static function tearDownAfterClass()
-    {
-        parent::tearDownAfterClass();
-        static::clearRuntime();
+        parent::setUp();
+        static::disableCache();
     }
 
     public function testGetAsArray()
@@ -169,6 +151,11 @@ class ListViewTest extends TemplateCommon
 
     public function testCacheExpire()
     {
+        if (!interface_exists('\rock\cache\CacheInterface') || !class_exists('\League\Flysystem\Filesystem')) {
+            $this->markTestSkipped('Rock cache not installed.');
+            return;
+        }
+
         static::clearRuntime();
         $cache = static::getCache();
         $this->template->cache = $cache;
@@ -210,23 +197,25 @@ class ListViewTest extends TemplateCommon
         return Pagination::get(count(static::getAll()), 1, 1, SORT_DESC);
     }
 
-    protected static function getCache()
-    {
-        $adapter = new FileManager(
-            [
-                'adapter' =>
-                    function () {
-                        return new Local(Alias::getAlias('@runtime/cache'));
-                    },
-                'cache' => function () {
-                        $local = new Local(Alias::getAlias('@runtime'));
-                        $cache = new Adapter($local, 'cache.tmp');
 
-                        return $cache;
-                    }
-            ]
-        );
-        return new CacheFile(['adapter' => $adapter]);
+
+    protected function calculatePath()
+    {
+        $this->path = __DIR__ . '/data';
+    }
+
+    public static function setUpBeforeClass()
+    {
+        parent::setUpBeforeClass();
+        static::clearRuntime();
+        Rock::$app->language = i18nInterface::EN;
+    }
+
+
+    public static function tearDownAfterClass()
+    {
+        parent::tearDownAfterClass();
+        static::clearRuntime();
     }
 }
  
