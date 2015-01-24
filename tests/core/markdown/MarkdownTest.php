@@ -121,9 +121,8 @@ Test</p>',
 
     public function testThumbSuccess()
     {
-        if (!interface_exists('\rock\file\FileManager') || !class_exists('\League\Flysystem\Filesystem')) {
+        if (!class_exists('\rock\file\FileManager') || !class_exists('\League\Flysystem\Filesystem')) {
             $this->markTestSkipped('FileManager not installed.');
-            return;
         }
 
         $mark = $this->getMarkdown(['imageProvider' => $this->getImageProvider()]);
@@ -139,9 +138,8 @@ Test</p>',
     }
     public function testThumbFail()
     {
-        if (!interface_exists('\rock\file\FileManager') || !class_exists('\League\Flysystem\Filesystem')) {
+        if (!class_exists('\rock\file\FileManager') || !class_exists('\League\Flysystem\Filesystem')) {
             $this->markTestSkipped('FileManager not installed.');
-            return;
         }
 
         $mark = $this->getMarkdown(['imageProvider' => $this->getImageProvider()]);
