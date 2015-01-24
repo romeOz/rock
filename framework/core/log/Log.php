@@ -24,13 +24,17 @@ use rock\helpers\StringHelper;
  * @method static Log alert(string $message, array $placeholders = [])
  * @method static Log emerg(string $message, array $placeholders = [])
  */
-class Log implements LoggerInterface, ObjectInterface
+class Log implements LogInterface, ObjectInterface
 {
     use ObjectTrait {
         ObjectTrait::__construct as parentConstruct;
         ObjectTrait::__call as parentCall;
     }
 
+    /**
+     * Path to log
+     * @var string
+     */
     public $path = '@runtime/logs';
     /** @var Logger  */
     protected $logger;
@@ -39,6 +43,9 @@ class Log implements LoggerInterface, ObjectInterface
     {
         $this->parentConstruct($config);
 
+        if (isset($this->logger)) {
+            return;
+        }
         $this->logger = new Logger('Rock');
         $path = Alias::getAlias($this->path);
         FileHelper::createDirectory($path);
@@ -58,6 +65,11 @@ class Log implements LoggerInterface, ObjectInterface
         $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::CRITICAL, false))->setFormatter($formatter));
         $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::ALERT, false))->setFormatter($formatter));
         $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::EMERGENCY, false))->setFormatter($formatter));
+    }
+    
+    public function setLogger(Logger $logger)
+    {
+        $this->logger = $logger;
     }
 
     public function __call($name, $arguments)
