@@ -6,13 +6,13 @@ use rock\base\Alias;
 use rock\base\BaseException;
 use rock\di\Container;
 use rock\log\Log;
-use rock\log\LoggerInterface;
+use rock\log\LogInterface;
 use rock\response\Response;
 use Whoops\Handler\JsonResponseHandler;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Handler\XmlResponseHandler;
 
-class ErrorHandler implements LoggerInterface
+class ErrorHandler implements LogInterface
 {
     public static $logged = true;
     public static $pathFatal = '@common.views/layouts/fatal.html';
