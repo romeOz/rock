@@ -178,27 +178,39 @@ class Rock extends Alias
     }
 
     /**
-     * Trace
-     *
-     * @param string $category
-     * @param mixed  $token
+     * Add trace data
      *
      * ```php
      * Rock::trace('db', ['dsn' => ..., 'query' => ...]);
      *
      * Rock::trace(__METHOD__, 'text');
      * ```
+     *
+     * @param string $category
+     * @param mixed  $token
      */
     public static function trace($category, $token)
     {
         Trace::trace($category, $token);
     }
 
+    /**
+     * Begin profile.
+     *
+     * @param $category
+     * @param $token
+     */
     public static function beginProfile($category, $token)
     {
         Trace::beginProfile($category, $token);
     }
 
+    /**
+     * End profile.
+     *
+     * @param $category
+     * @param $token
+     */
     public static function endProfile($category, $token)
     {
         Trace::endProfile($category, $token);

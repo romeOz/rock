@@ -21,7 +21,6 @@ class Trace
      * @var array
      */
     public static $exclude = ['valid', 'cache', 'exception', 'count', 'time', 'increment'];
-
     protected static $traces = [];
 
     /**
@@ -80,6 +79,14 @@ class Trace
     }
 
     /**
+     * Add trace data
+     *
+     * ```php
+     * Trace::trace('db', ['dsn' => ..., 'query' => ...]);
+     *
+     * Tarce::trace(__METHOD__, 'text');
+     * ```
+     *
      * @param string $category
      * @param mixed  $token
      */
@@ -140,7 +147,12 @@ class Trace
         static::$traces[$category][$hash] = $token;
     }
 
-
+    /**
+     * Begin profile.
+     *
+     * @param $category
+     * @param $token
+     */
     public static function beginProfile($category, $token)
     {
         $microtime = microtime(true);
@@ -159,6 +171,12 @@ class Trace
         static::$traces[$category][$hash] = $token;
     }
 
+    /**
+     * End profile.
+     *
+     * @param $category
+     * @param $token
+     */
     public static function endProfile($category, $token)
     {
         $hash = static::getHash($token);

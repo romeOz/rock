@@ -66,7 +66,7 @@ class Log implements LogInterface, ObjectInterface
         $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::ALERT, false))->setFormatter($formatter));
         $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::EMERGENCY, false))->setFormatter($formatter));
     }
-    
+
     public function setLogger(Logger $logger)
     {
         $this->logger = $logger;
