@@ -136,6 +136,11 @@ class Sanitize implements ObjectInterface
         return $input;
     }
 
+    /**
+     * Exists rule.
+     * @param string  $name name of rule.
+     * @return bool
+     */
     public function existsRule($name)
     {
         return isset($this->rules[$name]);
@@ -162,9 +167,7 @@ class Sanitize implements ObjectInterface
 
     public static function __callStatic($name, $arguments)
     {
-        /** @var static $self */
-        $self = Container::load(static::className());
-        return call_user_func_array([$self, $name], $arguments);
+        return call_user_func_array([static::getInstance('sanitize'), $name], $arguments);
     }
 
     protected function attributesInternal(array $attributes)
@@ -203,6 +206,24 @@ class Sanitize implements ObjectInterface
             call_user_func_array([$this, $rule], $args);
         }
         return $this;
+    }
+
+    /**
+     * Get instance.
+     *
+     * If exists {@see \rock\di\Container} that uses it.
+     *
+     * @param string|array $config the configuration. It can be either a string representing the class name
+     *                                     or an array representing the object configuration.
+     * @return static
+     * @throws \rock\di\ContainerException
+     */
+    protected static function getInstance($config)
+    {
+        if (class_exists('\rock\di\Container')) {
+            return Container::load($config);
+        }
+        return new static($config);
     }
 
     protected function defaultRules()
