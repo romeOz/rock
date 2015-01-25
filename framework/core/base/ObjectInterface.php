@@ -19,14 +19,12 @@ interface ObjectInterface
      * given configuration.
      */
     public function init();
-
     /**
      * Set properties
      *
      * @param array $configs name-value pairs that will be used to initialize the object properties
      */
     public function setProperties(array $configs = []);
-
     /**
      * Returns a value indicating whether a property is defined.
      * A property is defined if:
@@ -42,7 +40,6 @@ interface ObjectInterface
      * @see canSetProperty
      */
     public function hasProperty($name, $checkVars = true);
-
     /**
      * Returns a value indicating whether a property can be read.
      * A property is readable if:
@@ -57,8 +54,6 @@ interface ObjectInterface
      * @see canSetProperty
      */
     public function canGetProperty($name, $checkVars = true);
-
-
     /**
      * Returns a value indicating whether a property can be set.
      * A property is writable if:
@@ -73,7 +68,6 @@ interface ObjectInterface
      * @see canGetProperty
      */
     public function canSetProperty($name, $checkVars = true);
-
     /**
      * Returns a value indicating whether a method is defined.
      *
@@ -84,13 +78,10 @@ interface ObjectInterface
      * @return boolean whether the property is defined
      */
     public function hasMethod($name);
-
     /**
      * Reset property without static property
      */
     public function reset();
-
     public function resetStatic($name = null, array $keys = null);
-
     public function resetMultiStatic(array $names);
 }
