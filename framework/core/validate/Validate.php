@@ -6,6 +6,7 @@ use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\di\Container;
 use rock\helpers\StringHelper;
+use rock\i18n\i18n;
 use rock\validate\locale\Locale;
 use rock\validate\rules\Alnum;
 use rock\validate\rules\Alpha;
@@ -175,11 +176,7 @@ class Validate implements ObjectInterface
      * is null or an empty string.
      */
     public $skipOnEmpty = true;
-    /**
-     * Category dictionary.
-     * @var string
-     */
-    public $category = 'validate';
+    public $i18n = 'i18n';
     /** @var Rule[]  */
     protected $_rules = [];
     /**
@@ -392,9 +389,7 @@ class Validate implements ObjectInterface
 
     public static function __callStatic($name, $arguments)
     {
-        /** @var static $self */
-        $self = Container::load('validate');
-        return call_user_func_array([$self, $name], $arguments);
+        return call_user_func_array([static::getInstance('validate'), $name], $arguments);
     }
 
     /**
@@ -463,11 +458,9 @@ class Validate implements ObjectInterface
             throw new ValidateException(ValidateException::UNKNOWN_CLASS, ['class' => $locale]);
         }
         $locale = new $locale;
-        $locale->i18n = Container::load('i18n');
-        $locale->i18n
-            ->category($this->category)
-            ->locale($this->locale)
-            ->removeBraces(false);
+
+        $locale->i18n = $this->getI18N();
+        $locale->i18n->locale($this->locale);
         if (!$messages = $locale->defaultTemplates()) {
             throw new ValidateException("Messages `{$locale}` is empty.");
         }
@@ -494,6 +487,38 @@ class Validate implements ObjectInterface
     {
         $this->locale = $locale;
         return $this;
+    }
+
+    /**
+     * Get instance.
+     *
+     * If exists {@see \rock\di\Container} that uses it.
+     *
+     * @param string|array $config the configuration. It can be either a string representing the class name
+     *                                     or an array representing the object configuration.
+     * @return static
+     * @throws \rock\di\ContainerException
+     */
+    protected static function getInstance($config)
+    {
+        if (class_exists('\rock\di\Container')) {
+            return Container::load($config);
+        }
+        return new static($config);
+    }
+
+    /**
+     * Get instance i18n.
+     * @return i18n
+     * @throws \rock\di\ContainerException
+     */
+    protected function getI18N()
+    {
+        if (class_exists('\rock\di\Container')) {
+            return Container::load($this->i18n);
+        }
+        unset($this->i18n['class']);
+        return new i18n($this->i18n);
     }
 
     protected function defaultRules()
