@@ -3,8 +3,6 @@
 namespace rock\helpers;
 
 
-use rock\base\BaseException;
-
-class ObjectHelperException extends BaseException
+class ObjectHelperException extends HelperException
 {
 }
