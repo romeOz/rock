@@ -1,10 +1,5 @@
 <?php
 
-/**
- * Container "Models"
- */
-use rock\i18n\i18n;
-use rock\Rock;
 use rock\route\Route;
 use rock\template\Template;
 
