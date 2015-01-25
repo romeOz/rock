@@ -4,7 +4,6 @@ namespace rock\validate\locale;
 
 
 use rock\base\ClassName;
-use rock\i18n\i18n;
 
 abstract class Locale
 {
@@ -15,6 +14,10 @@ abstract class Locale
     const MODE_DEFAULT = 1;
     const MODE_NEGATIVE = 0;
 
+    /**
+     * Default template.
+     * @var int
+     */
     public $defaultTemplate = self::STANDARD;
 
     /**

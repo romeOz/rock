@@ -6,7 +6,6 @@ use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\di\Container;
 use rock\helpers\StringHelper;
-use rock\i18n\i18n;
 use rock\validate\locale\Locale;
 use rock\validate\rules\Alnum;
 use rock\validate\rules\Alpha;
