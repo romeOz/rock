@@ -16,6 +16,7 @@ use rock\helpers\Json;
 use rock\helpers\NumericHelper;
 use rock\helpers\Serialize;
 use rock\helpers\StringHelper;
+use rock\i18n\i18n;
 use rock\Rock;
 use rock\template\filters\ConditionFilter;
 
@@ -1221,7 +1222,7 @@ class Template implements ComponentsInterface
         } elseif ($matches['type'] === '%') {
             $result = $this->_provideI18n(
                 $matches['name'],
-                Helper::getValue($params['dataReplace'], []),
+                Helper::getValue($params['placeholders'], []),
                 Helper::getValue($params['lang']),
                 Helper::getValue($params['category'])
             );
@@ -1469,13 +1470,13 @@ class Template implements ComponentsInterface
         return null;
     }
 
-    private function _provideI18n($name, $dataReplace = [], $language = null, $category = null)
+    private function _provideI18n($name, $placeholders = [], $locale = null, $category = null)
     {
-        $result = Rock::t(
+        $result = i18n::t(
             explode('.', $name),
-            $dataReplace,
+            $placeholders,
             $category,
-            $language
+            $locale
         );
         if (!empty($params)) {
             $this->removeMultiPlaceholders(['dataReplace', 'lang', 'context']);
