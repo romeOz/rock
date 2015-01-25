@@ -217,7 +217,7 @@ class ActiveForm extends Widget
      * This method will create a new form field and returns its opening tag.
      * You should call {@see \rock\widgets\ActiveForm::endField()} afterwards.
      * @param Model $model the data model
-     * @param string $attribute the attribute name or expression. See {@see \rock\helpers\Html::getAttributeName()} for the format
+     * @param string $attribute the attribute name or expression. See {@see \rock\widgets\ActiveHtml::getAttributeName()} for the format
      * about attribute expression.
      * @param array $options the additional configurations for the field object
      * @return string the opening tag
@@ -295,7 +295,7 @@ class ActiveForm extends Widget
         foreach ($models as $model) {
             $model->validate($attributes);
             foreach ($model->getErrors() as $attribute => $errors) {
-                $result[Html::getInputId($model, $attribute)] = $errors;
+                $result[ActiveHtml::getInputId($model, $attribute)] = $errors;
             }
         }
 
@@ -331,7 +331,7 @@ class ActiveForm extends Widget
         foreach ($models as $i => $model) {
             $model->validate($attributes);
             foreach ($model->getErrors() as $attribute => $errors) {
-                $result[Html::getInputId($model, "[$i]" . $attribute)] = $errors;
+                $result[ActiveHtml::getInputId($model, "[$i]" . $attribute)] = $errors;
             }
         }
 

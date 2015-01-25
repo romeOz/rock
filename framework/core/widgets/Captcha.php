@@ -63,7 +63,7 @@ class Captcha extends InputWidget implements CaptchaInterface
     {
         if ($this->hasModel() && $this->activeField) {
             $this->options = $this->activeField->calculateClientInputOption($this->options);
-            $input = Html::activeTextInput($this->model, $this->attribute, $this->options);
+            $input = ActiveHtml::activeTextInput($this->model, $this->attribute, $this->options);
         } else {
             $input = Html::textInput($this->name, $this->value, $this->options);
         }

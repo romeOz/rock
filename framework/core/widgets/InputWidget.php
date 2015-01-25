@@ -5,7 +5,6 @@ namespace rock\widgets;
 
 use rock\base\Model;
 use rock\base\Widget;
-use rock\helpers\Html;
 
 class InputWidget extends Widget
 {
@@ -43,7 +42,7 @@ class InputWidget extends Widget
             throw new WidgetException("Either 'name', or 'model' and 'attribute' properties must be specified.");
         }
         if (!isset($this->options['id'])) {
-            $this->options['id'] = $this->hasModel() ? Html::getInputId($this->model, $this->attribute) : $this->getId();
+            $this->options['id'] = $this->hasModel() ? ActiveHtml::getInputId($this->model, $this->attribute) : $this->getId();
         }
         parent::init();
     }

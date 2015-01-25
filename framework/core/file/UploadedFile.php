@@ -7,7 +7,7 @@ use rock\base\ComponentsTrait;
 use rock\base\Model;
 use rock\di\Container;
 use rock\helpers\FileHelper;
-use rock\helpers\Html;
+use rock\widgets\ActiveHtml;
 
 /**
  * UploadedFile represents the information for an uploaded file.
@@ -112,7 +112,7 @@ class UploadedFile implements ComponentsInterface
      */
     public static function getInstance($model, $attribute)
     {
-        $name = Html::getInputName($model, $attribute);
+        $name = ActiveHtml::getInputName($model, $attribute);
         return static::getInstanceByName($name);
     }
 
@@ -126,7 +126,7 @@ class UploadedFile implements ComponentsInterface
      */
     public static function getInstances($model, $attribute)
     {
-        $name = Html::getInputName($model, $attribute);
+        $name = ActiveHtml::getInputName($model, $attribute);
         return static::getInstancesByName($name);
     }
 

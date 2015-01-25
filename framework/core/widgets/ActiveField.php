@@ -13,7 +13,6 @@ use rock\filters\RateLimiter;
 use rock\helpers\Html;
 use rock\helpers\Json;
 use rock\log\Log;
-use rock\Rock;
 
 class ActiveField implements ComponentsInterface
 {
@@ -207,10 +206,11 @@ class ActiveField implements ComponentsInterface
         if ($content === null) {
             if (!isset($this->parts['{input}'])) {
                 $this->inputOptions = $this->calculateClientInputOption($this->inputOptions);
-                $this->parts['{input}'] = Html::activeTextInput($this->model, $this->attribute, $this->inputOptions);
+                $this->parts['{input}'] =
+                    ActiveHtml::activeTextInput($this->model, $this->attribute, $this->inputOptions);
             }
             if (!isset($this->parts['{label}'])) {
-                $this->parts['{label}'] = Html::activeLabel($this->model, $this->attribute, $this->labelOptions);
+                $this->parts['{label}'] = ActiveHtml::activeLabel($this->model, $this->attribute, $this->labelOptions);
             }
             if (!isset($this->parts['{error}'])) {
                 $this->parts['{error}'] = $this->renderErrors();
@@ -331,7 +331,7 @@ class ActiveField implements ComponentsInterface
         $this->errorOptions['data-ng-class'] = isset($this->formName)
             ? 'hideError("' . $this->formName . '[' . $this->attribute . ']", error)'
             : 'hideError("' . $this->attribute . '", error)';
-        $result .= Html::error($this->model, $this->attribute, $this->errorOptions);
+        $result .= ActiveHtml::error($this->model, $this->attribute, $this->errorOptions);
 
         return $result;
     }
@@ -343,8 +343,8 @@ class ActiveField implements ComponentsInterface
      */
     public function begin()
     {
-        $inputID = Html::getInputId($this->model, $this->attribute);
-        $attribute = Html::getAttributeName($this->attribute);
+        $inputID = ActiveHtml::getInputId($this->model, $this->attribute);
+        $attribute = ActiveHtml::getAttributeName($this->attribute);
         $options = $this->options;
         $class = isset($options['class']) ? [$options['class']] : [];
         $class[] = "field-$inputID";
@@ -393,7 +393,7 @@ class ActiveField implements ComponentsInterface
         if ($label !== null) {
             $options['label'] = $label;
         }
-        $this->parts['{label}'] = Html::activeLabel($this->model, $this->attribute, $options);
+        $this->parts['{label}'] = ActiveHtml::activeLabel($this->model, $this->attribute, $options);
 
         return $this;
     }
@@ -424,7 +424,7 @@ class ActiveField implements ComponentsInterface
             return $this;
         }
         $options = array_merge($this->errorOptions, $options);
-        $this->parts['{error}'] = Html::error($this->model, $this->attribute, $options);
+        $this->parts['{error}'] = ActiveHtml::error($this->model, $this->attribute, $options);
 
         return $this;
     }
@@ -464,7 +464,7 @@ class ActiveField implements ComponentsInterface
         $options = array_merge($this->inputOptions, $options);
         $options = $this->calculateClientInputOption($options);
         $this->adjustLabelFor($options);
-        $this->parts['{input}'] = Html::activeInput($type, $this->model, $this->attribute, $options);
+        $this->parts['{input}'] = ActiveHtml::activeInput($type, $this->model, $this->attribute, $options);
 
         return $this;
     }
@@ -496,7 +496,7 @@ class ActiveField implements ComponentsInterface
         $options = array_merge($this->inputOptions, $options);
         $options = $this->calculateClientInputOption($options);
         $this->adjustLabelFor($options);
-        $this->parts['{input}'] = Html::activeTextInput($this->model, $this->attribute, $options);
+        $this->parts['{input}'] = ActiveHtml::activeTextInput($this->model, $this->attribute, $options);
 
         return $this;
     }
@@ -506,7 +506,7 @@ class ActiveField implements ComponentsInterface
      *
      * Note that this method is provided for completeness. In most cases because you do not need
      * to validate a hidden input, you should not need to use this method. Instead, you should
-     * use @see Html::activeHiddenInput() .
+     * use @see ActiveHtml::activeHiddenInput() .
      *
      * This method will generate the "name" and "value" tag attributes automatically for the model attribute
      * unless they are explicitly specified in `$options`.
@@ -525,7 +525,7 @@ class ActiveField implements ComponentsInterface
                 : "form.values.{$this->attribute}={$options['value']}";
         }
         $this->adjustLabelFor($options);
-        $this->parts['{input}'] = Html::activeHiddenInput($this->model, $this->attribute, $options);
+        $this->parts['{input}'] = ActiveHtml::activeHiddenInput($this->model, $this->attribute, $options);
 
         return $this;
     }
@@ -545,7 +545,7 @@ class ActiveField implements ComponentsInterface
         $options = array_merge($this->inputOptions, $options);
         $options = $this->calculateClientInputOption($options);
         $this->adjustLabelFor($options);
-        $this->parts['{input}'] = Html::activePasswordInput($this->model, $this->attribute, $options);
+        $this->parts['{input}'] = ActiveHtml::activePasswordInput($this->model, $this->attribute, $options);
 
         return $this;
     }
@@ -567,7 +567,7 @@ class ActiveField implements ComponentsInterface
         }
         $options = $this->calculateClientInputOption($options);
         $this->adjustLabelFor($options);
-        $this->parts['{input}'] = Html::activeFileInput($this->model, $this->attribute, $options);
+        $this->parts['{input}'] = ActiveHtml::activeFileInput($this->model, $this->attribute, $options);
 
         return $this;
     }
@@ -586,7 +586,7 @@ class ActiveField implements ComponentsInterface
         $options = array_merge($this->inputOptions, $options);
         $options = $this->calculateClientInputOption($options);
         $this->adjustLabelFor($options);
-        $this->parts['{input}'] = Html::activeTextarea($this->model, $this->attribute, $options);
+        $this->parts['{input}'] = ActiveHtml::activeTextarea($this->model, $this->attribute, $options);
 
         return $this;
     }
@@ -618,7 +618,7 @@ class ActiveField implements ComponentsInterface
     {
         $options = $this->calculateClientInputOption($options);
         if ($enclosedByLabel) {
-            $this->parts['{input}'] = Html::activeRadio($this->model, $this->attribute, $options);
+            $this->parts['{input}'] = ActiveHtml::activeRadio($this->model, $this->attribute, $options);
             $this->parts['{label}'] = '';
         } else {
             if (isset($options['label']) && !isset($this->parts['{label}'])) {
@@ -628,7 +628,7 @@ class ActiveField implements ComponentsInterface
                 }
             }
             unset($options['label'], $options['labelOptions']);
-            $this->parts['{input}'] = Html::activeRadio($this->model, $this->attribute, $options);
+            $this->parts['{input}'] = ActiveHtml::activeRadio($this->model, $this->attribute, $options);
         }
         $this->adjustLabelFor($options);
 
@@ -662,7 +662,7 @@ class ActiveField implements ComponentsInterface
     {
         $options = $this->calculateClientInputOption($options);
         if ($enclosedByLabel) {
-            $this->parts['{input}'] = Html::activeCheckbox($this->model, $this->attribute, $options);
+            $this->parts['{input}'] = ActiveHtml::activeCheckbox($this->model, $this->attribute, $options);
             $this->parts['{label}'] = '';
         } else {
             if (isset($options['label']) && !isset($this->parts['{label}'])) {
@@ -673,7 +673,7 @@ class ActiveField implements ComponentsInterface
             }
             unset($options['labelOptions']);
             $options['label'] = null;
-            $this->parts['{input}'] = Html::activeCheckbox($this->model, $this->attribute, $options);
+            $this->parts['{input}'] = ActiveHtml::activeCheckbox($this->model, $this->attribute, $options);
         }
         $this->adjustLabelFor($options);
 
@@ -724,7 +724,7 @@ class ActiveField implements ComponentsInterface
         $options = array_merge($this->inputOptions, $options);
         $options = $this->calculateClientInputOption($options);
         $this->adjustLabelFor($options);
-        $this->parts['{input}'] = Html::activeDropDownList($this->model, $this->attribute, $items, $options);
+        $this->parts['{input}'] = ActiveHtml::activeDropDownList($this->model, $this->attribute, $items, $options);
         $this->cache->set($cacheKey, $this->parts['{input}']);
 
         return $this;
@@ -777,7 +777,7 @@ class ActiveField implements ComponentsInterface
         }
         $options = array_merge($this->inputOptions, $options);
         $this->adjustLabelFor($options);
-        $this->parts['{input}'] = Html::activeListBox($this->model, $this->attribute, $items, $options);
+        $this->parts['{input}'] = ActiveHtml::activeListBox($this->model, $this->attribute, $items, $options);
         $this->cache->set($cacheKey, $this->parts['{input}']);
 
         return $this;
@@ -820,7 +820,7 @@ class ActiveField implements ComponentsInterface
             $items = call_user_func($items, $this);
         }
         $this->adjustLabelFor($options);
-        $this->parts['{input}'] = Html::activeCheckboxList($this->model, $this->attribute, $items, $options);
+        $this->parts['{input}'] = ActiveHtml::activeCheckboxList($this->model, $this->attribute, $items, $options);
         $this->cache->set($cacheKey, $this->parts['{input}']);
 
         return $this;
@@ -864,7 +864,7 @@ class ActiveField implements ComponentsInterface
         if (!isset($options['itemOptions']['data-ng-model'])) {
             $options['itemOptions']['data-ng-model'] = "{$this->formName}.values.{$this->attribute}";
         }
-        $this->parts['{input}'] = Html::activeRadioList($this->model, $this->attribute, $items, $options);
+        $this->parts['{input}'] = ActiveHtml::activeRadioList($this->model, $this->attribute, $items, $options);
         $this->cache->set($cacheKey, $this->parts['{input}']);
 
         return $this;
