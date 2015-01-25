@@ -339,16 +339,6 @@ return array_merge(
                 'locale' => Rock::$app->language,
                 'category' => 'validate',
                 'removeBraces' => false,
-                'pathsDicts' => [
-                    'ru' => [
-                        '@common/lang/ru/lang.php',
-                        '@common/lang/ru/validate.php',
-                    ],
-                    'en' => [
-                        '@common/lang/en/lang.php',
-                        '@common/lang/en/validate.php',
-                    ]
-                ],
             ]
         ],
         'activeValidate' => [
@@ -358,31 +348,15 @@ return array_merge(
                 'locale' => Rock::$app->language,
                 'category' => 'validate',
                 'removeBraces' => false,
-                'pathsDicts' => [
-                    'ru' => [
-                        '@common/lang/ru/lang.php',
-                        '@common/lang/ru/validate.php',
-                    ],
-                    'en' => [
-                        '@common/lang/en/lang.php',
-                        '@common/lang/en/validate.php',
-                    ]
-                ],
             ]
         ],
         'captcha' => [
             'class' => \rock\captcha\Captcha::className(),
-            /**
-             * Captcha string length
-             */
+            // Captcha string length
             'length' => 0,
-            /**
-             * Noise white
-             */
+            // Noise white
             'whiteNoiseDensity' => 1 / 6,
-            /**
-             * Noise black
-             */
+            // Noise black
             'blackNoiseDensity' => 1 / 30,
         ],
         'file' => [
