@@ -24,7 +24,7 @@ class i18nTest extends \PHPUnit_Framework_TestCase
     public function testAdd()
     {
         $i18n = new i18n();
-        $i18n->locale('en')->category('lang');
+        $i18n->locale('test')->category('lang');
         $i18n->add('foo.bar', 'text {{placeholder}}');
         $this->assertSame(
             [
@@ -52,7 +52,7 @@ class i18nTest extends \PHPUnit_Framework_TestCase
     public function testRemove()
     {
         $i18n = new i18n();
-        $i18n->locale('en')->category('lang');
+        $i18n->locale('test')->category('lang');
         $i18n->add('foo.bar', 'text');
         $i18n->remove('foo.bar');
         $this->assertSame(
