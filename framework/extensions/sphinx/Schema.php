@@ -4,7 +4,7 @@ namespace rock\sphinx;
 use rock\base\ObjectTrait;
 use rock\cache\CacheInterface;
 use rock\di\Container;
-use rock\helpers\Helper;
+use rock\helpers\Json;
 
 /**
  * Schema represents the Sphinx schema information.
@@ -128,12 +128,12 @@ class Schema
             $cache = is_string($connection->schemaCache) ? Container::load($connection->schemaCache) : $connection->schemaCache;
 
             if ($cache instanceof CacheInterface) {
-                $cacheKey = serialize($this->getCacheKey($name));
+                $cacheKey = $this->getCacheKey($name);
                 if ($refresh || ($table = $cache->get($cacheKey)) === false) {
                     $table = $this->loadIndexSchema($realName);
                     self::$_indexes[$name] = $table;
                     if ($table !== null) {
-                        $cache->set($cacheKey, $table, $connection->schemaCacheExpire, [$this->getCacheGroup()]);
+                        $cache->set($cacheKey, $table, $connection->schemaCacheExpire, [$this->getCacheTag()]);
                     }
                 } else {
                     self::$_indexes[$name] = $table;
@@ -162,12 +162,12 @@ class Schema
      */
     protected function getCacheKey($name)
     {
-        return [
+        return Json::encode([
             __CLASS__,
             $this->connection->dsn,
             $this->connection->username,
             $name,
-        ];
+        ]);
     }
 
     /**
@@ -175,16 +175,15 @@ class Schema
      * This allows {@see \rock\sphinx\Schema::refresh()} to invalidate all cached index schemas.
      * @return string the cache group name
      */
-    protected function getCacheGroup()
+    protected function getCacheTag()
     {
-        return Helper::hash(
+        return md5(Json::encode(
             [
                 __CLASS__,
                 $this->connection->dsn,
                 $this->connection->username,
-            ],
-            Helper::SERIALIZE_JSON
-        );
+            ]
+        ));
     }
 
     /**
@@ -308,7 +307,7 @@ class Schema
         /** @var CacheInterface $cache */
         $cache = is_string($this->connection->schemaCache) ? Container::load($this->connection->schemaCache) : $this->connection->schemaCache;
         if ($this->connection->enableSchemaCache && $cache instanceof CacheInterface) {
-            $cache->removeTag($this->getCacheGroup());
+            $cache->removeTag($this->getCacheTag());
         }
         self::$_indexNames = [];
         self::$_indexes = [];

@@ -381,7 +381,7 @@ class Command
      * @param string[] $tables - tables names
      * @return string[] the cache group name
      */
-    protected function getCacheGroup(array $tables = [])
+    protected function calculateEntityNames(array $tables = [])
     {
         if (empty($tables)) {
             return [];
@@ -410,7 +410,7 @@ class Command
      */
     protected function getRawEntityNames()
     {
-        return !empty($this->entities) ? $this->getCacheGroup(array_unique($this->entities)) : [];
+        return !empty($this->entities) ? $this->calculateEntityNames(array_unique($this->entities)) : [];
     }
 
     /**

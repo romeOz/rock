@@ -4,7 +4,7 @@ namespace rock\db;
 use rock\base\ObjectTrait;
 use rock\cache\CacheInterface;
 use rock\di\Container;
-use rock\helpers\Helper;
+use rock\helpers\Json;
 
 /**
  * Schema is the base class for concrete DBMS-specific schema classes.
@@ -104,12 +104,12 @@ abstract class Schema
             /** @var CacheInterface $cache */
             $cache = is_string($connection->schemaCache) ? Container::load($connection->schemaCache) : $connection->schemaCache;
             if ($cache instanceof CacheInterface) {
-                $cacheKey = serialize($this->getCacheKey($name));
+                $cacheKey = $this->getCacheKey($name);
                 if ($refresh || ($table = $cache->get($cacheKey)) === false) {
                     $table = $this->loadTableSchema($realName);
                     self::$_tables[$name] = $table;
                     if ($table !== null) {
-                        $cache->set($cacheKey, $table, $connection->schemaCacheExpire, [$this->getCacheGroup()]);
+                        $cache->set($cacheKey, $table, $connection->schemaCacheExpire, [$this->getCacheTag()]);
                     }
                 } else {
                     self::$_tables[$name] = $table;
@@ -138,12 +138,12 @@ abstract class Schema
      */
     protected function getCacheKey($name)
     {
-        return [
+        return Json::encode([
             __CLASS__,
             $this->connection->dsn,
             $this->connection->username,
             $name,
-        ];
+        ]);
     }
 
     /**
@@ -151,13 +151,13 @@ abstract class Schema
      * This allows {@see \rock\db\Schema::refresh()} to invalidate all cached table schemas.
      * @return string the cache group name
      */
-    protected function getCacheGroup()
+    protected function getCacheTag()
     {
-        return Helper::hash([
+        return md5(Json::encode([
             __CLASS__,
             $this->connection->dsn,
             $this->connection->username,
-        ], Helper::SERIALIZE_JSON);
+        ]));
     }
 
     /**
@@ -244,7 +244,7 @@ abstract class Schema
             /** @var CacheInterface $cache */
             $cache = is_string($this->connection->schemaCache) ? Container::load($this->connection->schemaCache) : $this->connection->schemaCache;
             if ($cache instanceof CacheInterface) {
-                $cache->removeTag($this->getCacheGroup());
+                $cache->removeTag($this->getCacheTag());
             }
         }
         self::$_tableNames = [];
@@ -266,7 +266,7 @@ abstract class Schema
      * This method should be overridden by child classes in order to support this feature
      * because the default implementation simply throws an exception.
      *
-*@param string $schema the schema of the tables. Defaults to empty string, meaning the current or default schema.
+     * @param string $schema the schema of the tables. Defaults to empty string, meaning the current or default schema.
      * @return array all table names in the database. The names have NO schema name prefix.
      * @throws DbException if this method is called
      */
@@ -289,7 +289,7 @@ abstract class Schema
      * This method should be overridden by child classes in order to support this feature
      * because the default implementation simply throws an exception
      *
-*@param TableSchema $table the table metadata
+     * @param TableSchema $table the table metadata
      * @return array all unique indexes for the given table.
      * @throws DbException if this method is called
      */
@@ -301,7 +301,7 @@ abstract class Schema
     /**
      * Returns the ID of the last inserted row or sequence value.
      *
-*@param string $sequenceName name of the sequence object (required by some DBMS)
+     * @param string $sequenceName name of the sequence object (required by some DBMS)
      * @return string the row ID of the last row inserted, or the last value retrieved from the sequence object
      * @throws DbException if the DB connection is not active
      * @see http://www.php.net/manual/en/function.PDO-lastInsertId.php
