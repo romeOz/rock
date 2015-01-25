@@ -13,12 +13,11 @@ use rock\db\Connection;
 use rock\di\Container;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
-use rock\helpers\String;
 use rock\helpers\StringHelper;
+use rock\i18n\i18n;
 use rock\log\Log;
 use rock\mail\Mail;
 use rock\response\Response;
-use rock\Rock;
 use rock\session\Session;
 use rock\template\Template;
 use rock\url\Url;
@@ -125,11 +124,11 @@ class BaseSignupForm extends Model
     public function attributeLabels()
     {
         return [
-            'email'=> Rock::t('email'),
-            'password'=> Rock::t('password'),
-            'username'=> Rock::t('username'),
-            'password_confirm'=> Rock::t('confirmPassword'),
-            'captcha'=> Rock::t('captcha'),
+            'email'=> i18n::t('email'),
+            'password'=> i18n::t('password'),
+            'username'=> i18n::t('username'),
+            'password_confirm'=> i18n::t('confirmPassword'),
+            'captcha'=> i18n::t('captcha'),
         ];
     }
 
@@ -210,7 +209,7 @@ class BaseSignupForm extends Model
         }
 
         if (!isset($subject)) {
-            $subject = Rock::t('subjectRegistration', ['site_name' => Rock::t('siteName')]);
+            $subject = i18n::t('subjectRegistration', ['site_name' => i18n::t('siteName')]);
         }
 
         $body = $this->prepareBody($this->getUsers()->toArray(['username', 'email','token']), Helper::getValue($chunkBody, $this->emailBodyTpl));
@@ -222,7 +221,7 @@ class BaseSignupForm extends Model
                 ->body($body)
                 ->send();
         } catch (\Exception $e) {
-            $this->addErrorAsPlaceholder(Rock::t('failSendEmail'), 'e_signup');
+            $this->addErrorAsPlaceholder(i18n::t('failSendEmail'), 'e_signup');
             Log::warn(BaseException::convertExceptionToString($e));
         }
     }
@@ -232,7 +231,7 @@ class BaseSignupForm extends Model
         $users = $this->getUsers();
         $users->login_last = DateTime::set()->isoDatetime();
         if (!$users->save()) {
-            $this->addErrorAsPlaceholder(Rock::t('failSignup'), 'e_signup');
+            $this->addErrorAsPlaceholder(i18n::t('failSignup'), 'e_signup');
             return;
         }
 
@@ -251,7 +250,7 @@ class BaseSignupForm extends Model
     public function afterSignup()
     {
         if (!$users = BaseUsers::create($this->getAttributes(), $this->defaultStatus, $this->generateToken)) {
-            $this->addErrorAsPlaceholder(Rock::t('failSignup'), 'e_signup');
+            $this->addErrorAsPlaceholder(i18n::t('failSignup'), 'e_signup');
             return false;
         }
         $this->users = $users;
@@ -272,7 +271,7 @@ class BaseSignupForm extends Model
             return true;
         }
         if (BaseUsers::existsByUsernameOrEmail($this->email, $this->username, null)) {
-            $this->addErrorAsPlaceholder(Rock::t('existsUsernameOrEmail'), 'e_signup');
+            $this->addErrorAsPlaceholder(i18n::t('existsUsernameOrEmail'), 'e_signup');
             return false;
         }
         return true;

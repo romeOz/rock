@@ -3,7 +3,7 @@ namespace rock\base;
 
 use rock\di\Container;
 use rock\helpers\Inflector;
-use rock\Rock;
+use rock\i18n\i18n;
 use rock\sanitize\Sanitize;
 use rock\template\Template;
 use rock\validate\ValidateModel;
@@ -989,7 +989,7 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable, ComponentsIn
                         if (!isset($placeholders['name'])) {
                             $placeholders['name'] = 'value';
                         }
-                        $message = isset($messages[$ruleName]) ? $messages[$ruleName] : Rock::t('validation.call', $placeholders);
+                        $message = isset($messages[$ruleName]) ? $messages[$ruleName] : i18n::t('validation.call', $placeholders);
                         $this->addError($name, $message);
                         $valid = false;
                     }

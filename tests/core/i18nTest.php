@@ -7,24 +7,24 @@ use rock\i18n\i18n;
 class i18nTest extends \PHPUnit_Framework_TestCase
 {
     protected static $buffer = [];
+
     public static function setUpBeforeClass()
     {
         $i18n = new i18n();
-        $i18n->locale = null;
+        $i18n->locale = 'en';
         static::$buffer = $i18n->getAll();
         $i18n->clear();
     }
 
     public static function tearDownAfterClass()
     {
-        (new i18n())->load(static::$buffer);
+        (new i18n())->addMulti(static::$buffer);
     }
-
 
     public function testAdd()
     {
         $i18n = new i18n();
-        $i18n->locale(i18n::EN)->category('lang');
+        $i18n->locale('en')->category('lang');
         $i18n->add('foo.bar', 'text {{placeholder}}');
         $this->assertSame(
             [
@@ -52,7 +52,7 @@ class i18nTest extends \PHPUnit_Framework_TestCase
     public function testRemove()
     {
         $i18n = new i18n();
-        $i18n->locale(i18n::EN)->category('lang');
+        $i18n->locale('en')->category('lang');
         $i18n->add('foo.bar', 'text');
         $i18n->remove('foo.bar');
         $this->assertSame(
@@ -79,7 +79,7 @@ class i18nTest extends \PHPUnit_Framework_TestCase
     public function testUnknown()
     {
         $i18n = new i18n();
-        $i18n->locale(i18n::EN)->category('lang');
+        $i18n->locale('en')->category('lang');
         $i18n->translate('foo.bar');
     }
 }

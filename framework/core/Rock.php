@@ -11,6 +11,7 @@ use rock\di\Container;
 use rock\event\Event;
 use rock\exception\ErrorHandler;
 use rock\helpers\Trace;
+use rock\i18n\i18n;
 use rock\i18n\i18nInterface;
 use rock\log\Log;
 
@@ -162,19 +163,15 @@ class Rock extends Alias
     /**
      * Translate
      *
-     * @param string|array  $keys
+     * @param string|array  $keys chain keys
      * @param array $placeholders
      * @param string|null  $category
      * @param string $locale
-     * @return null|string.
+     * @return null|string
      */
     public static function t($keys, array $placeholders = [], $category = null, $locale = null)
     {
-        return static::$app->i18n
-            ->locale($locale ? : static::$app->language)
-            ->category($category)
-            ->removeBraces(true)
-            ->translate($keys, $placeholders);
+        return i18n::t($keys, $placeholders, $category, $locale);
     }
 
     /**

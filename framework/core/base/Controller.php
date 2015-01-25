@@ -5,6 +5,7 @@ use rock\di\Container;
 use rock\helpers\ArrayHelper;
 use rock\helpers\FileHelper;
 use rock\helpers\StringHelper;
+use rock\i18n\i18n;
 use rock\Rock;
 use rock\template\Template;
 
@@ -89,7 +90,7 @@ abstract class Controller implements ComponentsInterface
     public function notPage($layout = null)
     {
         Rock::$app->response->status404();
-        $this->template->title = StringHelper::upperFirst( Rock::t('notPage'));
+        $this->template->title = StringHelper::upperFirst(i18n::t('notPage'));
         if (!isset($layout)) {
             $layout = '@common.views/layouts/notPage';
         }

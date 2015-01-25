@@ -10,8 +10,8 @@ use rock\csrf\CSRF;
 use rock\date\DateTime;
 use rock\di\Container;
 use rock\helpers\ArrayHelper;
+use rock\i18n\i18n;
 use rock\response\Response;
-use rock\Rock;
 use rock\user\User;
 use rock\validate\Validate;
 
@@ -87,8 +87,8 @@ class BaseLoginForm extends Model
     public function attributeLabels()
     {
         return [
-            'email' => Rock::t('email'),
-            'password'=> Rock::t('password')
+            'email' => i18n::t('email'),
+            'password'=> i18n::t('password')
         ];
     }
 
@@ -104,7 +104,7 @@ class BaseLoginForm extends Model
     {
         if (!isset($this->_users)) {
             if (!$this->_users = BaseUsers::findOneByEmail($this->email, null, false)) {
-                $this->addErrorAsPlaceholder(Rock::t('notExistsUser'), 'e_login');
+                $this->addErrorAsPlaceholder(i18n::t('notExistsUser'), 'e_login');
             }
         }
 
@@ -121,7 +121,7 @@ class BaseLoginForm extends Model
         $users = $this->getUsers();
         $users->login_last = DateTime::set()->isoDatetime();
         if (!$users->save()) {
-            $this->addErrorAsPlaceholder(Rock::t('failLogin'), 'e_login');
+            $this->addErrorAsPlaceholder(i18n::t('failLogin'), 'e_login');
             return false;
         }
 
@@ -183,7 +183,7 @@ class BaseLoginForm extends Model
             return false;
         }
         if (!$user->validatePassword($password)) {
-            $this->addErrorAsPlaceholder(Rock::t('invalidPasswordOrEmail'), 'e_login');
+            $this->addErrorAsPlaceholder(i18n::t('invalidPasswordOrEmail'), 'e_login');
             return false;
         }
         return true;
@@ -211,7 +211,7 @@ class BaseLoginForm extends Model
         }
 
         if ($user->status !== BaseUsers::STATUS_ACTIVE) {
-            $this->addErrorAsPlaceholder(Rock::t('notActivatedUser'), 'e_login');
+            $this->addErrorAsPlaceholder(i18n::t('notActivatedUser'), 'e_login');
             return false;
         }
         return true;

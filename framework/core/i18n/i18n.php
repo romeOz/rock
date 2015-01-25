@@ -4,6 +4,7 @@ namespace rock\i18n;
 use rock\base\Alias;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
+use rock\di\Container;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\StringHelper;
@@ -13,22 +14,54 @@ class i18n implements ObjectInterface, i18nInterface
     use ObjectTrait;
 
     /**
+     * List paths to dicts.
      * @var array
      */
     public $pathsDicts = [];
-    /** @var string  */
-    public $locale = self::EN;
+    /**
+     * Default locale.
+     * @var string
+     */
+    public $locale = 'en';
+    /**
+     * Default category.
+     * @var string
+     */
     public $category = 'lang';
+    /**
+     * Remove braces in record.
+     * @var bool
+     */
     public $removeBraces = true;
+    /**
+     * Cache records.
+     * @var array
+     */
     protected static $data = [];
 
     public function init()
     {
         $this->locale = strtolower($this->locale);
-        $this->loadDicts($this->pathsDicts);
+        $this->addDicts($this->pathsDicts);
     }
 
-    public function loadDicts(array $dicts)
+    /**
+     * Adds dicts.
+     *
+     * ```php
+     *  [ 'ru' =>
+     *    [
+     *     'path/lang/ru/lang.php',
+     *     'path/lang/ru/validate.php',
+     *    ]
+     *  ]
+     * ```
+     *
+     * @param array $dicts
+     * @throws \Exception
+     * @throws i18nException
+     */
+    public function addDicts(array $dicts)
     {
         if (!empty(static::$data)){
             return;
@@ -48,39 +81,15 @@ class i18n implements ObjectInterface, i18nInterface
         }
     }
 
-    public function locale($locale = self::EN)
-    {
-        if (!isset($locale)) {
-            return $this;
-        }
-        $this->locale = $locale;
-        return $this;
-    }
-
-    public function category($category = 'lang')
-    {
-        if (!isset($category)) {
-            return $this;
-        }
-        $this->category = $category;
-        return $this;
-    }
-
-    public function removeBraces($removeBraces = false)
-    {
-        $this->removeBraces = $removeBraces;
-        return $this;
-    }
-
     /**
-     * Get string by lang
+     * Translate
      *
      * ```php
      * i18n::translate('bar.foo');
      * i18n::translate(['bar', 'foo']);
      * ```
      *
-     * @param string|array $keys        - chain keys
+     * @param string|array $keys    chain keys
      * @param array        $placeholders
      * @return null|string
      */
@@ -93,29 +102,71 @@ class i18n implements ObjectInterface, i18nInterface
     }
 
     /**
-     * @inheritdoc
+     * Translate
+     *
+     * @param string|array  $keys chain keys
+     * @param array $placeholders
+     * @param string|null  $category
+     * @param string $locale
+     * @return null|string
      */
-    public function getAll(array $only = [], array $exclude = [])
+    public static function t($keys, array $placeholders = [], $category = null, $locale = null)
     {
-        $data = static::$data;
-        if (isset($this->locale)) {
-            $data = $data[$this->locale];
-        }
-        return ArrayHelper::only($data, $only, $exclude);
+        /** @var self $i18n */
+        $i18n = Container::load('i18n');
+        return $i18n
+            ->locale($locale ? : $i18n->locale)
+            ->category($category ? : $i18n->category)
+            ->removeBraces(true)
+            ->translate($keys, $placeholders);
     }
 
     /**
-     * Exists lang.
-     *
-     * @param string|array $keys chain keys
-     * @return bool
+     * Set locale.
+     * @param string $locale
+     * @return $this
      */
-    public function exists($keys)
+    public function locale($locale)
     {
-        if (!isset(static::$data[$this->locale][$this->category])) {
-            static::$data[$this->locale][$this->category] = [];
+        $this->locale = $locale;
+        return $this;
+    }
+
+    /**
+     * Set category.
+     * @param string $category
+     * @return $this
+     */
+    public function category($category)
+    {
+        $this->category = $category;
+        return $this;
+    }
+
+    /**
+     * Removes braces in i18n-record.
+     * @param bool $removeBraces
+     * @return $this
+     */
+    public function removeBraces($removeBraces = false)
+    {
+        $this->removeBraces = $removeBraces;
+        return $this;
+    }
+
+    /**
+     * Get all i18-records by locale.
+     *
+     * @param array $only
+     * @param array $exclude
+     * @return array
+     */
+    public function getAll(array $only = [], array $exclude = [])
+    {
+        if (!isset(static::$data[$this->locale])) {
+            return [];
         }
-        return (bool)ArrayHelper::getValue(static::$data[$this->locale][$this->category], $keys);
+        return ArrayHelper::only(static::$data[$this->locale], $only, $exclude);
     }
 
     /**
@@ -137,8 +188,27 @@ class i18n implements ObjectInterface, i18nInterface
         ArrayHelper::setValue(static::$data[$this->locale][$this->category], !is_array($keys) ? explode('.', $keys) : $keys, $value);
     }
 
+    public function addMulti(array $data)
+    {
+        static::$data = $data;
+    }
+
     /**
-     * Removes a lang.
+     * Exists record.
+     *
+     * @param string|array $keys chain keys
+     * @return bool
+     */
+    public function exists($keys)
+    {
+        if (!isset(static::$data[$this->locale][$this->category])) {
+            static::$data[$this->locale][$this->category] = [];
+        }
+        return (bool)ArrayHelper::getValue(static::$data[$this->locale][$this->category], $keys);
+    }
+
+    /**
+     * Removes a record.
      *
      * ```php
      * i18n::remove('foo.bar');
@@ -155,24 +225,14 @@ class i18n implements ObjectInterface, i18nInterface
         ArrayHelper::removeValue(static::$data[$this->locale][$this->category], !is_array($keys) ? explode('.', $keys) : $keys);
     }
 
-    public function load(array $data)
-    {
-        static::$data = $data;
-    }
-
+    /**
+     * Clear records.
+     */
     public function clear()
     {
         static::$data = [];
     }
 
-    /**
-     * Prepare lang
-     *
-     * @param string|array $keys chain keys
-     * @param array        $placeholders
-     * @throws i18nException
-     * @return mixed|null
-     */
     protected function translateInternal($keys, array $placeholders = [])
     {
         if (!isset(static::$data[$this->locale][$this->category])) {

@@ -2,9 +2,8 @@
 
 namespace rockunit\core\forms\models;
 
-
 use apps\common\models\forms\BaseLoginForm;
-use rock\Rock;
+use rock\i18n\i18n;
 use rockunit\core\db\models\BaseUsers;
 
 class LoginFormMock extends BaseLoginForm
@@ -18,7 +17,7 @@ class LoginFormMock extends BaseLoginForm
     {
         if (!isset($this->_users)) {
             if (!$this->_users = BaseUsers::findOneByEmail($this->email, null, false)) {
-                $this->addErrorAsPlaceholder(Rock::t('notExistsUser'), 'e_login');
+                $this->addErrorAsPlaceholder(i18n::t('notExistsUser'), 'e_login');
             }
         }
 

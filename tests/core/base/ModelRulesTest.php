@@ -2,7 +2,7 @@
 namespace rockunit\core\base;
 
 use rock\base\Model;
-use rock\Rock;
+use rock\i18n\i18n;
 
 /**
  * @group base
@@ -20,7 +20,7 @@ class ModelRulesTest extends \PHPUnit_Framework_TestCase
                 FooModal::RULE_VALIDATE, ['email', 'username'], 'required'
             ],
             [
-                FooModal::RULE_SANITIZE, 'email', 'mb_strtolower' => [Rock::$app->charset], 'removeTags'
+                FooModal::RULE_SANITIZE, 'email', 'mb_strtolower' => ['utf8'], 'removeTags'
             ],
             [
                 FooModal::RULE_SANITIZE, 'username', 'customFilter' => ['.']
@@ -58,7 +58,7 @@ class ModelRulesTest extends \PHPUnit_Framework_TestCase
                 FooModal::RULE_VALIDATE, 'age', 'is_int', 'messages' => ['is_int' => 'error']
             ],
             [
-                FooModal::RULE_SANITIZE, 'email', 'mb_strtolower' => [Rock::$app->charset]
+                FooModal::RULE_SANITIZE, 'email', 'mb_strtolower' => ['utf-8']
             ],
             [
                 FooModal::RULE_SANITIZE, 'username', 'customFilter' => ['.']
@@ -111,7 +111,7 @@ class ModelRulesTest extends \PHPUnit_Framework_TestCase
                 FooModal::RULE_VALIDATE, 'age', 'is_int', 'messages' => ['is_int' => 'error']
             ],
             [
-                FooModal::RULE_SANITIZE, 'email', 'mb_strtolower' => [Rock::$app->charset]
+                FooModal::RULE_SANITIZE, 'email', 'mb_strtolower' => ['utf-8']
             ],
             [
                 FooModal::RULE_SANITIZE, 'username', 'customFilter' => ['.']
@@ -339,7 +339,7 @@ class ModelRulesTest extends \PHPUnit_Framework_TestCase
                 FooModal::RULE_VALIDATE, ['email', 'username'], 'required'
             ],
             [
-                FooModal::RULE_SANITIZE, 'email', 'mb_strtolower' => [Rock::$app->charset], 'removeTags'
+                FooModal::RULE_SANITIZE, 'email', 'mb_strtolower' => ['utf-8'], 'removeTags'
             ],
             [
                 FooModal::RULE_SANITIZE, 'username', 'customFilter' => ['.']
@@ -372,7 +372,7 @@ class FooModal extends Model
 
     public function attributeLabels()
     {
-        return ['email' => Rock::t('email'), 'username' => Rock::t('username')];
+        return ['email' => i18n::t('email'), 'username' => i18n::t('username')];
     }
 
 
@@ -391,7 +391,7 @@ class FooModal extends Model
             if (($label = $this->attributeLabels()) && isset($label[$attributeName])) {
                 $placeholders['name'] = $label[$attributeName];
             }
-            $this->addError($attributeName, Rock::t('call', $placeholders, 'validate'));
+            $this->addError($attributeName, i18n::t('call', $placeholders, 'validate'));
             return false;
         }
         return true;

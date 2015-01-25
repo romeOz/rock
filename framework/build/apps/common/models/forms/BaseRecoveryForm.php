@@ -14,10 +14,11 @@ use rock\di\Container;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\StringHelper;
+use rock\i18n\i18n;
 use rock\log\Log;
 use rock\mail\Mail;
 use rock\response\Response;
-use rock\Rock;
+use rock\security\Security;
 use rock\template\Template;
 use rock\validate\Validate;
 
@@ -104,8 +105,8 @@ class BaseRecoveryForm extends Model
     public function attributeLabels()
     {
         return [
-            'email' => Rock::t('email'),
-            'captcha'=> Rock::t('captcha'),
+            'email' => i18n::t('email'),
+            'captcha'=> i18n::t('captcha'),
         ];
     }
 
@@ -120,7 +121,7 @@ class BaseRecoveryForm extends Model
     {
         if (!isset($this->_users)) {
             if (!$this->_users = BaseUsers::findOneByEmail($this->email, BaseUsers::STATUS_ACTIVE, false)) {
-                $this->addErrorAsPlaceholder(Rock::t('invalidEmail'), 'e_recovery');
+                $this->addErrorAsPlaceholder(i18n::t('invalidEmail'), 'e_recovery');
             }
         }
 
@@ -158,7 +159,7 @@ class BaseRecoveryForm extends Model
         }
 
         if (!isset($subject)) {
-            $subject = Rock::t('subjectRecovery', ['site_name' => Rock::t('siteName')]);
+            $subject = i18n::t('subjectRecovery', ['site_name' => i18n::t('siteName')]);
         }
 
         $body = $this->prepareBody(Helper::getValue($chunkBody, $this->emailBodyTpl));
@@ -170,7 +171,7 @@ class BaseRecoveryForm extends Model
                 ->body($body)
                 ->send();
         } catch (\Exception $e) {
-            $this->addErrorAsPlaceholder(Rock::t('failSendEmail'), 'e_recovery');
+            $this->addErrorAsPlaceholder(i18n::t('failSendEmail'), 'e_recovery');
             Log::warn(BaseException::convertExceptionToString($e));
         }
 
@@ -208,10 +209,12 @@ class BaseRecoveryForm extends Model
     public function afterRecovery()
     {
         $users = $this->getUsers();
-        $this->password = Rock::$app->security->generateRandomKey(7);
+        /** @var Security $security */
+        $security = Container::load('security');
+        $this->password = $security->generateRandomKey(7);
         $users->setPassword($this->password);
         if (!$users->save()) {
-            $this->addErrorAsPlaceholder(Rock::t('failRecovery'), 'e_recovery');
+            $this->addErrorAsPlaceholder(i18n::t('failRecovery'), 'e_recovery');
             return false;
         }
         $this->isRecovery = true;

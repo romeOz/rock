@@ -5,7 +5,7 @@ namespace rockunit\core\forms\models;
 
 use apps\common\models\forms\BaseSignupForm;
 use rock\base\ModelEvent;
-use rock\Rock;
+use rock\i18n\i18n;
 use rockunit\core\db\models\BaseUsers;
 
 class SignupFormMock extends BaseSignupForm
@@ -17,7 +17,7 @@ class SignupFormMock extends BaseSignupForm
             return true;
         }
         if (BaseUsers::existsByUsernameOrEmail($this->email, $this->username, null)) {
-            $this->addErrorAsPlaceholder(Rock::t('existsUsernameOrEmail'), 'e_signup');
+            $this->addErrorAsPlaceholder(i18n::t('existsUsernameOrEmail'), 'e_signup');
             return false;
         }
         return true;
@@ -26,7 +26,7 @@ class SignupFormMock extends BaseSignupForm
     public function afterSignup()
     {
         if (!$users = BaseUsers::create($this->getAttributes())) {
-            $this->addErrorAsPlaceholder(Rock::t('failSignup'), 'e_signup');
+            $this->addErrorAsPlaceholder(i18n::t('failSignup'), 'e_signup');
             return false;
         }
         $this->users = $users;

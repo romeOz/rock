@@ -4,7 +4,7 @@ namespace rockunit\core\forms\models;
 
 
 use apps\common\models\forms\BaseRecoveryForm;
-use rock\Rock;
+use rock\i18n\i18n;
 use rockunit\core\db\models\BaseUsers;
 
 class RecoveryFormMock extends BaseRecoveryForm
@@ -18,7 +18,7 @@ class RecoveryFormMock extends BaseRecoveryForm
     {
         if (!isset($this->_users)) {
             if (!$this->_users = BaseUsers::findOneByEmail($this->email, BaseUsers::STATUS_ACTIVE, false)) {
-                $this->addErrorAsPlaceholder(Rock::t('invalidEmail'), 'e_recovery');
+                $this->addErrorAsPlaceholder(i18n::t('invalidEmail'), 'e_recovery');
             }
         }
 
