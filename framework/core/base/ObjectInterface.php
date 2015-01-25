@@ -20,17 +20,12 @@ interface ObjectInterface
      */
     public function init();
 
-
     /**
      * Set properties
      *
      * @param array $configs name-value pairs that will be used to initialize the object properties
      */
     public function setProperties(array $configs = []);
-
-    public function mergeProperties(array $configs, $object);
-
-
 
     /**
      * Returns a value indicating whether a property is defined.
@@ -90,7 +85,6 @@ interface ObjectInterface
      */
     public function hasMethod($name);
 
-
     /**
      * Reset property without static property
      */
@@ -99,4 +93,4 @@ interface ObjectInterface
     public function resetStatic($name = null, array $keys = null);
 
     public function resetMultiStatic(array $names);
-} 
+}

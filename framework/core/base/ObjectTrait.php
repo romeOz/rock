@@ -52,18 +52,6 @@ trait ObjectTrait
         }
     }
 
-    public function mergeProperties(array $configs, $object)
-    {
-        foreach ($configs as $name) {
-            if (property_exists($object, $name) &&
-                property_exists($this, $name)
-            ) {
-
-                $this->$name = $object->$name;
-            }
-        }
-    }
-
     /**
      * Returns the value of an object property.
      *
