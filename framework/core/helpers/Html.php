@@ -6,8 +6,8 @@ namespace rock\helpers;
 use rock\base\Model;
 use rock\csrf\CSRF;
 use rock\db\ActiveRecordInterface;
+use rock\di\Container;
 use rock\request\Request;
-use rock\Rock;
 use rock\url\Url;
 
 class Html
@@ -262,7 +262,8 @@ class Html
      */
     public static function csrfMetaTags()
     {
-        $csrf = Rock::$app->csrf;
+        /** @var CSRF $csrf */
+        $csrf = Container::load('csrf');
         if ($csrf instanceof CSRF && $csrf->enableCsrfValidation) {
             return static::tag('meta', '', ['name' => 'csrf-param', 'content' => $csrf->csrfParam]) . "\n    "
                    . static::tag('meta', '', ['name' => 'csrf-token', 'content' => $csrf->get()]) . "\n";
@@ -293,9 +294,11 @@ class Html
         $urlBuilder = Url::set($action);
         $action = $urlBuilder->getAbsoluteUrl();
         $hiddenInputs = [];
-        $request = Rock::$app->request;
+        /** @var Request $request */
+        $request = Container::load('request');
         if ($request instanceof Request) {
-            $csrf = Rock::$app->csrf;
+            /** @var CSRF $csrf */
+            $csrf = Container::load('csrf');
             if (strcasecmp($method, 'get') && strcasecmp($method, 'post')) {
                 // simulate PUT, DELETE, etc. via POST
                 $hiddenInputs[] = static::hiddenInput(
