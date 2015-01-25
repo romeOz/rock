@@ -1223,7 +1223,7 @@ class Template implements ComponentsInterface
             $result = $this->_provideI18n(
                 $matches['name'],
                 Helper::getValue($params['placeholders'], []),
-                Helper::getValue($params['lang']),
+                Helper::getValue($params['locale']),
                 Helper::getValue($params['category'])
             );
             // link to resource
@@ -1478,9 +1478,6 @@ class Template implements ComponentsInterface
             $category,
             $locale
         );
-        if (!empty($params)) {
-            $this->removeMultiPlaceholders(['dataReplace', 'lang', 'context']);
-        }
 
         return $result;
     }
