@@ -358,6 +358,16 @@ return array_merge(
                 'locale' => Rock::$app->language,
                 'category' => 'validate',
                 'removeBraces' => false,
+                'pathsDicts' => [
+                    'ru' => [
+                        '@common/lang/ru/lang.php',
+                        '@common/lang/ru/validate.php',
+                    ],
+                    'en' => [
+                        '@common/lang/en/lang.php',
+                        '@common/lang/en/validate.php',
+                    ]
+                ],
             ]
         ],
         'captcha' => [
