@@ -6,7 +6,6 @@ use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\di\Container;
 use rock\helpers\StringHelper;
-use rock\Rock;
 use rock\validate\locale\Locale;
 use rock\validate\rules\Alnum;
 use rock\validate\rules\Alpha;
@@ -362,6 +361,11 @@ class Validate implements ObjectInterface
         return $error;
     }
 
+    /**
+     * Exists rule.
+     * @param string $name name of rule.
+     * @return bool
+     */
     public function existsRule($name)
     {
         return isset($this->rules[$name]);
@@ -389,7 +393,7 @@ class Validate implements ObjectInterface
     public static function __callStatic($name, $arguments)
     {
         /** @var static $self */
-        $self = Container::load(static::className());
+        $self = Container::load('validate');
         return call_user_func_array([$self, $name], $arguments);
     }
 
@@ -452,12 +456,14 @@ class Validate implements ObjectInterface
             return $this->replace($this->messages[$ruleName]);
         }
         /** @var Locale $locale */
-        $locale = isset($this->rules[$ruleName]['locales'][$this->locale]) ? $this->rules[$ruleName]['locales'][$this->locale] : current($this->rules[$ruleName]['locales']);
+        $locale = isset($this->rules[$ruleName]['locales'][$this->locale])
+            ? $this->rules[$ruleName]['locales'][$this->locale]
+            : current($this->rules[$ruleName]['locales']);
         if (!class_exists($locale)) {
             throw new ValidateException(ValidateException::UNKNOWN_CLASS, ['class' => $locale]);
         }
         $locale = new $locale;
-        $locale->i18n = Rock::$app->i18n;
+        $locale->i18n = Container::load('i18n');
         $locale->i18n
             ->category($this->category)
             ->locale($this->locale)
