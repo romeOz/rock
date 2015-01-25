@@ -389,7 +389,7 @@ class Validate implements ObjectInterface
 
     public static function __callStatic($name, $arguments)
     {
-        return call_user_func_array([static::getInstance(static::className()), $name], $arguments);
+        return call_user_func_array([static::getInstance('validate'), $name], $arguments);
     }
 
     /**

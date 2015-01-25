@@ -13,17 +13,22 @@ use rock\validate\rules\Unique;
  *
  * @package rock\validate
  */
-class ValidateModel extends Validate
+class ActiveValidate extends Validate
 {
-    protected function defaultRules()
+    public static function __callStatic($name, $arguments)
     {
-        return array_merge(parent::defaultRules(), $this->modelRules());
+        return call_user_func_array([static::getInstance('activeValidate'), $name], $arguments);
     }
 
     public function existsModelRule($name)
     {
         $rules = $this->modelRules();
         return !empty($rules) && isset($rules[$name]);
+    }
+
+    protected function defaultRules()
+    {
+        return array_merge(parent::defaultRules(), $this->modelRules());
     }
 
     protected function modelRules()

@@ -341,8 +341,8 @@ return array_merge(
                 'removeBraces' => false,
             ]
         ],
-        \rock\validate\ValidateModel::className() => [
-            'class' => \rock\validate\ValidateModel::className(),
+        'activeValidate' => [
+            'class' => \rock\validate\ActiveValidate::className(),
             'i18n' => [
                 'class' => i18n::className(),
                 'locale' => Rock::$app->language,

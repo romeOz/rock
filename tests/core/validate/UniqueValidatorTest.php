@@ -4,7 +4,7 @@ namespace rockunit\core\validate;
 
 
 use rock\base\Model;
-use rock\validate\ValidateModel;
+use rock\validate\ActiveValidate;
 use rockunit\core\db\DatabaseTestCase;
 use rockunit\core\db\models\ActiveRecord;
 use rockunit\core\db\models\Order;
@@ -27,23 +27,23 @@ class UniqueValidatorTest extends DatabaseTestCase
     public function testValidateAttributeDefault()
     {
         $m = ValidatorTestMainModel::find()->one();
-        $val = ValidateModel::unique($m);
+        $val = ActiveValidate::unique($m);
         $this->assertTrue($val->validate('id'));
 
         $m = ValidatorTestRefModel::findOne(1);
-        $val = ValidateModel::unique($m);
+        $val = ActiveValidate::unique($m);
         $this->assertFalse($val->validate('ref'));
 
         // new record:
         $m = new ValidatorTestRefModel();
         $m->ref = 5;
-        $val = ValidateModel::unique($m);
+        $val = ActiveValidate::unique($m);
         $this->assertFalse($val->validate('ref'));
         $this->assertNotEmpty($val->getErrors());
         $m = new ValidatorTestRefModel();
         $m->id = 7;
         $m->ref = 12121;
-        $val = ValidateModel::unique($m);
+        $val = ActiveValidate::unique($m);
         $this->assertTrue($val->validate('ref'));
         $this->assertEmpty($val->getErrors());
         $m->save(false);
@@ -51,7 +51,7 @@ class UniqueValidatorTest extends DatabaseTestCase
 
         // array error
         $m = FakedValidationModel::createWithAttributes(['attr_arr' => ['a', 'b']]);
-        $val = ValidateModel::unique($m);
+        $val = ActiveValidate::unique($m);
         $this->assertFalse($val->validate('attr_arr'));
     }
 
@@ -133,7 +133,7 @@ class UniqueValidatorTest extends DatabaseTestCase
     public function testValidateAttributeOfNonARModel()
     {
         $m = FakedValidationModel::createWithAttributes(['attr_1' => 5, 'attr_2' => 1313]);
-        $val = ValidateModel::unique($m, 'ref', ValidatorTestRefModel::className());
+        $val = ActiveValidate::unique($m, 'ref', ValidatorTestRefModel::className());
         $this->assertFalse($val->validate('attr_1'));
         $this->assertTrue($val->validate('attr_2'));
     }
@@ -141,12 +141,12 @@ class UniqueValidatorTest extends DatabaseTestCase
     public function testValidateNonDatabaseAttribute()
     {
         $m = ValidatorTestMainModel::findOne(1);
-        $val = ValidateModel::unique($m, 'ref', ValidatorTestRefModel::className());
+        $val = ActiveValidate::unique($m, 'ref', ValidatorTestRefModel::className());
         $this->assertTrue($val->validate('testMainVal'));
 
         $m = ValidatorTestMainModel::findOne(1);
         $m->testMainVal = 4;
-        $val = ValidateModel::unique($m, 'ref', ValidatorTestRefModel::className());
+        $val = ActiveValidate::unique($m, 'ref', ValidatorTestRefModel::className());
         $this->assertFalse($val->validate('testMainVal'));
 
     }
@@ -155,7 +155,7 @@ class UniqueValidatorTest extends DatabaseTestCase
     {
         $this->setExpectedException(\rock\db\DbException::className());
         $m = new ValidatorTestMainModel();
-        $val = ValidateModel::unique($m);
+        $val = ActiveValidate::unique($m);
         $val->validate('testMainVal');
     }
 
@@ -163,39 +163,39 @@ class UniqueValidatorTest extends DatabaseTestCase
     {
         // validate old record
         $m = OrderItem::findOne(['order_id' => 1, 'item_id' => 2]);
-        $val = ValidateModel::unique($m, ['order_id', 'item_id'], OrderItem::className());
+        $val = ActiveValidate::unique($m, ['order_id', 'item_id'], OrderItem::className());
         $this->assertTrue($val->validate('order_id'));
 
         $m->item_id = 1;
-        $val = ValidateModel::unique($m, ['order_id', 'item_id'], OrderItem::className());
+        $val = ActiveValidate::unique($m, ['order_id', 'item_id'], OrderItem::className());
         $this->assertFalse($val->validate('order_id'));
 
         // validate new record
         $m = new OrderItem(['order_id' => 1, 'item_id' => 2]);
-        $val = ValidateModel::unique($m, ['order_id', 'item_id'], OrderItem::className());
+        $val = ActiveValidate::unique($m, ['order_id', 'item_id'], OrderItem::className());
         $this->assertFalse($val->validate('order_id'));
 
         $m = new OrderItem(['order_id' => 10, 'item_id' => 2]);
-        $val = ValidateModel::unique($m, ['order_id', 'item_id'], OrderItem::className());
+        $val = ActiveValidate::unique($m, ['order_id', 'item_id'], OrderItem::className());
         $this->assertTrue($val->validate('order_id'));
 
         // validate old record
         $m = Order::findOne(1);
-        $val = ValidateModel::unique($m, ['id' => 'order_id'], OrderItem::className());
+        $val = ActiveValidate::unique($m, ['id' => 'order_id'], OrderItem::className());
         $this->assertFalse($val->validate('id'));
         $m = Order::findOne(1);
         $m->id = 2;
-        $val = ValidateModel::unique($m, ['id' => 'order_id'], OrderItem::className());
+        $val = ActiveValidate::unique($m, ['id' => 'order_id'], OrderItem::className());
         $this->assertFalse($val->validate('id'));
         $m = Order::findOne(1);
         $m->id = 10;
-        $val = ValidateModel::unique($m, ['id' => 'order_id'], OrderItem::className());
+        $val = ActiveValidate::unique($m, ['id' => 'order_id'], OrderItem::className());
         $this->assertTrue($val->validate('id'));
         $m = new Order(['id' => 1]);
-        $val = ValidateModel::unique($m, ['id' => 'order_id'], OrderItem::className());
+        $val = ActiveValidate::unique($m, ['id' => 'order_id'], OrderItem::className());
         $this->assertFalse($val->validate('id'));
         $m = new Order(['id' => 10]);
-        $val = ValidateModel::unique($m, ['id' => 'order_id'], OrderItem::className());
+        $val = ActiveValidate::unique($m, ['id' => 'order_id'], OrderItem::className());
         $this->assertTrue($val->validate('id'));
     }
 }

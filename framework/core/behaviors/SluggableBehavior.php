@@ -3,7 +3,7 @@ namespace rock\behaviors;
 
 use rock\db\BaseActiveRecord;
 use rock\helpers\Inflector;
-use rock\validate\ValidateModel;
+use rock\validate\ActiveValidate;
 
 /**
  * SluggableBehavior automatically fills the specified attribute with a value that can be used a slug in a URL.
@@ -172,7 +172,7 @@ class SluggableBehavior extends AttributeBehavior
         //$model->clearErrors();
         $model->{$this->slugAttribute} = $slug;
 
-        $validator = ValidateModel::unique($model, null, null, null, $this->uniqueValidator);
+        $validator = ActiveValidate::unique($model, null, null, null, $this->uniqueValidator);
         return $validator->validate($this->slugAttribute);
     }
 

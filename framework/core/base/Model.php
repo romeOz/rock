@@ -6,7 +6,7 @@ use rock\helpers\Inflector;
 use rock\i18n\i18n;
 use rock\sanitize\Sanitize;
 use rock\template\Template;
-use rock\validate\ValidateModel;
+use rock\validate\ActiveValidate;
 
 /**
  * Model is the base class for data models.
@@ -977,8 +977,8 @@ class Model implements \IteratorAggregate, \ArrayAccess, Arrayable, ComponentsIn
                     continue;
                 }
 
-                /** @var ValidateModel $validate */
-                $validate = Container::load(ValidateModel::className());
+                /** @var ActiveValidate $validate */
+                $validate = Container::load('activeValidate');
                 // function
                 if (function_exists($ruleName) && !$validate->existsRule($ruleName)) {
                     if ($attributes[$name] === '') {
