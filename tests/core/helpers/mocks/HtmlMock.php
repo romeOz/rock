@@ -5,7 +5,7 @@ namespace rockunit\core\helpers\mocks;
 
 use rock\csrf\CSRF;
 use rock\di\Container;
-use rock\helpers\Html;
+use rock\template\Html;
 
 class HtmlMock extends Html
 {

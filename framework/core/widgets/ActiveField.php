@@ -10,9 +10,9 @@ use rock\base\Widget;
 use rock\cache\CacheInterface;
 use rock\di\Container;
 use rock\filters\RateLimiter;
-use rock\helpers\Html;
 use rock\helpers\Json;
 use rock\log\Log;
+use rock\template\Html;
 
 class ActiveField implements ComponentsInterface
 {
@@ -32,7 +32,7 @@ class ActiveField implements ComponentsInterface
     public $attribute;
     /**
      * @var array the HTML attributes (name-value pairs) for the field container tag.
-     * The values will be HTML-encoded using {@see \rock\helpers\Html::encode()}.
+     * The values will be HTML-encoded using {@see \rock\template\Html::encode()}.
      * If a value is null, the corresponding attribute will not be rendered.
      * The following special options are recognized:
      *
@@ -375,11 +375,11 @@ class ActiveField implements ComponentsInterface
      *
      * @param string|boolean $label   the label to use. If null, the label will be generated
      *                                via {@see \rock\base\Model::getAttributeLabel()}.
-     *                                If false, the generated field will not contain the label part. Note that this will NOT be {@see \rock\helpers\Html::encode()}.
+     *                                If false, the generated field will not contain the label part. Note that this will NOT be {@see \rock\template\Html::encode()}.
      * @param array          $options the tag options in terms of name-value pairs. It will be merged
      *                                with {@see \rock\widgets\ActiveField::$labelOptions}.
      *                                The options will be rendered as the attributes of the resulting tag. The values will be HTML-encoded
-     *                                using {@see \rock\helpers\Html::encode()}. If a value is null, the corresponding attribute will not be rendered.
+     *                                using {@see \rock\template\Html::encode()}. If a value is null, the corresponding attribute will not be rendered.
      * @return static the field object itself
      */
     public function label($label = null, $options = [])
@@ -406,7 +406,7 @@ class ActiveField implements ComponentsInterface
      * @param array|boolean $options the tag options in terms of name-value pairs. It will be merged
      *                               with @see errorOptions .
      *                               The options will be rendered as the attributes of the resulting tag. The values will be HTML-encoded
-     *                               using {@see \rock\helpers\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
+     *                               using {@see \rock\template\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
      *
      * The following options are specially handled:
      *
@@ -434,7 +434,7 @@ class ActiveField implements ComponentsInterface
      *
      * @param string $content the hint content. It will NOT be HTML-encoded.
      * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
-     *                        the attributes of the hint tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()}.
+     *                        the attributes of the hint tag. The values will be HTML-encoded using {@see \rock\template\Html::encode()}.
      *
      * The following options are specially handled:
      *
@@ -456,7 +456,7 @@ class ActiveField implements ComponentsInterface
      *
      * @param string $type    the input type (e.g. 'text', 'password')
      * @param array  $options the tag options in terms of name-value pairs. These will be rendered as
-     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()}.
+     *                        the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\template\Html::encode()}.
      * @return static the field object itself
      */
     public function input($type, $options = [])
@@ -488,7 +488,7 @@ class ActiveField implements ComponentsInterface
      * unless they are explicitly specified in `$options`.
      *
      * @param array $options the tag options in terms of name-value pairs. These will be rendered as
-     *                       the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()}.
+     *                       the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\template\Html::encode()}.
      * @return static the field object itself
      */
     public function textInput($options = [])
@@ -512,7 +512,7 @@ class ActiveField implements ComponentsInterface
      * unless they are explicitly specified in `$options`.
      *
      * @param array $options the tag options in terms of name-value pairs. These will be rendered as
-     *                       the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
+     *                       the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\template\Html::encode()} .
      * @return static the field object itself
      */
     public function hiddenInput($options = [])
@@ -537,7 +537,7 @@ class ActiveField implements ComponentsInterface
      * unless they are explicitly specified in `$options`.
      *
      * @param array $options the tag options in terms of name-value pairs. These will be rendered as
-     *                       the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
+     *                       the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\template\Html::encode()} .
      * @return static the field object itself
      */
     public function passwordInput($options = [])
@@ -557,7 +557,7 @@ class ActiveField implements ComponentsInterface
      * unless they are explicitly specified in `$options`.
      *
      * @param array $options the tag options in terms of name-value pairs. These will be rendered as
-     *                       the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
+     *                       the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\template\Html::encode()} .
      * @return static the field object itself
      */
     public function fileInput($options = [])
@@ -578,7 +578,7 @@ class ActiveField implements ComponentsInterface
      * The model attribute value will be used as the content in the textarea.
      *
      * @param array $options the tag options in terms of name-value pairs. These will be rendered as
-     *                       the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
+     *                       the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\template\Html::encode()} .
      * @return static the field object itself
      */
     public function textarea($options = [])
@@ -603,12 +603,12 @@ class ActiveField implements ComponentsInterface
      *   is not checked and is submitted, the value of this attribute will still be submitted to the server
      *   via the hidden input.
      * - label: string, a label displayed next to the radio button.  It will NOT be HTML-encoded. Therefore you can pass
-     *   in HTML code such as an image tag. If this is is coming from end users, you should {@see \rock\helpers\Html::encode()} it to prevent XSS attacks.
+     *   in HTML code such as an image tag. If this is is coming from end users, you should {@see \rock\template\Html::encode()} it to prevent XSS attacks.
      *   When this option is specified, the radio button will be enclosed by a label tag.
      * - labelOptions: array, the HTML attributes for the label tag. This is only used when the "label" option is specified.
      *
      * The rest of the options will be rendered as the attributes of the resulting tag. The values will
-     * be HTML-encoded using {@see \rock\helpers\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
+     * be HTML-encoded using {@see \rock\template\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
      * @param boolean $enclosedByLabel whether to enclose the radio within the label.
      *                                 If true, the method will still use `template` to layout the checkbox and the error message
      *                                 except that the radio is enclosed by the label tag.
@@ -647,12 +647,12 @@ class ActiveField implements ComponentsInterface
      *   is not checked and is submitted, the value of this attribute will still be submitted to the server
      *   via the hidden input.
      * - label: string, a label displayed next to the checkbox.  It will NOT be HTML-encoded. Therefore you can pass
-     *   in HTML code such as an image tag. If this is is coming from end users, you should {@see \rock\helpers\Html::encode()} it to prevent XSS attacks.
+     *   in HTML code such as an image tag. If this is is coming from end users, you should {@see \rock\template\Html::encode()} it to prevent XSS attacks.
      *   When this option is specified, the checkbox will be enclosed by a label tag.
      * - labelOptions: array, the HTML attributes for the label tag. This is only used when the "label" option is specified.
      *
      * The rest of the options will be rendered as the attributes of the resulting tag. The values will
-     * be HTML-encoded using {@see \rock\helpers\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
+     * be HTML-encoded using {@see \rock\template\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
      * @param boolean $enclosedByLabel whether to enclose the checkbox within the label.
      *                                 If true, the method will still use {@see \rock\widgets\ActiveField::$template} to layout the checkbox and the error message
      *                                 except that the checkbox is enclosed by the label tag.
@@ -708,7 +708,7 @@ class ActiveField implements ComponentsInterface
      *   except that the array keys represent the optgroup labels specified in `$items`.
      *
      * The rest of the options will be rendered as the attributes of the resulting tag. The values will
-     * be HTML-encoded using {@see \rock\helpers\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
+     * be HTML-encoded using {@see \rock\template\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
      *
      * @return static the field object itself
      */
@@ -762,7 +762,7 @@ class ActiveField implements ComponentsInterface
      *   mode, we can still obtain the posted unselect value.
      *
      * The rest of the options will be rendered as the attributes of the resulting tag. The values will
-     * be HTML-encoded using {@see \rock\helpers\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
+     * be HTML-encoded using {@see \rock\template\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
      *
      * @return static the field object itself
      */

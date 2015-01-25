@@ -6,12 +6,12 @@ use rock\date\DateTime;
 use rock\di\Container;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
-use rock\helpers\Html;
 use rock\helpers\Json;
 use rock\helpers\Serialize;
 use rock\image\ImageProvider;
 use rock\image\ThumbInterface;
 use rock\Rock;
+use rock\template\Html;
 use rock\template\Template;
 use rock\url\Url;
 

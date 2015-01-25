@@ -3,9 +3,9 @@
 namespace rock\snippets;
 use rock\base\Snippet;
 use rock\di\Container;
-use rock\helpers\Html;
 use rock\image\ImageProvider;
 use rock\image\ThumbInterface;
+use rock\template\Html;
 
 /**
  * Snippet "Thumb" 

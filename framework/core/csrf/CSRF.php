@@ -29,7 +29,7 @@ class CSRF implements ComponentsInterface, RequestInterface
      *
      * Note, this feature requires that the user client accepts cookie. Also, to use this feature,
      * forms submitted via POST method must contain a hidden input whose name is specified by @see \rock\csrf\CSRF::csrfParam.
-     * You may use {@see \rock\helpers\Html::beginForm()} to generate his hidden input.
+     * You may use {@see \rock\template\Html::beginForm()} to generate his hidden input.
      *
      * @link http://en.wikipedia.org/wiki/Cross-site_request_forgery
      */

@@ -7,8 +7,8 @@ use rock\base\Widget;
 use rock\csrf\CSRF;
 use rock\di\Container;
 use rock\helpers\ArrayHelper;
-use rock\helpers\Html;
 use rock\request\Request;
+use rock\template\Html;
 
 class ActiveForm extends Widget
 {
@@ -189,7 +189,7 @@ class ActiveForm extends Widget
      * A form field is associated with a model and an attribute. It contains a label, an input and an error message
      * and use them to interact with end users to collect their inputs for the attribute.
      * @param \rock\base\Model $model the data model
-     * @param string $attribute the attribute name or expression. See `\rock\helpers\Html::getAttributeName()` for the format
+     * @param string $attribute the attribute name or expression. See `\rock\template\Html::getAttributeName()` for the format
      * about attribute expression.
      * @param array $options the additional configurations for the field object
      * @return ActiveField the created ActiveField object

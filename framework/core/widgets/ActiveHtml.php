@@ -5,8 +5,8 @@ namespace rock\widgets;
 
 use rock\base\Model;
 use rock\db\ActiveRecordInterface;
-use rock\helpers\Html;
 use rock\helpers\HtmlException;
+use rock\template\Html;
 
 class ActiveHtml extends Html
 {
@@ -21,15 +21,15 @@ class ActiveHtml extends Html
      *                          See {@see \rock\widgets\ActiveHtml::getAttributeName()} for the format
      *                          about attribute expression.
      * @param array  $options   the tag options in terms of name-value pairs. These will be rendered as
-     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
+     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\template\Html::encode()} .
      *                          If a value is null, the corresponding attribute will not be rendered.
      *                          The following options are specially handled:
      *
-     * - label: this specifies the label to be displayed. Note that this will NOT be {@see \rock\helpers\Html::encode()}.
+     * - label: this specifies the label to be displayed. Note that this will NOT be {@see \rock\template\Html::encode()}.
      *   If this is not set, {@see \rock\base\Model::getAttributeLabel()} will be called to get the label for display
      *   (after encoding).
      *
-     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     * See {@see \rock\template\Html::renderTagAttributes()} for details on how attributes are being rendered.
      *
      * @return string the generated label tag
      */
@@ -53,8 +53,8 @@ class ActiveHtml extends Html
      * @param string $attribute the attribute name or expression. See {@see \rock\widgets\ActiveHtml::getAttributeName()} for the format
      *                          about attribute expression.
      * @param array  $options   the tag options in terms of name-value pairs. These will be rendered as
-     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
-     *                          See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\template\Html::encode()} .
+     *                          See {@see \rock\template\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated input tag
      */
     public static function activeInput($type, $model, $attribute, $options = [])
@@ -78,8 +78,8 @@ class ActiveHtml extends Html
      * @param string $attribute the attribute name or expression. See {@see \rock\widgets\ActiveHtml::getAttributeName()} for the format
      *                          about attribute expression.
      * @param array  $options   the tag options in terms of name-value pairs. These will be rendered as
-     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
-     *                          See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\template\Html::encode()} .
+     *                          See {@see \rock\template\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated input tag
      */
     public static function activeTextInput($model, $attribute, $options = [])
@@ -97,8 +97,8 @@ class ActiveHtml extends Html
      * @param string $attribute the attribute name or expression. See {@see \rock\widgets\ActiveHtml::getAttributeName()} for the format
      *                          about attribute expression.
      * @param array  $options   the tag options in terms of name-value pairs. These will be rendered as
-     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
-     *                          See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\template\Html::encode()} .
+     *                          See {@see \rock\template\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated input tag
      */
     public static function activeHiddenInput($model, $attribute, $options = [])
@@ -116,8 +116,8 @@ class ActiveHtml extends Html
      * @param string $attribute the attribute name or expression. See {@see \rock\widgets\ActiveHtml::getAttributeName()} for the format
      *                          about attribute expression.
      * @param array  $options   the tag options in terms of name-value pairs. These will be rendered as
-     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()}.
-     *                          See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\template\Html::encode()}.
+     *                          See {@see \rock\template\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated input tag
      */
     public static function activePasswordInput($model, $attribute, $options = [])
@@ -135,8 +135,8 @@ class ActiveHtml extends Html
      * @param string $attribute the attribute name or expression. See {@see \rock\widgets\ActiveHtml::getAttributeName()} for the format
      *                          about attribute expression.
      * @param array  $options   the tag options in terms of name-value pairs. These will be rendered as
-     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()} .
-     *                          See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\template\Html::encode()} .
+     *                          See {@see \rock\template\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated input tag
      */
     public static function activeFileInput($model, $attribute, $options = [])
@@ -156,8 +156,8 @@ class ActiveHtml extends Html
      * @param string $attribute the attribute name or expression. See {@see \rock\widgets\ActiveHtml::getAttributeName()} for the format
      *                          about attribute expression.
      * @param array  $options   the tag options in terms of name-value pairs. These will be rendered as
-     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\helpers\Html::encode()}.
-     *                          See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     *                          the attributes of the resulting tag. The values will be HTML-encoded using {@see \rock\template\Html::encode()}.
+     *                          See {@see \rock\template\Html::renderTagAttributes()} for details on how attributes are being rendered.
      * @return string the generated textarea tag
      */
     public static function activeTextarea($model, $attribute, $options = [])
@@ -186,16 +186,16 @@ class ActiveHtml extends Html
      *   is not checked and is submitted, the value of this attribute will still be submitted to the server
      *   via the hidden input. If you do not want any hidden input, you should explicitly set this option as null.
      * - label: string, a label displayed next to the radio button.  It will NOT be HTML-encoded. Therefore you can pass
-     *   in HTML code such as an image tag. If this is is coming from end users, you should {@see \rock\helpers\Html::encode()} it to prevent XSS attacks.
+     *   in HTML code such as an image tag. If this is is coming from end users, you should {@see \rock\template\Html::encode()} it to prevent XSS attacks.
      *   The radio button will be enclosed by the label tag. Note that if you do not specify this option, a default label
      *   will be used based on the attribute label declaration in the model. If you do not want any label, you should
      *   explicitly set this option as null.
      * - labelOptions: array, the HTML attributes for the label tag. This is only used when the "label" option is specified.
      *
      * The rest of the options will be rendered as the attributes of the resulting tag. The values will
-     * be HTML-encoded using {@see \rock\helpers\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
+     * be HTML-encoded using {@see \rock\template\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
      *
-     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     * See {@see \rock\template\Html::renderTagAttributes()} for details on how attributes are being rendered.
      *
      * @return string the generated radio button tag
      */
@@ -235,15 +235,15 @@ class ActiveHtml extends Html
      *   is not checked and is submitted, the value of this attribute will still be submitted to the server
      *   via the hidden input.
      * - label: string, a label displayed next to the checkbox.  It will NOT be HTML-encoded. Therefore you can pass
-     *   in HTML code such as an image tag. If this is is coming from end users, you should {@see \rock\helpers\Html::encode()} it to prevent XSS attacks.
+     *   in HTML code such as an image tag. If this is is coming from end users, you should {@see \rock\template\Html::encode()} it to prevent XSS attacks.
      *   The checkbox will be enclosed by the label tag. Note that if you do not specify this option, a default label
      *   will be used based on the attribute label declaration in the model. If you do not want any label, you should
      *   explicitly set this option as null.
      * - labelOptions: array, the HTML attributes for the label tag. This is only used when the "label" option is specified.
      *
      * The rest of the options will be rendered as the attributes of the resulting tag. The values will
-     * be HTML-encoded using {@see \rock\helpers\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
-     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     * be HTML-encoded using {@see \rock\template\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
+     * See {@see \rock\template\Html::renderTagAttributes()} for details on how attributes are being rendered.
      *
      * @return string the generated checkbox tag
      */
@@ -302,8 +302,8 @@ class ActiveHtml extends Html
      *   Defaults to `false`.
      *
      * The rest of the options will be rendered as the attributes of the resulting tag. The values will
-     * be HTML-encoded using {@see \rock\helpers\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
-     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     * be HTML-encoded using {@see \rock\template\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
+     * See {@see \rock\template\Html::renderTagAttributes()} for details on how attributes are being rendered.
      *
      * @return string the generated drop-down list tag
      */
@@ -353,8 +353,8 @@ class ActiveHtml extends Html
      *   Defaults to `false`.
      *
      * The rest of the options will be rendered as the attributes of the resulting tag. The values will
-     * be HTML-encoded using {@see \rock\helpers\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
-     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     * be HTML-encoded using {@see \rock\template\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
+     * See {@see \rock\template\Html::renderTagAttributes()} for details on how attributes are being rendered.
      *
      * @return string the generated list box tag
      */
@@ -366,7 +366,7 @@ class ActiveHtml extends Html
     /**
      * Generates a list of checkboxes.
      *
-     * A checkbox list allows multiple selection, like {@see \rock\helpers\Html::listBox()}.
+     * A checkbox list allows multiple selection, like {@see \rock\template\Html::listBox()}.
      * As a result, the corresponding submitted value is an array.
      * The selection of the checkbox list is taken from the value of the model attribute.
      *
@@ -393,7 +393,7 @@ class ActiveHtml extends Html
      *   is the label for the checkbox; and $name, $value and $checked represent the name,
      *   value and the checked status of the checkbox input.
      *
-     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     * See {@see \rock\template\Html::renderTagAttributes()} for details on how attributes are being rendered.
      *
      * @return string the generated checkbox list
      */
@@ -431,7 +431,7 @@ class ActiveHtml extends Html
      *   is the label for the radio button; and $name, $value and $checked represent the name,
      *   value and the checked status of the radio button input.
      *
-     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     * See {@see \rock\template\Html::renderTagAttributes()} for details on how attributes are being rendered.
      *
      * @return string the generated radio button list
      */
@@ -449,14 +449,14 @@ class ActiveHtml extends Html
      * @param string $attribute the attribute name or expression. See {@see \rock\widgets\ActiveHtml::getAttributeName()} for the format
      *                          about attribute expression.
      * @param array  $options   the tag options in terms of name-value pairs. The values will be HTML-encoded
-     *                          using {@see \rock\helpers\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
+     *                          using {@see \rock\template\Html::encode()} . If a value is null, the corresponding attribute will not be rendered.
      *
      * The following options are specially handled:
      *
      * - tag: this specifies the tag name. If not set, "div" will be used.
      * - encode: boolean, if set to false then value won't be encoded.
      *
-     * See {@see \rock\helpers\Html::renderTagAttributes()} for details on how attributes are being rendered.
+     * See {@see \rock\template\Html::renderTagAttributes()} for details on how attributes are being rendered.
      *
      * @return string the generated label tag
      */

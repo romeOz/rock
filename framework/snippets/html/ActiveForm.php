@@ -9,9 +9,9 @@ use rock\base\Snippet;
 use rock\di\Container;
 use rock\file\UploadedFile;
 use rock\helpers\Helper;
-use rock\helpers\Html;
 use rock\helpers\Serialize;
 use rock\request\Request;
+use rock\template\Html;
 use rock\user\User;
 
 class ActiveForm extends Snippet
