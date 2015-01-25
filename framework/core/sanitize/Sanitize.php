@@ -167,7 +167,7 @@ class Sanitize implements ObjectInterface
 
     public static function __callStatic($name, $arguments)
     {
-        return call_user_func_array([static::getInstance('sanitize'), $name], $arguments);
+        return call_user_func_array([static::getInstance(static::className()), $name], $arguments);
     }
 
     protected function attributesInternal(array $attributes)
@@ -223,7 +223,7 @@ class Sanitize implements ObjectInterface
         if (class_exists('\rock\di\Container')) {
             return Container::load($config);
         }
-        return new static($config);
+        return new static();
     }
 
     protected function defaultRules()

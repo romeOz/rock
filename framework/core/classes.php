@@ -222,11 +222,11 @@ return array_merge(
         'i18n' => [
             'class' => \rock\i18n\i18n::className(),
             'pathsDicts' => [
-                i18n::RU => [
+                'ru' => [
                     '@common/lang/ru/lang.php',
                     '@common/lang/ru/validate.php',
                 ],
-                i18n::EN => [
+                'en' => [
                     '@common/lang/en/lang.php',
                     '@common/lang/en/validate.php',
                 ]

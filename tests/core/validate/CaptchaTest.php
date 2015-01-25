@@ -3,7 +3,7 @@ namespace rockunit\core\validate;
 
 use rock\validate\Validate;
 
-class Captcha extends \PHPUnit_Framework_TestCase
+class CaptchaTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider providerValid
