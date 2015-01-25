@@ -2,17 +2,15 @@
 namespace rock\helpers;
 
 use League\Flysystem\Util;
-use rock\base\BaseException;
 use rock\file\FileException;
 use rock\log\Log;
-use rock\Rock;
 
 /**
  * Helper "File"
  *
  * @package rock\helpers
  */
-class FileHelper extends Util
+class FileHelper
 {
     const PATTERN_NODIR = 1;
     const PATTERN_ENDSWITH = 4;
@@ -39,7 +37,7 @@ class FileHelper extends Util
         }
         if (!file_put_contents($pathFile, $value, $const)) {
             if (class_exists('\rock\log\Log')) {
-                $message = BaseException::convertExceptionToString(new FileException(FileException::NOT_CREATE_FILE, ['name' => $pathFile]));
+                $message = FileException::convertExceptionToString(new FileException(FileException::NOT_CREATE_FILE, ['name' => $pathFile]));
                 Log::warn($message);
             }
 
@@ -73,7 +71,7 @@ class FileHelper extends Util
         }
         if (!$result = mkdir($path, $mode)) {
             if (class_exists('\rock\log\Log')) {
-                $message = BaseException::convertExceptionToString(new FileException(FileException::NOT_CREATE_DIR, ['name' => $path]));
+                $message = FileException::convertExceptionToString(new FileException(FileException::NOT_CREATE_DIR, ['name' => $path]));
                 Log::warn($message);
             }
             return false;
@@ -110,7 +108,7 @@ class FileHelper extends Util
     {
         if (!rename($oldPath, $newPath)) {
             if (class_exists('\rock\log\Log')) {
-                $message = BaseException::convertExceptionToString(new FileHelperException("Error when renaming file: {$oldPath}"));
+                $message = FileException::convertExceptionToString(new FileHelperException("Error when renaming file: {$oldPath}"));
                 Log::err($message);
             }
 
@@ -374,12 +372,12 @@ class FileHelper extends Util
      *
      * @param string $pattern
      * @return array with keys: (string)pattern, (int)flags, (int|bool)firstWildcard
-     * @throws \Exception if the pattern is not a string.
+     * @throws FileException if the pattern is not a string.
      */
     private static function parseExcludePattern($pattern)
     {
         if (!is_string($pattern)) {
-            throw new \Exception('Exclude/include pattern must be a string.');
+            throw new FileException('Exclude/include pattern must be a string.');
         }
         $result = array(
             'pattern' => $pattern,
