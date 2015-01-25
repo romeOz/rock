@@ -176,7 +176,6 @@ class Validate implements ObjectInterface
      * is null or an empty string.
      */
     public $skipOnEmpty = true;
-    public $i18n = 'i18n';
     /** @var Rule[]  */
     protected $_rules = [];
     /**
@@ -458,9 +457,6 @@ class Validate implements ObjectInterface
             throw new ValidateException(ValidateException::UNKNOWN_CLASS, ['class' => $locale]);
         }
         $locale = new $locale;
-
-        $locale->i18n = $this->getI18N();
-        $locale->i18n->locale($this->locale);
         if (!$messages = $locale->defaultTemplates()) {
             throw new ValidateException("Messages `{$locale}` is empty.");
         }
@@ -505,20 +501,6 @@ class Validate implements ObjectInterface
             return Container::load($config);
         }
         return new static();
-    }
-
-    /**
-     * Get instance i18n.
-     * @return i18n
-     * @throws \rock\di\ContainerException
-     */
-    protected function getI18N()
-    {
-        if (class_exists('\rock\di\Container')) {
-            return Container::load($this->i18n);
-        }
-        unset($this->i18n['class']);
-        return new i18n($this->i18n);
     }
 
     protected function defaultRules()

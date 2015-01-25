@@ -17,10 +17,10 @@ class Regex extends Locale
     {
         return [
             self::MODE_DEFAULT => [
-                self::STANDARD => $this->i18n->translate('regex'),
+                self::STANDARD => '{{name}} содержит неверные символы',
             ],
             self::MODE_NEGATIVE => [
-                self::STANDARD => $this->i18n->translate('notRegex'),
+                self::STANDARD => '{{name}} не содержит верные символы',
             ]
         ];
     }

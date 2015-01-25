@@ -14,12 +14,12 @@ class Max extends Locale
     {
         return [
             self::MODE_DEFAULT => [
-                self::STANDARD => $this->i18n->translate('max'),
-                self::INCLUSIVE => $this->i18n->translate('maxInclusive'),
+                self::STANDARD => '{{name}} must be lower than {{maxValue}}',
+                self::INCLUSIVE => '{{name}} must be lower than or equals {{maxValue}}',
             ],
             self::MODE_NEGATIVE => [
-                self::STANDARD => $this->i18n->translate('notMax'),
-                self::INCLUSIVE => $this->i18n->translate('notMaxInclusive'),
+                self::STANDARD => '{{name}} must not be lower than {{maxValue}}',
+                self::INCLUSIVE => '{{name}} must not be lower than or equals {{maxValue}}',
             ]
         ];
     }

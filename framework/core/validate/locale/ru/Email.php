@@ -17,10 +17,10 @@ class Email extends Locale
     {
         return [
             self::MODE_DEFAULT => [
-                self::STANDARD => $this->i18n->translate('email'),
+                self::STANDARD => '{{name}} должен быть верным',
             ],
             self::MODE_NEGATIVE => [
-                self::STANDARD => $this->i18n->translate('notEmail'),
+                self::STANDARD => '{{name}} не должен быть верным',
             ]
         ];
     }

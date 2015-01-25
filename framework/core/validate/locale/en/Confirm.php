@@ -11,10 +11,10 @@ class Confirm extends Locale
     {
         return [
             self::MODE_DEFAULT => [
-                self::STANDARD => $this->i18n->translate('confirm'),
+                self::STANDARD => 'values must be equals',
             ],
             self::MODE_NEGATIVE => [
-                self::STANDARD => $this->i18n->translate('notConfirm'),
+                self::STANDARD => 'values must not be equals',
             ]
         ];
     }

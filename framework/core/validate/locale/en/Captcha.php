@@ -11,10 +11,10 @@ class Captcha extends Locale
     {
         return [
             self::MODE_DEFAULT => [
-                self::STANDARD => $this->i18n->translate('captcha'),
+                self::STANDARD => 'captcha must be valid',
             ],
             self::MODE_NEGATIVE => [
-                self::STANDARD => $this->i18n->translate('notCaptcha'),
+                self::STANDARD => 'captcha must not be valid',
             ]
         ];
     }

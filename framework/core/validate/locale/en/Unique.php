@@ -11,10 +11,10 @@ class Unique extends Locale
     {
         return [
             self::MODE_DEFAULT => [
-                self::STANDARD => $this->i18n->translate('unique'),
+                self::STANDARD => '{{value}} has already been taken',
             ],
             self::MODE_NEGATIVE => [
-                self::STANDARD => $this->i18n->translate('notUnique'),
+                self::STANDARD => '{{value}} not already been taken',
             ]
         ];
     }

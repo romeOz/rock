@@ -334,21 +334,11 @@ return array_merge(
         ],
         'validate' => [
             'class' => \rock\validate\Validate::className(),
-            'i18n' => [
-                'class' => i18n::className(),
-                'locale' => Rock::$app->language,
-                'category' => 'validate',
-                'removeBraces' => false,
-            ]
+            'locale' => Rock::$app->language,
         ],
         'activeValidate' => [
             'class' => \rock\validate\ActiveValidate::className(),
-            'i18n' => [
-                'class' => i18n::className(),
-                'locale' => Rock::$app->language,
-                'category' => 'validate',
-                'removeBraces' => false,
-            ]
+            'locale' => Rock::$app->language,
         ],
         'captcha' => [
             'class' => \rock\captcha\Captcha::className(),

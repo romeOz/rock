@@ -17,10 +17,10 @@ class Confirm extends Locale
     {
         return [
             self::MODE_DEFAULT => [
-                self::STANDARD => $this->i18n->translate('confirm'),
+                self::STANDARD => 'значения должны совпадать',
             ],
             self::MODE_NEGATIVE => [
-                self::STANDARD => $this->i18n->translate('notConfirm'),
+                self::STANDARD => 'значения не должны совпадать',
             ]
         ];
     }

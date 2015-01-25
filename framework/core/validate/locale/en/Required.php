@@ -11,10 +11,10 @@ class Required extends Locale
     {
         return [
             self::MODE_DEFAULT => [
-                self::STANDARD => $this->i18n->translate('required'),
+                self::STANDARD => '{{name}} must not be empty',
             ],
             self::MODE_NEGATIVE => [
-                self::STANDARD => $this->i18n->translate('notRequired'),
+                self::STANDARD => '{{name}} must be empty',
             ]
         ];
     }

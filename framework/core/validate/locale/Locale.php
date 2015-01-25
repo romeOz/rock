@@ -15,12 +15,18 @@ abstract class Locale
     const MODE_DEFAULT = 1;
     const MODE_NEGATIVE = 0;
 
-    /** @var  i18n */
-    public $i18n;
     public $defaultTemplate = self::STANDARD;
 
+    /**
+     * List templates by default.
+     * @return mixed
+     */
     abstract public function defaultTemplates();
 
+    /**
+     * List placeholders by default.
+     * @return array
+     */
     public function defaultPlaceholders()
     {
         return ['name' => 'value'];

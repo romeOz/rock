@@ -20,12 +20,12 @@ class Min extends Locale
     {
         return [
             self::MODE_DEFAULT => [
-                self::STANDARD => $this->i18n->translate('min'),
-                self::INCLUSIVE => $this->i18n->translate('minInclusive'),
+                self::STANDARD => '{{name}} должно быть больше {{minValue}}',
+                self::INCLUSIVE => '{{name}} должно быть больше или равно {{minValue}}',
             ],
             self::MODE_NEGATIVE => [
-                self::STANDARD => $this->i18n->translate('notMin'),
-                self::INCLUSIVE => $this->i18n->translate('notMinInclusive'),
+                self::STANDARD => '{{name}} не должно быть больше {{minValue}}',
+                self::INCLUSIVE => '{{name}} не должно быть больше или равно {{minValue}}',
             ]
         ];
     }
