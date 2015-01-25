@@ -1220,7 +1220,7 @@ class Template implements ComponentsInterface
                 $this->getExtension($matches['name'], $params, Helper::getValueIsset($params['autoEscape'], $escape));
             //  i18n
         } elseif ($matches['type'] === '%') {
-            $result = $this->_provideI18n(
+            $result = $this->_calculateI18N(
                 $matches['name'],
                 Helper::getValue($params['placeholders'], []),
                 Helper::getValue($params['locale']),
@@ -1228,7 +1228,7 @@ class Template implements ComponentsInterface
             );
             // link to resource
         } elseif ($matches['type'] === '~') {
-            $result = $this->_provideLink($matches['name']);
+            $result = $this->_calculateLink($matches['name']);
             // snippet
         } elseif (empty($matches['type'])) {
             $result = $this->getSnippet($matches['name'], $params, $escape);
@@ -1470,16 +1470,14 @@ class Template implements ComponentsInterface
         return null;
     }
 
-    private function _provideI18n($name, $placeholders = [], $locale = null, $category = null)
+    private function _calculateI18N($name, $placeholders = [], $locale = null, $category = null)
     {
-        $result = i18n::t(
+        return i18n::t(
             explode('.', $name),
             $placeholders,
             $category,
             $locale
         );
-
-        return $result;
     }
 
     /**
@@ -1498,7 +1496,7 @@ class Template implements ComponentsInterface
         $this->localPlaceholders = array_diff_key($this->localPlaceholders, array_flip($names));
     }
 
-    private function _provideLink($link)
+    private function _calculateLink($link)
     {
         if (empty($link) || !$this->handlerLink instanceof \Closure) {
             return '#';
