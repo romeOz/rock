@@ -2,7 +2,7 @@
 
 namespace rockunit\core\helpers;
 
-use rock\base\Model;
+use rock\components\Model;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Json;
 use rock\helpers\Serialize;

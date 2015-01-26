@@ -1,7 +1,7 @@
 <?php
 namespace rockunit\core\base;
 
-use rock\base\Model;
+use rock\components\Model;
 use rock\i18n\i18n;
 
 /**
@@ -161,7 +161,7 @@ class ModelRulesTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \rock\base\ModelException
+     * @expectedException \rock\components\ModelException
      */
     public function testFilterThrowExceptionArgumentsMustBeArray()
     {
@@ -176,7 +176,7 @@ class ModelRulesTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \rock\base\ModelException
+     * @expectedException \rock\components\ModelException
      */
     public function testValidateThrowExceptionArgumentsMustBeArray()
     {
@@ -191,7 +191,7 @@ class ModelRulesTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \rock\base\ModelException
+     * @expectedException \rock\components\ModelException
      */
     public function testThrowExceptionUnknownTypeRule()
     {

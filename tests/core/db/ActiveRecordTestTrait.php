@@ -9,7 +9,7 @@ use rock\db\BaseActiveRecord;
 use rock\db\Connection;
 use rock\db\DbException;
 use rock\db\SelectBuilder;
-use rock\event\Event;
+use rock\events\Event;
 use rock\helpers\Trace;
 use rockunit\core\db\models\Customer;
 use rockunit\core\db\models\Order;

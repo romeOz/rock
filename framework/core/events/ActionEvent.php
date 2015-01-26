@@ -1,13 +1,11 @@
 <?php
 
-namespace rock\base;
-
-use rock\event\Event;
+namespace rock\events;
 
 /**
  * ActionEvent represents the event parameter used for an action event.
  *
- * By setting the {@see rock\base\ActionEvent::$isValid} property, one may control whether to continue running the action.
+ * By setting the {@see rock\events\ActionEvent::$isValid} property, one may control whether to continue running the action.
  */
 class ActionEvent extends Event
 {
@@ -21,7 +19,7 @@ class ActionEvent extends Event
     public $result;
     /**
      * @var boolean whether to continue running the action. Event handlers of
-     * {@see \rock\base\Controller::EVENT_BEFORE_ACTION} may set this property to decide whether
+     * {@see \rock\core\Controller::EVENT_BEFORE_ACTION} may set this property to decide whether
      * to continue running the current action.
      */
     public $isValid = true;

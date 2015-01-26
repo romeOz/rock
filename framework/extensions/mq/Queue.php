@@ -3,12 +3,11 @@
 namespace rock\mq;
 
 
-use rock\base\ComponentsInterface;
-use rock\base\ComponentsTrait;
+use rock\components\ComponentsInterface;
 
 class Queue implements ComponentsInterface
 {
-    use ComponentsTrait;
+    use \rock\components\ComponentsTrait;
 
     /**
      * @event Event an event that is triggered before a message is sent to a queue.

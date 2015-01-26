@@ -1,14 +1,17 @@
 <?php
 
-namespace rock\base;
+namespace rock\components;
 
+
+use rock\core\Controller;
+use rock\events\ActionEvent;
 
 class ActionFilter extends Behavior
 {
     /**
      * @var array list of action IDs that this filter should apply to. If this property is not set,
-     * then the filter applies to all actions, unless they are listed in {@see \rock\base\ActionFilter::$except}.
-     * If an action ID appears in both {@see \rock\base\ActionFilter::$only} and {@see \rock\base\ActionFilter::$except}, this filter will NOT apply to it.
+     * then the filter applies to all actions, unless they are listed in {@see \rock\components\ActionFilter::$except}.
+     * If an action ID appears in both {@see \rock\components\ActionFilter::$only} and {@see \rock\components\ActionFilter::$except}, this filter will NOT apply to it.
      *
      * Note that if the filter is attached to a module, the action IDs should also include child module IDs (if any)
      * and controller IDs.
@@ -55,7 +58,7 @@ class ActionFilter extends Behavior
 //    }
 
     /**
-     * @param ActionEvent $event
+     * @param \rock\events\ActionEvent $event
      */
     public function beforeFilter($event)
     {
@@ -74,7 +77,7 @@ class ActionFilter extends Behavior
     }
 
     /**
-     * @param ActionEvent $event
+     * @param \rock\event\\rock\events\ActionEvent $event
      */
     public function afterFilter($event)
     {

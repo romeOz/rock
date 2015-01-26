@@ -2,8 +2,6 @@
 
 namespace rockunit\extensions\mongodb;
 
-use rock\access\Access;
-use rock\event\Event;
 use rock\helpers\Trace;
 use rock\mongodb\ActiveQuery;
 use rockunit\common\CommonTestTrait;

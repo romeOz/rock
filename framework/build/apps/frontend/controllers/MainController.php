@@ -3,7 +3,7 @@
 namespace apps\frontend\controllers;
 
 
-use rock\base\Controller;
+use rock\core\Controller;
 
 class MainController extends Controller
 {

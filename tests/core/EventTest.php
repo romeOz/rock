@@ -2,9 +2,7 @@
 namespace rockunit\core;
 
 use rock\base\ClassName;
-
-use rock\event\Event;
-
+use rock\events\Event;
 
 class Foo
 {

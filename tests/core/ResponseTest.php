@@ -2,13 +2,12 @@
 namespace rockunit\core;
 
 use rock\base\Alias;
-use rock\base\Controller;
+use rock\core\Controller;
 use rock\di\Container;
 use rock\helpers\Json;
 use rock\helpers\StringHelper;
 use rock\response\Response;
 use rock\response\ResponseException;
-use rock\Rock;
 use rock\route\Route;
 
 $_SERVER['HTTP_HOST'] = $_SERVER['SERVER_NAME'] = 'site.com';

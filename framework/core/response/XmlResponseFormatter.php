@@ -7,9 +7,9 @@ namespace rock\response;
 use DOMDocument;
 use DOMElement;
 use DOMText;
-use rock\base\Arrayable;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
+use rock\components\Arrayable;
 use rock\helpers\ObjectHelper;
 
 class XmlResponseFormatter implements ResponseFormatterInterface, ObjectInterface

@@ -3,7 +3,6 @@ namespace rock\db;
 
 use PDO;
 use rock\base\BaseException;
-use rock\base\ComponentsTrait;
 use rock\base\ObjectInterface;
 use rock\cache\CacheInterface;
 use rock\di\Container;
@@ -125,7 +124,7 @@ use rock\log\Log;
  */
 class Connection implements ObjectInterface
 {
-    use ComponentsTrait;
+    use \rock\components\ComponentsTrait;
 
     /**
      * @event Event an event that is triggered after a DB connection is established

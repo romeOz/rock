@@ -318,16 +318,16 @@ abstract class ActiveRecord extends BaseActiveRecord
      *
      * This method performs the following steps in order:
      *
-     * 1. call {@see \rock\base\Model::beforeValidate()} when `$runValidation` is true. If validation
+     * 1. call {@see \rock\components\Model::beforeValidate()} when `$runValidation` is true. If validation
      *    fails, it will skip the rest of the steps;
-     * 2. call {@see \rock\base\Model::afterValidate()} when `$runValidation` is true.
+     * 2. call {@see \rock\components\Model::afterValidate()} when `$runValidation` is true.
      * 3. call {@see \rock\db\BaseActiveRecord::beforeSave()}. If the method returns false, it will skip the
      *    rest of the steps;
      * 4. insert the record into index. If this fails, it will skip the rest of the steps;
      * 5. call {@see \rock\db\BaseActiveRecord::afterSave()};
      *
-     * In the above step 1, 2, 3 and 5, events {@see \rock\base\Model::EVENT_BEFORE_VALIDATE},
-     * {@see \rock\db\BaseActiveRecord::EVENT_BEFORE_INSERT}, {@see \rock\db\BaseActiveRecord::EVENT_AFTER_INSERT} and {@see \rock\base\Model::EVENT_AFTER_VALIDATE}
+     * In the above step 1, 2, 3 and 5, events {@see \rock\components\Model::EVENT_BEFORE_VALIDATE},
+     * {@see \rock\db\BaseActiveRecord::EVENT_BEFORE_INSERT}, {@see \rock\db\BaseActiveRecord::EVENT_AFTER_INSERT} and {@see \rock\components\Model::EVENT_AFTER_VALIDATE}
      * will be raised by the corresponding methods.
      *
      * Only the {@see \rock\db\BaseActiveRecord::$dirtyAttributes}(changed attribute values) will be inserted.
@@ -407,16 +407,16 @@ abstract class ActiveRecord extends BaseActiveRecord
      *
      * This method performs the following steps in order:
      *
-     * 1. call {@see \rock\base\Model::beforeValidate()} when `$runValidation` is true. If validation
+     * 1. call {@see \rock\components\Model::beforeValidate()} when `$runValidation` is true. If validation
      *    fails, it will skip the rest of the steps;
-     * 2. call {@see \rock\base\Model::afterValidate()} when `$runValidation` is true.
+     * 2. call {@see \rock\components\Model::afterValidate()} when `$runValidation` is true.
      * 3. call {@see \rock\db\BaseActiveRecord::beforeSave()}. If the method returns false, it will skip the
      *    rest of the steps;
      * 4. save the record into index. If this fails, it will skip the rest of the steps;
      * 5. call {@see \rock\db\BaseActiveRecord::afterSave()};
      *
-     * In the above step 1, 2, 3 and 5, events {@see \rock\base\Model::EVENT_BEFORE_VALIDATE},
-     * {@see \rock\db\BaseActiveRecord::EVENT_BEFORE_UPDATE}, {@see \rock\db\BaseActiveRecord::EVENT_AFTER_UPDATE} and {@see \rock\base\Model::EVENT_AFTER_VALIDATE}
+     * In the above step 1, 2, 3 and 5, events {@see \rock\components\Model::EVENT_BEFORE_VALIDATE},
+     * {@see \rock\db\BaseActiveRecord::EVENT_BEFORE_UPDATE}, {@see \rock\db\BaseActiveRecord::EVENT_AFTER_UPDATE} and {@see \rock\components\Model::EVENT_AFTER_VALIDATE}
      * will be raised by the corresponding methods.
      *
      * Only the {@see \rock\db\BaseActiveRecord::$dirtyAttributes}(changed attribute values) will be saved into database.
@@ -634,9 +634,9 @@ abstract class ActiveRecord extends BaseActiveRecord
     }
 
     /**
-     * Returns a value indicating whether the specified operation is transactional in the current {@see \rock\base\Model::$scenario}.
+     * Returns a value indicating whether the specified operation is transactional in the current {@see \rock\components\Model::$scenario}.
      * @param integer $operation the operation to check. Possible values are {@see \rock\sphinx\ActiveRecord::OP_INSERT}, {@see \rock\sphinx\ActiveRecord::OP_UPDATE} and {@see \rock\sphinx\ActiveRecord::OP_DELETE}.
-     * @return boolean whether the specified operation is transactional in the current {@see \rock\base\Model::$scenario}.
+     * @return boolean whether the specified operation is transactional in the current {@see \rock\components\Model::$scenario}.
      */
     public function isTransactional($operation)
     {

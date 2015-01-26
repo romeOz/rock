@@ -1,5 +1,5 @@
 <?php
-namespace rock\event;
+namespace rock\events;
 
 use rock\base\BaseException;
 

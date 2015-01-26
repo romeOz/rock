@@ -2,8 +2,7 @@
 
 namespace rock\widgets;
 
-use rock\base\Model;
-use rock\base\Widget;
+use rock\components\Model;
 use rock\csrf\CSRF;
 use rock\di\Container;
 use rock\helpers\ArrayHelper;
@@ -34,7 +33,7 @@ class ActiveForm extends Widget
      */
     public $method = 'post';
     /**
-     * @var \rock\base\Model
+     * @var \rock\components\Model
      */
     public $model;
     /**
@@ -188,7 +187,8 @@ class ActiveForm extends Widget
      * Generates a form field.
      * A form field is associated with a model and an attribute. It contains a label, an input and an error message
      * and use them to interact with end users to collect their inputs for the attribute.
-     * @param \rock\base\Model $model the data model
+     *
+*@param \rock\components\Model $model the data model
      * @param string $attribute the attribute name or expression. See `\rock\template\Html::getAttributeName()` for the format
      * about attribute expression.
      * @param array $options the additional configurations for the field object
@@ -216,7 +216,8 @@ class ActiveForm extends Widget
      * Begins a form field.
      * This method will create a new form field and returns its opening tag.
      * You should call {@see \rock\widgets\ActiveForm::endField()} afterwards.
-     * @param Model $model the data model
+     *
+*@param \rock\components\Model $model the data model
      * @param string $attribute the attribute name or expression. See {@see \rock\widgets\ActiveHtml::getAttributeName()} for the format
      * about attribute expression.
      * @param array $options the additional configurations for the field object
@@ -271,7 +272,7 @@ class ActiveForm extends Widget
      * ActiveForm::validate($model1, $model2, ...);
      * ```
      *
-     * @param \rock\base\Model $model the model to be validated
+     * @param \rock\components\Model $model the model to be validated
      * @param mixed $attributes list of attributes that should be validated.
      * If this parameter is empty, it means any attribute listed in the applicable
      * validation rules should be validated.
@@ -291,7 +292,7 @@ class ActiveForm extends Widget
         } else {
             $models = [$model];
         }
-        /** @var \rock\base\Model $model */
+        /** @var \rock\components\Model $model */
         foreach ($models as $model) {
             $model->validate($attributes);
             foreach ($model->getErrors() as $attribute => $errors) {
@@ -327,7 +328,7 @@ class ActiveForm extends Widget
     public static function validateMultiple($models, $attributes = null)
     {
         $result = [];
-        /** @var Model $model */
+        /** @var \rock\components\Model $model */
         foreach ($models as $i => $model) {
             $model->validate($attributes);
             foreach ($model->getErrors() as $attribute => $errors) {

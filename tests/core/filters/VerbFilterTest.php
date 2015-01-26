@@ -2,7 +2,7 @@
 
 namespace rockunit\core\filters\verbs;
 
-use rock\base\Controller;
+use rock\core\Controller;
 use rock\filters\VerbFilter;
 use rock\request\Request;
 

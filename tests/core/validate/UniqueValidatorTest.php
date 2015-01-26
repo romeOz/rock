@@ -3,7 +3,7 @@
 namespace rockunit\core\validate;
 
 
-use rock\base\Model;
+use rock\components\Model;
 use rock\validate\ActiveValidate;
 use rockunit\core\db\DatabaseTestCase;
 use rockunit\core\db\models\ActiveRecord;

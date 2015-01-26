@@ -3,12 +3,12 @@
 namespace rock\cache;
 
 
-use rock\base\ComponentsTrait;
+use rock\components\ComponentsTrait;
 use rock\helpers\Serialize;
 
 trait CommonTrait
 {
-    use ComponentsTrait {
+    use \rock\components\ComponentsTrait {
         ComponentsTrait::init as parentInit;
     }
 

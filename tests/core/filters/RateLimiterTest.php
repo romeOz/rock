@@ -2,7 +2,7 @@
 
 namespace rockunit\core\filters\RateLimiter;
 
-use rock\base\Controller;
+use rock\core\Controller;
 use rock\filters\RateLimiter;
 use rock\Rock;
 

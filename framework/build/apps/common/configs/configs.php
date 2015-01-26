@@ -9,7 +9,7 @@
  * @scope - scope root directory of currently running web application.
  * @web - base URL of currently running web application.
  */
-use rock\event\Event;
+use rock\events\Event;
 
 \rock\base\Alias::setAlias('root', dirname(dirname(dirname(__DIR__))));
 \rock\base\Alias::setAlias('rock', '@root/framework/core');

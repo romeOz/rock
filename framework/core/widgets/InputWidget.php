@@ -3,13 +3,12 @@
 namespace rock\widgets;
 
 
-use rock\base\Model;
-use rock\base\Widget;
+use rock\components\Model;
 
 class InputWidget extends Widget
 {
     /**
-     * @var Model the data model that this widget is associated with.
+     * @var \rock\components\Model the data model that this widget is associated with.
      */
     public $model;
     /** @var  ActiveField */

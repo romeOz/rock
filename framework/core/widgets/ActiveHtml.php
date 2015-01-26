@@ -3,7 +3,7 @@
 namespace rock\widgets;
 
 
-use rock\base\Model;
+use rock\components\Model;
 use rock\db\ActiveRecordInterface;
 use rock\helpers\HtmlException;
 use rock\template\Html;
@@ -14,7 +14,7 @@ class ActiveHtml extends Html
     /**
      * Generates a label tag for the given model attribute.
      *
-     * The label text is the label associated with the attribute, obtained via {@see \rock\base\Model::getAttributeLabel()}.
+     * The label text is the label associated with the attribute, obtained via {@see \rock\components\Model::getAttributeLabel()}.
      *
      * @param Model  $model     the model object
      * @param string $attribute the attribute name or expression.
@@ -26,7 +26,7 @@ class ActiveHtml extends Html
      *                          The following options are specially handled:
      *
      * - label: this specifies the label to be displayed. Note that this will NOT be {@see \rock\template\Html::encode()}.
-     *   If this is not set, {@see \rock\base\Model::getAttributeLabel()} will be called to get the label for display
+     *   If this is not set, {@see \rock\components\Model::getAttributeLabel()} will be called to get the label for display
      *   (after encoding).
      *
      * See {@see \rock\template\Html::renderTagAttributes()} for details on how attributes are being rendered.
@@ -112,7 +112,7 @@ class ActiveHtml extends Html
      * This method will generate the "name" and "value" tag attributes automatically for the model attribute
      * unless they are explicitly specified in `$options`.
      *
-     * @param Model  $model     the model object
+     * @param \rock\components\Model  $model     the model object
      * @param string $attribute the attribute name or expression. See {@see \rock\widgets\ActiveHtml::getAttributeName()} for the format
      *                          about attribute expression.
      * @param array  $options   the tag options in terms of name-value pairs. These will be rendered as
@@ -131,7 +131,7 @@ class ActiveHtml extends Html
      * This method will generate the "name" and "value" tag attributes automatically for the model attribute
      * unless they are explicitly specified in `$options`.
      *
-     * @param Model  $model     the model object
+     * @param \rock\components\Model  $model     the model object
      * @param string $attribute the attribute name or expression. See {@see \rock\widgets\ActiveHtml::getAttributeName()} for the format
      *                          about attribute expression.
      * @param array  $options   the tag options in terms of name-value pairs. These will be rendered as
@@ -152,7 +152,7 @@ class ActiveHtml extends Html
      *
      * The model attribute value will be used as the content in the textarea.
      *
-     * @param Model  $model     the model object
+     * @param \rock\components\Model  $model     the model object
      * @param string $attribute the attribute name or expression. See {@see \rock\widgets\ActiveHtml::getAttributeName()} for the format
      *                          about attribute expression.
      * @param array  $options   the tag options in terms of name-value pairs. These will be rendered as
@@ -321,7 +321,7 @@ class ActiveHtml extends Html
      *
      * The selection of the list box is taken from the value of the model attribute.
      *
-     * @param Model  $model     the model object
+     * @param \rock\components\Model  $model     the model object
      * @param string $attribute the attribute name or expression. See {@see \rock\widgets\ActiveHtml::getAttributeName()} for the format
      *                          about attribute expression.
      * @param array  $items     the option data items. The array keys are option values, and the array values
@@ -483,7 +483,7 @@ class ActiveHtml extends Html
      * If an attribute value is an instance of {@see \rock\db\ActiveRecordInterface} or an array of such instances,
      * the primary value(s) of the AR instance(s) will be returned instead.
      *
-     * @param Model  $model     the model object
+     * @param \rock\components\Model  $model     the model object
      * @param string $attribute the attribute name or expression
      * @return string|array the corresponding attribute value
      * @throws HtmlException if the attribute name contains non-word characters.
@@ -590,7 +590,7 @@ class ActiveHtml extends Html
      * This method converts the result {@see \rock\widgets\ActiveHtml::getInputName()} into a valid input ID.
      * For example, if {@see \rock\widgets\ActiveHtml::getInputName()} returns `Post[content]`, this method will return `post-content`.
      *
-     * @param Model  $model     the model object
+     * @param \rock\components\Model  $model     the model object
      * @param string $attribute the attribute name or expression.
      *                          See {@see \rock\widgets\ActiveHtml::getAttributeName()} for explanation of attribute expression.
      * @return string the generated input ID

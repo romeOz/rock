@@ -2,9 +2,9 @@
 namespace rock\db;
 
 
-use rock\base\ComponentsTrait;
-use rock\base\ModelEvent;
+use rock\components\ComponentsTrait;
 use rock\di\Container;
+use rock\events\ModelEvent;
 
 /**
  * Query represents a SELECT SQL statement in a way that is independent of DBMS.
@@ -33,7 +33,7 @@ use rock\di\Container;
  */
 class Query implements QueryInterface
 {
-    use ComponentsTrait {
+    use \rock\components\ComponentsTrait {
         ComponentsTrait::__call as parentCall;
     }
     use QueryTrait;

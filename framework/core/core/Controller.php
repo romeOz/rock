@@ -1,7 +1,11 @@
 <?php
-namespace rock\base;
+namespace rock\core;
 
+use rock\base\Alias;
+use rock\components\ComponentsInterface;
+use rock\components\ComponentsTrait;
 use rock\di\Container;
+use rock\events\ActionEvent;
 use rock\helpers\ArrayHelper;
 use rock\helpers\FileHelper;
 use rock\helpers\StringHelper;
@@ -19,7 +23,7 @@ abstract class Controller implements ComponentsInterface
 
     /**
      * @event ActionEvent an event raised right before executing a controller action.
-     * You may set {@see \rock\base\ActionEvent::$isValid} to be false to cancel the action execution.
+     * You may set {@see \rock\events\ActionEvent::$isValid} to be false to cancel the action execution.
      */
     const EVENT_BEFORE_ACTION = 'beforeAction';
     /**
@@ -100,7 +104,7 @@ abstract class Controller implements ComponentsInterface
     /**
      * This method is invoked right before an action is executed.
      *
-     * The method will trigger the {@see \rock\base\Controller::EVENT_BEFORE_ACTION} event. The return value of the method
+     * The method will trigger the {@see \rock\core\Controller::EVENT_BEFORE_ACTION} event. The return value of the method
      * will determine whether the action should continue to run.
      *
      * If you override this method, your code should look like the following:
@@ -130,7 +134,7 @@ abstract class Controller implements ComponentsInterface
     /**
      * This method is invoked right after an action is executed.
      *
-     * The method will trigger the {@see \rock\base\Controller::EVENT_AFTER_ACTION} event. The return value of the method
+     * The method will trigger the {@see \rock\core\Controller::EVENT_AFTER_ACTION} event. The return value of the method
      * will be used as the action return value.
      *
      * If you override this method, your code should look like the following:

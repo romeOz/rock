@@ -4,7 +4,7 @@ namespace rock\authclient\snippets;
 
 
 use rock\authclient\Collection;
-use rock\base\Snippet;
+use rock\core\Snippet;
 use rock\di\Container;
 use rock\helpers\Json;
 

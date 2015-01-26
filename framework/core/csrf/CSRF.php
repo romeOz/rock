@@ -2,8 +2,7 @@
 namespace rock\csrf;
 
 
-use rock\base\ComponentsInterface;
-use rock\base\ComponentsTrait;
+use rock\components\ComponentsInterface;
 use rock\cookie\Cookie;
 use rock\di\Container;
 use rock\request\RequestInterface;
@@ -12,7 +11,7 @@ use rock\session\SessionInterface;
 
 class CSRF implements ComponentsInterface, RequestInterface
 {
-    use ComponentsTrait;
+    use \rock\components\ComponentsTrait;
 
     /**
      * The name of the HTTP header for sending CSRF-token.

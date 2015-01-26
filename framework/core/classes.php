@@ -6,7 +6,6 @@ use rock\base\Alias;
 use rock\db\BatchQueryResult;
 use rock\file\FileManager;
 use rock\helpers\ArrayHelper;
-use rock\i18n\i18n;
 use rock\rbac\Permission;
 use rock\rbac\Role;
 use rock\Rock;
@@ -60,7 +59,7 @@ return array_merge(
                 {
                     $class = $link[0];
                     if (!class_exists($class)) {
-                        /** @var \rock\base\Controller $class */
+                        /** @var \rock\core\Controller $class */
                         if (!$class = ArrayHelper::getValue((array)\rock\di\Container::get($class), ['class'])) {
                             throw new \rock\template\TemplateException(\rock\template\TemplateException::UNKNOWN_CLASS, ['class' => $link[0]]);
                         }
@@ -365,7 +364,7 @@ return array_merge(
         ],
 
         'behavior' => [
-            'class' => \rock\base\Behavior::className(),
+            'class' => \rock\components\Behavior::className(),
         ],
         \rock\filters\AccessFilter::className() => [
             'class' => \rock\filters\AccessFilter::className(),

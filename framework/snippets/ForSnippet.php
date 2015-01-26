@@ -1,7 +1,7 @@
 <?php
 namespace rock\snippets;
 
-use rock\base\Snippet;
+use rock\core\Snippet;
 
 /**
  * Snippet "ForSnippet"

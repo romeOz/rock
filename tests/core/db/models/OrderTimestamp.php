@@ -2,9 +2,8 @@
 
 namespace rockunit\core\db\models;
 
-use rock\base\ModelEvent;
 use rock\behaviors\TimestampBehavior;
-use rock\db\Expression;
+use rock\events\ModelEvent;
 
 /**
  * Class Order

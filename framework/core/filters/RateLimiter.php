@@ -2,8 +2,8 @@
 
 namespace rock\filters;
 
-use rock\base\ActionFilter;
-use rock\base\Controller;
+use rock\components\ActionFilter;
+use rock\core\Controller;
 use rock\request\Request;
 use rock\response\Response;
 use rock\Rock;

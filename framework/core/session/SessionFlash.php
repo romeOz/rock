@@ -3,12 +3,12 @@
 namespace rock\session;
 
 
-use rock\base\ComponentsInterface;
-use rock\base\ComponentsTrait;
+use rock\components\ComponentsInterface;
+use rock\components\ComponentsTrait;
 
 abstract class SessionFlash implements ComponentsInterface
 {
-    use ComponentsTrait {
+    use \rock\components\ComponentsTrait {
         ComponentsTrait::__construct as parentConstruct;
     }
 

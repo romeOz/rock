@@ -4,8 +4,7 @@ namespace rock\snippets\html;
 
 
 use rock\base\Alias;
-use rock\base\Model;
-use rock\base\Snippet;
+use rock\core\Snippet;
 use rock\di\Container;
 use rock\file\UploadedFile;
 use rock\helpers\Helper;
@@ -17,7 +16,7 @@ use rock\user\User;
 class ActiveForm extends Snippet
 {
     public $config = [];
-    /** @var  Model|string|array */
+    /** @var  \rock\components\Model|string|array */
     public $model;
     public $fields = [];
     public $submitButton = [];

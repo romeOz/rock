@@ -2,9 +2,8 @@
 namespace rock\file;
 
 use rock\base\Alias;
-use rock\base\ComponentsInterface;
-use rock\base\ComponentsTrait;
-use rock\base\Model;
+use rock\components\ComponentsInterface;
+use rock\components\Model;
 use rock\di\Container;
 use rock\helpers\FileHelper;
 use rock\widgets\ActiveHtml;
@@ -49,7 +48,7 @@ use rock\widgets\ActiveHtml;
  */
 class UploadedFile implements ComponentsInterface
 {
-    use ComponentsTrait;
+    use \rock\components\ComponentsTrait;
 
     private static $_files;
 
@@ -103,7 +102,8 @@ class UploadedFile implements ComponentsInterface
     /**
      * Returns an uploaded file for the given model attribute.
      * The file should be uploaded using {@see \rock\widgets\ActiveField::fileInput()}.
-     * @param Model $model the data model
+     *
+*@param \rock\components\Model $model the data model
      * @param string $attribute the attribute name. The attribute name may contain array indexes.
      * For example, '[1]file' for tabular file uploading; and 'file[1]' for an element in a file array.
      * @return UploadedFile the instance of the uploaded file.
@@ -118,7 +118,8 @@ class UploadedFile implements ComponentsInterface
 
     /**
      * Returns all uploaded files for the given model attribute.
-     * @param Model $model the data model
+     *
+*@param \rock\components\Model $model the data model
      * @param string $attribute the attribute name. The attribute name may contain array indexes
      * for tabular file uploading, e.g. '[1]file'.
      * @return UploadedFile[] array of UploadedFile objects.

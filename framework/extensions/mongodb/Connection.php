@@ -1,8 +1,7 @@
 <?php
 namespace rock\mongodb;
 
-use rock\base\ComponentsInterface;
-use rock\base\ComponentsTrait;
+use rock\components\ComponentsInterface;
 use rock\di\Container;
 use rock\Rock;
 
@@ -64,7 +63,7 @@ use rock\Rock;
  */
 class Connection implements ComponentsInterface
 {
-    use ComponentsTrait;
+    use \rock\components\ComponentsTrait;
 
     /**
      * @event Event an event that is triggered after a DB connection is established

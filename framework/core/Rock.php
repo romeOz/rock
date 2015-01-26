@@ -5,10 +5,10 @@ namespace rock;
 use League\Flysystem\Util;
 use rock\base\Alias;
 use rock\base\ClassName;
-use rock\base\Controller;
 use rock\base\ObjectInterface;
+use rock\core\Controller;
 use rock\di\Container;
-use rock\event\Event;
+use rock\events\Event;
 use rock\exception\ErrorHandler;
 use rock\helpers\Trace;
 use rock\i18n\i18n;
@@ -57,7 +57,8 @@ class Rock extends Alias
     public static $components = [];
     /**
      * Current controller
-     * @var Controller
+     *
+*@var \rock\core\Controller
      */
     public $controller;
 

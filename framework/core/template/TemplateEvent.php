@@ -3,7 +3,7 @@
 namespace rock\template;
 
 
-use rock\event\Event;
+use rock\events\Event;
 
 class TemplateEvent extends Event
 {

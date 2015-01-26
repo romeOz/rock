@@ -2,7 +2,7 @@
 
 namespace rockunit\core\filters\verbs\ContentNegotiatorFilter;
 
-use rock\base\Controller;
+use rock\core\Controller;
 use rock\filters\ContentNegotiatorFilter;
 use rock\i18n\i18nInterface;
 use rock\response\Response;

@@ -3,7 +3,7 @@
 namespace rockunit\core\widgets\mocks;
 
 
-use rock\base\Model;
+use rock\components\Model;
 
 class ModelMock extends Model
 {

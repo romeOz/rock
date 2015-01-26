@@ -3,7 +3,7 @@
 namespace rockunit\core\template\controllers;
 
 
-use rock\base\Controller;
+use rock\core\Controller;
 
 class TestController extends Controller
 {

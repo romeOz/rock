@@ -4,7 +4,7 @@ namespace rockunit\snippets\data;
 
 
 
-use rock\base\Snippet;
+use rock\core\Snippet;
 
 class PrepareSnippet extends Snippet
 {

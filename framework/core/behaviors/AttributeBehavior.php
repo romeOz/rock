@@ -3,8 +3,8 @@
 namespace rock\behaviors;
 
 
-use rock\base\Behavior;
-use rock\event\Event;
+use rock\components\Behavior;
+use rock\events\Event;
 
 class AttributeBehavior extends Behavior
 {

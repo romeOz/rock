@@ -3,8 +3,8 @@
 namespace rockunit\core;
 
 
-use rock\base\Model;
 use rock\base\ObjectTrait;
+use rock\components\Model;
 
 class Post1
 {

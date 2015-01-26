@@ -4,10 +4,10 @@ namespace rockunit\core\behavior\Behavior;
 
 
 use rock\access\Access;
-use rock\base\ActionEvent;
-use rock\base\Behavior;
-use rock\base\Controller;
-use rock\event\Event;
+use rock\components\Behavior;
+use rock\core\Controller;
+use rock\events\ActionEvent;
+use rock\events\Event;
 use rock\filters\AccessFilter;
 
 class FooBehavior extends Behavior

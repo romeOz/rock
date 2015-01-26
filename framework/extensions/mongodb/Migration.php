@@ -1,8 +1,7 @@
 <?php
 namespace rock\mongodb;
 
-use rock\base\ComponentsInterface;
-use rock\base\ComponentsTrait;
+use rock\components\ComponentsInterface;
 use rock\db\MigrationInterface;
 use rock\di\Container;
 use rock\helpers\Json;
@@ -25,7 +24,7 @@ use rock\helpers\Json;
  */
 abstract class Migration implements MigrationInterface, ComponentsInterface
 {
-    use ComponentsTrait;
+    use \rock\components\ComponentsTrait;
 
     /**
      * @var Connection|string the MongoDB connection object or the application component ID of the MongoDB connection

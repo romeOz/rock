@@ -3,7 +3,7 @@
 namespace rockunit\core\template\snippets;
 
 
-use rock\base\Snippet;
+use rock\core\Snippet;
 
 class TestSnippet extends Snippet
 {

@@ -4,10 +4,10 @@ namespace rock\route;
 
 
 use rock\base\Alias;
-use rock\base\ComponentsTrait;
 use rock\base\ObjectInterface;
+use rock\components\ComponentsTrait;
 use rock\di\Container;
-use rock\event\Event;
+use rock\events\Event;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\StringHelper;

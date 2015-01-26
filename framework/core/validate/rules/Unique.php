@@ -3,7 +3,7 @@
 namespace rock\validate\rules;
 
 use rock\base\BaseException;
-use rock\base\Model;
+use rock\components\Model;
 use rock\db\ActiveRecordInterface;
 use rock\log\Log;
 use rock\validate\ValidateException;

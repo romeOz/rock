@@ -4,8 +4,8 @@ namespace rock\filters;
 
 
 use rock\access\Access;
-use rock\base\ActionFilter;
-use rock\base\Controller;
+use rock\components\ActionFilter;
+use rock\core\Controller;
 use rock\db\BaseActiveRecord;
 use rock\di\Container;
 use rock\route\Route;

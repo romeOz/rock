@@ -2,7 +2,7 @@
 
 namespace rock\helpers;
 
-use rock\base\Arrayable;
+use rock\components\Arrayable;
 
 /**
  * Helper "Json"

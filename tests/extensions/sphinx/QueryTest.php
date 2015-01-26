@@ -2,9 +2,7 @@
 
 namespace rockunit\extensions\sphinx;
 
-use rock\access\Access;
 use rock\db\Expression;
-use rock\event\Event;
 use rock\helpers\Trace;
 use rock\sphinx\Query;
 use rockunit\common\CommonTestTrait;

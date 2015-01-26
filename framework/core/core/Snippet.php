@@ -1,7 +1,10 @@
 <?php
-namespace rock\base;
+namespace rock\core;
 
+use rock\components\ComponentsInterface;
+use rock\components\ComponentsTrait;
 use rock\di\Container;
+use rock\events\ActionEvent;
 use rock\template\Template;
 
 abstract class Snippet implements ComponentsInterface
@@ -41,7 +44,7 @@ abstract class Snippet implements ComponentsInterface
     /**
      * This method is invoked right before an action is executed.
      *
-     * The method will trigger the {@see \rock\base\Controller::EVENT_BEFORE_ACTION} event. The return value of the method
+     * The method will trigger the {@see \rock\core\Controller::EVENT_BEFORE_ACTION} event. The return value of the method
      * will determine whether the action should continue to run.
      *
      * If you override this method, your code should look like the following:
@@ -71,7 +74,7 @@ abstract class Snippet implements ComponentsInterface
     /**
      * This method is invoked right after an action is executed.
      *
-     * The method will trigger the {@see \rock\base\Controller::EVENT_AFTER_ACTION} event. The return value of the method
+     * The method will trigger the {@see \rock\core\Controller::EVENT_AFTER_ACTION} event. The return value of the method
      * will be used as the action return value.
      *
      * If you override this method, your code should look like the following:

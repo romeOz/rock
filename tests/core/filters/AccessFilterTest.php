@@ -3,7 +3,7 @@
 namespace rockunit\core\filters\verbs\AccessFilter;
 
 use rock\access\Access;
-use rock\base\Controller;
+use rock\core\Controller;
 use rock\filters\AccessFilter;
 
 /**

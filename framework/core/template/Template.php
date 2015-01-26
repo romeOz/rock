@@ -2,12 +2,11 @@
 namespace rock\template;
 
 use rock\base\Alias;
-use rock\base\ComponentsInterface;
-use rock\base\ComponentsTrait;
-use rock\base\Snippet;
 use rock\cache\CacheInterface;
+use rock\components\ComponentsInterface;
+use rock\core\Snippet;
 use rock\di\Container;
-use rock\event\Event;
+use rock\events\Event;
 use rock\helpers\ArrayHelper;
 use rock\helpers\FileHelper;
 use rock\helpers\Helper;
@@ -21,7 +20,7 @@ use rock\template\filters\ConditionFilter;
 
 class Template implements ComponentsInterface
 {
-    use ComponentsTrait;
+    use \rock\components\ComponentsTrait;
 
     const ESCAPE = 1;
     const STRIP_TAGS = 2;
@@ -1073,7 +1072,7 @@ class Template implements ComponentsInterface
     /**
      * This method is invoked right before an chunk/snippet is executed.
      *
-     * The method will trigger the {@see \rock\base\Controller::EVENT_BEFORE_TEMPLATE} event. The return value of the method
+     * The method will trigger the {@see \rock\core\Controller::EVENT_BEFORE_TEMPLATE} event. The return value of the method
      * will determine whether the action should continue to run.
      *
      * If you override this method, your code should look like the following:
@@ -1104,7 +1103,7 @@ class Template implements ComponentsInterface
     /**
      * This method is invoked right after an action is executed.
      *
-     * The method will trigger the {@see \rock\base\Controller::EVENT_AFTER_ACTION} event. The return value of the method
+     * The method will trigger the {@see \rock\core\Controller::EVENT_AFTER_ACTION} event. The return value of the method
      * will be used as the action return value.
      *
      * If you override this method, your code should look like the following:
@@ -1508,7 +1507,7 @@ class Template implements ComponentsInterface
     /**
      * Get data from snippet.
      *
-     * @param string|\rock\base\Snippet $snippet name of
+     * @param string|\rock\core\Snippet $snippet name of
      *                                           snippet/instance @see \rock\base\Snippet
      * @param array                     $params  params
      * @param bool                      $autoEscape
@@ -1538,7 +1537,7 @@ class Template implements ComponentsInterface
         } else {
             $class = ltrim(Alias::getAlias($snippet, ['lang' => $this->locale]), '\\');
             $params['class'] = $class;
-            /** @var \rock\base\Snippet $snippet */
+            /** @var \rock\core\Snippet $snippet */
             $snippet = Container::load($params);
             if (!$snippet instanceof Snippet) {
                 throw new TemplateException(TemplateException::UNKNOWN_SNIPPET, ['name' => $snippet::className()]);

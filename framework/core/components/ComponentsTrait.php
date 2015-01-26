@@ -1,8 +1,10 @@
 <?php
-namespace rock\base;
+namespace rock\components;
 
+use rock\base\BaseException;
+use rock\base\ObjectTrait;
 use rock\di\Container;
-use rock\event\Event;
+use rock\events\Event;
 
 trait ComponentsTrait
 {
@@ -36,7 +38,7 @@ trait ComponentsTrait
     /**
      * Detaches an existing event handler from this component.
      *
-     * This method is the opposite of {@see \rock\base\ComponentsInterface::on()}.
+     * This method is the opposite of {@see \rock\components\ComponentsInterface::on()}.
      * @param string $name event name
      * @param callable $handler the event handler to be removed.
      * If it is null, all handlers attached to the named event will be removed.
@@ -93,7 +95,7 @@ trait ComponentsTrait
     }
 
     /**
-     * Makes sure that the behaviors declared in {@see \rock\base\ComponentsInterface::behaviors()} are attached to this component.
+     * Makes sure that the behaviors declared in {@see \rock\components\ComponentsInterface::behaviors()} are attached to this component.
      */
     public function ensureBehaviors()
     {
@@ -497,7 +499,7 @@ trait ComponentsTrait
     /**
      * Attaches a list of behaviors to the component.
      *
-     * Each behavior is indexed by its name and should be a {@see \rock\base\Behavior} object,
+     * Each behavior is indexed by its name and should be a {@see \rock\components\Behavior} object,
      * a string specifying the behavior class, or an configuration array for creating the behavior.
      * @param array $behaviors list of behaviors to be attached to the component
      * @see attachBehavior()
@@ -515,11 +517,11 @@ trait ComponentsTrait
      *
      * This method will create the behavior object based on the given
      * configuration. After that, the behavior object will be attached to
-     * this component by calling the {@see \rock\base\Behavior::attach()} method.
+     * this component by calling the {@see \rock\components\Behavior::attach()} method.
      * @param string $name the name of the behavior.
      * @param string|array|Behavior $behavior the behavior configuration. This can be one of the following:
      *
-     *  - a {@see \rock\base\Behavior} object
+     *  - a {@see \rock\components\Behavior} object
      *  - a string specifying the behavior class
      *  - an object configuration array that will be passed to {@see \rock\di\Container::load()} to create the behavior object.
      *
@@ -535,7 +537,7 @@ trait ComponentsTrait
     /**
      * Detaches a behavior from the component.
      *
-     * The behavior's {@see \rock\base\Behavior::detach()} method will be invoked.
+     * The behavior's {@see \rock\components\Behavior::detach()} method will be invoked.
      * @param string $name the behavior's name.
      * @return Behavior the detached behavior. Null if the behavior does not exist.
      */

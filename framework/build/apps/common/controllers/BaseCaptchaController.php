@@ -3,7 +3,7 @@
 namespace apps\common\controllers;
 
 
-use rock\base\Controller;
+use rock\core\Controller;
 use rock\Rock;
 
 class BaseCaptchaController extends Controller

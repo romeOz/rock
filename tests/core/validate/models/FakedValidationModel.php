@@ -4,7 +4,7 @@ namespace rockunit\core\validate\models;
 
 
 
-use rock\base\Model;
+use rock\components\Model;
 
 class FakedValidationModel extends Model
 {

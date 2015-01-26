@@ -9,8 +9,7 @@ use rock\authclient\ClientInterface;
 use rock\authclient\services\Vkontakte;
 use rock\authclient\storages\Session;
 use rock\base\BaseException;
-use rock\base\ComponentsInterface;
-use rock\base\ComponentsTrait;
+use rock\components\ComponentsInterface;
 use rock\helpers\Json;
 use rock\helpers\JsonException;
 use rock\log\Log;
@@ -19,7 +18,7 @@ use rock\url\Url;
 
 class VK implements ComponentsInterface, ClientInterface
 {
-    use ComponentsTrait;
+    use \rock\components\ComponentsTrait;
 
     public $clientId;
 

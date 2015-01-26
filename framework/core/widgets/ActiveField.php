@@ -3,11 +3,9 @@
 namespace rock\widgets;
 
 use rock\base\BaseException;
-use rock\base\ComponentsInterface;
-use rock\base\ComponentsTrait;
-use rock\base\Model;
-use rock\base\Widget;
 use rock\cache\CacheInterface;
+use rock\components\ComponentsInterface;
+use rock\components\Model;
 use rock\di\Container;
 use rock\filters\RateLimiter;
 use rock\helpers\Json;
@@ -16,7 +14,7 @@ use rock\template\Html;
 
 class ActiveField implements ComponentsInterface
 {
-    use ComponentsTrait;
+    use \rock\components\ComponentsTrait;
 
     /**
      * @var ActiveForm the form that this field is associated with.
@@ -374,7 +372,7 @@ class ActiveField implements ComponentsInterface
      * Generates a label tag for {@see \rock\widgets\ActiveField::$attribute}.
      *
      * @param string|boolean $label   the label to use. If null, the label will be generated
-     *                                via {@see \rock\base\Model::getAttributeLabel()}.
+     *                                via {@see \rock\components\Model::getAttributeLabel()}.
      *                                If false, the generated field will not contain the label part. Note that this will NOT be {@see \rock\template\Html::encode()}.
      * @param array          $options the tag options in terms of name-value pairs. It will be merged
      *                                with {@see \rock\widgets\ActiveField::$labelOptions}.

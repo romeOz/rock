@@ -3,8 +3,7 @@
 namespace rock\authclient;
 
 
-use rock\base\ComponentsInterface;
-use rock\base\ComponentsTrait;
+use rock\components\ComponentsInterface;
 use rock\di\Container;
 
 /**
@@ -39,7 +38,7 @@ use rock\di\Container;
  */
 class Collection implements ComponentsInterface
 {
-    use ComponentsTrait;
+    use \rock\components\ComponentsTrait;
 
     /**
      * @var array list of Auth clients with their configuration in format: 'clientId' => [...]

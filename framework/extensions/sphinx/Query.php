@@ -1,9 +1,9 @@
 <?php
 namespace rock\sphinx;
 
-use rock\base\ModelEvent;
 use rock\db\AfterFindEvent;
 use rock\db\Expression;
+use rock\events\ModelEvent;
 
 /**
  * Query represents a SELECT SQL statement.

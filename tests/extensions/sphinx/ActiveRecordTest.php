@@ -3,7 +3,7 @@
 namespace rockunit\extensions\sphinx;
 
 
-use rock\event\Event;
+use rock\events\Event;
 use rock\helpers\Trace;
 use rock\sphinx\ActiveQuery;
 use rock\sphinx\Connection;

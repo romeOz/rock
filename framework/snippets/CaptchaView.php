@@ -4,8 +4,8 @@ namespace rock\snippets;
 
 
 use rock\base\Alias;
-use rock\base\Snippet;
 use rock\captcha\Captcha;
+use rock\core\Snippet;
 use rock\di\Container;
 use rock\helpers\FileHelper;
 

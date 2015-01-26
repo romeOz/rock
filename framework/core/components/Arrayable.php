@@ -1,14 +1,14 @@
 <?php
 
-namespace rock\base;
+namespace rock\components;
 
 
 interface Arrayable
 {
     /**
-     * Returns the list of fields that should be returned by default by {@see \rock\base\Arrayable::toArray()} when no specific fields are specified.
+     * Returns the list of fields that should be returned by default by {@see \rock\components\Arrayable::toArray()} when no specific fields are specified.
      *
-     * A field is a named element in the returned array by {@see \rock\base\Arrayable::toArray()}.
+     * A field is a named element in the returned array by {@see \rock\components\Arrayable::toArray()}.
      *
      * This method should return an array of field names or field definitions.
      * If the former, the field name will be treated as an object property name whose value will be used
@@ -53,11 +53,11 @@ interface Arrayable
     public function fields();
 
     /**
-     * Returns the list of fields that can be expanded further and returned by {@see \rock\base\Arrayable::toArray()}.
+     * Returns the list of fields that can be expanded further and returned by {@see \rock\components\Arrayable::toArray()}.
      *
-     * This method is similar to {@see \rock\base\Arrayable::fields()} except that the list of fields returned
-     * by this method are not returned by default by {@see \rock\base\Arrayable::toArray()}. Only when field names
-     * to be expanded are explicitly specified when calling {@see \rock\base\Arrayable::toArray()}, will their values
+     * This method is similar to {@see \rock\components\Arrayable::fields()} except that the list of fields returned
+     * by this method are not returned by default by {@see \rock\components\Arrayable::toArray()}. Only when field names
+     * to be expanded are explicitly specified when calling {@see \rock\components\Arrayable::toArray()}, will their values
      * be exported.
      *
      * The default implementation returns an empty array.
@@ -66,7 +66,7 @@ interface Arrayable
      * (e.g. the current application user).
      *
      * @return array the list of expandable field names or field definitions. Please refer
-     * to {@see \rock\base\Arrayable::fields()} on the format of the return value.
+     * to {@see \rock\components\Arrayable::fields()} on the format of the return value.
      * @see toArray()
      * @see fields()
      */

@@ -2,14 +2,12 @@
 namespace rock\response;
 
 use rock\base\BaseException;
-use rock\base\ComponentsInterface;
-use rock\base\ComponentsTrait;
+use rock\components\ComponentsInterface;
 use rock\csrf\CSRF;
 use rock\di\Container;
 use rock\helpers\FileHelper;
 use rock\helpers\StringHelper;
 use rock\request\Request;
-
 use rock\url\Url;
 use rock\user\User;
 
@@ -52,7 +50,7 @@ use rock\user\User;
  */
 class Response implements ComponentsInterface
 {
-    use ComponentsTrait;
+    use \rock\components\ComponentsTrait;
     /**
      * @event ResponseEvent an event that is triggered at the beginning
      * of {@see \rock\response\Response::send()}.

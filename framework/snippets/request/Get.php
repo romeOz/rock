@@ -1,6 +1,6 @@
 <?php
 namespace rock\snippets\request;
-use rock\base\Snippet;
+use rock\core\Snippet;
 use rock\request\Request;
 use rock\sanitize\Sanitize;
 

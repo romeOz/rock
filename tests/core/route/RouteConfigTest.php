@@ -3,7 +3,7 @@
 namespace rockunit\core\route;
 
 use rock\access\Access;
-use rock\base\Controller;
+use rock\core\Controller;
 use rock\filters\AccessFilter;
 use rock\helpers\Helper;
 use rock\route\Route;

@@ -5,12 +5,12 @@ namespace apps\common\models\forms;
 
 use apps\common\models\users\BaseUsers;
 use rock\base\BaseException;
-use rock\base\Model;
-use rock\base\ModelEvent;
 use rock\captcha\Captcha;
+use rock\components\Model;
 use rock\csrf\CSRF;
 use rock\db\Session;
 use rock\di\Container;
+use rock\events\ModelEvent;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\StringHelper;

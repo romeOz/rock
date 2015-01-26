@@ -3,7 +3,7 @@
 namespace rock\db;
 
 
-use rock\event\Event;
+use rock\events\Event;
 
 class AfterFindEvent extends Event
 {

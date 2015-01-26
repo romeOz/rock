@@ -2,11 +2,9 @@
 
 namespace rockunit\core\db;
 
-use rock\access\Access;
 use rock\db\Expression;
 use rock\db\Query;
 use rock\db\SelectBuilder;
-use rock\event\Event;
 use rock\helpers\Trace;
 use rockunit\common\CommonTestTrait;
 

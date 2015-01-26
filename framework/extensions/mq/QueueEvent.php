@@ -1,7 +1,7 @@
 <?php
 namespace rock\mq;
 
-use rock\event\Event;
+use rock\events\Event;
 
 class QueueEvent extends Event
 {

@@ -9,11 +9,11 @@ namespace rock;
  * @property-read string $language
  * @property-read string[] $allowLanguages a list of the languages supported by the application.
  * @property-read string $charset
- * @property-read \rock\base\Controller $controller
+ * @property-read \rock\core\Controller $controller
  * @property-read string $name
  * @property-read \rock\cache\CacheInterface                                            $cache
  * @property-read \rock\db\Connection                                           $db
- * @property-read \rock\event\Event                                             $event
+ * @property-read \rock\events\Event                                             $event
  * @property-read \rock\file\FileManager                                         $file
  * @property-read \rock\template\Template                                       $template
  * @property-read \rock\request\Request                                         $request

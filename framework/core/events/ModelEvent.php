@@ -1,9 +1,7 @@
 <?php
 
-namespace rock\base;
+namespace rock\events;
 
-
-use rock\event\Event;
 
 class ModelEvent extends Event
 {

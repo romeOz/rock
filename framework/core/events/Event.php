@@ -1,5 +1,5 @@
 <?php
-namespace rock\event;
+namespace rock\events;
 
 use rock\base\Alias;
 use rock\base\ObjectInterface;
@@ -154,7 +154,7 @@ class Event implements ObjectInterface
      * $events = [
      *  ['rock\\db\\Query', \rock\db\Query::EVENT_AFTER_FIND]
      * ];
-     * \rock\event\Event::offMulti($events);
+     * \rock\events\Event::offMulti($events);
      * ```
      *
      * @param array $names - names of event

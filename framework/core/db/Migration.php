@@ -1,7 +1,6 @@
 <?php
 namespace rock\db;
 
-use rock\base\ComponentsTrait;
 use rock\di\Container;
 
 /**
@@ -29,7 +28,7 @@ use rock\di\Container;
  */
 class Migration
 {
-    use ComponentsTrait;
+    use \rock\components\ComponentsTrait;
 
     /**
      * @var Connection|string the DB connection object or the application component ID of the DB connection

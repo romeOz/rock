@@ -1,13 +1,13 @@
 <?php
 namespace rock\mongodb;
 
-use rock\base\ComponentsTrait;
-use rock\base\ModelEvent;
 use rock\cache\CacheInterface;
+use rock\components\ComponentsTrait;
 use rock\db\CacheTrait;
 use rock\db\QueryInterface;
 use rock\db\QueryTrait;
 use rock\di\Container;
+use rock\events\ModelEvent;
 use rock\helpers\Json;
 use rock\helpers\Trace;
 
@@ -31,7 +31,7 @@ use rock\helpers\Trace;
  */
 class Query implements QueryInterface
 {
-    use ComponentsTrait {
+    use \rock\components\ComponentsTrait {
         ComponentsTrait::__call as parentCall;
     }
     use QueryTrait;

@@ -8,18 +8,16 @@ use OAuth\ServiceFactory;
 use rock\authclient\ClientInterface;
 use rock\authclient\storages\Session;
 use rock\base\BaseException;
-use rock\base\ComponentsInterface;
-use rock\base\ComponentsTrait;
+use rock\components\ComponentsInterface;
 use rock\helpers\Json;
 use rock\helpers\JsonException;
 use rock\log\Log;
 use rock\request\Request;
-use rock\Rock;
 use rock\url\Url;
 
 class Facebook implements ComponentsInterface, ClientInterface
 {
-    use ComponentsTrait;
+    use \rock\components\ComponentsTrait;
 
     public $clientId;
 

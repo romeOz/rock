@@ -1,7 +1,7 @@
 <?php
 namespace rock\db;
 
-use rock\base\ComponentsInterface;
+use rock\components\ComponentsInterface;
 
 /**
  * The QueryInterface defines the minimum set of methods to be implemented by a database query.

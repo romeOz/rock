@@ -2,12 +2,12 @@
 namespace rock\mail;
 
 
-use rock\base\ComponentsInterface;
-use rock\base\ComponentsTrait;
+use rock\components\ComponentsInterface;
+use rock\components\ComponentsTrait;
 
 class Mail extends \PHPMailer implements ComponentsInterface
 {
-    use ComponentsTrait {
+    use \rock\components\ComponentsTrait {
         ComponentsTrait::__construct as parentConstruct;
     }
     public $charset = 'utf-8';

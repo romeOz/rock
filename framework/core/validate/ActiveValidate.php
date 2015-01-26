@@ -3,7 +3,7 @@
 namespace rock\validate;
 
 
-use rock\base\Model;
+use rock\components\Model;
 use rock\validate\rules\Unique;
 
 /**
