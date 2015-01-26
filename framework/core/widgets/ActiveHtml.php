@@ -5,8 +5,8 @@ namespace rock\widgets;
 
 use rock\components\Model;
 use rock\db\ActiveRecordInterface;
-use rock\helpers\HtmlException;
 use rock\template\Html;
+use rock\template\HtmlException;
 
 class ActiveHtml extends Html
 {
@@ -564,7 +564,7 @@ class ActiveHtml extends Html
      * @param Model  $model     the model object
      * @param string $attribute the attribute name or expression
      * @return string the generated input name
-     * @throws HtmlException if the attribute name contains non-word characters.
+     * @throws \rock\template\HtmlException if the attribute name contains non-word characters.
      */
     public static function getInputName($model, $attribute)
     {
@@ -594,7 +594,7 @@ class ActiveHtml extends Html
      * @param string $attribute the attribute name or expression.
      *                          See {@see \rock\widgets\ActiveHtml::getAttributeName()} for explanation of attribute expression.
      * @return string the generated input ID
-     * @throws HtmlException if the attribute name contains non-word characters.
+     * @throws \rock\template\HtmlException if the attribute name contains non-word characters.
      */
     public static function getInputId($model, $attribute)
     {
@@ -619,7 +619,7 @@ class ActiveHtml extends Html
      *
      * @param string $attribute the attribute name or expression
      * @return string the attribute name without prefix and suffix.
-     * @throws HtmlException if the attribute name contains non-word characters.
+     * @throws \rock\template\HtmlException if the attribute name contains non-word characters.
      */
     public static function getAttributeName($attribute)
     {
