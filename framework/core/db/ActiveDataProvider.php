@@ -2,6 +2,7 @@
 namespace rock\db;
 
 
+use rock\base\ObjectTrait;
 use rock\components\Model;
 use rock\di\Container;
 use rock\helpers\ArrayHelper;
@@ -54,7 +55,7 @@ use rock\url\Url;
  */
 class ActiveDataProvider
 {
-    use \rock\components\ComponentsTrait;
+    use ObjectTrait;
 
     const PAGE_VAR   = Pagination::PAGE_VAR;
 

@@ -4,12 +4,13 @@ namespace rock\cache;
 
 
 use rock\components\ComponentsTrait;
+use rock\events\EventsTrait;
 use rock\helpers\Serialize;
 
 trait CommonTrait
 {
-    use \rock\components\ComponentsTrait {
-        ComponentsTrait::init as parentInit;
+    use EventsTrait {
+        EventsTrait::init as parentInit;
     }
 
     /**

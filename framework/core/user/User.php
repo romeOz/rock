@@ -3,7 +3,8 @@ namespace rock\user;
 
 use apps\common\models\users\Users;
 use rock\base\CollectionInterface;
-use rock\components\ComponentsInterface;
+use rock\base\ObjectInterface;
+use rock\base\ObjectTrait;
 use rock\cookie\Cookie;
 use rock\di\Container;
 use rock\helpers\ArrayHelper;
@@ -12,9 +13,9 @@ use rock\Rock;
 use rock\session\Session;
 use rock\session\SessionInterface;
 
-class User implements \ArrayAccess, CollectionInterface, ComponentsInterface
+class User implements \ArrayAccess, CollectionInterface, ObjectInterface
 {
-    use \rock\components\ComponentsTrait;
+    use ObjectTrait;
 
     /**
      * The adapter where to store the token: cookies or session (by default).

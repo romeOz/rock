@@ -8,6 +8,36 @@ use rock\events\Event;
 use rock\filters\AccessFilter;
 use rock\Rock;
 
+/**
+ * @group base
+ */
+class SnippetBehaviorsTest extends \PHPUnit_Framework_TestCase {
+
+    public function setUp()
+    {
+        static::tearDownAfterClass();
+    }
+
+    public static function tearDownAfterClass()
+    {
+        Event::offAll();
+    }
+
+    public function testSnippetAccessFalse()
+    {
+        $result = Rock::$app->template->getSnippet(SnippetAccessFalse::className());
+        $this->assertNull($result);
+        $this->expectOutputString('1success_11fail_2');
+    }
+
+    public function testSnippetAccessTrue()
+    {
+        $result = Rock::$app->template->getSnippet(SnippetAccessTrue::className());
+        $this->assertSame('bar', $result);
+        $this->expectOutputString('1success_11success_2');
+    }
+}
+
 class TestSnippet extends Snippet
 {
     public function get()
@@ -116,34 +146,3 @@ class SnippetAccessTrue extends Snippet
         return 'bar';
     }
 }
-
-/**
- * @group base
- */
-class SnippetBehaviorsTest extends \PHPUnit_Framework_TestCase {
-
-    public function setUp()
-    {
-        static::tearDownAfterClass();
-    }
-
-    public static function tearDownAfterClass()
-    {
-        Event::offAll();
-    }
-
-    public function testSnippetAccessFalse()
-    {
-        $result = Rock::$app->template->getSnippet(SnippetAccessFalse::className());
-        $this->assertNull($result);
-        $this->expectOutputString('1success_11fail_2');
-    }
-
-    public function testSnippetAccessTrue()
-    {
-        $result = Rock::$app->template->getSnippet(SnippetAccessTrue::className());
-        $this->assertSame('bar', $result);
-        $this->expectOutputString('1success_11success_2');
-    }
-}
- 

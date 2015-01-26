@@ -3,8 +3,9 @@
 namespace rock\widgets;
 
 use rock\base\BaseException;
+use rock\base\ObjectInterface;
+use rock\base\ObjectTrait;
 use rock\cache\CacheInterface;
-use rock\components\ComponentsInterface;
 use rock\components\Model;
 use rock\di\Container;
 use rock\filters\RateLimiter;
@@ -12,9 +13,9 @@ use rock\helpers\Json;
 use rock\log\Log;
 use rock\template\Html;
 
-class ActiveField implements ComponentsInterface
+class ActiveField implements ObjectInterface
 {
-    use \rock\components\ComponentsTrait;
+    use ObjectTrait;
 
     /**
      * @var ActiveForm the form that this field is associated with.

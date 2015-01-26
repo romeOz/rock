@@ -3,10 +3,11 @@ namespace rock\template;
 
 use rock\base\Alias;
 use rock\cache\CacheInterface;
-use rock\components\ComponentsInterface;
 use rock\core\Snippet;
 use rock\di\Container;
 use rock\events\Event;
+use rock\events\EventsInterface;
+use rock\events\EventsTrait;
 use rock\helpers\ArrayHelper;
 use rock\helpers\FileHelper;
 use rock\helpers\Helper;
@@ -18,9 +19,9 @@ use rock\i18n\i18n;
 use rock\Rock;
 use rock\template\filters\ConditionFilter;
 
-class Template implements ComponentsInterface
+class Template implements EventsInterface
 {
-    use \rock\components\ComponentsTrait;
+    use EventsTrait;
 
     const ESCAPE = 1;
     const STRIP_TAGS = 2;

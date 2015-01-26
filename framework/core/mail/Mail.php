@@ -2,13 +2,13 @@
 namespace rock\mail;
 
 
-use rock\components\ComponentsInterface;
-use rock\components\ComponentsTrait;
+use rock\events\EventsInterface;
+use rock\events\EventsTrait;
 
-class Mail extends \PHPMailer implements ComponentsInterface
+class Mail extends \PHPMailer implements EventsInterface
 {
-    use \rock\components\ComponentsTrait {
-        ComponentsTrait::__construct as parentConstruct;
+    use EventsTrait {
+        EventsTrait::__construct as parentConstruct;
     }
     public $charset = 'utf-8';
 

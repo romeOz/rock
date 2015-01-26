@@ -3,11 +3,6 @@
 namespace rockunit\core\template;
 
 
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Cache\Adapter;
-use rock\base\Alias;
-use rock\cache\CacheFile;
-use rock\file\FileManager;
 use rock\helpers\StringHelper;
 use rock\i18n\i18nInterface;
 use rock\Rock;

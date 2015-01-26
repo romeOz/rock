@@ -2,9 +2,10 @@
 namespace rock\response;
 
 use rock\base\BaseException;
-use rock\components\ComponentsInterface;
 use rock\csrf\CSRF;
 use rock\di\Container;
+use rock\events\EventsInterface;
+use rock\events\EventsTrait;
 use rock\helpers\FileHelper;
 use rock\helpers\StringHelper;
 use rock\request\Request;
@@ -48,9 +49,9 @@ use rock\user\User;
  * @property boolean $isSuccessful Whether this response is successful. This property is read-only.
  * @property integer $statusCode The HTTP status code to send with the response.
  */
-class Response implements ComponentsInterface
+class Response implements EventsInterface
 {
-    use \rock\components\ComponentsTrait;
+    use EventsTrait;
     /**
      * @event ResponseEvent an event that is triggered at the beginning
      * of {@see \rock\response\Response::send()}.

@@ -3,13 +3,13 @@
 namespace rock\session;
 
 
-use rock\components\ComponentsInterface;
-use rock\components\ComponentsTrait;
+use rock\events\EventsInterface;
+use rock\events\EventsTrait;
 
-abstract class SessionFlash implements ComponentsInterface
+abstract class SessionFlash implements EventsInterface
 {
-    use \rock\components\ComponentsTrait {
-        ComponentsTrait::__construct as parentConstruct;
+    use EventsTrait {
+        EventsTrait::__construct as parentConstruct;
     }
 
     /**

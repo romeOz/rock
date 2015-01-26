@@ -3,13 +3,13 @@
 namespace rock\widgets;
 
 
-use rock\components\ComponentsInterface;
-use rock\components\ComponentsTrait;
 use rock\di\Container;
+use rock\events\EventsInterface;
+use rock\events\EventsTrait;
 
-class Widget implements ComponentsInterface
+class Widget implements EventsInterface
 {
-    use ComponentsTrait;
+    use EventsTrait;
 
     /**
      * @var integer a counter used to generate `id` for widgets.

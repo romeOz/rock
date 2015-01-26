@@ -3,10 +3,9 @@
 namespace rock\components;
 
 
-use rock\base\ObjectInterface;
-use rock\db\ActiveQueryInterface;
+use rock\events\EventsInterface;
 
-interface ComponentsInterface extends ObjectInterface
+interface ComponentsInterface extends EventsInterface
 {
     /**
      * Get data behaviors
@@ -14,33 +13,6 @@ interface ComponentsInterface extends ObjectInterface
      * @return array
      */
     public function behaviors();
-
-    /**
-     * Subscribing in event
-     *
-     * @param string $name name of event
-     * @return static|ActiveQueryInterface
-     */
-    public function trigger($name);
-
-    /**
-     * Publishing event
-     *
-     * @param string         $name    name of event
-     * @param array|\Closure $handler handler
-     * @param null           $args
-     * @param bool           $append
-     * @return static|ActiveQueryInterface
-     */
-    public function on($name, $handler, $args = null, $append = true);
-
-    /**
-     * Detach event
-     *
-     * @param string $name name of event
-     * @return static|ActiveQueryInterface
-     */
-    public function off($name);
 
     /**
      * Returns the named behavior object.
@@ -57,7 +29,6 @@ interface ComponentsInterface extends ObjectInterface
      * @return Behavior[] list of behaviors attached to this component
      */
     public function getBehaviors();
-
 
     /**
      * Attaches a behavior to this component.

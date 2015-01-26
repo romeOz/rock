@@ -2,9 +2,9 @@
 namespace rock\file;
 
 use rock\base\Alias;
-use rock\components\ComponentsInterface;
-use rock\components\Model;
 use rock\di\Container;
+use rock\events\EventsInterface;
+use rock\events\EventsTrait;
 use rock\helpers\FileHelper;
 use rock\widgets\ActiveHtml;
 
@@ -46,9 +46,9 @@ use rock\widgets\ActiveHtml;
  * error code information. This property is read-only.
  *
  */
-class UploadedFile implements ComponentsInterface
+class UploadedFile implements EventsInterface
 {
-    use \rock\components\ComponentsTrait;
+    use EventsTrait;
 
     private static $_files;
 

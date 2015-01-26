@@ -6,7 +6,6 @@ use League\Flysystem\Util;
 use rock\base\Alias;
 use rock\base\ClassName;
 use rock\base\ObjectInterface;
-use rock\core\Controller;
 use rock\di\Container;
 use rock\events\Event;
 use rock\exception\ErrorHandler;
@@ -70,7 +69,7 @@ class Rock extends Alias
      */
     public static function bootstrap(array $configs)
     {
-        \rock\helpers\Trace::beginProfile(\rock\helpers\Trace::APP, \rock\helpers\Trace::TOKEN_APP_RUNTIME);
+        Trace::beginProfile(Trace::APP, Trace::TOKEN_APP_RUNTIME);
         try {
             static::$components = $configs['components'];
             unset($configs['components']);
@@ -94,7 +93,7 @@ class Rock extends Alias
             ErrorHandler::display($e);
         }
         //var_dump(Trace::getTime(Trace::APP_TIME));
-        \rock\helpers\Trace::endProfile(\rock\helpers\Trace::APP, \rock\helpers\Trace::TOKEN_APP_RUNTIME);
+        Trace::endProfile(Trace::APP, Trace::TOKEN_APP_RUNTIME);
         //var_dump(Trace::get('db.query'), Trace::get(\rock\helpers\Trace::APP));
 
         // Triggered at the end

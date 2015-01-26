@@ -2,17 +2,15 @@
 namespace rock\components;
 
 use rock\base\BaseException;
-use rock\base\ObjectTrait;
 use rock\di\Container;
-use rock\events\Event;
+use rock\events\EventsTrait;
 
 trait ComponentsTrait
 {
-    use ObjectTrait;
+    use EventsTrait;
 
     /** @var Behavior[]  */
     private $_behaviors;
-    private $_events = [];
 
     /**
      * Get data behaviors
@@ -22,76 +20,6 @@ trait ComponentsTrait
     public function behaviors()
     {
         return [];
-    }
-
-    public function on($name, $handler, $args = null, $append = true)
-    {
-        $this->ensureBehaviors();
-        if ($append || empty($this->_events[$name])) {
-            $this->_events[$name][] = [$handler, $args];
-        } else {
-            array_unshift($this->_events[$name], [$handler, $args]);
-        }
-        return $this;
-    }
-
-    /**
-     * Detaches an existing event handler from this component.
-     *
-     * This method is the opposite of {@see \rock\components\ComponentsInterface::on()}.
-     * @param string $name event name
-     * @param callable $handler the event handler to be removed.
-     * If it is null, all handlers attached to the named event will be removed.
-     * @return boolean if a handler is found and detached
-     * @see on()
-     */
-    public function off($name, $handler = null)
-    {
-        $this->ensureBehaviors();
-        if (empty($this->_events[$name])) {
-            return false;
-        }
-        if ($handler === null) {
-            unset($this->_events[$name]);
-            return true;
-        } else {
-            $removed = false;
-            foreach ($this->_events[$name] as $i => $event) {
-                if ($event[0] === $handler) {
-                    unset($this->_events[$name][$i]);
-                    $removed = true;
-                }
-            }
-            if ($removed) {
-                $this->_events[$name] = array_values($this->_events[$name]);
-            }
-            return $removed;
-        }
-    }
-
-    public function trigger($name, Event $event = null)
-    {
-        $this->ensureBehaviors();
-        if (!empty($this->_events[$name])) {
-            if ($event === null) {
-                $event = new Event;
-            }
-            if ($event->owner === null) {
-                $event->owner = $this;
-            }
-            $event->handled = false;
-            $event->name = $name;
-            foreach ($this->_events[$name] as $handler) {
-                $event->data = $handler[1];
-                call_user_func($handler[0], $event);
-                // stop further handling if the event is handled
-                if ($event->handled) {
-                    return;
-                }
-            }
-        }
-        // invoke class-level attached handlers
-        Event::trigger($this, $name, $event);
     }
 
     /**
