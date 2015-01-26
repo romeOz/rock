@@ -23,7 +23,6 @@
         "php": ">=5.4.0",
         "filp/whoops": "*",
         "phpmailer/phpmailer"   : "*",
-        "jeremeamia/SuperClosure": "*",
         "imagine/imagine": "*",
         "monolog/monolog": "*",
         "league/flysystem": "*",

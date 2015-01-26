@@ -59,7 +59,7 @@ class ObjectHelper
         if (empty($array)) {
             return null;
         }
-        $hash = Helper::hash($array, Helper::SERIALIZE_JSON);
+        $hash = md5(json_encode($array));
         if (isset(static::$objects[$hash])) {
             return static::$objects[$hash];
         }

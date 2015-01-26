@@ -21,12 +21,5 @@ class HelperTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(Helper::toType('foo'), 'foo');
         $this->assertSame(Helper::toType(null), null);
     }
-
-    public function testHash()
-    {
-        $this->assertSame(Helper::hash('foo'), md5('foo'));
-        $this->assertSame(Helper::hash(['foo']), md5(serialize(['foo'])));
-        $this->assertSame(Helper::hash(['foo'], Helper::SERIALIZE_JSON), md5(json_encode(['foo'])));
-    }
 }
  

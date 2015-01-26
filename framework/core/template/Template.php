@@ -609,7 +609,7 @@ class Template implements EventsInterface
     public function autoEscape($value, $const = true)
     {
         if (is_array($value)) {
-            $hash = Helper::hash($value, Helper::SERIALIZE_JSON);
+            $hash = md5(json_encode($value));
             if (isset(static::$data[$hash])) {
                 return static::$data[$hash];
             }

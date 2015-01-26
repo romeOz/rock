@@ -65,46 +65,4 @@ class Helper implements SerializeInterface
 
         return $value;
     }
-
-    /**
-     * Get hash var.
-     *
-     * @param      $value
-     * @param int  $serializator
-     * @param bool $recursive recursive array
-     * @return string
-     */
-    public static function hash($value, $serializator = self::SERIALIZE_PHP, $recursive = false)
-    {
-        if ($value instanceof \Closure) {
-            return md5(Closure::serialize($value));
-        } elseif (is_object($value)) {
-            return md5(serialize($value));
-        } elseif(is_array($value)) {
-            array_multisort($value);
-            $value = $recursive
-                ?  static::prepareHash(
-                    ArrayHelper::map(
-                        $value,
-                        function($value){
-                            return $value instanceof \Closure && !is_string($value) ? Closure::serialize($value) : $value;
-                        },
-                        true
-                    ),
-                    $serializator
-                )
-                : static::prepareHash($value, $serializator);
-        }
-
-        return md5($value);
-    }
-
-    protected static function prepareHash($value, $serializator = self::SERIALIZE_PHP)
-    {
-        if ($serializator === self::SERIALIZE_JSON) {
-            return Json::encode($value);
-        }
-
-        return serialize($value);
-    }
 }
