@@ -599,7 +599,6 @@ class TemplateTest extends TemplateCommon
     {
         if (!interface_exists('\rock\cache\CacheInterface') || !class_exists('\League\Flysystem\Filesystem')) {
             $this->markTestSkipped('Rock cache not installed.');
-            return;
         }
 
         $cache = static::getCache();

@@ -61,9 +61,14 @@ trait CommonTestTrait
         static::$post = $_POST;
     }
 
+    protected static function getPathRuntime()
+    {
+        return Alias::getAlias('@runtime');
+    }
+
     protected static function clearRuntime()
     {
-        $runtime = Alias::getAlias('@runtime');
+        $runtime = static::getPathRuntime();
         FileHelper::deleteDirectory("{$runtime}/cache");
         FileHelper::deleteDirectory("{$runtime}/filesystem");
         @unlink("{$runtime}/cache.tmp");

@@ -1,6 +1,6 @@
 <?php
 
-namespace rockunit\core\helpers\mocks;
+namespace rockunit\core\template\mocks;
 
 
 use rock\csrf\CSRF;
