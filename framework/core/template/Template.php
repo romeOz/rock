@@ -230,7 +230,7 @@ class Template implements EventsInterface
             return [null, null, null];
         }
         $cacheKey = $params['cacheKey'];
-        $cacheExpire = Helper::getValueIsset($params['cacheExpire'], 0);
+        $cacheExpire = Helper::getValue($params['cacheExpire'], 0, true);
         $cacheTags = Helper::getValue($params['cacheTags'], []);
         unset($params['cacheKey'], $params['cacheExpire'], $params['cacheTags']);
 
@@ -1195,7 +1195,7 @@ class Template implements EventsInterface
         } elseif ($matches['type'] === '*') {
             $result = $this->getResource(
                 $matches['name'],
-                Helper::getValueIsset($params['autoEscape'], $escape)
+                Helper::getValue($params['autoEscape'], $escape, true)
             );
             // config
         } elseif ($matches['type'] === '**') {
@@ -1207,16 +1207,16 @@ class Template implements EventsInterface
         } elseif ($matches['type'] === '+') {
             $result = $this->getPlaceholder(
                 $matches['name'],
-                Helper::getValueIsset($params['autoEscape'], $escape)
+                Helper::getValue($params['autoEscape'], $escape, true)
             );
             // global placeholder
         } elseif ($matches['type'] === '++') {
             $result =
-                $this->getPlaceholder($matches['name'], Helper::getValueIsset($params['autoEscape'], $escape), true);
+                $this->getPlaceholder($matches['name'], Helper::getValue($params['autoEscape'], $escape, true), true);
             // extensions
         } elseif ($matches['type'] === '#') {
             $result =
-                $this->getExtension($matches['name'], $params, Helper::getValueIsset($params['autoEscape'], $escape));
+                $this->getExtension($matches['name'], $params, Helper::getValue($params['autoEscape'], $escape, true));
             //  i18n
         } elseif ($matches['type'] === '%') {
             $result = $this->_calculateI18N(

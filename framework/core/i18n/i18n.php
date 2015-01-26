@@ -75,9 +75,9 @@ class i18n implements ObjectInterface, i18nInterface
                     break 2;
                 }
                 $context         = basename($path, '.php');
-                $total[$context] = array_merge(Helper::getValueIsset($total[$context], []), $data);
+                $total[$context] = array_merge(Helper::getValue($total[$context], [], true), $data);
             }
-            static::$data[$lang] = array_merge(Helper::getValueIsset(static::$data[$lang], []), $total);
+            static::$data[$lang] = array_merge(Helper::getValue(static::$data[$lang], [], true), $total);
         }
     }
 

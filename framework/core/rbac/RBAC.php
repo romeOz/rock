@@ -6,7 +6,6 @@ namespace rock\rbac;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\helpers\ArrayHelper;
-use rock\helpers\Helper;
 use rock\helpers\Serialize;
 
 abstract class RBAC implements RBACInterface, ObjectInterface
@@ -222,9 +221,7 @@ abstract class RBAC implements RBACInterface, ObjectInterface
         }
 
         throw new RBACException(RBACException::UNKNOWN_TYPE, [
-            'name' => Helper::getValueIsset(
-                    static::$items[$roleName]['type']
-                )
+            'name' => isset(static::$items[$roleName]['type']) ? static::$items[$roleName]['type'] : null
         ]);
     }
 
@@ -258,9 +255,7 @@ abstract class RBAC implements RBACInterface, ObjectInterface
         }
 
         throw new RBACException(RBACException::UNKNOWN_TYPE, [
-            'name' => Helper::getValueIsset(
-                    static::$items[$roleName]['type']
-                )
+            'name' => isset(static::$items[$roleName]['type']) ? static::$items[$roleName]['type'] : null
         ]);
     }
 
@@ -398,9 +393,7 @@ abstract class RBAC implements RBACInterface, ObjectInterface
         }
 
         throw new RBACException(RBACException::UNKNOWN_TYPE, [
-            'name' => Helper::getValueIsset(
-                static::$items[$itemName]['type']
-            )
+            'name' =>isset(static::$items[$itemName]['type']) ? static::$items[$itemName]['type'] : null
         ]);
     }
 }

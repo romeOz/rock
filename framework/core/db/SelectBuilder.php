@@ -69,8 +69,8 @@ class SelectBuilder
             $alias = false;
             $aliasSeparator = null;
             if (is_array($select) && !is_string($key) && !is_string(key($select))) {
-                $select[1] = Helper::getValueIsset($select[1], false);
-                $select[2] = Helper::getValueIsset($select[2]);
+                $select[1] = Helper::getValue($select[1], false, true);
+                $select[2] = Helper::getValue($select[2], null, true);
 
                 list($select, $alias, $aliasSeparator) = $select;
             }
@@ -96,8 +96,8 @@ class SelectBuilder
 
                 if (!is_string($key)) {
                     $table = key($select);
-                    $select[0] = Helper::getValueIsset($select[0], false);
-                    $select[1] = Helper::getValueIsset($select[1]);
+                    $select[0] = Helper::getValue($select[0], false, true);
+                    $select[1] = Helper::getValue($select[1], null, true);
                     list($alias, $aliasSeparator) = $select;
                     $columns = current($select);
                 } else {

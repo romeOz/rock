@@ -293,7 +293,7 @@ class ActiveRecord extends BaseActiveRecord
             self::$_alias[$nameClass] = $matches[2];
         }
 
-        return Helper::getValueIsset(self::$_alias[$nameClass]);
+        return isset(self::$_alias[$nameClass]) ? self::$_alias[$nameClass] : null;
     }
 
     /**

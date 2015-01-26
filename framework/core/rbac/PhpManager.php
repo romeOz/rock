@@ -3,7 +3,6 @@
 namespace rock\rbac;
 
 use rock\base\Alias;
-use rock\helpers\Helper;
 
 class PhpManager extends RBAC
 {
@@ -99,7 +98,7 @@ class PhpManager extends RBAC
             throw new RBACException("Cannot attach '{$role->name}' as a item of '{$item->name}'. A has been detected.");
         }
 
-        static::$items[$role->name]['items'] = Helper::getValueIsset(static::$items[$role->name]['items'], []);
+        static::$items[$role->name]['items'] = isset(static::$items[$role->name]['items']) ? static::$items[$role->name]['items'] : [];
         static::$items[$role->name]['items'][] = $item->name;
         $this->saveToFile(static::$items, $this->path);
         unset(static::$roles[$role->name], static::$permissions[$role->name]);
@@ -120,8 +119,9 @@ class PhpManager extends RBAC
             $names[] = $item->name;
         }
 
+        $items = isset(static::$items[$role->name]['items']) ? static::$items[$role->name]['items'] : [];
         static::$items[$role->name]['items'] =
-            array_merge(Helper::getValueIsset(static::$items[$role->name]['items'], []), $names);
+            array_merge($items, $names);
         $this->saveToFile(static::$items, $this->path);
         unset(static::$roles[$role->name], static::$permissions[$role->name]);
 

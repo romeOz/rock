@@ -273,7 +273,7 @@ class Access implements ErrorsInterface
      */
     protected function matchCustom(array $rule)
     {
-        $rule['custom'][1] = Helper::getValueIsset($rule['custom'][1], []);
+        $rule['custom'][1] = Helper::getValue($rule['custom'][1], [], true);
         list($function, $args) = $rule['custom'];
 
         $result = (bool)call_user_func(
@@ -295,7 +295,7 @@ class Access implements ErrorsInterface
         if ($handler instanceof \Closure) {
             $handler = [$handler];
         }
-        $handler[1] = Helper::getValueIsset($handler[1], []);
+        $handler[1] = Helper::getValue($handler[1], [], true);
         list($function, $data) = $handler;
         $access = clone $this;
         $access->data = $data;

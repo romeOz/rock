@@ -7,7 +7,6 @@ use rock\base\CollectionInterface;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\helpers\ArrayHelper;
-use rock\helpers\Helper;
 
 class RequestCollection implements \ArrayAccess, CollectionInterface, ObjectInterface
 {
@@ -125,7 +124,7 @@ class RequestCollection implements \ArrayAccess, CollectionInterface, ObjectInte
      */
     public function get($name)
     {
-        return Helper::getValueIsset($this->data[$name]);
+        return isset($this->data[$name]) ? $this->data[$name] : null;
     }
 
     /**

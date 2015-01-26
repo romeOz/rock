@@ -10,7 +10,6 @@ use rock\db\Connection;
 use rock\db\SelectBuilder;
 use rock\di\Container;
 use rock\helpers\ArrayHelper;
-use rock\helpers\Helper;
 
 class DBManager extends RBAC
 {
@@ -74,7 +73,7 @@ class DBManager extends RBAC
             ->insert(RolesItems::tableName(), ['role' => $role->name, 'item' => $item->name])
             ->execute();
 
-        static::$items[$role->name]['items'] = Helper::getValueIsset(static::$items[$role->name]['items'], []);
+        static::$items[$role->name]['items'] = isset(static::$items[$role->name]['items']) ? static::$items[$role->name]['items'] : [];
         static::$items[$role->name]['items'][] = $item->name;
         unset(static::$roles[$role->name], static::$permissions[$role->name]);
 
@@ -99,8 +98,9 @@ class DBManager extends RBAC
             ->createCommand()
             ->batchInsert(RolesItems::tableName(), ['role', 'item'], $rows)
             ->execute();
+        $items = isset(static::$items[$role->name]['items']) ? static::$items[$role->name]['items'] : [];
         static::$items[$role->name]['items'] =
-            array_merge(Helper::getValueIsset(static::$items[$role->name]['items'], []), $itemNames);
+            array_merge($items, $itemNames);
         unset(static::$roles[$role->name], static::$permissions[$role->name]);
 
         return (bool)$result;

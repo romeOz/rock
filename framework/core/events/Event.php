@@ -106,7 +106,7 @@ class Event implements ObjectInterface
             $handler = [$handler];
         }
 
-        $handler[1] = Helper::getValueIsset($handler[1], []);
+        $handler[1] = Helper::getValue($handler[1], [], true);
         list($function, $data) = $handler;
         static::$events[$class][$name][] = [self::_calculateHandler($function), $data];
     }

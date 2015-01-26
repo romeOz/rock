@@ -196,7 +196,7 @@ class BaseFilter implements ThumbInterface
             }
             $path = $params['dummy'];
         }
-        $const = Helper::getValueIsset($params['const'], 1);
+        $const = Helper::getValue($params['const'], 1, true);
         /** @var ImageProvider $imageProvider */
         $imageProvider = Container::load('imageProvider');
         $src = $imageProvider->get($path, Helper::getValue($params['w']), Helper::getValue($params['h']));

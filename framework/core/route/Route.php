@@ -336,7 +336,7 @@ class Route implements RequestInterface, ErrorsInterface, ObjectInterface
             case self::FORMAT_PATH:
                 return $this->data['path'];
             case self::FORMAT_QUERY:
-                return Helper::getValueIsset($this->data['query']);
+                return isset($this->data['query']) ? $this->data['query'] : null;
             default:
                 throw new RouteException(RouteException::UNKNOWN_FORMAT, ['format' => $key]);
         }
@@ -401,7 +401,7 @@ class Route implements RequestInterface, ErrorsInterface, ObjectInterface
         if ($this->success instanceof \Closure) {
             $this->success = [$this->success];
         }
-        $this->success[1] = Helper::getValueIsset($this->success[1], []);
+        $this->success[1] = isset($this->success[1]) ? $this->success[1] : [];
         list($function, $args) = $this->success;
         $route = clone $this;
         $route->data = array_merge(['callbackParams' => $args], $this->data);
@@ -417,7 +417,7 @@ class Route implements RequestInterface, ErrorsInterface, ObjectInterface
             $this->fail = [$this->fail];
         }
 
-        $this->fail[1] = Helper::getValueIsset($this->fail[1], []);
+        $this->fail[1] = isset($this->fail[1]) ? $this->fail[1] : [];
         list($function, $args) = $this->fail;
         $route = clone $this;
         $route->data = array_merge(['callbackParams' => $args], $this->data);
