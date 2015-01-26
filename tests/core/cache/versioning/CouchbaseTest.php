@@ -2,7 +2,7 @@
 namespace rockunit\core\cache\versioning;
 
 use rock\cache\versioning\Couchbase;
-use rockunit\core\cache\CommonCacheTrait;
+use rockunit\core\cache\CacheTestTrait;
 use rock\cache\CacheInterface;
 
 /**
@@ -11,7 +11,7 @@ use rock\cache\CacheInterface;
  */
 class CouchbaseTest extends \PHPUnit_Framework_TestCase
 {
-    use CommonCacheTrait;
+    use CacheTestTrait;
 
     public static function flush()
     {

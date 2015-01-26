@@ -3,7 +3,7 @@ namespace rockunit\core\cache\versioning;
 
 use rock\cache\CacheInterface;
 use rock\cache\versioning\Memcache;
-use rockunit\core\cache\CommonCacheTrait;
+use rockunit\core\cache\CacheTestTrait;
 
 /**
  * @group cache
@@ -11,7 +11,7 @@ use rockunit\core\cache\CommonCacheTrait;
  */
 class MemcacheTest extends \PHPUnit_Framework_TestCase
 {
-    use CommonCacheTrait;
+    use CacheTestTrait;
 
     public static function flush()
     {

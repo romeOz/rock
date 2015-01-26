@@ -5,7 +5,7 @@ namespace rockunit\core\cache;
 
 use rock\cache\CacheInterface;
 
-trait CommonCacheTrait
+trait CacheTestTrait
 {
     public static function flush(){}
 
@@ -23,10 +23,10 @@ trait CommonCacheTrait
 
     public function providerCache()
     {
-        return array(
+        return [
             [$this->init(CacheInterface::SERIALIZE_PHP, true)],
             [$this->init(CacheInterface::SERIALIZE_JSON, false)],
-        );
+        ];
     }
 
     /**

@@ -10,7 +10,7 @@ use rock\cache\Memcache;
  */
 class MemcacheTest extends \PHPUnit_Framework_TestCase
 {
-    use CommonCacheTrait;
+    use CacheTestTrait;
 
     public static function flush()
     {
