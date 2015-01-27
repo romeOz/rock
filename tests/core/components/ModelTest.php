@@ -1,6 +1,7 @@
 <?php
 namespace rockunit\core\components;
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\components\Model;
 use rock\i18n\i18n;
@@ -460,7 +461,7 @@ class Post1
     public $title = 'tt';
 }
 
-class Post2
+class Post2 implements ObjectInterface
 {
     use ObjectTrait;
 
@@ -474,7 +475,7 @@ class Post2
     }
 }
 
-class Post3
+class Post3 implements ObjectInterface
 {
     use ObjectTrait {
         ObjectTrait::__construct as parentConstruct;

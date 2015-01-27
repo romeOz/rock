@@ -1,6 +1,7 @@
 <?php
 namespace rock\db;
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\cache\CacheInterface;
 use rock\di\Container;
@@ -22,7 +23,7 @@ use rock\helpers\Json;
  * {@see \rock\db\Transaction::REPEATABLE_READ} and {@see \rock\db\Transaction::SERIALIZABLE} but also a string containing DBMS specific
  * syntax to be used after `SET TRANSACTION ISOLATION LEVEL`. This property is write-only.
  */
-abstract class Schema
+abstract class Schema implements ObjectInterface
 {
     use ObjectTrait;
     /**

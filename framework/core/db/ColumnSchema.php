@@ -1,12 +1,13 @@
 <?php
 namespace rock\db;
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 
 /**
  * ColumnSchema class describes the metadata of a column in a database table.
  */
-class ColumnSchema
+class ColumnSchema implements ObjectInterface
 {
     use ObjectTrait;
 

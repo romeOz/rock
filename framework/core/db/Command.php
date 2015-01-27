@@ -1,6 +1,7 @@
 <?php
 namespace rock\db;
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\cache\CacheInterface;
 use rock\di\Container;
@@ -46,7 +47,7 @@ use rock\helpers\Trace;
  * {@see \rock\db\Command::$_sql}. This property is read-only.
  * @property string $sql The SQL statement to be executed.
  */
-class Command
+class Command implements ObjectInterface
 {
     use ObjectTrait;
 

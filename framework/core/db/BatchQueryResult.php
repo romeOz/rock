@@ -1,6 +1,7 @@
 <?php
 namespace rock\db;
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 
 /**
@@ -20,9 +21,10 @@ use rock\base\ObjectTrait;
  * ```
  *
  */
-class BatchQueryResult implements \Iterator
+class BatchQueryResult implements \Iterator, ObjectInterface
 {
-    use  ObjectTrait;
+    use ObjectTrait;
+
     /**
      * @var Connection the DB connection to be used when performing batch query.
      * If null, the "db" application component will be used.

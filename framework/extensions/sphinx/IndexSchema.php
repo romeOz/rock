@@ -2,6 +2,7 @@
 
 namespace rock\sphinx;
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 
 /**
@@ -9,7 +10,7 @@ use rock\base\ObjectTrait;
  *
  * @property array $columnNames List of column names. This property is read-only.
  */
-class IndexSchema
+class IndexSchema implements ObjectInterface
 {
     use ObjectTrait;
     /**

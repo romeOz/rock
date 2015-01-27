@@ -1,6 +1,7 @@
 <?php
 namespace rock\access;
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\di\Container;
 use rock\helpers\Helper;
@@ -10,7 +11,7 @@ use rock\route\ErrorsInterface;
 use rock\route\ErrorsTrait;
 use rock\user\User;
 
-class Access implements ErrorsInterface
+class Access implements ErrorsInterface, ObjectInterface
 {
     use ObjectTrait;
     use ErrorsTrait;

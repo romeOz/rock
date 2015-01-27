@@ -17,7 +17,6 @@ class RequestCollection implements \ArrayAccess, CollectionInterface, ObjectInte
     /** @var  string */
     public $method;
 
-
     /**
      * Returns an iterator for traversing the global vars in the collection.
      *

@@ -2,6 +2,7 @@
 namespace rock\db;
 
 use rock\base\BaseException;
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\log\Log;
 use rock\Rock;
@@ -33,7 +34,7 @@ use rock\Rock;
  * containing DBMS specific syntax to be used after `SET TRANSACTION ISOLATION LEVEL`. This property is
  * write-only.
  */
-class Transaction
+class Transaction implements ObjectInterface
 {
     use ObjectTrait;
     /**

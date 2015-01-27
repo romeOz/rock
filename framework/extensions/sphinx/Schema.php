@@ -1,6 +1,7 @@
 <?php
 namespace rock\sphinx;
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\cache\CacheInterface;
 use rock\di\Container;
@@ -16,7 +17,7 @@ use rock\helpers\Json;
  * property is read-only.
  * @property QueryBuilder $queryBuilder The query builder for this connection. This property is read-only.
  */
-class Schema 
+class Schema implements ObjectInterface
 {
     use ObjectTrait;
     /**

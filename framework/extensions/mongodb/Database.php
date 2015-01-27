@@ -1,6 +1,7 @@
 <?php
 namespace rock\mongodb;
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\di\Container;
 use rock\helpers\Json;
@@ -12,7 +13,7 @@ use rock\Rock;
  * @property file\Collection $fileCollection Mongo GridFS collection. This property is read-only.
  * @property string $name Name of this database. This property is read-only.
  */
-class Database
+class Database implements ObjectInterface
 {
     use ObjectTrait;
 

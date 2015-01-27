@@ -1,6 +1,7 @@
 <?php
 namespace rock\db;
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 
 /**
@@ -8,7 +9,7 @@ use rock\base\ObjectTrait;
  *
  * @property array $columnNames List of column names. This property is read-only.
  */
-class TableSchema
+class TableSchema implements ObjectInterface
 {
     use ObjectTrait;
     /**

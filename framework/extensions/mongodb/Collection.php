@@ -2,6 +2,7 @@
 
 namespace rock\mongodb;
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\cache\CacheInterface;
 use rock\db\CacheTrait;
@@ -59,7 +60,7 @@ use rock\helpers\Trace;
  * @property array $lastError Last error information. This property is read-only.
  * @property string $name Name of this collection. This property is read-only.
  */
-class Collection
+class Collection implements ObjectInterface
 {
     use ObjectTrait;
     use CacheTrait;

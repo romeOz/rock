@@ -2,6 +2,7 @@
 namespace rock\db;
 
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\components\Model;
 use rock\di\Container;
@@ -53,7 +54,7 @@ use rock\url\Url;
  * ```
  *
  */
-class ActiveDataProvider
+class ActiveDataProvider implements ObjectInterface
 {
     use ObjectTrait;
 

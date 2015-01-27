@@ -1,13 +1,14 @@
 <?php
 namespace rock\sphinx;
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\db\Expression;
 
 /**
  * ColumnSchema class describes the metadata of a column in a Sphinx index.
  */
-class ColumnSchema
+class ColumnSchema implements ObjectInterface
 {
     use ObjectTrait;
     /**
