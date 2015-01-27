@@ -84,7 +84,11 @@ class UploadedFile implements EventsInterface
     public function init()
     {
         if (!is_object($this->adapter)) {
-            $this->adapter = Container::load($this->adapter);
+            if (class_exists('\rock\di\Container')) {
+                $this->adapter = Container::load($this->adapter);
+                return;
+            }
+            throw new FileException(FileException::NOT_OBJECT, ['name' => FileManager::className()]);
         }
     }
 
@@ -103,15 +107,20 @@ class UploadedFile implements EventsInterface
      * Returns an uploaded file for the given model attribute.
      * The file should be uploaded using {@see \rock\widgets\ActiveField::fileInput()}.
      *
-     * @param \rock\components\Model $model the data model
-     * @param string $attribute the attribute name. The attribute name may contain array indexes.
-     * For example, '[1]file' for tabular file uploading; and 'file[1]' for an element in a file array.
+     * @param \rock\components\Model $model     the data model
+     * @param string                 $attribute the attribute name. The attribute name may contain array indexes.
+     *                                          For example, '[1]file' for tabular file uploading; and 'file[1]' for an element in a file array.
      * @return UploadedFile the instance of the uploaded file.
-     * Null is returned if no file is uploaded for the specified model attribute.
+     *                                          Null is returned if no file is uploaded for the specified model attribute.
+     * @throws FileException
+     * @throws \rock\template\HtmlException
      * @see getInstanceByName()
      */
     public static function getInstance($model, $attribute)
     {
+        if (!class_exists('\rock\widgets\ActiveHtml')) {
+            throw new FileException(FileException::NOT_INSTALL_TEMPLATE);
+        }
         $name = ActiveHtml::getInputName($model, $attribute);
         return static::getInstanceByName($name);
     }
@@ -119,14 +128,19 @@ class UploadedFile implements EventsInterface
     /**
      * Returns all uploaded files for the given model attribute.
      *
-     * @param \rock\components\Model $model the data model
-     * @param string $attribute the attribute name. The attribute name may contain array indexes
-     * for tabular file uploading, e.g. '[1]file'.
+     * @param \rock\components\Model $model     the data model
+     * @param string                 $attribute the attribute name. The attribute name may contain array indexes
+     *                                          for tabular file uploading, e.g. '[1]file'.
      * @return UploadedFile[] array of UploadedFile objects.
-     * Empty array is returned if no available file was found for the given attribute.
+     *                                          Empty array is returned if no available file was found for the given attribute.
+     * @throws FileException
+     * @throws \rock\template\HtmlException
      */
     public static function getInstances($model, $attribute)
     {
+        if (!class_exists('\rock\widgets\ActiveHtml')) {
+            throw new FileException(FileException::NOT_INSTALL_TEMPLATE);
+        }
         $name = ActiveHtml::getInputName($model, $attribute);
         return static::getInstancesByName($name);
     }
@@ -297,16 +311,34 @@ class UploadedFile implements EventsInterface
                 self::loadFilesRecursive($key . '[' . $i . ']', $name, $tempNames[$i], $types[$i], $sizes[$i], $errors[$i]);
             }
         } else {
-            /** @var self $self */
-            $self = Container::load(static::className());
-            $self->setProperties([
+            $config = [
+                'class' => static::className(),
                 'name' => $names,
                 'tempName' => $tempNames,
                 'type' => $types,
                 'size' => FileHelper::fixedIntegerOverflow($sizes),
                 'error' => $errors,
-            ]);
-            self::$_files[$key] = $self;
+            ];
+            self::$_files[$key] = static::getSelfInstance($config);
         }
+    }
+
+    /**
+     * Get instance.
+     *
+     * If exists {@see \rock\di\Container} that uses it.
+     *
+     * @param string|array $config the configuration. It can be either a string representing the class name
+     *                                     or an array representing the object configuration.
+     * @return $this
+     * @throws \rock\di\ContainerException
+     */
+    protected static function getSelfInstance($config)
+    {
+        if (class_exists('\rock\di\Container')) {
+            return Container::load($config);
+        }
+        unset($config['class']);
+        return new static($config);
     }
 }
