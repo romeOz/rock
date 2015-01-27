@@ -4,7 +4,6 @@ namespace rock\components;
 
 
 use rock\core\Controller;
-use rock\events\ActionEvent;
 
 class ActionFilter extends Behavior
 {
@@ -58,7 +57,7 @@ class ActionFilter extends Behavior
 //    }
 
     /**
-     * @param \rock\events\ActionEvent $event
+     * @param \rock\components\ActionEvent $event
      */
     public function beforeFilter($event)
     {
@@ -77,7 +76,7 @@ class ActionFilter extends Behavior
     }
 
     /**
-     * @param \rock\event\\rock\events\ActionEvent $event
+     * @param \rock\event\\rock\components\ActionEvent $event
      */
     public function afterFilter($event)
     {

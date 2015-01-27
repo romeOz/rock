@@ -3,11 +3,11 @@ namespace rock\mongodb;
 
 use rock\cache\CacheInterface;
 use rock\components\ComponentsTrait;
+use rock\components\ModelEvent;
 use rock\db\CacheTrait;
 use rock\db\QueryInterface;
 use rock\db\QueryTrait;
 use rock\di\Container;
-use rock\events\ModelEvent;
 use rock\helpers\Json;
 use rock\helpers\Trace;
 

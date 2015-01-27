@@ -3,7 +3,7 @@
 namespace rockunit\core\db\models;
 
 use rock\behaviors\TimestampBehavior;
-use rock\events\ModelEvent;
+use rock\components\ModelEvent;
 
 /**
  * Class Order

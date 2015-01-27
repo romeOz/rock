@@ -1,10 +1,10 @@
 <?php
 namespace rock\core;
 
+use rock\components\ActionEvent;
 use rock\components\ComponentsInterface;
 use rock\components\ComponentsTrait;
 use rock\di\Container;
-use rock\events\ActionEvent;
 use rock\template\Template;
 
 abstract class Snippet implements ComponentsInterface

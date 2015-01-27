@@ -2,7 +2,6 @@
 namespace rock\components;
 
 use rock\di\Container;
-use rock\events\ModelEvent;
 use rock\helpers\Inflector;
 use rock\i18n\i18n;
 use rock\sanitize\Sanitize;

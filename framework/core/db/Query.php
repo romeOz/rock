@@ -3,8 +3,8 @@ namespace rock\db;
 
 
 use rock\components\ComponentsTrait;
+use rock\components\ModelEvent;
 use rock\di\Container;
-use rock\events\ModelEvent;
 
 /**
  * Query represents a SELECT SQL statement in a way that is independent of DBMS.
