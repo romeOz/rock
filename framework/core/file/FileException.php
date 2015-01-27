@@ -5,5 +5,5 @@ use rock\base\BaseException;
 
 class FileException extends BaseException
 {
-    const FILE_EXISTS = 'File exists: {path}.';
+    const FILE_EXISTS = 'File exists: {{path}}.';
 }

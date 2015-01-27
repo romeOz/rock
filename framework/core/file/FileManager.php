@@ -33,8 +33,6 @@ class FileManager extends Filesystem implements ObjectInterface
             $this->cache->save();
         }
         parent::__construct($this->adapter, $this->cache, $this->config);
-
-
     }
 
     public function setAdapter(AdapterInterface $adapter)
@@ -430,7 +428,7 @@ class FileManager extends Filesystem implements ObjectInterface
     }
 
     /**
-     * List the filesystem contents
+     * List the filesystem contents.
      *
      * ```php
      * listContents('folder/foo')
@@ -463,7 +461,7 @@ class FileManager extends Filesystem implements ObjectInterface
     }
 
     /**
-     * List all paths
+     * List all paths.
      *
      * @param string $directory
      * @param bool   $recursive
@@ -493,7 +491,7 @@ class FileManager extends Filesystem implements ObjectInterface
     }
 
     /**
-     * List contents with metadata
+     * List contents with metadata.
      *
      * @param array  $keys metadata keys
      * @param string $directory
@@ -567,7 +565,6 @@ class FileManager extends Filesystem implements ObjectInterface
 
         return $result;
     }
-
 
     protected function searchFilesWithByPattern(array $keys = [], $pattern, $recursive = false, $is = null)
     {
