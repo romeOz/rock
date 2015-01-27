@@ -57,7 +57,7 @@ class Rock extends Alias
     /**
      * Current controller
      *
-*@var \rock\core\Controller
+     * @var \rock\core\Controller
      */
     public $controller;
 
