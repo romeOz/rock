@@ -103,7 +103,7 @@ class UploadedFile implements EventsInterface
      * Returns an uploaded file for the given model attribute.
      * The file should be uploaded using {@see \rock\widgets\ActiveField::fileInput()}.
      *
-*@param \rock\components\Model $model the data model
+     * @param \rock\components\Model $model the data model
      * @param string $attribute the attribute name. The attribute name may contain array indexes.
      * For example, '[1]file' for tabular file uploading; and 'file[1]' for an element in a file array.
      * @return UploadedFile the instance of the uploaded file.
@@ -119,7 +119,7 @@ class UploadedFile implements EventsInterface
     /**
      * Returns all uploaded files for the given model attribute.
      *
-*@param \rock\components\Model $model the data model
+     * @param \rock\components\Model $model the data model
      * @param string $attribute the attribute name. The attribute name may contain array indexes
      * for tabular file uploading, e.g. '[1]file'.
      * @return UploadedFile[] array of UploadedFile objects.
