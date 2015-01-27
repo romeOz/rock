@@ -22,6 +22,10 @@
         },
         {
             "type": "vcs",
+            "url": "https://github.com/romeOz/rock-events"
+        },
+        {
+            "type": "vcs",
             "url": "https://github.com/romeOz/cartographer"
         }
     ],
@@ -31,6 +35,7 @@
         "romeoz/rock-helpers" : "*@dev",
         "romeoz/rock-sanitize" : "*@dev",
         "romeoz/rock-validate" : "*@dev",
+        "romeoz/rock-events" : "*@dev",
         "filp/whoops": "*",
         "phpmailer/phpmailer"   : "*",
         "imagine/imagine": "*",
