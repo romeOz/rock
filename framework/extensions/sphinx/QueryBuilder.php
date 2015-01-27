@@ -1,6 +1,7 @@
 <?php
 namespace rock\sphinx;
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\db\Expression;
 
@@ -10,7 +11,7 @@ use rock\db\Expression;
  * QueryBuilder can also be used to build SQL statements such as INSERT, REPLACE, UPDATE, DELETE,
  * from a {@see \rock\sphinx\Query} object.
  */
-class QueryBuilder
+class QueryBuilder implements ObjectInterface
 {
     use ObjectTrait {
         ObjectTrait::__construct as parentConstruct;

@@ -3,10 +3,11 @@
 namespace rock\cache;
 
 use rock\base\BaseException;
+use rock\events\EventsInterface;
 use rock\helpers\Json;
 use rock\log\Log;
 
-class Couchbase implements CacheInterface
+class Couchbase implements CacheInterface, EventsInterface
 {
     use CacheTrait {
         CacheTrait::__construct as parentConstruct;

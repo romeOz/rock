@@ -2,6 +2,7 @@
 namespace rock\cache;
 
 use rock\base\BaseException;
+use rock\events\EventsInterface;
 use rock\helpers\Json;
 use rock\log\Log;
 
@@ -20,7 +21,7 @@ use rock\log\Log;
  * ```
  *
  */
-class Memcached implements CacheInterface
+class Memcached implements CacheInterface, EventsInterface
 {
     use CacheTrait {
         CacheTrait::__construct as parentConstruct;

@@ -1,6 +1,7 @@
 <?php
 namespace rock\db;
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 
 /**
@@ -9,7 +10,7 @@ use rock\base\ObjectTrait;
  * QueryBuilder can also be used to build SQL statements such as INSERT, UPDATE, DELETE, CREATE TABLE,
  * from a {@see \rock\db\Query} object.
  */
-class QueryBuilder
+class QueryBuilder implements ObjectInterface
 {
     use ObjectTrait {
         ObjectTrait::__construct as parentConstruct;

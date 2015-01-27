@@ -3,6 +3,7 @@
 namespace rock\db;
 
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\di\Container;
 use rock\helpers\Helper;
@@ -21,7 +22,7 @@ use rock\helpers\Helper;
  * //sql: SELECT `articles`.`id` AS `articles__id`, `articles`.`name` AS `articles__id`
  * ```
  */
-class SelectBuilder
+class SelectBuilder implements ObjectInterface
 {
     use ObjectTrait {
         ObjectTrait::__call as parentCall;

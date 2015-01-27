@@ -3,15 +3,13 @@
 namespace rock\cookie;
 
 
-use rock\base\CollectionInterface;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Serialize;
 use rock\helpers\SerializeInterface;
 use rock\sanitize\Sanitize;
 use rock\session\SessionFlash;
-use rock\session\SessionInterface;
 
-class Cookie extends SessionFlash implements \ArrayAccess, CollectionInterface, SerializeInterface, SessionInterface
+class Cookie extends SessionFlash implements \ArrayAccess, SerializeInterface
 {
     /**
      * @var array

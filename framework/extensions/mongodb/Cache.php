@@ -5,6 +5,7 @@ use rock\cache\CacheException;
 use rock\cache\CacheInterface;
 use rock\cache\CacheTrait;
 use rock\di\Container;
+use rock\events\EventsInterface;
 
 /**
  * Cache implements a cache application component by storing cached data in a MongoDB.
@@ -26,7 +27,7 @@ use rock\di\Container;
  * ```
  *
  */
-class Cache implements CacheInterface
+class Cache implements CacheInterface, EventsInterface
 {
     use CacheTrait {
         CacheTrait::__construct as parentConstruct;

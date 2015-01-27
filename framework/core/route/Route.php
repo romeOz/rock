@@ -4,7 +4,7 @@ namespace rock\route;
 
 
 use rock\base\Alias;
-use rock\base\ObjectInterface;
+use rock\components\ComponentsInterface;
 use rock\components\ComponentsTrait;
 use rock\di\Container;
 use rock\events\Event;
@@ -17,7 +17,7 @@ use rock\response\Response;
 use rock\Rock;
 use rock\sanitize\Sanitize;
 
-class Route implements RequestInterface, ErrorsInterface, ObjectInterface
+class Route implements RequestInterface, ErrorsInterface, ComponentsInterface
 {
     use ComponentsTrait;
     use ErrorsTrait;

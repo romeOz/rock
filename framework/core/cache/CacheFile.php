@@ -2,11 +2,12 @@
 namespace rock\cache;
 
 use rock\di\Container;
+use rock\events\EventsInterface;
 use rock\file\FileManager;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Trace;
 
-class CacheFile implements CacheInterface
+class CacheFile implements CacheInterface, EventsInterface
 {
     use CommonTrait {
         CommonTrait::prepareTags as parentPrepareTags;

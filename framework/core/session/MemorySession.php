@@ -5,7 +5,6 @@ namespace rock\session;
 
 use rock\cache\CacheInterface;
 use rock\di\Container;
-use rock\Rock;
 
 /**
  * CacheSession implements a session component using cache as storage medium.

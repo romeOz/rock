@@ -1,6 +1,7 @@
 <?php
 namespace rock\db;
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 
 /**
@@ -16,7 +17,7 @@ use rock\base\ObjectTrait;
  *
  * An expression can also be bound with parameters specified via [[params]].
  */
-class Expression
+class Expression implements ObjectInterface
 {
     use ObjectTrait {
         ObjectTrait::__construct as parentConstruct;

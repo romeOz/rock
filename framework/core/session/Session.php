@@ -60,7 +60,7 @@ use rock\request\Request;
  * @property boolean $useTransparentSessionID Whether transparent sid support is enabled or not, defaults to
  * false.
  */
-class Session extends SessionFlash implements \ArrayAccess, SessionInterface
+class Session extends SessionFlash implements \ArrayAccess
 {
     const NOT_USE_COOKIES = 1;
     const USE_ONLY_COOKIES = 2;

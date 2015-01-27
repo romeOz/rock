@@ -2,6 +2,7 @@
 namespace rock\db;
 
 
+use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 
 /**
@@ -40,12 +41,12 @@ use rock\base\ObjectTrait;
  * @property boolean $isClosed Whether the reader is closed or not. This property is read-only.
  * @property integer $rowCount Number of rows contained in the result. This property is read-only.
  */
-class DataReader implements \Iterator, \Countable
+class DataReader implements \Iterator, \Countable, ObjectInterface
 {
     use ObjectTrait {
         ObjectTrait::__construct as parentConstruct;
     }
-    //use ComponentsTrait;
+
     /**
      * @var \PDOStatement the PDOStatement associated with the command
      */

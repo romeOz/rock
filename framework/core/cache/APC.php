@@ -3,9 +3,10 @@
 namespace rock\cache;
 
 use rock\base\BaseException;
+use rock\events\EventsInterface;
 use rock\log\Log;;
 
-class APC implements CacheInterface
+class APC implements CacheInterface, EventsInterface
 {
     use CacheTrait;
 
