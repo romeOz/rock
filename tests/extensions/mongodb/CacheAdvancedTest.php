@@ -7,14 +7,12 @@ namespace rockunit\extensions\mongodb;
 use rock\cache\CacheInterface;
 use rock\di\Container;
 use rock\mongodb\Cache;
-use rockunit\core\cache\CacheTestTrait;
 
 /**
  * @group mongodb
  */
 class CacheAdvancedTest extends MongoDbTestCase
 {
-    use CacheTestTrait;
     /**
      * @var string test cache collection name.
      */
