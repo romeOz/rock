@@ -38,6 +38,7 @@
         "romeoz/rock-validate" : "*@dev",
         "romeoz/rock-events" : "*@dev",
         "romeoz/rock-file" : "*@dev",
+        "romeoz/rock-cache" : "*@dev",
         "filp/whoops": "*",
         "phpmailer/phpmailer"   : "*",
         "imagine/imagine": "*",
