@@ -22,14 +22,6 @@
         },
         {
             "type": "vcs",
-            "url": "https://github.com/romeOz/rock-di"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/romeOz/rock-events"
-        },
-        {
-            "type": "vcs",
             "url": "https://github.com/romeOz/cartographer"
         }
     ],
