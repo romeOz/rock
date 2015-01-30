@@ -43,6 +43,9 @@ class Date extends Snippet implements DateTimeInterface
     public function get()
     {
         $dateTime = DateTime::set($this->date, null, $this->config);
-        return $dateTime->convertTimezone($this->timezone)->format($this->format);
+        if (isset($this->timezone)) {
+            $dateTime->convertTimezone($this->timezone);
+        }
+        return $dateTime->format($this->format);
     }
 }

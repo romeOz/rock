@@ -83,7 +83,10 @@ class BaseFilter implements ThumbInterface
             $params['config']['locale'] = $params['locale'];
         }
         $dateTime = DateTime::set($date, null, $params['config']);
-        return $dateTime->convertTimezone(Helper::getValue($params['timezone']))->format(
+        if (isset($params['timezone'])) {
+            $dateTime->convertTimezone($params['timezone']);
+        }
+        return $dateTime->format(
             Helper::getValue($params['format']));
     }
 
