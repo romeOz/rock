@@ -263,9 +263,6 @@ return array_merge(
             'class' => \rock\request\Request::className(),
             'locale' => Rock::$app->language
         ],
-        'requestCollection' => [
-            'class' => \rock\request\RequestCollection::className(),
-        ],
         'response' => [
             'class' => \rock\response\Response::className(),
             'singleton' => true,
