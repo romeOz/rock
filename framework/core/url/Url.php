@@ -11,7 +11,7 @@ use rock\helpers\StringHelper;
 use rock\request\Request;
 
 /**
- * Class Url.
+ * Class Url
  *
  * @property string $scheme
  * @property string $host
@@ -21,7 +21,6 @@ use rock\request\Request;
  * @property string $path
  * @property string|null $query
  * @property string|null $fragment
- * @package rock\template\url
  */
 class Url implements UrlInterface, ObjectInterface
 {
@@ -58,7 +57,9 @@ class Url implements UrlInterface, ObjectInterface
     private $_request;
 
     /**
-     * @param string|null  $url URL for formatting. If url as `NULL`, then use current (self) URL.
+     * Modify URL.
+     *
+     * @param string|null  $url URL for formatting. If URL as `NULL`, then use current (self) URL.
      * @param array $config
      */
     public function __construct($url = null, $config = [])
@@ -74,9 +75,9 @@ class Url implements UrlInterface, ObjectInterface
     }
 
     /**
-     * Set url for modify.
+     * Modify URL.
      *
-     * @param string|null $url url for modify (default: NULL)
+     * @param string|null $url URL for modify (default: NULL)
      * @param array       $config the configuration. It can be either a string representing the class name
      *                             or an array representing the object configuration.
      * @throws \rock\di\ContainerException
@@ -196,7 +197,7 @@ class Url implements UrlInterface, ObjectInterface
     }
 
     /**
-     * Replacing path
+     * Replacing path.
      *
      * @param string $search
      * @param string $replace
@@ -209,7 +210,7 @@ class Url implements UrlInterface, ObjectInterface
     }
 
     /**
-     * Custom formatting
+     * Custom formatting.
      *
      * @param callable $callback
      * @return $this
@@ -220,32 +221,8 @@ class Url implements UrlInterface, ObjectInterface
         return $this;
     }
 
-    protected function build(array $data)
-    {
-        $url = StringHelper::rconcat($data['scheme'], '://');
-
-        if (isset($data['user']) && isset($data['pass'])) {
-            $url .= StringHelper::rconcat($data['user'], ':');
-            $url .= StringHelper::rconcat($data['pass'], '@');
-        }
-        $url .= Helper::getValue($data['host']);
-        if (isset($data['path'])) {
-            $url .= preg_replace(['/\/+(?!http:\/\/)/', '/\\\+/'], '/', $data['path']);
-        }
-        if (isset($data['query'])) {
-            if (is_string($data['query'])) {
-                $data['query'] = [$data['query']];
-            }
-            // @see http://php.net/manual/ru/function.http-build-query.php#111819
-            $url .= '?' . preg_replace('/%5B[0-9]+%5D/i', '%5B%5D', http_build_query($data['query']));
-        }
-        $url .= StringHelper::lconcat($data['fragment'], '#');
-
-        return $url;
-    }
-
     /**
-     * Get formatted URL.
+     * Returns formatted URL.
      *
      * @param int  $const
      * @param bool $selfHost to use current host (security).
@@ -274,6 +251,46 @@ class Url implements UrlInterface, ObjectInterface
     }
 
     /**
+     * Returns absolute URL: `http://site.com`
+     * @param bool $selfHost
+     * @return null|string
+     */
+    public function getAbsoluteUrl($selfHost = false)
+    {
+        return $this->get(self::ABS, $selfHost);
+    }
+
+    /**
+     * Returnst absolute URL: `/`
+     * @param bool $selfHost
+     * @return null|string
+     */
+    public function getRelativeUrl($selfHost = false)
+    {
+        return $this->get(0, $selfHost);
+    }
+
+    /**
+     * Returns http URL: `http://site.com`
+     * @param bool $selfHost
+     * @return null|string
+     */
+    public function getHttpUrl($selfHost = false)
+    {
+        return $this->get(self::HTTP, $selfHost);
+    }
+
+    /**
+     * Returns https URL: `https://site.com`
+     * @param bool $selfHost
+     * @return null|string
+     */
+    public function getHttpsUrl($selfHost = false)
+    {
+        return $this->get(self::HTTPS, $selfHost);
+    }
+
+    /**
      * Set data of URL.
      *
      * @param $name
@@ -289,7 +306,7 @@ class Url implements UrlInterface, ObjectInterface
     }
 
     /**
-     * Get URL-data.
+     * Returns URL-data.
      * @param $name
      * @return string|null
      *
@@ -306,51 +323,35 @@ class Url implements UrlInterface, ObjectInterface
         return null;
     }
 
-    /**
-     * Get absolute URL: `http://site.com`
-     * @param bool $selfHost
-     * @return null|string
-     */
-    public function getAbsoluteUrl($selfHost = false)
-    {
-        return $this->get(self::ABS, $selfHost);
-    }
-
-    /**
-     * Get absolute URL: `/`
-     * @param bool $selfHost
-     * @return null|string
-     */
-    public function getRelativeUrl($selfHost = false)
-    {
-        return $this->get(0, $selfHost);
-    }
-
-    /**
-     * Get http URL: `http://site.com`
-     * @param bool $selfHost
-     * @return null|string
-     */
-    public function getHttpUrl($selfHost = false)
-    {
-        return $this->get(self::HTTP, $selfHost);
-    }
-
-    /**
-     * Get https URL: `https://site.com`
-     * @param bool $selfHost
-     * @return null|string
-     */
-    public function getHttpsUrl($selfHost = false)
-    {
-        return $this->get(self::HTTPS, $selfHost);
-    }
-
     protected function defaultUrlInternal($url)
     {
         if (!isset($url)) {
             return $this->defaultUrl === self::DEFAULT_ABSOLUTE ? $this->_request->getAbsoluteUrl() : $this->_request->getReferrer();
         }
         return Alias::getAlias($url);
+    }
+
+    protected function build(array $data)
+    {
+        $url = StringHelper::rconcat($data['scheme'], '://');
+
+        if (isset($data['user']) && isset($data['pass'])) {
+            $url .= StringHelper::rconcat($data['user'], ':');
+            $url .= StringHelper::rconcat($data['pass'], '@');
+        }
+        $url .= Helper::getValue($data['host']);
+        if (isset($data['path'])) {
+            $url .= preg_replace(['/\/+(?!http:\/\/)/', '/\\\+/'], '/', $data['path']);
+        }
+        if (isset($data['query'])) {
+            if (is_string($data['query'])) {
+                $data['query'] = [$data['query']];
+            }
+            // @see http://php.net/manual/ru/function.http-build-query.php#111819
+            $url .= '?' . preg_replace('/%5B[0-9]+%5D/i', '%5B%5D', http_build_query($data['query']));
+        }
+        $url .= StringHelper::lconcat($data['fragment'], '#');
+
+        return $url;
     }
 }
