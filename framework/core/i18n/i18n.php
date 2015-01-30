@@ -9,7 +9,7 @@ use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\StringHelper;
 
-class i18n implements ObjectInterface, i18nInterface
+class i18n implements ObjectInterface
 {
     use ObjectTrait;
 

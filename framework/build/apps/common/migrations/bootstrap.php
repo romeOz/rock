@@ -10,7 +10,7 @@ require(dirname(dirname(dirname(__DIR__))) . '/vendor/autoload.php');
 $configs = require(dirname(dirname(__DIR__)) . '/common/configs/configs.php');
 
 Rock::$app = new Rock();
-Rock::$app->language = \rock\i18n\i18nInterface::EN;
+Rock::$app->language = 'en';
 
 \rock\base\Config::set($configs);
 

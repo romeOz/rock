@@ -69,7 +69,7 @@ class BaseFilter implements ThumbInterface
      * @param array  $params params:
      *
      * - format: date format
-     * - locale: date locale. See {@see \rock\i18n\i18nInterface}
+     * - locale: date locale.
      *
      * @return string|null
      */

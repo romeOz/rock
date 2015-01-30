@@ -3,8 +3,6 @@
 namespace rockunit\snippets;
 
 
-
-use rock\i18n\i18nInterface;
 use rock\Rock;
 use rock\snippets\Pagination;
 use rock\template\TemplateException;
@@ -16,7 +14,7 @@ class PaginationTest extends TemplateCommon
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
-        Rock::$app->language = i18nInterface::EN;
+        Rock::$app->language = 'en';
     }
 
     protected function calculatePath()

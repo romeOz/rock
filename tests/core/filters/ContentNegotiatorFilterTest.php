@@ -4,7 +4,6 @@ namespace rockunit\core\filters\verbs\ContentNegotiatorFilter;
 
 use rock\core\Controller;
 use rock\filters\ContentNegotiatorFilter;
-use rock\i18n\i18nInterface;
 use rock\response\Response;
 use rock\Rock;
 
@@ -28,7 +27,7 @@ class ContentNegotiatorFilterTest extends \PHPUnit_Framework_TestCase
     {
         $controller = new FooController();
         Rock::$app->response->data = $controller->method('actionIndex');
-        $this->assertSame(Rock::$app->language, i18nInterface::EN);
+        $this->assertSame(Rock::$app->language, 'en');
         Rock::$app->response->send();
         $this->expectOutputString(json_encode(['foo', 'bar']));
     }

@@ -3,7 +3,6 @@
 namespace rockunit\snippets;
 
 use rock\helpers\Pagination;
-use rock\i18n\i18nInterface;
 use rock\Rock;
 use rock\snippets\ListView;
 use rock\template\Template;
@@ -208,7 +207,7 @@ class ListViewTest extends TemplateCommon
     {
         parent::setUpBeforeClass();
         static::clearRuntime();
-        Rock::$app->language = i18nInterface::EN;
+        Rock::$app->language = 'en';
     }
 
 

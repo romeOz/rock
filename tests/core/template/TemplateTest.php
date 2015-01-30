@@ -4,7 +4,6 @@ namespace rockunit\core\template;
 
 
 use rock\helpers\StringHelper;
-use rock\i18n\i18nInterface;
 use rock\Rock;
 use rock\template\TemplateException;
 use rock\template\Template;
@@ -29,7 +28,7 @@ class TemplateTest extends TemplateCommon
     {
         parent::setUpBeforeClass();
         $_SERVER['SERVER_NAME'] = $_SERVER['HTTP_HOST'] = 'site.com';
-        Rock::$app->language = i18nInterface::EN;
+        Rock::$app->language = 'en';
     }
 
 

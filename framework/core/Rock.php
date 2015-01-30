@@ -11,7 +11,6 @@ use rock\events\Event;
 use rock\exception\ErrorHandler;
 use rock\helpers\Trace;
 use rock\i18n\i18n;
-use rock\i18n\i18nInterface;
 use rock\log\Log;
 
 class Rock extends Alias
@@ -38,7 +37,7 @@ class Rock extends Alias
      * @var string the language that is meant to be used for end users.
      * @see sourceLanguage
      */
-    public $language = i18nInterface::EN;
+    public $language = 'en';
     /**
      * A list of the languages supported by the application.
      * @var array
