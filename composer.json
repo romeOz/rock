@@ -38,6 +38,7 @@
         "romeoz/rock-validate" : "*@dev",
         "romeoz/rock-events" : "*@dev",
         "romeoz/rock-request" : "*@dev",
+        "romeoz/rock-url" : "*@dev",
         "romeoz/rock-date" : "*@dev",
         "romeoz/rock-file" : "*@dev",
         "romeoz/rock-cache" : "*@dev",
