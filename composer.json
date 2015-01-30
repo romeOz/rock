@@ -37,6 +37,7 @@
         "romeoz/rock-sanitize" : "*@dev",
         "romeoz/rock-validate" : "*@dev",
         "romeoz/rock-events" : "*@dev",
+        "romeoz/rock-request" : "*@dev",
         "romeoz/rock-date" : "*@dev",
         "romeoz/rock-file" : "*@dev",
         "romeoz/rock-cache" : "*@dev",
