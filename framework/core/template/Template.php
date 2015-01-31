@@ -290,16 +290,17 @@ class Template implements EventsInterface
      *
      * @param array $placeholders placeholders
      * @param bool  $global       globally placeholder
+     * @param bool  $recursive
      * @return mixed
      */
-    public function addMultiPlaceholders(array $placeholders, $global = false)
+    public function addMultiPlaceholders(array $placeholders, $global = false, $recursive = false)
     {
         if ($global === true) {
-            static::$placeholders = array_merge(static::$placeholders, $placeholders);
+            static::$placeholders = $recursive ? ArrayHelper::merge(static::$placeholders, $placeholders) : array_merge(static::$placeholders, $placeholders);
 
             return;
         }
-        $this->localPlaceholders = $this->oldPlaceholders = array_merge($this->localPlaceholders, $placeholders);
+        $this->localPlaceholders = $this->oldPlaceholders = $recursive ? ArrayHelper::merge($this->localPlaceholders, $placeholders) : array_merge($this->localPlaceholders, $placeholders);
     }
 
     /**
@@ -368,7 +369,7 @@ class Template implements EventsInterface
             '/
                 (?P<beforeSkip>\{\!\\s*)?\[\[
                 (?P<escape>\!)?
-                (?P<type>[\#\%\~\*]?|\+{1,2}|\${1,2})					# search type of variable template
+                (?P<type>[\#\%\~]?|\+{1,2}|\${1,2})					# search type of variable template
                 (?P<name>[\\w\-\/\\\.@]+)							# name of variable template [\w, -, \, .]
                 (?:[^\[\]]++ | \[(?!\[) | \](?!\]) | (?R))*		# possible recursion
                 \]\](?P<afterSkip>\\s*\!\})?
@@ -547,10 +548,6 @@ class Template implements EventsInterface
         if ($this->hasPlaceholder($name, true)) {
             return $this->getPlaceholder($name, true, true);
         }
-        if ($this->hasResource($name)) {
-            return $this->getResource($name);
-        }
-
         return null;
     }
 
@@ -587,7 +584,7 @@ class Template implements EventsInterface
      * @param string        $name   name of placeholder
      * @param int|bool|null $autoEscape
      * @param bool          $global globally placeholder
-     * @return string|null
+     * @return mixed
      */
     public function getPlaceholder($name, $autoEscape = true, $global = false)
     {
@@ -654,56 +651,33 @@ class Template implements EventsInterface
     }
 
     /**
-     * Has resource by name.
-     *
-     * @param string $name name of resource.
-     * @return bool
-     */
-    public function hasResource($name)
-    {
-        return (bool)ArrayHelper::getValue(static::$resources, $name);
-    }
-
-    /**
-     * Get resource.
-     *
-     * @param string $name name of resource.
-     * @param bool   $autoEscape
-     * @return array|mixed|null|string
-     */
-    public function getResource($name, $autoEscape = true)
-    {
-        return $this->autoEscape(ArrayHelper::getValue(static::$resources, $name), $autoEscape);
-    }
-
-    /**
      * Adding placeholder.
      *
      * @param string $name   name of placeholder
      * @param mixed  $value  value
      * @param bool   $global globally placeholder
      */
-    public function addPlaceholder($name, $value = null, $global = false)
+    public function addPlaceholder($name, $value = null, $global = false, $recursive = false)
     {
         if ($global === true) {
             static::$placeholders[$name] =
                 isset(static::$placeholders[$name]) && is_array(static::$placeholders[$name])
-                    ? array_merge(static::$placeholders[$name], (array)$value)
+                    ? $recursive ? ArrayHelper::merge(static::$placeholders[$name], (array)$value) : array_merge(static::$placeholders[$name], (array)$value)
                     : $value;
 
             return;
         }
         $this->localPlaceholders[$name] =
             isset($this->localPlaceholders[$name]) && is_array($this->localPlaceholders[$name])
-                ? array_merge($this->localPlaceholders[$name], (array)$value)
+                ? $recursive ? ArrayHelper::merge($this->localPlaceholders[$name], (array)$value) :  array_merge($this->localPlaceholders[$name], (array)$value)
                 : $value;
         $this->oldPlaceholders = $this->localPlaceholders;
     }
 
     /**
-     * Exists local/global placeholder and resource.
+     * Exists local/global placeholder.
      *
-     * @param string $name name of placeholder/resource.
+     * @param string $name name of placeholder.
      * @return bool
      */
     public function __isset($name)
@@ -712,9 +686,6 @@ class Template implements EventsInterface
             return true;
         }
         if ($this->hasPlaceholder($name, true)) {
-            return true;
-        }
-        if ($this->hasResource($name)) {
             return true;
         }
 
@@ -766,60 +737,6 @@ class Template implements EventsInterface
         }
 
         return $this->autoEscape(ArrayHelper::only($this->localPlaceholders, $only, $exclude), $autoEscape);
-    }
-
-    /**
-     * Adding multi-resources.
-     *
-     * @param array $resources
-     */
-    public function addMultiResources(array $resources)
-    {
-        foreach ($resources as $name => $value) {
-            $this->addResource($name, $value);
-        }
-    }
-
-    /**
-     * Adding resource.
-     *
-     * @param string $name  name of resource
-     * @param mixed $value value of resource
-     */
-    public function addResource($name, $value)
-    {
-        static::$resources[$name] = $value;
-    }
-
-    /**
-     * Get all resources.
-     *
-     * @param bool  $autoEscape
-     * @param array $only
-     * @param array $exclude
-     * @return array|mixed|null|string
-     */
-    public function getAllResources($autoEscape = true, array $only = [], array $exclude = [])
-    {
-        return $this->autoEscape(ArrayHelper::only(static::$resources, $only, $exclude), $autoEscape);
-    }
-
-    /**
-     * Deleting resource.
-     *
-     * @param string $name name of resource
-     */
-    public function removeResource($name)
-    {
-        unset(static::$resources[$name]);
-    }
-
-    /**
-     * Deleting all resources.
-     */
-    public function removeAllResource()
-    {
-        static::$resources = [];
     }
 
     /**
@@ -1190,12 +1107,6 @@ class Template implements EventsInterface
         // chunk
         if ($matches['type'] === '$') {
             $result = $this->getChunk($matches['name'], $params);
-            // data of resource
-        } elseif ($matches['type'] === '*') {
-            $result = $this->getResource(
-                $matches['name'],
-                Helper::getValue($params['autoEscape'], $escape, true)
-            );
             // get alias
         } elseif ($matches['type'] === '$$') {
             $result = Alias::getAlias("@{$matches['name']}");

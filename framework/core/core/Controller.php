@@ -40,9 +40,9 @@ abstract class Controller implements ComponentsInterface
         if (!is_object($this->template)) {
             $this->template = Container::load($this->template);
             $this->template->context = $this;
-            if (!$this->template->hasResource('context')) {
+            if (!$this->template->hasPlaceholder(['res', 'context'], true)) {
                 Rock::$app->controller = $this;
-                $this->template->addMultiResources(static::defaultData());
+                $this->template->addPlaceholder('res', static::defaultData(), true);
             }
         }
     }

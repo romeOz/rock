@@ -75,20 +75,6 @@ class TemplateTest extends TemplateCommon
         $this->template->removePlaceholder(null);
     }
 
-    public function testResource()
-    {
-        $template = new Template();
-        $template->addResource('foo', 'foo');
-        $template->addResource('bar', 'bar');
-        $template->addResource('baz', 'baz');
-        $this->assertTrue(isset($template->foo));
-        $this->assertSame($template->getAllResources(true, ['foo', 'bar'], ['foo']), ['bar' => 'bar']);
-
-        // remove resource
-        $template->removeResource('bar');
-        $this->assertFalse($template->hasResource('bar'));
-    }
-
     public function testLink()
     {
         $template = Rock::$app->template;
@@ -100,8 +86,7 @@ class TemplateTest extends TemplateCommon
     public function testRenderAsRock()
     {
         $template = new Template();
-        $template->addMultiPlaceholders(['foo'=> ['bar' => '<b>text_bar</b>']], true);
-        $template->addMultiResources(['baz'=> ['bar' => '<b>text_baz</b>']]);
+        $template->addMultiPlaceholders(['foo'=> ['bar' => '<b>text_bar</b>'], 'baz'=> ['bar' => '<b>text_baz</b>']], true);
         $this->assertSame($template->render($this->path . '/layout', ['text' => 'world']), file_get_contents($this->path . '/_layout.html'));
     }
 
@@ -603,8 +588,7 @@ class TemplateTest extends TemplateCommon
         $cache = static::getCache();
         $this->template = new Template();
         $this->template->cache = $cache;
-        $this->template->addMultiPlaceholders(['foo'=> ['bar' => '<b>text_bar</b>']], true);
-        $this->template->addMultiResources(['baz'=> ['bar' => '<b>text_baz</b>']]);
+        $this->template->addMultiPlaceholders(['foo'=> ['bar' => '<b>text_bar</b>'], 'baz'=> ['bar' => '<b>text_baz</b>']], true);
         $placeholders = [
             'text' => 'world',
             'cacheKey' => 'key_layout'
@@ -617,8 +601,7 @@ class TemplateTest extends TemplateCommon
     public function testRenderAsPHP()
     {
         $this->template = new Template();
-        $this->template->addMultiPlaceholders(['foo'=> ['bar' => '<b>text_bar</b>']], true);
-        $this->template->addMultiResources(['baz'=> ['bar' => '<b>text_baz</b>']], true);
+        $this->template->addMultiPlaceholders(['foo'=> ['bar' => '<b>text_bar</b>'], 'baz'=> ['bar' => '<b>text_baz</b>']], true);
         $this->assertSame($this->template->render($this->path . '/layout.php', ['text' => 'world']), file_get_contents($this->path . '/_layout.html'));
         $this->assertSame($this->template->getChunk($this->path . '/subchunk.php', ['title'=> 'test']), '<b>subchunk</b>test');
     }

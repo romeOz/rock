@@ -30,7 +30,6 @@ abstract class TemplateCommon extends \PHPUnit_Framework_TestCase
         $this->template = Container::load('template');
         $this->template->autoEscape = Template::ESCAPE | Template::TO_TYPE;
         $this->template->removeAllPlaceholders(true);
-        $this->template->removeAllResource();
     }
 
     public function removeSpace($value)
