@@ -15,7 +15,6 @@ use rock\helpers\NumericHelper;
 use rock\helpers\Serialize;
 use rock\helpers\StringHelper;
 use rock\i18n\i18n;
-use rock\Rock;
 use rock\template\filters\ConditionFilter;
 
 class Template implements EventsInterface
@@ -101,6 +100,7 @@ class Template implements EventsInterface
      */
     public $extensions = [];
     public $handlerLink;
+    public $handlerConfig;
     /**
      * Is mode auto-escaping.
      *
@@ -368,7 +368,7 @@ class Template implements EventsInterface
             '/
                 (?P<beforeSkip>\{\!\\s*)?\[\[
                 (?P<escape>\!)?
-                (?P<type>[\#\%\~]?|\+{1,2}|\*{1,2}|\${1,2})					# search type of variable template
+                (?P<type>[\#\%\~\*]?|\+{1,2}|\${1,2})					# search type of variable template
                 (?P<name>[\\w\-\/\\\.@]+)							# name of variable template [\w, -, \, .]
                 (?:[^\[\]]++ | \[(?!\[) | \](?!\]) | (?R))*		# possible recursion
                 \]\](?P<afterSkip>\\s*\!\})?
@@ -1196,9 +1196,6 @@ class Template implements EventsInterface
                 $matches['name'],
                 Helper::getValue($params['autoEscape'], $escape, true)
             );
-            // config
-        } elseif ($matches['type'] === '**') {
-            $result = ArrayHelper::getValue(Rock::$config, explode('.', $matches['name']));
             // get alias
         } elseif ($matches['type'] === '$$') {
             $result = Alias::getAlias("@{$matches['name']}");

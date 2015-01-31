@@ -174,6 +174,9 @@ return array_merge(
                 ],
             ],
             'extensions' => [
+                'cfg' => function (array $keys) {
+                    return \rock\helpers\ArrayHelper::getValue(Rock::$config, $keys);
+                },
                 'user' => function (array $keys) {
                         if (current($keys) === 'isGuest') {
                             return Rock::$app->user->isGuest();

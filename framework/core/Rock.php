@@ -63,16 +63,16 @@ class Rock extends Alias
     /**
      * Bootstrap
      *
-     * @param array $configs
+     * @param array $config
      * @throws \rock\base\BaseException
      */
-    public static function bootstrap(array $configs)
+    public static function bootstrap(array $config)
     {
         Trace::beginProfile(Trace::APP, Trace::TOKEN_APP_RUNTIME);
         try {
-            static::$components = $configs['components'];
-            unset($configs['components']);
-            static::$config = $configs;
+            static::$components = $config['components'];
+            unset($config['components']);
+            static::$config = $config;
             Container::addMulti(static::$components);
 
             Event::on(
