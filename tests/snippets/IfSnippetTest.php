@@ -36,7 +36,7 @@ class IfSnippetTest extends TemplateCommon
             'success'
         );
 
-        $className = IfSnippet::className();
+        $className = 'If';
         $this->assertSame(
             $this->template->replace('[['.$className.'
                                             ?subject=`:foo > 1 && :foo < 3`

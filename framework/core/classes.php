@@ -77,102 +77,7 @@ return array_merge(
                     }
                     return '#';
                 },
-            'filters' => [
-                'size' => [
-                    'class' => \rock\template\filters\StringFilter::className(),
-                ],
-                'trimPattern' => [
-                    'class' => \rock\template\filters\StringFilter::className(),
-                ],
-                'contains' => [
-                    'class' => \rock\template\filters\StringFilter::className(),
-                ],
-                'truncate' => [
-                    'class' => \rock\template\filters\StringFilter::className(),
-                ],
-                'truncateWords' => [
-                    'class' => \rock\template\filters\StringFilter::className(),
-                ],
-                'upper' => [
-                    'class' => \rock\template\filters\StringFilter::className(),
-                ],
-                'lower' => [
-                    'class' => \rock\template\filters\StringFilter::className(),
-                ],
-                'upperFirst' => [
-                    'class' => \rock\template\filters\StringFilter::className(),
-                ],
-                'encode' => [
-                    'class' => \rock\template\filters\StringFilter::className(),
-                ],
-                'decode' => [
-                    'class' => \rock\template\filters\StringFilter::className(),
-                ],
-                'markdown' => [
-                    'class' => \rock\template\filters\StringFilter::className(),
-                ],
-                'paragraph' => [
-                    'class' => \rock\template\filters\StringFilter::className(),
-                ],
-                'isParity' => [
-                    'class' => \rock\template\filters\NumericFilter::className(),
-                ],
-                'positive' => [
-                    'class' => \rock\template\filters\NumericFilter::className(),
-                ],
-                'formula' => [
-                    'class' => \rock\template\filters\NumericFilter::className(),
-                ],
-                'unserialize' => [
-                    'class' => \rock\template\filters\BaseFilter::className(),
-                ],
-                'replaceTpl' => [
-                    'class' => \rock\template\filters\BaseFilter::className(),
-                ],
-                'modifyDate' => [
-                    'class' => \rock\template\filters\BaseFilter::className(),
-                ],
-                'date' => [
-                    'class' => \rock\template\filters\BaseFilter::className(),
-                ],
-                'modifyUrl' => [
-                    'class' => \rock\template\filters\BaseFilter::className(),
-                ],
-                'url' => [
-                    'method' => 'modifyUrl',
-                    'class' => \rock\template\filters\BaseFilter::className(),
-                ],
-                'arrayToJson' => [
-                    'class' => \rock\template\filters\BaseFilter::className(),
-                ],
-                'toJson' => [
-                    'method' => 'arrayToJson',
-                    'class' => \rock\template\filters\BaseFilter::className(),
-                ],
-                'jsonToArray' => [
-                    'method' => 'unserialize',
-                    'class' => \rock\template\filters\BaseFilter::className(),
-                ],
-                'toArray' => [
-                    'method' => 'unserialize',
-                    'class' => \rock\template\filters\BaseFilter::className(),
-                ],
-                'notEmpty' => [
-                    'class' => \rock\template\filters\ConditionFilter::className(),
-                ],
-                'empty' => [
-                    'method' => '_empty',
-                    'class' => \rock\template\filters\ConditionFilter::className(),
 
-                ],
-                'if' => [
-                    'method' => '_if',
-                    'class' => \rock\template\filters\ConditionFilter::className(),
-                ],
-                'thumb' => [
-                    'class' => \rock\template\filters\BaseFilter::className(),
-                ],
-            ],
             'extensions' => [
                 'cfg' => function (array $keys) {
                     return \rock\helpers\ArrayHelper::getValue(Rock::$config, $keys);
@@ -215,6 +120,61 @@ return array_merge(
             'linkTags' => [
                 '<link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico?10">',
             ],
+            'snippets' => [
+                'ListView' => [
+                    'class'        => \rock\snippets\ListView::className(),
+                ],
+
+                'Date' => [
+                    'class'        => \rock\snippets\Date::className(),
+                ],
+
+                'For' => [
+                    'class'        => \rock\snippets\ForSnippet::className(),
+                ],
+
+                'Formula' => [
+                    'class'        => \rock\snippets\Formula::className(),
+                ],
+
+                'If' => [
+                    'class'        => \rock\snippets\IfSnippet::className(),
+                ],
+
+                'Pagination' => [
+                    'class'        => \rock\snippets\Pagination::className(),
+                ],
+
+                'request\Get' => [
+
+                    'class'        => \rock\snippets\request\Get::className(),
+                ],
+
+                'request\Post' => [
+                    'class'        => \rock\snippets\request\Post::className(),
+                ],
+
+                'CSRF' => [
+                    'class'        => \rock\snippets\CSRF::className(),
+                ],
+
+                'Url' => [
+                    'class'        => \rock\snippets\Url::className(),
+                ],
+
+                'CaptchaView' => [
+                    'class'        => \rock\snippets\CaptchaView::className(),
+                ],
+
+                'Thumb' => [
+                    'class'        => \rock\snippets\Thumb::className(),
+                ],
+
+
+                'ActiveForm' => [
+                    'class' => \rock\snippets\html\ActiveForm::className(),
+                ]
+            ]
         ],
 
         'execute' => [
@@ -424,6 +384,6 @@ return array_merge(
             'class' => UserRole::className(),
         ],
     ],
-    require(__DIR__ . '/widgets.php'),
-    require(__DIR__ . '/snippets.php')
+    require(__DIR__ . '/widgets.php')
+    //require(__DIR__ . '/snippets.php')
 );

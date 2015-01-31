@@ -44,10 +44,10 @@ class FormulaTest extends TemplateCommon
             ''
         );
 
-        $this->assertSame($this->template->getSnippet(Formula::className(), ['subject' => ':num - 1', 'operands' => ['num' => 8]]), 7);
+        $this->assertSame($this->template->getSnippet('Formula', ['subject' => ':num - 1', 'operands' => ['num' => 8]]), 7);
 
         // string
-        $this->assertSame($this->template->getSnippet(Formula::className(), ['subject' => ':num - 1', 'operands' => ['num' => 'foo']]), -1);
+        $this->assertSame($this->template->getSnippet('Formula', ['subject' => ':num - 1', 'operands' => ['num' => 'foo']]), -1);
     }
 }
  

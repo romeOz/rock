@@ -4,7 +4,6 @@ namespace rockunit\snippets;
 
 use rock\helpers\Pagination;
 use rock\Rock;
-use rock\snippets\ListView;
 use rock\template\Template;
 use rockunit\core\template\TemplateCommon;
 
@@ -22,18 +21,18 @@ class ListViewTest extends TemplateCommon
             'array' => $this->getAll(),
         ];
         // null tpl
-        $this->assertSame($this->template->getSnippet(ListView::className(), $params), json_encode($params['array']));
+        $this->assertSame($this->template->getSnippet('ListView', $params), json_encode($params['array']));
 
         // tpl + wrapper tpl
         $params['tpl'] = "@INLINE<h1>[[+name]]</h1>\n<p>[[+email]]</p>\n[[!+about]]\n[[+currentItem]]";
         $params['wrapperTpl'] = "@INLINE[[!+output]]\n[[+countItems]]";
-        $this->assertSame($this->removeSpace($this->template->getSnippet(ListView::className(), $params)), $this->removeSpace(file_get_contents($this->path . '/snippet_as_array.html')));
+        $this->assertSame($this->removeSpace($this->template->getSnippet('ListView', $params)), $this->removeSpace(file_get_contents($this->path . '/snippet_as_array.html')));
 
         // pagination
         $params['pagination']['array'] = Pagination::get(count($params['array']), 1, 1, SORT_DESC);
         $params['pagination']['pageVar'] = 'num';
         $params['pagination']['toPlaceholder'] = 'pagination';
-        $this->assertSame($this->removeSpace($this->template->getSnippet(ListView::className(), $params)), $this->removeSpace(file_get_contents($this->path . '/snippet_as_array.html')));
+        $this->assertSame($this->removeSpace($this->template->getSnippet('ListView', $params)), $this->removeSpace(file_get_contents($this->path . '/snippet_as_array.html')));
         $this->assertNotEmpty($this->template->getPlaceholder('pagination', false, true));
     }
 
@@ -42,12 +41,12 @@ class ListViewTest extends TemplateCommon
         $params['array'] = ['foo', 'bar'];
         $params['tpl'] = "@INLINE<li>[[!+output]][[+currentItem]]</li>";
         $params['wrapperTpl'] = "@INLINE<ul>[[!+output]]</ul>";
-        $this->assertSame($this->removeSpace($this->template->getSnippet(ListView::className(), $params)), '<ul><li>foo1</li><li>bar2</li></ul>');
+        $this->assertSame($this->removeSpace($this->template->getSnippet('ListView', $params)), '<ul><li>foo1</li><li>bar2</li></ul>');
     }
 
     public function testGetAsMethod()
     {
-        $class = ListView::className();
+        $class = 'ListView';
         // null tpl
         $this->assertSame(
             trim($this->template->replace('

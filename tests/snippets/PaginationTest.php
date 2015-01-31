@@ -39,7 +39,7 @@ class PaginationTest extends TemplateCommon
                   return \rock\helpers\Pagination::get(0, null, 10, SORT_DESC);
               }
         ];
-        $this->assertEmpty($this->template->getSnippet(Pagination::className(), $params));
+        $this->assertEmpty($this->template->getSnippet('Pagination', $params));
 
         // with args + anchor
         $params = [
@@ -50,7 +50,7 @@ class PaginationTest extends TemplateCommon
         ];
 
         $this->assertSame(
-            static::removeSpace($this->template->getSnippet(Pagination::className(), $params)),
+            static::removeSpace($this->template->getSnippet('Pagination', $params)),
             static::removeSpace(file_get_contents(__DIR__ . '/data/_pagination_args.html'))
         );
 
@@ -59,7 +59,7 @@ class PaginationTest extends TemplateCommon
             'array' => \rock\helpers\Pagination::get(7, null, 5, SORT_DESC),
         ];
         $this->assertSame(
-            static::removeSpace($this->template->getSnippet(Pagination::className(), $params)),
+            static::removeSpace($this->template->getSnippet('Pagination', $params)),
             static::removeSpace(file_get_contents(__DIR__ . '/data/_pagination_not_args.html'))
         );
     }
@@ -70,7 +70,7 @@ class PaginationTest extends TemplateCommon
             'call' => 'Foo.method'
         ];
         $this->setExpectedException(TemplateException::className());
-        $this->template->getSnippet(Pagination::className(), $params);
+        $this->template->getSnippet('Pagination', $params);
     }
 }
  

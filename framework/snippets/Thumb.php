@@ -39,7 +39,7 @@ class Thumb extends Snippet implements ThumbInterface
      * attr "class"
      * @var
      */
-    public $class;
+    public $_class;
     /**
      * attr "alt"
      * @var
@@ -70,7 +70,7 @@ class Thumb extends Snippet implements ThumbInterface
         }
 
         $options = [
-            'class' => $this->class,
+            'class' => $this->_class,
             'alt' => $this->alt,
             'title' => $this->title,
         ];

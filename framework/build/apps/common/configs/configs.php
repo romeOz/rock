@@ -48,8 +48,7 @@ Event::on(
 $config =\rock\helpers\ArrayHelper::merge(
     require(\rock\base\Alias::getAlias('@rock/classes.php')),
     require(__DIR__ . '/classes.php'),
-    require(__DIR__ . '/controllers.php'),
-    require(__DIR__ . '/snippets.php')
+    require(__DIR__ . '/controllers.php')
 );
 
 return [

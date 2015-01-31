@@ -5,17 +5,30 @@ namespace rockunit\core\template\behaviors;
 use rock\access\Access;
 use rock\events\Event;
 use rock\filters\AccessFilter;
-use rock\Rock;
 use rock\template\Snippet;
+use rock\template\Template;
 
 /**
  * @group base
  */
 class SnippetBehaviorsTest extends \PHPUnit_Framework_TestCase {
 
+    /** @var  Template */
+    protected $template;
     public function setUp()
     {
         static::tearDownAfterClass();
+        $config = [
+            'snippets' => [
+                'snippetAccessFalse' => [
+                    'class' => SnippetAccessFalse::className()
+                ],
+                'snippetAccessTrue' => [
+                    'class' => SnippetAccessTrue::className()
+                ]
+            ]
+        ];
+        $this->template = new Template($config);
     }
 
     public static function tearDownAfterClass()
@@ -25,14 +38,14 @@ class SnippetBehaviorsTest extends \PHPUnit_Framework_TestCase {
 
     public function testSnippetAccessFalse()
     {
-        $result = Rock::$app->template->getSnippet(SnippetAccessFalse::className());
+        $result = $this->template->getSnippet('snippetAccessFalse');
         $this->assertNull($result);
         $this->expectOutputString('1success_11fail_2');
     }
 
     public function testSnippetAccessTrue()
     {
-        $result = Rock::$app->template->getSnippet(SnippetAccessTrue::className());
+        $result = $this->template->getSnippet('snippetAccessTrue');
         $this->assertSame('bar', $result);
         $this->expectOutputString('1success_11success_2');
     }

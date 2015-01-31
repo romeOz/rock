@@ -14,8 +14,7 @@ $path = \rock\base\Alias::getAlias('@frontend') . '/configs/';
 $config['components'] = \rock\helpers\ArrayHelper::merge(
     $config['components'],
     require(__DIR__ . '/models.php'),
-    require(__DIR__ . '/controllers.php'),
-    require(__DIR__ . '/snippets.php')
+    require(__DIR__ . '/controllers.php')
 );
 return $configs;
 

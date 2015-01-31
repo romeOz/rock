@@ -36,7 +36,7 @@ class DateTest extends TemplateCommon
 
         // default format
         $this->assertSame(
-            $this->template->getSnippet(Date::className(), ['date' => '2012-02-12 15:01']),
+            $this->template->getSnippet('Date', ['date' => '2012-02-12 15:01']),
             '2012-02-12 15:01:00'
         );
     }

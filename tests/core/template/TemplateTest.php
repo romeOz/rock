@@ -3,11 +3,11 @@
 namespace rockunit\core\template;
 
 
+use rock\di\Container;
 use rock\helpers\StringHelper;
 use rock\Rock;
 use rock\template\TemplateException;
 use rock\template\Template;
-use rock\url\Url;
 use rockunit\core\template\controllers\TestController;
 use rockunit\core\template\snippets\NullSnippet;
 use rockunit\core\template\snippets\TestSnippet;
@@ -518,28 +518,23 @@ class TemplateTest extends TemplateCommon
 
     public function testSnippet()
     {
-        $className = TestSnippet::className();
-        $this->assertSame($this->template->getSnippet($className, ['param' => '<b>test snippet</b>']), StringHelper::encode('<b>test snippet</b>'));
+        $this->template->snippets['test']['class'] = TestSnippet::className();
+        $this->assertSame($this->template->getSnippet('test', ['param' => '<b>test snippet</b>']), StringHelper::encode('<b>test snippet</b>'));
         $this->assertSame($this->template->getSnippet(new TestSnippet(), ['param' => '<b>test snippet</b>']), StringHelper::encode('<b>test snippet</b>'));
-        $this->assertSame($this->template->replace('[['.$className.'?param=`<b>test snippet</b>`]]'), StringHelper::encode('<b>test snippet</b>'));
-        $this->assertSame($this->template->replace('[[!'.$className.'?param=`<b>test snippet</b>`]]'), '<b>test snippet</b>');
+        $this->assertSame($this->template->replace('[[test?param=`<b>test snippet</b>`]]'), StringHelper::encode('<b>test snippet</b>'));
+        $this->assertSame($this->template->replace('[[!test?param=`<b>test snippet</b>`]]'), '<b>test snippet</b>');
     }
 
     public function testNullSnippet()
     {
-        $this->assertEmpty($this->template->getSnippet(NullSnippet::className()));
+        $this->template->snippets['nullSnippet']['class'] = NullSnippet::className();
+        $this->assertEmpty($this->template->getSnippet('nullSnippet'));
     }
 
     public function testUnknownSnippet()
     {
-        $this->setExpectedException(\rock\di\ContainerException::className());
-        $this->template->getSnippet('Unknown');
-    }
-
-    public function testUnknown2Snippet()
-    {
         $this->setExpectedException(TemplateException::className());
-        $this->template->getSnippet(Url::className());
+        $this->template->getSnippet('Unknown');
     }
 
     public function testExtensions()
@@ -565,18 +560,20 @@ class TemplateTest extends TemplateCommon
         }
 
         $cache = static::getCache();
+
         $className = TestSnippet::className();
         $this->template = new Template();
         $this->template->cache = $cache;
+        $this->template->snippets['test']['class'] = TestSnippet::className();
 
         // Rock engine
-        $this->assertSame($this->template->replace('[[!'.$className.'?param=`<b>test snippet</b>`?cacheKey=`'.$className.'`]]'), '<b>test snippet</b>');
+        $this->assertSame($this->template->replace('[[!test?param=`<b>test snippet</b>`?cacheKey=`'.$className.'`]]'), '<b>test snippet</b>');
         $this->assertTrue($cache->exists($className));
         $this->assertSame($cache->get($className), '<b>test snippet</b>');
-        $this->assertSame($this->template->replace('[[!'.$className.'?param=`<b>test snippet</b>`?cacheKey=`'.$className.'`]]'), '<b>test snippet</b>');
+        $this->assertSame($this->template->replace('[[!test?param=`<b>test snippet</b>`?cacheKey=`'.$className.'`]]'), '<b>test snippet</b>');
 
         // PHP engine
-        $this->assertSame($this->template->getSnippet($className, ['cacheKey' => $className]), '<b>test snippet</b>');
+        $this->assertSame($this->template->getSnippet('test', ['cacheKey' => $className]), '<b>test snippet</b>');
     }
 
     public function testCacheLayout()
@@ -605,6 +602,13 @@ class TemplateTest extends TemplateCommon
         $this->assertSame($this->template->render($this->path . '/layout.php', ['text' => 'world']), file_get_contents($this->path . '/_layout.html'));
         $this->assertSame($this->template->getChunk($this->path . '/subchunk.php', ['title'=> 'test']), '<b>subchunk</b>test');
     }
+
+//    public function test()
+//    {
+//        $template = Container::load('template');
+//
+//        var_dump($template);
+//    }
 
 }
 

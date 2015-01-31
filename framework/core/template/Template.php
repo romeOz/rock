@@ -88,11 +88,17 @@ class Template implements EventsInterface
      */
     public $defaultEngine = self::ENGINE_ROCK;
     /**
-     * Collection filters.
+     * List filters.
      *
      * @var array
      */
     public $filters = [];
+    /**
+     * List snippets.
+     *
+     * @var array
+     */
+    public $snippets = [];
     /**
      * Collection extensions.
      *
@@ -177,6 +183,9 @@ class Template implements EventsInterface
         if (!is_object($this->cache)) {
             $this->cache = Container::load($this->cache);
         }
+
+        $this->snippets = array_merge($this->defaultSnippets(), $this->snippets);
+        $this->filters = array_merge($this->defaultFilters(), $this->filters);
     }
 
     /**
@@ -1443,10 +1452,20 @@ class Template implements EventsInterface
                 $snippet->setProperties($params);
             }
         } else {
-            $class = ltrim(Alias::getAlias($snippet, ['lang' => $this->locale]), '\\');
-            $params['class'] = $class;
+            if (!isset($this->snippets[$snippet]['class'])) {
+                throw new TemplateException(TemplateException::UNKNOWN_SNIPPET, ['name' => $snippet]);
+            }
+            $config = array_merge($this->snippets[$snippet], $params);
+
             /** @var \rock\template\Snippet $snippet */
-            $snippet = Container::load($params);
+            if (class_exists('\rock\di\Container')){
+                $snippet = Container::load($config);
+            } else {
+                $className = $config['class'];
+                unset($config['class']);
+                $snippet = new $className($config);
+            }
+
             if (!$snippet instanceof Snippet) {
                 throw new TemplateException(TemplateException::UNKNOWN_SNIPPET, ['name' => $snippet::className()]);
             }
@@ -1558,5 +1577,135 @@ class Template implements EventsInterface
             default:
                 return $matches[0];
         }
+    }
+
+    protected function defaultFilters()
+    {
+        return [
+            'size' => [
+                'class' => \rock\template\filters\StringFilter::className(),
+            ],
+            'trimPattern' => [
+                'class' => \rock\template\filters\StringFilter::className(),
+            ],
+            'contains' => [
+                'class' => \rock\template\filters\StringFilter::className(),
+            ],
+            'truncate' => [
+                'class' => \rock\template\filters\StringFilter::className(),
+            ],
+            'truncateWords' => [
+                'class' => \rock\template\filters\StringFilter::className(),
+            ],
+            'upper' => [
+                'class' => \rock\template\filters\StringFilter::className(),
+            ],
+            'lower' => [
+                'class' => \rock\template\filters\StringFilter::className(),
+            ],
+            'upperFirst' => [
+                'class' => \rock\template\filters\StringFilter::className(),
+            ],
+            'encode' => [
+                'class' => \rock\template\filters\StringFilter::className(),
+            ],
+            'decode' => [
+                'class' => \rock\template\filters\StringFilter::className(),
+            ],
+            'markdown' => [
+                'class' => \rock\template\filters\StringFilter::className(),
+            ],
+            'paragraph' => [
+                'class' => \rock\template\filters\StringFilter::className(),
+            ],
+            'isParity' => [
+                'class' => \rock\template\filters\NumericFilter::className(),
+            ],
+            'positive' => [
+                'class' => \rock\template\filters\NumericFilter::className(),
+            ],
+            'formula' => [
+                'class' => \rock\template\filters\NumericFilter::className(),
+            ],
+            'unserialize' => [
+                'class' => \rock\template\filters\BaseFilter::className(),
+            ],
+            'replaceTpl' => [
+                'class' => \rock\template\filters\BaseFilter::className(),
+            ],
+            'modifyDate' => [
+                'class' => \rock\template\filters\BaseFilter::className(),
+            ],
+            'date' => [
+                'class' => \rock\template\filters\BaseFilter::className(),
+            ],
+            'modifyUrl' => [
+                'class' => \rock\template\filters\BaseFilter::className(),
+            ],
+            'url' => [
+                'method' => 'modifyUrl',
+                'class' => \rock\template\filters\BaseFilter::className(),
+            ],
+            'arrayToJson' => [
+                'class' => \rock\template\filters\BaseFilter::className(),
+            ],
+            'toJson' => [
+                'method' => 'arrayToJson',
+                'class' => \rock\template\filters\BaseFilter::className(),
+            ],
+            'jsonToArray' => [
+                'method' => 'unserialize',
+                'class' => \rock\template\filters\BaseFilter::className(),
+            ],
+            'toArray' => [
+                'method' => 'unserialize',
+                'class' => \rock\template\filters\BaseFilter::className(),
+            ],
+            'notEmpty' => [
+                'class' => \rock\template\filters\ConditionFilter::className(),
+            ],
+            'empty' => [
+                'method' => '_empty',
+                'class' => \rock\template\filters\ConditionFilter::className(),
+
+            ],
+            'if' => [
+                'method' => '_if',
+                'class' => \rock\template\filters\ConditionFilter::className(),
+            ],
+            'thumb' => [
+                'class' => \rock\template\filters\BaseFilter::className(),
+            ],
+        ];
+    }
+
+    protected function defaultSnippets()
+    {
+        return [
+            'ListView' => [
+                'class'        => \rock\snippets\ListView::className(),
+            ],
+            'List' => [
+                'class'        => \rock\snippets\ListView::className(),
+            ],
+            'Date' => [
+                'class'        => \rock\snippets\Date::className(),
+            ],
+            'For' => [
+                'class'        => \rock\snippets\ForSnippet::className(),
+            ],
+            'Formula' => [
+                'class'        => \rock\snippets\Formula::className(),
+            ],
+            'If' => [
+                'class'        => \rock\snippets\IfSnippet::className(),
+            ],
+            'Pagination' => [
+                'class'        => \rock\snippets\Pagination::className(),
+            ],
+            'Url' => [
+                'class'        => \rock\snippets\Url::className(),
+            ]
+        ];
     }
 }
