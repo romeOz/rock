@@ -23,13 +23,13 @@ class SignupFormTest extends DatabaseTestCase
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
-        Rock::$app->language = i18n::EN;
+        Rock::$app->language = 'en';
     }
 
     public static function tearDownAfterClass()
     {
         parent::tearDownAfterClass();
-        Rock::$app->language = i18n::RU;
+        Rock::$app->language = 'ru';
     }
 
     public function setUp()
