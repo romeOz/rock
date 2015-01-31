@@ -44,7 +44,7 @@ class UrlTest extends TemplateCommon
         $this->assertSame(
             'http://site.com/categories/?page=1',
             $this->template->getSnippet(
-                Url::className(),
+                'Url',
                 [
                     'url' => 'http://site.com/categories/?view=all',
                     'removeArgs' => ['view'],
@@ -73,7 +73,7 @@ class UrlTest extends TemplateCommon
         $this->assertSame(
             'http://site.com/',
             $this->template->getSnippet(
-                Url::className(),
+                'Url',
                 [
                     'removeAllArgs' => true,
                     'const' => Url::ABS
