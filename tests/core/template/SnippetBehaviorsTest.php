@@ -3,10 +3,10 @@
 namespace rockunit\core\template\behaviors;
 
 use rock\access\Access;
-use rock\core\Snippet;
 use rock\events\Event;
 use rock\filters\AccessFilter;
 use rock\Rock;
+use rock\template\Snippet;
 
 /**
  * @group base

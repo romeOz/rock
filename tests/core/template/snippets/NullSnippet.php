@@ -3,7 +3,7 @@
 namespace rockunit\core\template\snippets;
 
 
-use rock\core\Snippet;
+use rock\template\Snippet;
 
 class NullSnippet extends Snippet
 {
