@@ -4,13 +4,13 @@ namespace rock\snippets\html;
 
 
 use rock\base\Alias;
-use rock\core\Snippet;
 use rock\di\Container;
 use rock\file\UploadedFile;
 use rock\helpers\Helper;
 use rock\helpers\Serialize;
 use rock\request\Request;
 use rock\template\Html;
+use rock\template\Snippet;
 use rock\user\User;
 
 class ActiveForm extends Snippet

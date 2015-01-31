@@ -3,7 +3,6 @@ namespace rock\template;
 
 use rock\base\Alias;
 use rock\cache\CacheInterface;
-use rock\core\Snippet;
 use rock\di\Container;
 use rock\events\Event;
 use rock\events\EventsInterface;
@@ -1508,7 +1507,7 @@ class Template implements EventsInterface
     /**
      * Get data from snippet.
      *
-     * @param string|\rock\core\Snippet $snippet name of
+     * @param string|\rock\template\Snippet $snippet name of
      *                                           snippet/instance @see \rock\base\Snippet
      * @param array                     $params  params
      * @param bool                      $autoEscape
@@ -1538,7 +1537,7 @@ class Template implements EventsInterface
         } else {
             $class = ltrim(Alias::getAlias($snippet, ['lang' => $this->locale]), '\\');
             $params['class'] = $class;
-            /** @var \rock\core\Snippet $snippet */
+            /** @var \rock\template\Snippet $snippet */
             $snippet = Container::load($params);
             if (!$snippet instanceof Snippet) {
                 throw new TemplateException(TemplateException::UNKNOWN_SNIPPET, ['name' => $snippet::className()]);

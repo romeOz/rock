@@ -1,9 +1,9 @@
 <?php
 namespace rock\snippets;
 
-use rock\core\Snippet;
 use rock\date\DateTime;
 use rock\date\DateTimeInterface;
+use rock\template\Snippet;
 
 /**
  * Snippet "DateView"

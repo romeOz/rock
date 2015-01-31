@@ -1,8 +1,8 @@
 <?php
 namespace rock\snippets\request;
-use rock\core\Snippet;
 use rock\request\Request;
 use rock\sanitize\Sanitize;
+use rock\template\Snippet;
 
 /**
  * Snippet "Get request"

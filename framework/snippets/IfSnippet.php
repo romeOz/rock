@@ -1,11 +1,11 @@
 <?php
 namespace rock\snippets;
 
-use rock\core\Snippet;
 use rock\di\Container;
 use rock\execute\Execute;
 use rock\helpers\Helper;
 use rock\helpers\StringHelper;
+use rock\template\Snippet;
 
 /**
  * Snippet "IfSnippet"
