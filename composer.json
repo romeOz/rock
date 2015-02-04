@@ -26,6 +26,10 @@
         },
         {
             "type": "vcs",
+            "url": "https://github.com/romeOz/rock-execute"
+        },
+        {
+            "type": "vcs",
             "url": "https://github.com/romeOz/cartographer"
         }
     ],
@@ -43,6 +47,7 @@
         "romeoz/rock-i18n" : "*@dev",
         "romeoz/rock-file" : "*@dev",
         "romeoz/rock-cache" : "*@dev",
+        "romeoz/rock-execute" : "*@dev",
         "filp/whoops": "*",
         "phpmailer/phpmailer"   : "*",
         "imagine/imagine": "*",

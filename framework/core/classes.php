@@ -179,6 +179,7 @@ return array_merge(
 
         'execute' => [
             'class' => \rock\execute\CacheExecute::className(),
+            'path' => '@common/runtime/execute'
         ],
 
         'i18n' => [
