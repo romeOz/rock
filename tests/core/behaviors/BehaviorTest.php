@@ -88,7 +88,7 @@ class BehaviorTest extends \PHPUnit_Framework_TestCase
             'class' => AccessFilter::className(),
             'rules' => [
                 'allow' => true,
-                'verbs' => ['POST'],
+                'ips' => ['127.0.0.5'],
             ],
             'success' => function (Access $access) {
                 $this->assertTrue($access->owner instanceof FooController);

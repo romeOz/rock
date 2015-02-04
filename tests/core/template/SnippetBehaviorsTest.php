@@ -8,6 +8,7 @@ use rock\filters\AccessFilter;
 use rock\template\Snippet;
 use rock\template\Template;
 
+$_SERVER['REMOTE_ADDR'] = '127.0.0.1';
 /**
  * @group base
  */
@@ -69,8 +70,7 @@ class SnippetAccessFalse extends Snippet
                 'rules' =>
                     [
                         'allow' => true,
-                        //'ips'   => ['127.0.0.1'],
-                        'verbs' => ['GET'],
+                        'ips'   => ['127.0.0.1'],
                     ],
                 'success' => [
                     function (Access $access) {
@@ -88,7 +88,7 @@ class SnippetAccessFalse extends Snippet
                 'rules' =>
                     [
                         'allow' => true,
-                        'verbs' => ['POST'],
+                        'ips' => ['127.0.0.5'],
                     ],
                 'success' => [
                     function (Access $access) {
@@ -121,8 +121,7 @@ class SnippetAccessTrue extends Snippet
                 'rules' =>
                     [
                         'allow'     => true,
-                        //'ips'   => ['127.0.0.1'],
-                        'verbs'   => ['GET'],
+                        'ips'   => ['127.0.0.1'],
 
                     ],
 
@@ -139,7 +138,7 @@ class SnippetAccessTrue extends Snippet
                 'rules' =>
                     [
                         'allow'     => false,
-                        'verbs'   => ['POST'],
+                        'ips'   => ['127.0.0.5'],
                     ],
 
 

@@ -13,6 +13,7 @@ class AccessFilterTest extends \PHPUnit_Framework_TestCase
 {
     public function testSelectActions()
     {
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
         $controller = new BarController();
         $this->assertSame($controller->method('actionIndex'), 'index');
         $this->assertNull($controller->actionView());
@@ -21,6 +22,7 @@ class AccessFilterTest extends \PHPUnit_Framework_TestCase
 
     public function testAllActions()
     {
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
         $controller = new FooController();
         $this->assertNull($controller->method('actionIndex'));
         $this->assertNull($controller->actionView());
@@ -30,6 +32,7 @@ class AccessFilterTest extends \PHPUnit_Framework_TestCase
 
     public function testSuccess()
     {
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
         $controller = new BazController();
         $this->assertSame($controller->method('actionIndex'), 'index');
         $this->assertSame($controller->actionView(), 'view');
@@ -38,6 +41,7 @@ class AccessFilterTest extends \PHPUnit_Framework_TestCase
 
     public function testMultiAccess()
     {
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
         $controller = new MultiAccessController();
         $this->assertNull($controller->method('actionIndex'));
         $this->assertNull($controller->method('actionUpdate'));
@@ -57,7 +61,7 @@ class FooController extends Controller
                 'rules' =>
                     [
                         'allow' => true,
-                        'verbs' => ['PUT'],
+                        'ips' => ['127.0.0.5'],
                         'roles' => ['editor']
                     ],
                 'fail' =>  [function(Access $access){
@@ -99,7 +103,7 @@ class BarController extends Controller
                 'rules' =>
                     [
                         'allow' => true,
-                        'verbs' => ['PUT'],
+                        'ips' => ['127.0.0.3'],
                         'roles' => ['editor']
                     ],
                 'fail' =>  function(Access $access){
@@ -142,7 +146,7 @@ class BazController extends Controller
                 'rules' =>
                     [
                         'allow' => false,
-                        'verbs' => ['PUT'],
+                        'ips' => ['127.0.0.3'],
                         'roles' => ['editor']
                     ],
                 'fail' =>  function(Access $access){
@@ -186,7 +190,7 @@ class MultiAccessController extends Controller
                 'rules' =>
                     [
                         'allow' => false,
-                        'verbs' => ['GET'],
+                        'ips' => ['127.0.0.1'],
                     ],
             ],
             [
@@ -195,7 +199,7 @@ class MultiAccessController extends Controller
                 'rules' =>
                     [
                         'allow' => true,
-                        'verbs' => ['GET'],
+                        'ips' => ['127.0.0.1'],
                     ],
             ],
             [
@@ -204,7 +208,7 @@ class MultiAccessController extends Controller
                 'rules' =>
                     [
                         'allow' => true,
-                        'verbs' => ['POST'],
+                        'ips' => ['127.0.0.3'],
                     ],
             ],
             [
@@ -213,7 +217,7 @@ class MultiAccessController extends Controller
                 'rules' =>
                     [
                         'allow' => true,
-                        'verbs' => ['POST'],
+                        'ips' => ['127.0.0.3'],
                     ],
             ],
             [
@@ -222,7 +226,7 @@ class MultiAccessController extends Controller
                 'rules' =>
                     [
                         'allow' => true,
-                        'verbs' => ['GET'],
+                        'ips' => ['127.0.0.3'],
                     ],
             ],
 

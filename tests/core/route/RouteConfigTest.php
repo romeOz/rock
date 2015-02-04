@@ -8,32 +8,6 @@ use rock\filters\AccessFilter;
 use rock\helpers\Helper;
 use rock\route\Route;
 
-class OrdersController extends Controller
-{
-    public function actionIndex()
-    {
-        echo 'index';
-    }
-    public function actionShow()
-    {
-        echo 'show';
-    }
-    public function actionCreate()
-    {
-        echo 'create';
-    }
-    public function actionUpdate()
-    {
-        echo 'update';
-    }
-
-    public function actionDelete()
-    {
-        echo 'delete';
-    }
-
-}
-
 /**
  * @group base
  * @group route
@@ -164,7 +138,6 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
                         'class' => AccessFilter::className(),
                         'rules' =>            [
                             'allow' => true,
-                            'verbs' => ['GET'],
                             'ips' => ['10.2.3']
                         ],
                         'success' => function (Access $access) {
@@ -309,7 +282,6 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
                         'rules' =>
                             [
                                 'allow' => false,
-                                'verbs' => ['GET'],
                                 'ips' => ['10.2.3']
                             ],
                         'success' => [
@@ -324,8 +296,8 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
                         ],
                     ]
                 ],
-                'fail_behavior' . (Route::E_IPS | Route::E_VERBS) . 'total_fail' .
-                (Route::E_IPS | Route::E_VERBS)
+                'fail_behavior' . (Route::E_IPS) . 'total_fail' .
+                (Route::E_IPS)
             ],
 
             [
@@ -550,4 +522,30 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
         ];
     }
 }
- 
+
+
+class OrdersController extends Controller
+{
+    public function actionIndex()
+    {
+        echo 'index';
+    }
+    public function actionShow()
+    {
+        echo 'show';
+    }
+    public function actionCreate()
+    {
+        echo 'create';
+    }
+    public function actionUpdate()
+    {
+        echo 'update';
+    }
+
+    public function actionDelete()
+    {
+        echo 'delete';
+    }
+
+}
