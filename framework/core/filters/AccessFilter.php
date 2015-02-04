@@ -6,7 +6,6 @@ namespace rock\filters;
 use rock\access\Access;
 use rock\components\ActionFilter;
 use rock\core\Controller;
-use rock\db\BaseActiveRecord;
 use rock\di\Container;
 use rock\route\Route;
 use rock\route\RouteEvent;
@@ -65,15 +64,6 @@ class AccessFilter extends ActionFilter
         if (class_exists('\rock\template\Snippet')) {
             $events[Snippet::EVENT_BEFORE_SNIPPET] = 'beforeFilter';
             $events[Snippet::EVENT_AFTER_SNIPPET] = 'afterFilter';
-        }
-
-        if (class_exists('\rock\db\BaseActiveRecord')) {
-            $events[BaseActiveRecord::EVENT_BEFORE_INSERT] =
-            $events[BaseActiveRecord::EVENT_BEFORE_UPDATE] =
-            $events[BaseActiveRecord::EVENT_BEFORE_FIND] = 'beforeFilter';
-            $events[BaseActiveRecord::EVENT_AFTER_INSERT] =
-            $events[BaseActiveRecord::EVENT_AFTER_UPDATE] =
-            $events[BaseActiveRecord::EVENT_AFTER_FIND] = 'afterFilter';
         }
 
         if (class_exists('\rock\route\Route')) {

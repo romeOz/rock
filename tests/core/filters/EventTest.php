@@ -3,7 +3,6 @@
 namespace rockunit\core\filters\EventTest;
 
 
-use rock\access\Access;
 use rock\core\ActionEvent;
 use rock\core\Controller;
 use rock\events\Event;

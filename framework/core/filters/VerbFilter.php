@@ -3,10 +3,7 @@
 namespace rock\filters;
 
 use rock\components\ActionFilter;
-use rock\core\Controller;
-use rock\db\BaseActiveRecord;
 use rock\Rock;
-use rock\template\Snippet;
 
 /**
  * VerbFilter is an action filter that filters by HTTP request methods.
@@ -63,29 +60,6 @@ class VerbFilter extends ActionFilter
      */
     public $actions = [];
     public $throwException = false;
-
-    public function events()
-    {
-        $events = [];
-        if (class_exists('\rock\core\Controller')) {
-            $events[Controller::EVENT_BEFORE_ACTION] = 'beforeFilter';
-            $events[Controller::EVENT_AFTER_ACTION] = 'afterFilter';
-        }
-        if (class_exists('\rock\template\Snippet')) {
-            $events[Snippet::EVENT_BEFORE_SNIPPET] = 'beforeFilter';
-            $events[Snippet::EVENT_AFTER_SNIPPET] = 'afterFilter';
-        }
-
-        if (class_exists('\rock\db\BaseActiveRecord')) {
-            $events[BaseActiveRecord::EVENT_BEFORE_INSERT] =
-            $events[BaseActiveRecord::EVENT_BEFORE_UPDATE] =
-            $events[BaseActiveRecord::EVENT_BEFORE_FIND] = 'beforeFilter';
-            $events[BaseActiveRecord::EVENT_AFTER_INSERT] =
-            $events[BaseActiveRecord::EVENT_AFTER_UPDATE] =
-            $events[BaseActiveRecord::EVENT_AFTER_FIND] = 'afterFilter';
-        }
-        return $events;
-    }
 
     /**
      * @inheritdoc

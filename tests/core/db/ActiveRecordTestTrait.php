@@ -31,11 +31,6 @@ trait ActiveRecordTestTrait
     abstract public function getCustomerRulesClass();
 
     /**
-     * @return string
-     */
-    abstract public function getCustomerFilterClass();
-
-    /**
      * This method should return the classname of Order class
      * @return string
      */
@@ -1205,19 +1200,6 @@ trait ActiveRecordTestTrait
                             ], $afterFindCalls);
 
         Event::off(BaseActiveRecord::className(), BaseActiveRecord::EVENT_AFTER_FIND);
-
-        /* @var $customerFilterClass ActiveRecordInterface */
-        $customerFilterClass = $this->getCustomerFilterClass();
-
-        $_POST['_method'] = 'POST';
-        $query = $customerFilterClass::find()
-            ->where(['id' => 1])
-            ->asArray();
-        $this->assertSame($query->one()['name'], 'user1');
-        $this->assertEmpty(Event::getAll());
-        $this->expectOutputString('1success');
-
-        unset($_POST['_method']);
     }
 
 
@@ -1333,29 +1315,6 @@ trait ActiveRecordTestTrait
         $this->assertFalse($trace->current()['cache']);
 
         static::disableCache();
-    }
-
-    public function testBeforeFind()
-    {
-        /* @var $this \PHPUnit_Framework_TestCase|ActiveRecordTestTrait */
-
-        /* @var $customerFilterClass ActiveRecordInterface */
-        $customerFilterClass = $this->getCustomerFilterClass();
-
-        // fail
-        $query = $customerFilterClass::find()
-            ->where(['id' => 1]);
-        $this->assertEmpty($query->one());
-
-        // success
-        $_POST['_method'] = 'POST';
-        $query = $customerFilterClass::find()
-            ->where(['id' => 1]);
-        $this->assertNotEmpty($query->one());
-        $this->assertEmpty(Event::getAll());
-        $this->expectOutputString('1fail1success');
-
-        unset($_POST['_method']);
     }
 
     public function testInsertWithRule()

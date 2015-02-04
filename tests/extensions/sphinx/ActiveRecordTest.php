@@ -9,7 +9,6 @@ use rock\sphinx\ActiveQuery;
 use rock\sphinx\Connection;
 use rockunit\common\CommonTestTrait;
 use rockunit\extensions\sphinx\models\ActiveRecord;
-use rockunit\extensions\sphinx\models\ArticleFilterIndex;
 use rockunit\extensions\sphinx\models\ArticleIndex;
 use rockunit\extensions\sphinx\models\RuntimeIndex;
 use rockunit\extensions\sphinx\models\RuntimeRulesIndex;
@@ -444,24 +443,6 @@ class ActiveRecordTest extends SphinxTestCase
 
         static::disableCache();
     }
-
-    public function testBeforeFind()
-    {
-        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
-        // fail
-        $query = ArticleFilterIndex::find()
-            ->where(['id' => 1]);
-        $this->assertEmpty($query->one());
-
-        // success
-        $_SERVER['REMOTE_ADDR'] = '127.0.0.2';
-        $query = ArticleFilterIndex::find()
-            ->where(['id' => 1]);
-        $this->assertEquals($query->one()->author_id, 1);
-        $this->assertEmpty(Event::getAll());
-        $this->expectOutputString('1fail1success');
-    }
-
 
     public function testInsertWithRule()
     {

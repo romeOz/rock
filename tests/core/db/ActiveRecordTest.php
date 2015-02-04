@@ -41,11 +41,6 @@ class ActiveRecordTest extends DatabaseTestCase
         return CustomerRules::className();
     }
 
-    public function getCustomerFilterClass()
-    {
-        return CustomerFilter::className();
-    }
-
     public function getItemClass()
     {
         return Item::className();
@@ -84,6 +79,7 @@ class ActiveRecordTest extends DatabaseTestCase
         static::getCache()->flush();
         static::disableCache();
         static::clearRuntime();
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
     }
 
     protected function setUp()
@@ -92,6 +88,7 @@ class ActiveRecordTest extends DatabaseTestCase
         ActiveRecord::$connection = $this->getConnection();
         Trace::removeAll();
         Event::offAll();
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
     }
 
 
