@@ -22,6 +22,10 @@
         },
         {
             "type": "vcs",
+            "url": "https://github.com/romeOz/rock-components"
+        },
+        {
+            "type": "vcs",
             "url": "https://github.com/romeOz/rock-file"
         },
         {
@@ -38,6 +42,7 @@
         "romeoz/rock-base" : "*@dev",
         "romeoz/rock-helpers" : "*@dev",
         "romeoz/rock-di" : "*@dev",
+        "romeoz/rock-components" : "*@dev",
         "romeoz/rock-sanitize" : "*@dev",
         "romeoz/rock-validate" : "*@dev",
         "romeoz/rock-events" : "*@dev",
