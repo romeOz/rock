@@ -11,6 +11,7 @@ use rockunit\core\db\models\ActiveRecord;
  * @see SluggableBehavior
  *
  * @group behaviors
+ * @group db
  */
 class SluggableBehaviorTest extends DatabaseTestCase
 {

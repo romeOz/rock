@@ -10,39 +10,8 @@ use rock\core\Controller;
 use rock\events\Event;
 use rock\filters\AccessFilter;
 
-class FooBehavior extends Behavior
-{
-
-    public $test = 'fooBehavior';
-
-    public function bar()
-    {
-        return 'bar';
-    }
-}
-
-
-class FooController extends Controller
-{
-    public function actionIndex()
-    {
-        return 'index';
-    }
-
-    public function actionView()
-    {
-        if (!$this->beforeAction('actionView')) {
-            return null;
-        }
-        $event = new ActionEvent('actionView');
-        $event->result = 'view';
-        $this->trigger('test', $event);
-        return 'view';
-    }
-}
-
 /**
- * @group base
+ * @group behaviors
  */
 class BehaviorTest extends \PHPUnit_Framework_TestCase
 {
@@ -135,5 +104,36 @@ class BehaviorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($controller->existsBehavior('access'));
         $this->assertSame('view', $controller->actionView());
         $this->expectOutputString('test view');
+    }
+}
+
+class FooBehavior extends Behavior
+{
+
+    public $test = 'fooBehavior';
+
+    public function bar()
+    {
+        return 'bar';
+    }
+}
+
+
+class FooController extends Controller
+{
+    public function actionIndex()
+    {
+        return 'index';
+    }
+
+    public function actionView()
+    {
+        if (!$this->beforeAction('actionView')) {
+            return null;
+        }
+        $event = new ActionEvent('actionView');
+        $event->result = 'view';
+        $this->trigger('test', $event);
+        return 'view';
     }
 }

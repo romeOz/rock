@@ -8,7 +8,7 @@ use rockunit\core\db\models\Order;
 use rockunit\core\db\models\OrderTimestamp;
 
 /**
- * @group base
+ * @group behaviors
  * @group db
  */
 class TimestampBehaviorTest extends DatabaseTestCase
