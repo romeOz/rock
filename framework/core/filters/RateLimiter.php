@@ -7,7 +7,7 @@ use rock\core\Controller;
 use rock\request\Request;
 use rock\response\Response;
 use rock\Rock;
-use rock\template\Template;
+use rock\template\Snippet;
 use rock\user\User;
 
 /**
@@ -66,8 +66,8 @@ class RateLimiter extends ActionFilter
         return [
             Controller::EVENT_BEFORE_ACTION => 'beforeFilter',
             Controller::EVENT_AFTER_ACTION => 'afterFilter',
-            Template::EVENT_BEFORE_TEMPLATE => 'beforeFilter',
-            Template::EVENT_AFTER_TEMPLATE => 'afterFilter',
+            Snippet::EVENT_BEFORE_SNIPPET => 'beforeFilter',
+            Snippet::EVENT_AFTER_SNIPPET => 'afterFilter',
         ];
     }
 

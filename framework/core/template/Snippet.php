@@ -1,7 +1,6 @@
 <?php
 namespace rock\template;
 
-use rock\components\ActionEvent;
 use rock\components\ComponentsInterface;
 use rock\components\ComponentsTrait;
 use rock\di\Container;
@@ -12,6 +11,8 @@ abstract class Snippet implements ComponentsInterface
         ComponentsTrait::__set as parentSet;
         ComponentsTrait::init as parentInit;
     }
+    const EVENT_BEFORE_SNIPPET = 'beforeSnippet';
+    const EVENT_AFTER_SNIPPET = 'afterSnippet';
 
     /**
      * Is mode auto-escaping
@@ -49,9 +50,9 @@ abstract class Snippet implements ComponentsInterface
      * If you override this method, your code should look like the following:
      *
      * ```php
-     * public function beforeAction($action)
+     * public function beforeSnippet()
      * {
-     *     if (parent::beforeAction($action)) {
+     *     if (parent::beforeSnippet()) {
      *         // your custom code here
      *         return true;  // or false if needed
      *     } else {
@@ -60,13 +61,12 @@ abstract class Snippet implements ComponentsInterface
      * }
      * ```
      *
-     * @param string $action the action to be executed.
      * @return boolean whether the action should continue to run.
      */
-    public function beforeSnippet($action)
+    public function beforeSnippet()
     {
-        $event = new ActionEvent($action);
-        $this->trigger(Template::EVENT_BEFORE_TEMPLATE, $event);
+        $event = new SnippetEvent();
+        $this->trigger(self::EVENT_BEFORE_SNIPPET, $event);
         return $event->isValid;
     }
 
@@ -79,23 +79,22 @@ abstract class Snippet implements ComponentsInterface
      * If you override this method, your code should look like the following:
      *
      * ```php
-     * public function afterAction($action, $result)
+     * public function afterSnippet($result)
      * {
-     *     $result = parent::afterAction($action, $result);
+     *     $result = parent::afterSnippet($result);
      *     // your custom code here
      *     return $result;
      * }
      * ```
      *
-     * @param string $action the action just executed.
      * @param mixed $result the action return result.
      * @return mixed the processed action result.
      */
-    public function afterSnippet($action, $result)
+    public function afterSnippet($result)
     {
-        $event = new ActionEvent($action);
+        $event = new SnippetEvent();
         $event->result = $result;
-        $this->trigger(Template::EVENT_AFTER_TEMPLATE, $event);
+        $this->trigger(self::EVENT_AFTER_SNIPPET, $event);
         return $event->result;
     }
 

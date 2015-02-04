@@ -10,7 +10,7 @@ use rock\db\BaseActiveRecord;
 use rock\di\Container;
 use rock\route\Route;
 use rock\route\RouteEvent;
-use rock\template\Template;
+use rock\template\Snippet;
 
 /**
  * Access provides simple access control based on a set of rules.
@@ -84,8 +84,8 @@ class AccessFilter extends ActionFilter
         return [
             Controller::EVENT_BEFORE_ACTION => 'beforeFilter',
             Controller::EVENT_AFTER_ACTION => 'afterFilter',
-            Template::EVENT_BEFORE_TEMPLATE => 'beforeFilter',
-            Template::EVENT_AFTER_TEMPLATE => 'afterFilter',
+            Snippet::EVENT_BEFORE_SNIPPET => 'beforeFilter',
+            Snippet::EVENT_AFTER_SNIPPET => 'afterFilter',
             BaseActiveRecord::EVENT_BEFORE_FIND => 'beforeFilter',
             BaseActiveRecord::EVENT_AFTER_FIND => 'afterFilter',
             BaseActiveRecord::EVENT_BEFORE_INSERT => 'beforeFilter',

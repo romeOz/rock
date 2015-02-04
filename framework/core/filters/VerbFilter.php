@@ -6,7 +6,7 @@ use rock\components\ActionFilter;
 use rock\core\Controller;
 use rock\db\BaseActiveRecord;
 use rock\Rock;
-use rock\template\Template;
+use rock\template\Snippet;
 
 /**
  * VerbFilter is an action filter that filters by HTTP request methods.
@@ -69,8 +69,8 @@ class VerbFilter extends ActionFilter
         return [
             Controller::EVENT_BEFORE_ACTION => 'beforeFilter',
             Controller::EVENT_AFTER_ACTION => 'afterFilter',
-            Template::EVENT_BEFORE_TEMPLATE => 'beforeFilter',
-            Template::EVENT_AFTER_TEMPLATE => 'afterFilter',
+            Snippet::EVENT_BEFORE_SNIPPET => 'beforeFilter',
+            Snippet::EVENT_AFTER_SNIPPET => 'afterFilter',
             BaseActiveRecord::EVENT_BEFORE_INSERT => 'beforeFilter',
             BaseActiveRecord::EVENT_AFTER_INSERT => 'afterFilter',
             BaseActiveRecord::EVENT_BEFORE_UPDATE => 'beforeFilter',

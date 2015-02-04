@@ -27,9 +27,6 @@ class Template implements EventsInterface
     const ENGINE_ROCK = 1;
     const ENGINE_PHP = 2;
 
-    const EVENT_BEFORE_TEMPLATE = 'beforeTemplate';
-    const EVENT_AFTER_TEMPLATE = 'afterTemplate';
-
     /**
      * @event Event an event that is triggered by {@see \rock\template\Template::beginPage()}.
      */
@@ -201,15 +198,9 @@ class Template implements EventsInterface
         if (isset($context)) {
             $this->context = $context;
         }
-        if (!$this->before($path)) {
-            return null;
-        }
         list($cacheKey, $cacheExpire, $cacheTags) = $this->calculateCacheParams($placeholders);
         // Get cache
         if (($resultCache = $this->getCache($cacheKey)) !== false) {
-            if ($this->after($path, $resultCache) === false) {
-                return null;
-            }
 
             return $resultCache;
         }
@@ -223,9 +214,6 @@ class Template implements EventsInterface
         $result = implode("\n", [$this->beginPage(), $this->beginBody(), $result, $this->endBody(), $this->endPage()]);
         // Set cache
         $this->setCache($cacheKey, $result, $cacheExpire, $cacheTags ? : []);
-        if ($this->after($path, $result) === false) {
-            return null;
-        }
 
         return $result;
     }
@@ -996,67 +984,6 @@ class Template implements EventsInterface
     }
 
     /**
-     * This method is invoked right before an chunk/snippet is executed.
-     *
-     * The method will trigger the {@see \rock\core\Controller::EVENT_BEFORE_TEMPLATE} event. The return value of the method
-     * will determine whether the action should continue to run.
-     *
-     * If you override this method, your code should look like the following:
-     *
-     * ```php
-     * public function before($namen)
-     * {
-     *     if (parent::before($name)) {
-     *         // your custom code here
-     *         return true;  // or false if needed
-     *     } else {
-     *         return false;
-     *     }
-     * }
-     * ```
-     *
-     * @param string $name the path to chunk/snippet to be executed.
-     * @return boolean whether the action should continue to run.
-     */
-    protected function before($name)
-    {
-        $event = new TemplateEvent();
-        $event->name = $name;
-        $this->trigger(self::EVENT_BEFORE_TEMPLATE, $event);
-        return $event->isValid;
-    }
-
-    /**
-     * This method is invoked right after an action is executed.
-     *
-     * The method will trigger the {@see \rock\core\Controller::EVENT_AFTER_ACTION} event. The return value of the method
-     * will be used as the action return value.
-     *
-     * If you override this method, your code should look like the following:
-     *
-     * ```php
-     * public function after($name, $result)
-     * {
-     *     $result = parent::after($name, $result);
-     *     // your custom code here
-     *     return $result;
-     * }
-     * ```
-     *
-     * @param string $name the path to chunk/snippet just executed.
-     * @param mixed $result the action return result.
-     * @return mixed the processed action result.
-     */
-    protected function after($name, $result)
-    {
-        $event = new TemplateEvent();
-        $event->name = $name;
-        $event->result = $result;
-        $this->trigger(self::EVENT_AFTER_TEMPLATE, $event);
-        return $event->result;
-    }
-
-    /**
      * Callback to replace variables template.
      *
      * @param array $matches array of variables template.
@@ -1432,15 +1359,11 @@ class Template implements EventsInterface
      */
     public function getSnippet($snippet, array $params = [], $autoEscape = true)
     {
-        if (!$this->before($snippet)) {
-            return null;
-        }
         $template = clone $this;
         $template->removeAllPlaceholders();
         $result = $template->getSnippetInternal($snippet, $params, $autoEscape);
         $this->cachePlaceholders = $template->cachePlaceholders;
 
-        $this->after($snippet, $result);
         return $result;
     }
 
@@ -1474,12 +1397,12 @@ class Template implements EventsInterface
             $snippet->autoEscape = false;
         }
         $snippet->template = $this;
-        if (!$snippet->beforeSnippet($snippet::className())) {
+        if (!$snippet->beforeSnippet()) {
             return null;
         }
         // Get cache
         if (($resultCache = $this->getCache($cacheKey)) !== false) {
-            if (!$snippet->afterSnippet($snippet::className(), $resultCache)) {
+            if (!$snippet->afterSnippet($resultCache)) {
                 return null;
             }
 
@@ -1498,7 +1421,7 @@ class Template implements EventsInterface
             : $result;
         //  Set cache
         $this->setCache($cacheKey, $result, $cacheExpire, $cacheTags ? : []);
-        if (!$snippet->afterSnippet($snippet::className(), $result)) {
+        if (!$snippet->afterSnippet($result)) {
             return null;
         }
 

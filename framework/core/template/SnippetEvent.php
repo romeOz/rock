@@ -5,12 +5,8 @@ namespace rock\template;
 
 use rock\events\Event;
 
-class TemplateEvent extends Event
+class SnippetEvent extends Event
 {
-    /**
-     * @var string the path to chunk/name of snippet
-     */
-    public $name;
     /**
      * @var mixed the action result. Event handlers may modify this property to change the action result.
      */
