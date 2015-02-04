@@ -48,8 +48,6 @@ class BaseRecoveryForm extends Model
     protected $_response;
     /** @var  Captcha */
     protected $_captcha;
-    /** @var  Template */
-    protected $_template;
     /** @var  Mail */
     protected $_mail;
     /** @var  Session */
