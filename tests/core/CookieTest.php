@@ -1,6 +1,6 @@
 <?php
 
-namespace rockunit\core\cookie;
+namespace rockunit\core;
 
 use rock\Rock;
 use rock\sanitize\Sanitize;
