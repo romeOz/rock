@@ -7,7 +7,6 @@ use rock\core\Controller;
 use rock\filters\AccessFilter;
 
 /**
- * @group base
  * @group filters
  */
 class AccessFilterTest extends \PHPUnit_Framework_TestCase

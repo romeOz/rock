@@ -8,7 +8,6 @@ use rock\response\Response;
 use rock\Rock;
 
 /**
- * @group base
  * @group filters
  */
 class ContentNegotiatorFilterTest extends \PHPUnit_Framework_TestCase

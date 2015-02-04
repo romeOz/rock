@@ -10,7 +10,6 @@ use rock\events\Event;
 use rock\filters\AccessFilter;
 
 /**
- * @group base
  * @group filters
  */
 class EventTest extends \PHPUnit_Framework_TestCase

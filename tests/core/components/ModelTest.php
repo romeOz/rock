@@ -4,10 +4,9 @@ namespace rockunit\core\components;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\components\Model;
-use rock\i18n\i18n;
 
 /**
- * @group base
+ * @group components
  */
 class ModelTest extends \PHPUnit_Framework_TestCase
 {
@@ -429,7 +428,7 @@ class FooModal extends Model
 
     public function attributeLabels()
     {
-        return ['email' => i18n::t('email'), 'username' => i18n::t('username')];
+        return ['email' => 'e-mail', 'username' => 'username'];
     }
 
 
@@ -448,7 +447,8 @@ class FooModal extends Model
             if (($label = $this->attributeLabels()) && isset($label[$attributeName])) {
                 $placeholders['name'] = $label[$attributeName];
             }
-            $this->addError($attributeName, i18n::t('call', $placeholders, 'validate'));
+
+            $this->addError($attributeName, "{$placeholders['name']} must be valid");
             return false;
         }
         return true;

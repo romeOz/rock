@@ -7,7 +7,6 @@ use rock\filters\VerbFilter;
 use rock\request\Request;
 
 /**
- * @group base
  * @group filters
  */
 class VerbFilterTest extends \PHPUnit_Framework_TestCase

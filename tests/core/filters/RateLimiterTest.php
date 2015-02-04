@@ -7,7 +7,6 @@ use rock\filters\RateLimiter;
 use rock\Rock;
 
 /**
- * @group base
  * @group filters
  */
 class RateLimiterTest extends \PHPUnit_Framework_TestCase
