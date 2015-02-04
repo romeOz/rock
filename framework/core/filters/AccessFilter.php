@@ -53,32 +53,6 @@ class AccessFilter extends ActionFilter
 {
     public $rules = [];
 
-    /**
-     * Call function, when access success.
-     *
-     * ```php
-     * [[new Object, 'method'], $args]
-     * [['Object', 'staticMethod'], $args]
-     * [callback, $args]
-     * ```
-     *
-     * @var array
-     */
-    public $success;
-
-    /**
-     * Call function, when access fail.
-     *
-     * ```php
-     * [[new Object, 'method'], $args]
-     * [['Object', 'staticMethod'], $args]
-     * [callback, $args]
-     * ```
-     *
-     * @var array
-     */
-    public $fail;
-
     public function events()
     {
         $events = [];

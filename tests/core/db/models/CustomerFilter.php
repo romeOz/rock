@@ -4,6 +4,7 @@ namespace rockunit\core\db\models;
 
 use rock\access\Access;
 use rock\filters\AccessFilter;
+use rock\filters\VerbFilter;
 
 class CustomerFilter extends Customer
 {
@@ -11,20 +12,19 @@ class CustomerFilter extends Customer
     {
         return [
             [
-                'class' => AccessFilter::className(),
-                'rules' =>
+                'class' => VerbFilter::className(),
+                'actions' =>
                     [
-                        'allow' => true,
-                        'verbs' => ['POST'],
+                        '*' => ['POST']
                     ],
                 'success' => [
-                    function (Access $access) {
-                        echo $access->owner instanceof CustomerFilter . 'success';
+                    function (VerbFilter $verb) {
+                        echo $verb->owner instanceof CustomerFilter . 'success';
                     }
                 ],
                 'fail' => [
-                    function (Access $access) {
-                        echo $access->owner instanceof CustomerFilter . 'fail';
+                    function (VerbFilter $verb) {
+                        echo $verb->owner instanceof CustomerFilter . 'fail';
                     }
                 ]
             ],
