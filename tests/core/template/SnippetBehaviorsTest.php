@@ -72,12 +72,12 @@ class SnippetAccessFalse extends Snippet
                         'ips'   => ['127.0.0.1'],
                     ],
                 'success' => [
-                    function (Access $access) {
+                    function (AccessFilter $access) {
                         echo $access->owner instanceof self, $access->data['var'];
                     }, ['var' => 'success_1']
                 ],
                 'fail' => [
-                    function (Access $access) {
+                    function (AccessFilter $access) {
                         echo $access->owner instanceof self, $access->data['var'];
                     }, ['var' => 'fail_1']
                 ],
@@ -90,12 +90,12 @@ class SnippetAccessFalse extends Snippet
                         'ips' => ['127.0.0.5'],
                     ],
                 'success' => [
-                    function (Access $access) {
+                    function (AccessFilter $access) {
                         echo $access->owner instanceof self, $access->data['var'];
                     }, ['var' => 'success_2']
                 ],
                 'fail' => [
-                    function (Access $access) {
+                    function (AccessFilter $access) {
                         echo $access->owner instanceof self, $access->data['var'];
                     }, ['var' => 'fail_2']
                 ],
@@ -125,10 +125,10 @@ class SnippetAccessTrue extends Snippet
                     ],
 
 
-                'success' => [function(Access $access){
+                'success' => [function(AccessFilter $access){
                     echo $access->owner instanceof self, $access->data['var'];
                 }, ['var' => 'success_1']],
-                'fail' => [function(Access $access){
+                'fail' => [function(AccessFilter $access){
                     echo $access->owner instanceof self, $access->data['var'];
                 }, ['var' => 'fail']],
             ],
@@ -141,10 +141,10 @@ class SnippetAccessTrue extends Snippet
                     ],
 
 
-                'success' => [function(Access $access){
+                'success' => [function(AccessFilter $access){
                     echo $access->owner instanceof self, $access->data['var'];
                 }, ['var' => 'success_2']],
-                'fail' => [function(Access $access){
+                'fail' => [function(AccessFilter $access){
                     echo $access->owner instanceof self, $access->data['var'];
                 }, ['var' => 'fail']],
             ],

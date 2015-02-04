@@ -2,7 +2,6 @@
 
 namespace rockunit\core\filters\verbs\AccessFilter;
 
-use rock\access\Access;
 use rock\core\Controller;
 use rock\filters\AccessFilter;
 
@@ -64,8 +63,8 @@ class FooController extends Controller
                         'ips' => ['127.0.0.5'],
                         'roles' => ['editor']
                     ],
-                'fail' =>  [function(Access $access){
-                    echo $access->isErrorRoles().$access->isErrorIps().$access->isErrorCustom().$access->isErrorVerbs();
+                'fail' =>  [function(AccessFilter $access){
+                    echo $access->access->isErrorRoles().$access->access->isErrorIps().$access->access->isErrorCustom().$access->access->isErrorVerbs();
                 }],
             ],
         ];
@@ -106,11 +105,11 @@ class BarController extends Controller
                         'ips' => ['127.0.0.3'],
                         'roles' => ['editor']
                     ],
-                'fail' =>  function(Access $access){
-                    echo $access->isErrorRoles().$access->isErrorIps().$access->isErrorCustom().$access->isErrorVerbs();
+                'fail' =>  function(AccessFilter $access){
+                    echo $access->access->isErrorRoles().$access->access->isErrorIps().$access->access->isErrorCustom().$access->access->isErrorVerbs();
                 },
-                'success' =>  function(Access $access){
-                    echo 'success' . $access->getErrors();
+                'success' =>  function(AccessFilter $access){
+                    echo 'success' . $access->access->getErrors();
                 },
             ],
         ];
@@ -149,11 +148,11 @@ class BazController extends Controller
                         'ips' => ['127.0.0.3'],
                         'roles' => ['editor']
                     ],
-                'fail' =>  function(Access $access){
-                    echo $access->isErrorRoles().$access->isErrorIps().$access->isErrorCustom().$access->isErrorVerbs();
+                'fail' =>  function(AccessFilter $access){
+                    echo $access->access->isErrorRoles().$access->access->isErrorIps().$access->access->isErrorCustom().$access->access->isErrorVerbs();
                 },
-                'success' =>  function(Access $access){
-                    echo 'success' . $access->getErrors();
+                'success' =>  function(AccessFilter $access){
+                    echo 'success' . $access->access->getErrors();
                 },
             ],
         ];

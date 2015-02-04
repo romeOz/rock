@@ -140,11 +140,11 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
                             'allow' => true,
                             'ips' => ['10.2.3']
                         ],
-                        'success' => function (Access $access) {
+                        'success' => function (AccessFilter $access) {
                             echo 'success_behavior';
                         },
-                        'fail' => function (Access $access) {
-                            echo $access->getErrors();
+                        'fail' => function (AccessFilter $access) {
+                            echo $access->access->getErrors();
                         }
                     ]
                 ],
@@ -285,13 +285,13 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
                                 'ips' => ['10.2.3']
                             ],
                         'success' => [
-                            function (Access $access) {
-                                echo 'success_behavior' . $access->getErrors();
+                            function (AccessFilter $access) {
+                                echo 'success_behavior' . $access->access->getErrors();
                             }
                         ],
                         'fail' => [
-                            function (Access $access) {
-                                echo 'fail_behavior' . $access->getErrors();
+                            function (AccessFilter $access) {
+                                echo 'fail_behavior' . $access->access->getErrors();
                             }
                         ],
                     ]

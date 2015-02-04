@@ -72,11 +72,11 @@ class EventTest extends \PHPUnit_Framework_TestCase
                 'allow' => true,
                 'verbs' => ['127.0.0.5'],
             ],
-            'success' => function (Access $access) {
+            'success' => function (AccessFilter $access) {
                 $this->assertTrue($access->owner instanceof FooController);
                 echo 'success';
             },
-            'fail' => function (Access $access) {
+            'fail' => function (AccessFilter $access) {
                 $this->assertTrue($access->owner instanceof FooController);
                 echo 'fail';
             }

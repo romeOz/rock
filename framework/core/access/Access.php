@@ -26,36 +26,11 @@ class Access implements ErrorsInterface, ObjectInterface
      * @var object
      */
     public $owner;
-    public $data;
     /**
      * Sending response headers. `true` by default.
      * @var bool
      */
     public $sendHeaders = true;
-    /**
-     * ```php
-     * [[new Object, 'method'], $args]
-     * [['Object', 'staticMethod'], $args]
-     * [callback, $args]
-     * ```
-     *
-     * function(array params, Access $access){}
-     *
-     * @var array
-     */
-    public $success;
-    /**
-     * ```php
-     * [[new Object, 'method'], $args]
-     * [['Object', 'staticMethod'], $args]
-     * [callback, $args]
-     * ```
-     *
-     * function(array params, Access $access){}
-     *
-     * @var array
-     */
-    public $fail;
     /**
      * @var int
      */
@@ -87,8 +62,6 @@ class Access implements ErrorsInterface, ObjectInterface
         if ($valid = $this->provide()) {
             $this->errors = 0;
         }
-        $this->callback($valid === false ? $this->fail : $this->success);
-
         return $valid;
     }
 
@@ -258,21 +231,5 @@ class Access implements ErrorsInterface, ObjectInterface
             $this->_response->status403();
         }
         return $result;
-    }
-
-    protected function callback($handler)
-    {
-        if (!isset($handler)) {
-            return;
-        }
-
-        if ($handler instanceof \Closure) {
-            $handler = [$handler];
-        }
-        $handler[1] = Helper::getValue($handler[1], [], true);
-        list($function, $data) = $handler;
-        $access = clone $this;
-        $access->data = $data;
-        call_user_func($function, $access);
     }
 }

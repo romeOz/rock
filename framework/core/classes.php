@@ -327,9 +327,6 @@ return array_merge(
         'behavior' => [
             'class' => \rock\components\Behavior::className(),
         ],
-        \rock\filters\AccessFilter::className() => [
-            'class' => \rock\filters\AccessFilter::className(),
-        ],
         'rbac' =>[
             'class' => \rock\rbac\DBManager::className(),
         ],

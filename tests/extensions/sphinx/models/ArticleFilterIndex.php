@@ -20,12 +20,12 @@ class ArticleFilterIndex extends ArticleIndex
                         'ips' => ['127.0.0.2'],
                     ],
                 'success' =>
-                    function (Access $access) {
+                    function (AccessFilter $access) {
                         echo $access->owner instanceof ArticleFilterIndex . 'success';
                     }
                 ,
                 'fail' =>
-                    function (Access $access) {
+                    function (AccessFilter $access) {
                         echo $access->owner instanceof ArticleFilterIndex . 'fail';
                     }
 

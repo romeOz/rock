@@ -51,6 +51,8 @@ use rock\template\Snippet;
  */
 class AccessFilter extends ActionFilter
 {
+    /** @var  Access */
+    public $access;
     public $rules = [];
 
     public function events()
@@ -83,16 +85,14 @@ class AccessFilter extends ActionFilter
     public function beforeAction($action)
     {
         /** @var Access $access */
-        $access = Container::load([
+        $this->access = Container::load([
             'class' => Access::className(),
             'owner' => $this->owner,
             'rules' => $this->rules,
-            'success' => $this->success,
-            'fail' => $this->fail
         ]);
-        if (!$access->checkAccess()) {
+        if (!$this->access->checkAccess()) {
             if ($this->event instanceof RouteEvent) {
-                $this->event->errors |= $access->errors;
+                $this->event->errors |= $this->access->errors;
             }
             return false;
         }
