@@ -61,21 +61,26 @@ class RateLimiter extends ActionFilter
      */
     public $dependency = true;
 
-    public function events()
-    {
-        return [
-            Controller::EVENT_BEFORE_ACTION => 'beforeFilter',
-            Controller::EVENT_AFTER_ACTION => 'afterFilter',
-            Snippet::EVENT_BEFORE_SNIPPET => 'beforeFilter',
-            Snippet::EVENT_AFTER_SNIPPET => 'afterFilter',
-        ];
-    }
-
     public function init()
     {
         if ($this->dependency instanceof \Closure) {
             $this->dependency = (bool)call_user_func($this->dependency, $this);
         }
+    }
+
+    public function events()
+    {
+        $events = [];
+        if (class_exists('\rock\core\Controller')) {
+            $events[Controller::EVENT_BEFORE_ACTION] = 'beforeFilter';
+            $events[Controller::EVENT_AFTER_ACTION] = 'afterFilter';
+        }
+        if (class_exists('\rock\template\Snippet')) {
+            $events[Snippet::EVENT_BEFORE_SNIPPET] = 'beforeFilter';
+            $events[Snippet::EVENT_AFTER_SNIPPET] = 'afterFilter';
+        }
+
+        return $events;
     }
 
     /**

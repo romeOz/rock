@@ -27,10 +27,13 @@ class ActionFilter extends Behavior
 
     public function events()
     {
-        return [
-            Controller::EVENT_BEFORE_ACTION => 'beforeFilter',
-            Controller::EVENT_AFTER_ACTION => 'afterFilter'
-        ];
+        if (class_exists('\rock\core\Controller')) {
+            return [
+                Controller::EVENT_BEFORE_ACTION => 'beforeFilter',
+                Controller::EVENT_AFTER_ACTION => 'afterFilter'
+            ];
+        }
+        return [];
     }
 
     /**
