@@ -15,7 +15,7 @@ class CustomerFilter extends Customer
                 'rules' =>
                     [
                         'allow' => true,
-                        'ips' => ['127.0.0.5'],
+                        'verbs' => ['POST'],
                     ],
                 'success' => [
                     function (Access $access) {

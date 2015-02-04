@@ -129,6 +129,9 @@ class Access implements ErrorsInterface, ObjectInterface
         if (isset($rule['ips'])) {
             $result[] = $this->initError($this->matchIps((array)$rule['ips']), self::E_IPS, $rule['allow']);
         }
+        if (isset($rule['verbs'])) {
+            $result[] = $this->initError($this->matchVerbs((array)$rule['verbs']), self::E_VERBS, $rule['allow']);
+        }
         if (isset($rule['roles'])) {
             $result[] = $this->initError($this->matchRole((array)$rule['roles']), self::E_ROLES, $rule['allow']);
         }
@@ -206,6 +209,30 @@ class Access implements ErrorsInterface, ObjectInterface
             $this->_response->status403();
         }
         return $result;
+    }
+
+    /**
+     * Match methods by request
+     *
+     * @param array $verbs array data of access
+     * @return bool
+     */
+    protected function matchVerbs(array $verbs)
+    {
+        // all methods by request
+        if (in_array('*', $verbs)) {
+            return true;
+        }
+
+        if ($this->_request->isMethods($verbs)) {
+            return true;
+        }
+        if ($this->sendHeaders) {
+            // http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.7
+            $this->_response->getHeaders()->set('Allow', implode(', ', $verbs));
+            $this->_response->setStatusCode(405);
+        }
+        return false;
     }
 
     /**

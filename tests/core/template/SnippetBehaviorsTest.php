@@ -8,7 +8,6 @@ use rock\filters\AccessFilter;
 use rock\template\Snippet;
 use rock\template\Template;
 
-$_SERVER['REMOTE_ADDR'] = '127.0.0.1';
 /**
  * @group base
  */
