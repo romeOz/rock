@@ -14,6 +14,18 @@ use rock\route\Route;
  */
 class RouteConfigTest extends \PHPUnit_Framework_TestCase
 {
+    public static function setUpBeforeClass()
+    {
+        parent::setUpBeforeClass();
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+    }
+
+    public static function tearDownAfterClass()
+    {
+        parent::tearDownAfterClass();
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+    }
+
     /**
      * @dataProvider providerSuccess
      */

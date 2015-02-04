@@ -2,7 +2,6 @@
 
 namespace rockunit\core\template\behaviors;
 
-use rock\access\Access;
 use rock\events\Event;
 use rock\filters\AccessFilter;
 use rock\template\Snippet;

@@ -28,6 +28,7 @@ class ActiveRecordTest extends SphinxTestCase
         parent::setUpBeforeClass();
         static::getCache()->flush();
         static::clearRuntime();
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
     }
 
 
@@ -37,6 +38,7 @@ class ActiveRecordTest extends SphinxTestCase
         static::getCache()->flush();
         static::disableCache();
         static::clearRuntime();
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
     }
 
     protected function setUp()
