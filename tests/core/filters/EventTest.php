@@ -4,7 +4,7 @@ namespace rockunit\core\filters\EventTest;
 
 
 use rock\access\Access;
-use rock\components\ActionEvent;
+use rock\core\ActionEvent;
 use rock\core\Controller;
 use rock\events\Event;
 use rock\filters\AccessFilter;

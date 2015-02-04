@@ -2,7 +2,6 @@
 namespace rock\core;
 
 use rock\base\Alias;
-use rock\components\ActionEvent;
 use rock\components\ComponentsInterface;
 use rock\components\ComponentsTrait;
 use rock\di\Container;
@@ -23,7 +22,7 @@ abstract class Controller implements ComponentsInterface
 
     /**
      * @event ActionEvent an event raised right before executing a controller action.
-     * You may set {@see \rock\components\ActionEvent::$isValid} to be false to cancel the action execution.
+     * You may set {@see \rock\core\ActionEvent::$isValid} to be false to cancel the action execution.
      */
     const EVENT_BEFORE_ACTION = 'beforeAction';
     /**

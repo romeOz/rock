@@ -60,7 +60,7 @@ class ActionFilter extends Behavior
 //    }
 
     /**
-     * @param \rock\components\ActionEvent $event
+     * @param \rock\core\ActionEvent $event
      */
     public function beforeFilter($event)
     {
@@ -79,7 +79,7 @@ class ActionFilter extends Behavior
     }
 
     /**
-     * @param \rock\event\\rock\components\ActionEvent $event
+     * @param \rock\event\\rock\core\ActionEvent $event
      */
     public function afterFilter($event)
     {
