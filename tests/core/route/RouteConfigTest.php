@@ -2,9 +2,8 @@
 
 namespace rockunit\core\route;
 
-use rock\access\Access;
 use rock\core\Controller;
-use rock\filters\AccessFilter;
+use rock\route\filters\AccessFilter;
 use rock\helpers\Helper;
 use rock\route\Route;
 
