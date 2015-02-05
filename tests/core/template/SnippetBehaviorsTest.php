@@ -3,12 +3,12 @@
 namespace rockunit\core\template\behaviors;
 
 use rock\events\Event;
-use rock\filters\AccessFilter;
+use rock\snippets\filters\AccessFilter;
 use rock\snippets\Snippet;
 use rock\template\Template;
 
 /**
- * @group base
+ * @group template
  */
 class SnippetBehaviorsTest extends \PHPUnit_Framework_TestCase {
 

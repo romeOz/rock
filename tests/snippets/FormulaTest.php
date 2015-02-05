@@ -2,7 +2,6 @@
 
 namespace rockunit\snippets;
 
-use rock\snippets\Formula;
 use rockunit\core\template\TemplateCommon;
 
 

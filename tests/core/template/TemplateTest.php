@@ -13,7 +13,6 @@ use rockunit\core\template\snippets\NullSnippet;
 use rockunit\core\template\snippets\TestSnippet;
 
 /**
- * @group base
  * @group template
  */
 class TemplateTest extends TemplateCommon

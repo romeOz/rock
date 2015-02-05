@@ -8,8 +8,7 @@ use rock\template\Html;
 use rockunit\core\template\mocks\HtmlMock;
 
 /**
- * @group base
- * @group helpers
+ * @group template
  */
 class HtmlTest extends \PHPUnit_Framework_TestCase
 {

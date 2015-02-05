@@ -5,9 +5,7 @@ namespace rock\filters;
 
 use rock\access\Access;
 use rock\components\ActionFilter;
-use rock\core\Controller;
 use rock\di\Container;
-use rock\snippets\Snippet;
 
 /**
  * Access provides simple access control based on a set of rules.
@@ -51,20 +49,6 @@ class AccessFilter extends ActionFilter
     /** @var  Access */
     public $access;
     public $rules = [];
-
-    public function events()
-    {
-        $events = [];
-        if (class_exists('\rock\core\Controller')) {
-            $events[Controller::EVENT_BEFORE_ACTION] = 'beforeFilter';
-            $events[Controller::EVENT_AFTER_ACTION] = 'afterFilter';
-        }
-        if (class_exists('\rock\snippets\Snippet')) {
-            $events[Snippet::EVENT_BEFORE_SNIPPET] = 'beforeFilter';
-            $events[Snippet::EVENT_AFTER_SNIPPET] = 'afterFilter';
-        }
-        return $events;
-    }
 
     public function beforeAction($action)
     {

@@ -3,11 +3,9 @@
 namespace rock\filters;
 
 use rock\components\ActionFilter;
-use rock\core\Controller;
 use rock\request\Request;
 use rock\response\Response;
 use rock\Rock;
-use rock\snippets\Snippet;
 use rock\user\User;
 
 /**
@@ -66,21 +64,6 @@ class RateLimiter extends ActionFilter
         if ($this->dependency instanceof \Closure) {
             $this->dependency = (bool)call_user_func($this->dependency, $this);
         }
-    }
-
-    public function events()
-    {
-        $events = [];
-        if (class_exists('\rock\core\Controller')) {
-            $events[Controller::EVENT_BEFORE_ACTION] = 'beforeFilter';
-            $events[Controller::EVENT_AFTER_ACTION] = 'afterFilter';
-        }
-        if (class_exists('\rock\snippets\Snippet')) {
-            $events[Snippet::EVENT_BEFORE_SNIPPET] = 'beforeFilter';
-            $events[Snippet::EVENT_AFTER_SNIPPET] = 'afterFilter';
-        }
-
-        return $events;
     }
 
     /**
