@@ -1,7 +1,6 @@
 <?php
 namespace rock\filters;
 
-use rock\components\ActionFilter;
 use rock\request\Request;
 use rock\response\Response;
 use rock\Rock;

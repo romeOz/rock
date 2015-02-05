@@ -4,7 +4,6 @@ namespace rock\filters;
 
 
 use rock\access\Access;
-use rock\components\ActionFilter;
 use rock\di\Container;
 
 /**

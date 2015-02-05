@@ -2,7 +2,6 @@
 
 namespace rock\filters;
 
-use rock\components\ActionFilter;
 use rock\Rock;
 
 /**
