@@ -4,7 +4,7 @@ namespace rockunit\core\template\behaviors;
 
 use rock\events\Event;
 use rock\filters\AccessFilter;
-use rock\template\Snippet;
+use rock\snippets\Snippet;
 use rock\template\Template;
 
 /**

@@ -4,7 +4,6 @@ namespace rock\snippets;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\Json;
-use rock\template\Snippet;
 
 /**
  * Snippet "ListView".

@@ -1,8 +1,6 @@
 <?php
 namespace rock\snippets;
 
-use rock\template\Snippet;
-
 /**
  * Snippet "ForSnippet"
  *

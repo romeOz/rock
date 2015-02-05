@@ -5,7 +5,6 @@ use rock\di\Container;
 use rock\execute\Execute;
 use rock\helpers\Helper;
 use rock\helpers\StringHelper;
-use rock\template\Snippet;
 
 /**
  * Snippet "IfSnippet"

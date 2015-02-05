@@ -6,7 +6,7 @@ namespace rock\authclient\snippets;
 use rock\authclient\Collection;
 use rock\di\Container;
 use rock\helpers\Json;
-use rock\template\Snippet;
+use rock\snippets\Snippet;
 
 class AuthClient extends Snippet
 {

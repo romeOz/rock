@@ -3,7 +3,6 @@ namespace rock\snippets;
 
 use rock\date\DateTime;
 use rock\date\DateTimeInterface;
-use rock\template\Snippet;
 
 /**
  * Snippet "DateView"

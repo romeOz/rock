@@ -1,6 +1,6 @@
 <?php
 
-namespace rock\template;
+namespace rock\snippets;
 
 
 use rock\events\Event;

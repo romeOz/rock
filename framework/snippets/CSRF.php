@@ -1,7 +1,6 @@
 <?php
 namespace rock\snippets;
 use rock\di\Container;
-use rock\template\Snippet;
 
 class CSRF extends Snippet
 {

@@ -5,7 +5,6 @@ use rock\di\Container;
 use rock\helpers\Helper;
 use rock\helpers\StringHelper;
 use rock\Rock;
-use rock\template\Snippet;
 use rock\url\Url;
 
 /**

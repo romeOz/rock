@@ -4,12 +4,8 @@ namespace rock\route\filters;
 
 
 use rock\access\Access;
-use rock\components\ActionFilter;
-use rock\core\Controller;
 use rock\di\Container;
-use rock\route\Route;
 use rock\route\RouteEvent;
-use rock\template\Snippet;
 
 /**
  * Access provides simple access control based on a set of rules.

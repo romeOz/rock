@@ -7,7 +7,6 @@ use rock\base\Alias;
 use rock\captcha\Captcha;
 use rock\di\Container;
 use rock\helpers\FileHelper;
-use rock\template\Snippet;
 
 /**
  * @see Captcha

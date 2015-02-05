@@ -5,7 +5,6 @@ use rock\di\Container;
 use rock\image\ImageProvider;
 use rock\image\ThumbInterface;
 use rock\template\Html;
-use rock\template\Snippet;
 
 /**
  * Snippet "Thumb" 

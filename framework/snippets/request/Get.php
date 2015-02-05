@@ -2,7 +2,7 @@
 namespace rock\snippets\request;
 use rock\request\Request;
 use rock\sanitize\Sanitize;
-use rock\template\Snippet;
+use rock\snippets\Snippet;
 
 /**
  * Snippet "Get request"

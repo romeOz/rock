@@ -15,6 +15,7 @@ use rock\helpers\NumericHelper;
 use rock\helpers\Serialize;
 use rock\helpers\StringHelper;
 use rock\i18n\i18n;
+use rock\snippets\Snippet;
 use rock\template\filters\ConditionFilter;
 
 class Template implements EventsInterface
@@ -1351,7 +1352,7 @@ class Template implements EventsInterface
     /**
      * Get data from snippet.
      *
-     * @param string|\rock\template\Snippet $snippet name of
+     * @param string|\rock\snippets\Snippet $snippet name of
      *                                           snippet/instance @see \rock\base\Snippet
      * @param array                     $params  params
      * @param bool                      $autoEscape
@@ -1380,7 +1381,7 @@ class Template implements EventsInterface
             }
             $config = array_merge($this->snippets[$snippet], $params);
 
-            /** @var \rock\template\Snippet $snippet */
+            /** @var \rock\snippets\Snippet $snippet */
             if (class_exists('\rock\di\Container')){
                 $snippet = Container::load($config);
             } else {
