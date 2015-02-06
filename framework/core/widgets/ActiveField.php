@@ -8,7 +8,6 @@ use rock\base\ObjectTrait;
 use rock\cache\CacheInterface;
 use rock\components\Model;
 use rock\di\Container;
-use rock\filters\RateLimiter;
 use rock\helpers\Json;
 use rock\log\Log;
 use rock\template\Html;
@@ -199,25 +198,9 @@ class ActiveField implements ObjectInterface
      */
     public function render($content = null)
     {
-        if ($this->checkRateLimiter()) {
-            return '';
-        }
         if ($content === null) {
-            if (!isset($this->parts['{input}'])) {
-                $this->inputOptions = $this->calculateClientInputOption($this->inputOptions);
-                $this->parts['{input}'] =
-                    ActiveHtml::activeTextInput($this->model, $this->attribute, $this->inputOptions);
-            }
-            if (!isset($this->parts['{label}'])) {
-                $this->parts['{label}'] = ActiveHtml::activeLabel($this->model, $this->attribute, $this->labelOptions);
-            }
-            if (!isset($this->parts['{error}'])) {
-                $this->parts['{error}'] = $this->renderErrors();
-            }
-            if (!isset($this->parts['{hint}'])) {
-                $this->parts['{hint}'] = '';
-            }
-            $content = strtr($this->template, $this->parts);
+
+            $content = $this->_calculateParts();
         } elseif (!is_string($content)) {
             $content = call_user_func($content, $this);
         }
@@ -225,24 +208,26 @@ class ActiveField implements ObjectInterface
         return $this->begin() . "\n" . $content . "\n" . $this->end();
     }
 
-    protected function checkRateLimiter()
+    private function _calculateParts()
     {
-        if (!empty($this->rateLimiter)) {
-            if (!isset($this->rateLimiter[2])) {
-                $this->rateLimiter[2] = true;
-            }
-            list($limit, $period, $checked) = $this->rateLimiter;
-            $rateLimiter = new RateLimiter(
-                [
-                    'enableRateLimitHeaders' => false,
-                    'dependency' => isset($this->form->submitted) ? $this->form->submitted : true
-                ]);
-            if ($rateLimiter->check($limit, $period, get_class($this->model) . '::' . $this->attribute) === $checked) {
-                return true;
-            }
+        if (isset($this->parts['{input}']) && $this->parts['{input}'] === '') {
+            return '';
         }
-
-        return false;
+        if (!isset($this->parts['{input}'])) {
+            $this->inputOptions = $this->calculateClientInputOption($this->inputOptions);
+            $this->parts['{input}'] =
+                ActiveHtml::activeTextInput($this->model, $this->attribute, $this->inputOptions);
+        }
+        if (!isset($this->parts['{label}'])) {
+            $this->parts['{label}'] = ActiveHtml::activeLabel($this->model, $this->attribute, $this->labelOptions);
+        }
+        if (!isset($this->parts['{error}'])) {
+            $this->parts['{error}'] = $this->renderErrors();
+        }
+        if (!isset($this->parts['{hint}'])) {
+            $this->parts['{hint}'] = '';
+        }
+        return strtr($this->template, $this->parts);
     }
 
     public function calculateClientInputOption($options = [])

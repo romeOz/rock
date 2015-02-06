@@ -4,7 +4,7 @@ namespace rock\snippets\filters;
 
 
 use rock\access\Access;
-use rock\di\Container;
+use rock\helpers\Instance;
 
 class AccessFilter extends SnippetFilter
 {
@@ -19,12 +19,7 @@ class AccessFilter extends SnippetFilter
             'owner' => $this->owner,
             'rules' => $this->rules,
         ];
-        if (class_exists('\rock\di\Container')) {
-            $this->access = Container::load($config);
-        } else {
-            unset($config['class']);
-            $this->access = new Access($config);
-        }
+        $this->access = Instance::ensure($config, '\rock\access\Access');
         if (!$this->access->checkAccess()) {
             return false;
         }

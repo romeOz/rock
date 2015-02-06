@@ -7,11 +7,12 @@ use rock\base\Alias;
 use rock\di\Container;
 use rock\file\UploadedFile;
 use rock\helpers\Helper;
+use rock\helpers\Instance;
 use rock\helpers\Serialize;
 use rock\request\Request;
+use rock\snippets\filters\RateLimiter;
 use rock\snippets\Snippet;
 use rock\template\Html;
-use rock\user\User;
 
 class ActiveForm extends Snippet
 {
@@ -42,8 +43,8 @@ class ActiveForm extends Snippet
      * @inheritdoc
      */
     public $autoEscape = false;
-    /** @var  User */
-    protected $user;
+    /** @var  RateLimiter|string|array */
+    public $rateLimiter;
 
     /**
      * @inheritdoc
@@ -51,8 +52,7 @@ class ActiveForm extends Snippet
     public function init()
     {
         parent::init();
-
-        $this->user = Container::load('user');
+        $this->rateLimiter = Instance::ensure($this->rateLimiter, '\rock\snippets\filters\RateLimiter');
     }
 
     /**
@@ -75,15 +75,10 @@ class ActiveForm extends Snippet
         if ($this->validate === true) {
             $this->prepareAttributes();
             if ($this->model->validate()) {
-                /** remove rate limiter of attributes */
-                foreach ($this->fields as $attributeName => $params) {
-                    if (is_int($attributeName)) {
-                        continue;
-                    }
-                    if (isset($params['options']['rateLimiter'])) {
-                        $this->user->removeAllowance(get_class($this->model) . '::' . $attributeName);
-                    }
-                }
+                // remove rate limiter of attributes
+//                foreach ($this->fields as $attributeName => $params) {
+//                    $this->rateLimiter->removeAllowance(get_class($this->model) . '::' . $attributeName);
+//                }
                 if (isset($this->after)) {
                     foreach ($this->after as $method) {
                         $methodName = $method;

@@ -1,6 +1,6 @@
 <?php
 
-namespace rock\filters;
+namespace rock\snippets\filters;
 
 
 use rock\base\BaseException;

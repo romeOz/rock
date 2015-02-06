@@ -36,8 +36,8 @@ class Captcha extends InputWidget implements CaptchaInterface
      * @see \rock\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
      */
     public $options = ['class' => 'form-control'];
-    /** @var  \rock\captcha\Captcha */
-    protected $captcha;
+    /** @var  \rock\captcha\Captcha|string|array */
+    public $captcha = 'captcha';
 
     /**
      * Initializes the widget.
@@ -45,7 +45,9 @@ class Captcha extends InputWidget implements CaptchaInterface
     public function init()
     {
         parent::init();
-        $this->captcha = Container::load('captcha');
+        if (!is_object($this->captcha)) {
+            $this->captcha = Container::load($this->captcha);
+        }
 
         $this->checkRequirements();
         if (!isset($this->imageOptions['id'])) {

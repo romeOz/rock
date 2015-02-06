@@ -329,51 +329,6 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
     }
 
     /**
-     * Loads the number of allowed requests and the corresponding timestamp from a persistent storage.
-     *
-     * @param string $action name of action e.g. `FooController::actionIndex`
-     * @return array an array of two elements. The first element is the number of allowed requests,
-     * and the second element is the corresponding UNIX timestamp.
-     */
-    public function loadAllowance($action)
-    {
-        if ((!$allowance = $this->storage->get($this->prepareKeys('_allowance'))) || !isset($allowance[$action])) {
-            return [2, time()];
-        }
-
-        return [$allowance[$action]['maxRequests'], $allowance[$action]['timestamp']];
-    }
-
-    /**
-     * Saves the number of allowed requests and the corresponding timestamp to a persistent storage.
-     *
-     * @param string        $action name of action e.g. `FooController::actionIndex`
-     * @param integer $maxRequests the number of allowed requests remaining.
-     * @param integer $timestamp   the current timestamp.
-     */
-    public function saveAllowance($action, $maxRequests, $timestamp)
-    {
-        $this->add(
-            '_allowance',
-            [
-                $action => [
-                    'maxRequests' => $maxRequests,
-                    'timestamp' => $timestamp
-                ]
-            ]
-        );
-    }
-    /**
-     * Saves the number of allowed requests and the corresponding timestamp to a persistent storage.
-     *
-     * @param string $action name of action  e.g. `FooController::actionIndex`
-     */
-    public function removeAllowance($action)
-    {
-        $this->remove("_allowance.{$action}");
-    }
-
-    /**
      * Returns the URL that the browser should be redirected to after successful login.
      *
      * This method reads the return URL from the session. It is usually used by the login action which

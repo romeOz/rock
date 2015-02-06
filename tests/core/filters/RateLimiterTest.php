@@ -32,26 +32,26 @@ class RateLimiterTest extends \PHPUnit_Framework_TestCase
     {
         $controller = new FooController();
         $this->assertSame($controller->method('actionIndex'), 'test');
-        $this->assertSame($_SESSION['user']['_allowance'][$controller::className().'::actionIndex']["maxRequests"], 1);
+        $this->assertSame($_SESSION['_allowance'][$controller::className().'::actionIndex']["maxRequests"], 1);
         $this->assertSame($controller->method('actionIndex'), 'test');
-        $this->assertSame($_SESSION['user']['_allowance'][$controller::className().'::actionIndex']["maxRequests"], 0);
+        $this->assertSame($_SESSION['_allowance'][$controller::className().'::actionIndex']["maxRequests"], 0);
         $this->assertNull($controller->method('actionIndex'));
         sleep(4);
 
         $this->assertSame($controller->method('actionIndex'), 'test');
-        $this->assertSame($_SESSION['user']['_allowance'][$controller::className().'::actionIndex']["maxRequests"], 1);
+        $this->assertSame($_SESSION['_allowance'][$controller::className().'::actionIndex']["maxRequests"], 1);
 
 
         $controller = new BarController();
         $this->assertSame($controller->method('actionIndex'), 'test');
-        $this->assertSame($_SESSION['user']['_allowance'][$controller::className().'::actionIndex']["maxRequests"], 1);
+        $this->assertSame($_SESSION['_allowance'][$controller::className().'::actionIndex']["maxRequests"], 1);
         $this->assertSame($controller->method('actionIndex'), 'test');
-        $this->assertSame($_SESSION['user']['_allowance'][$controller::className().'::actionIndex']["maxRequests"], 0);
+        $this->assertSame($_SESSION['_allowance'][$controller::className().'::actionIndex']["maxRequests"], 0);
         $this->assertNull($controller->method('actionIndex'));
         sleep(4);
 
         $this->assertSame($controller->method('actionIndex'), 'test');
-        $this->assertSame($_SESSION['user']['_allowance'][$controller::className().'::actionIndex']["maxRequests"], 1);
+        $this->assertSame($_SESSION['_allowance'][$controller::className().'::actionIndex']["maxRequests"], 1);
     }
 
     public function testFail()
