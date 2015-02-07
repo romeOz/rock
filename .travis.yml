@@ -37,7 +37,7 @@ install:
   - tests/data/travis/gearman-setup.sh
   - tests/data/travis/rabbitmq-setup.sh
   - tests/data/travis/image-setup.sh
-  - tests/data/travis/cubrid-setup.sh
+  #- tests/data/travis/cubrid-setup.sh
   - framework/rock.sh
 
 before_script:
@@ -50,9 +50,9 @@ script:
   - mkdir -p build/logs
   - |
     if (php --version | grep -i HipHop > /dev/null); then
-      vendor/bin/phpunit --verbose --exclude-group php,mssql,mongodb,couchbase,memcache,memcached,redis,apc,mq
+      vendor/bin/phpunit --verbose --exclude-group php,mssql,mongodb,couchbase,memcache,memcached,redis,apc,mq,cubrid
     else
-      vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml --exclude-group hhvm,mssql
+      vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml --exclude-group hhvm,mssql,cubrid
     fi
 
 after_script:
