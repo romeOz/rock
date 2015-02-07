@@ -601,12 +601,12 @@ class ActiveRecordTest extends DatabaseTestCase
         $this->assertEquals(33.22, $model->numeric_col);
         $this->assertEquals(true, $model->bool_col2);
 
-        if ($this instanceof PostgreSQLActiveRecordTest) {
-            // PostgreSQL has non-standard timestamp representation
-            $this->assertEquals('12:00:00 AM 01/01/2002', $model->time);
-        } else {
+//        if ($this instanceof PostgreSQLActiveRecordTest) {
+//            // PostgreSQL has non-standard timestamp representation
+//            $this->assertEquals('12:00:00 AM 01/01/2002', $model->time);
+//        } else {
             $this->assertEquals('2002-01-01 00:00:00', $model->time);
-        }
+       // }
 
         $model = new Type();
         $model->char_col2 = 'not something';
