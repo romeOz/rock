@@ -1,7 +1,7 @@
 <?php
 use apps\common\rbac\UserRole;
 use League\Flysystem\Adapter\Local;
-use League\Flysystem\Cache\Adapter;
+use League\Flysystem\Cached\Storage\Adapter;
 use rock\base\Alias;
 use rock\db\BatchQueryResult;
 use rock\file\FileManager;
@@ -278,7 +278,7 @@ return array_merge(
             'adapter' => [
                 'class' => FileManager::className(),
                 'adapter' => new Local(Alias::getAlias('@assets/images')),
-                'cache' => $cache = new Adapter(new Local(Alias::getAlias('@common.runtime/filesystem')), 'images.tmp')
+                'cache' => new Adapter(new Local(Alias::getAlias('@common.runtime/filesystem')), 'images.tmp')
             ],
             'adapterCache' => [
                 'class' => FileManager::className(),
