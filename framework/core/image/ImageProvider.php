@@ -98,7 +98,6 @@ class ImageProvider implements ObjectInterface
             call_user_func($this->handler, $path, $this);
             return;
         }
-
         if (!$this->adapterCache->write($path, Image::thumbnail($this->resource, $this->width, $this->height)->get('jpg'))) {
             if (class_exists('\rock\log\Log')) {
                 $message = BaseException::convertExceptionToString(new ImageException(ImageException::NOT_CREATE_FILE, ['path' => $path]));
