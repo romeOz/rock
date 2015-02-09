@@ -106,7 +106,6 @@ trait CommonTestTrait
         return Container::load('cache');
     }
 
-
     protected static function disableCache()
     {
         static::getCache(['class' => CacheStub::className()]);
