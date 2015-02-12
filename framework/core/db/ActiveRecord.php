@@ -155,13 +155,11 @@ class ActiveRecord extends BaseActiveRecord
      * and {@see \rock\db\ActiveRecord::findAll()}.
      *
      * @param mixed $condition please refer to {@see \rock\db\ActiveRecord::findOne()} for the explanation of this parameter
-     * @param boolean $one whether this method is called by {@see \rock\db\ActiveRecord::findOne()}
-     *                     or {@see \rock\db\ActiveRecord::findAll()}
-     * @return static|static[]
+     * @return ActiveQueryInterface
      * @throws DbException if there is no primary key defined
      * @internal
      */
-    protected static function findByCondition($condition, $one)
+    protected static function findByCondition($condition)
     {
         $query = static::find();
 
@@ -179,7 +177,7 @@ class ActiveRecord extends BaseActiveRecord
             }
         }
 
-        return $one ? $query->andWhere($condition)->one() : $query->andWhere($condition)->all();
+        return $query->andWhere($condition);
     }
 
     /**

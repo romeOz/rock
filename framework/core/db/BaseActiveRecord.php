@@ -84,7 +84,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      */
     public static function findOne($condition)
     {
-        return static::findByCondition($condition, true);
+        return static::findByCondition($condition)->one();
     }
 
     /**
@@ -93,7 +93,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      */
     public static function findAll($condition)
     {
-        return static::findByCondition($condition, false);
+        return static::findByCondition($condition)->all();
     }
 
     /**
@@ -101,13 +101,12 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * 
      * This method is internally called by {@see BaseActiveRecord::findOne()} and {@see BaseActiveRecord::findAll()}.
      *
-*@param mixed $condition please refer to {@see BaseActiveRecord::findOne()} for the explanation of this parameter
-     * @param boolean $one whether this method is called by {@see BaseActiveRecord::findOne()} or {@see BaseActiveRecord::findAll()}
-     * @return static|static[]
+     * @param mixed $condition please refer to {@see BaseActiveRecord::findOne()} for the explanation of this parameter
+     * @return ActiveQueryInterface the newly created {@see \rock\db\ActiveQueryInterface} instance.
      * @throws DbException if there is no primary key defined
      * @internal
      */
-    protected static function findByCondition($condition, $one)
+    protected static function findByCondition($condition)
     {
         $query = static::find();
 
@@ -121,7 +120,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
             }
         }
 
-        return $one ? $query->andWhere($condition)->one() : $query->andWhere($condition)->all();
+        return $query->andWhere($condition);
     }
 
     /**
@@ -1128,7 +1127,7 @@ abstract class BaseActiveRecord extends Model implements ActiveRecordInterface
      * A relation is defined by a getter method which returns an {@see \rock\db\ActiveQueryInterface} object.
      * It can be declared in either the Active Record class itself or one of its behaviors.
      *
-*@param string $name the relation name
+     * @param string $name the relation name
      * @param boolean $throwException whether to throw exception if the relation does not exist.
      * @throws DbException if the named relation does not exist.
      * @return ActiveQueryInterface|ActiveQuery the relational query object. If the relation does not exist
