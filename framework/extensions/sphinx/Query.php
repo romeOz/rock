@@ -290,7 +290,7 @@ class Query extends \rock\db\Query
      */
     protected function fillUpSnippets($rows)
     {
-        if ($this->snippetCallback === null) {
+        if ($this->snippetCallback === null || empty($rows)) {
             return $rows;
         }
         $snippetSources = call_user_func($this->snippetCallback, $rows);
