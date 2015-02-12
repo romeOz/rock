@@ -523,7 +523,7 @@ class Captcha implements ObjectInterface, CaptchaInterface
      * @param string|null $name
      * @return bool
      */
-    public function hasSession($name = null)
+    public function existsSession($name = null)
     {
         return $this->session->hasFlash(Helper::getValue($name, $this->sessionName));
     }
