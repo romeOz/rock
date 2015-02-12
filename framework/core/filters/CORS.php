@@ -142,10 +142,8 @@ class CORS extends ActionFilter
     {
         $responseHeaders = [];
         // handle Origin
-        if (isset($requestHeaders['Origin'])) {
-            if ((in_array('*', $this->cors['Origin']) === true)
-                || (in_array($requestHeaders['Origin'], $this->cors['Origin']))
-            ) {
+        if (isset($requestHeaders['Origin'], $this->cors['Origin'])) {
+            if (in_array('*', $this->cors['Origin']) || in_array($requestHeaders['Origin'], $this->cors['Origin'])) {
                 $responseHeaders['Access-Control-Allow-Origin'] = $requestHeaders['Origin'];
             }
         }
@@ -164,7 +162,7 @@ class CORS extends ActionFilter
         if (isset($this->cors['Access-Control-Expose-Headers'])) {
              $responseHeaders['Access-Control-Expose-Headers'] = implode(', ', $this->cors['Access-Control-Expose-Headers']);
         }
-        
+
         return $responseHeaders;
     }
 
@@ -178,15 +176,17 @@ class CORS extends ActionFilter
     {
         $requestHeaderField = 'Access-Control-Request-' . $type;
         $responseHeaderField = 'Access-Control-Allow-' . $type;
-        if (isset($requestHeaders[$requestHeaderField])) {
-            if (in_array('*', $this->cors[$requestHeaderField])) {
-                $responseHeaders[$responseHeaderField] = $this->headerize($requestHeaders[$requestHeaderField]);
-            } else {
-                $requestedData = preg_split("/[\s,]+/", $requestHeaders[$requestHeaderField], -1, PREG_SPLIT_NO_EMPTY);
-                $acceptedData = array_uintersect($requestedData, $this->cors[$requestHeaderField], 'strcasecmp');
-                if (empty($acceptedData) === false) {
-                    $responseHeaders[$responseHeaderField] = implode(', ', $acceptedData);
-                }
+
+        if (!isset($requestHeaders[$requestHeaderField], $this->cors[$requestHeaderField])) {
+            return;
+        }
+        if (in_array('*', $this->cors[$requestHeaderField])) {
+            $responseHeaders[$responseHeaderField] = $this->headerize($requestHeaders[$requestHeaderField]);
+        } else {
+            $requestedData = preg_split("/[\\s,]+/", $requestHeaders[$requestHeaderField], -1, PREG_SPLIT_NO_EMPTY);
+            $acceptedData = array_uintersect($requestedData, $this->cors[$requestHeaderField], 'strcasecmp');
+            if (!empty($acceptedData)) {
+                $responseHeaders[$responseHeaderField] = implode(', ', $acceptedData);
             }
         }
     }
