@@ -33,19 +33,20 @@ use rock\Rock;
  * {
  *     return [
  *         'corsFilter' => [
- *             'class' => CORS::className(),
- *             'cors' => [
- *                 // restrict access to
- *                 'Origin' => ['http://www.site.com', 'https://www.site.com'],
- *                 'Access-Control-Request-Method' => ['POST', 'PUT'],
- *                 // Allow only POST and PUT methods
- *                 'Access-Control-Request-Headers' => ['X-Wsse'],
- *                 // Allow only headers 'X-Wsse'
- *                 'Access-Control-Allow-Credentials' => true,
- *                 // Allow OPTIONS caching
- *                 'Access-Control-Max-Age' => 3600,
- *             ],
- *
+ *              'class' => CORS::className(),
+ *              'cors' => [
+ *                  // restrict access to
+ *                  'Origin' => ['http://www.site.com', 'https://www.site.com'],
+ *                  'Access-Control-Request-Method' => ['POST', 'PUT'],
+ *                  // Allow only POST and PUT methods
+ *                  'Access-Control-Request-Headers' => ['X-Wsse'],
+ *                  // Allow only headers 'X-Wsse'
+ *                  'Access-Control-Allow-Credentials' => true,
+ *                  // Allow OPTIONS caching
+ *                  'Access-Control-Max-Age' => 3600,
+ *                  // Allow the X-Pagination-Current-Page header to be exposed to the browser.
+ *                  'Access-Control-Expose-Headers' => ['X-Pagination-Current-Page'],
+ *              ],
  *         ],
  *     ];
  * }
@@ -74,6 +75,7 @@ class CORS extends ActionFilter
         'Access-Control-Request-Headers' => ['*'],
         'Access-Control-Allow-Credentials' => null,
         'Access-Control-Max-Age' => 86400,
+        'Access-Control-Expose-Headers' => [],
     ];
 
 
@@ -153,15 +155,16 @@ class CORS extends ActionFilter
         if (isset($requestHeaders['Access-Control-Request-Method'])) {
             $responseHeaders['Access-Control-Allow-Methods'] = implode(', ', $this->cors['Access-Control-Request-Method']);
         }
-
         if (isset($this->cors['Access-Control-Allow-Credentials'])) {
             $responseHeaders['Access-Control-Allow-Credentials'] = $this->cors['Access-Control-Allow-Credentials'] ? 'true' : 'false';
         }
-
         if (isset($this->cors['Access-Control-Max-Age']) && $request->isOptions()) {
             $responseHeaders['Access-Control-Max-Age'] = $this->cors['Access-Control-Max-Age'];
         }
-
+        if (isset($this->cors['Access-Control-Expose-Headers'])) {
+             $responseHeaders['Access-Control-Expose-Headers'] = implode(', ', $this->cors['Access-Control-Expose-Headers']);
+        }
+        
         return $responseHeaders;
     }
 
