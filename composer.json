@@ -31,6 +31,9 @@
         {
             "type": "vcs",
             "url": "https://github.com/romeOz/rock-execute"
+        },        {
+            "type": "vcs",
+            "url": "https://github.com/romeOz/rock-access"
         },
         {
             "type": "vcs",
@@ -53,6 +56,7 @@
         "romeoz/rock-file" : "*@dev",
         "romeoz/rock-cache" : "*@dev",
         "romeoz/rock-execute" : "*@dev",
+        "romeoz/rock-access" : "*@dev",
         "filp/whoops": "*",
         "phpmailer/phpmailer"   : "*",
         "imagine/imagine": "*",
