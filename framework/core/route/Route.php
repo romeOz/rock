@@ -3,6 +3,8 @@
 namespace rock\route;
 
 
+use rock\access\ErrorsInterface;
+use rock\access\ErrorsTrait;
 use rock\base\Alias;
 use rock\components\ComponentsInterface;
 use rock\components\ComponentsTrait;

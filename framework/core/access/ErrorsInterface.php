@@ -1,6 +1,6 @@
 <?php
 
-namespace rock\route;
+namespace rock\access;
 
 
 interface ErrorsInterface 
