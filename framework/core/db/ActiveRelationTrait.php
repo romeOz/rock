@@ -134,7 +134,7 @@ trait ActiveRelationTrait
      * Finds the related records for the specified primary record.
      * This method is invoked when a relation of an ActiveRecord is being accessed in a lazy fashion.
      *
-*@param string $name the relation name
+     * @param string $name the relation name
      * @param ActiveRecordInterface|BaseActiveRecord $model the primary model
      * @return mixed the related record(s)
      * @throws DbException if the relation is invalid
@@ -180,7 +180,7 @@ trait ActiveRelationTrait
     /**
      * Finds the related records and populates them into the primary models.
      *
-*@param string $name the relation name
+     * @param string $name the relation name
      * @param array $primaryModels primary models
      * @return array the related models
      * @throws DbException if {@see \rock\db\ActiveRelationTrait::$link} is invalid
