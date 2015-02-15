@@ -4,8 +4,8 @@ namespace rockunit\core\forms;
 
 use rock\csrf\CSRF;
 use rock\di\Container;
-use rock\i18n\i18n;
 use rock\Rock;
+use rock\template\Template;
 use rockunit\common\CommonTestTrait;
 use rockunit\core\db\DatabaseTestCase;
 use rockunit\core\db\models\ActiveRecord;
@@ -40,9 +40,6 @@ class RecoveryFormTest extends DatabaseTestCase
         ActiveRecord::$connection = $this->getConnection();
         static::sessionUp();
         static::activeSession();
-        $template = Rock::$app->template;
-        $template->removeAllPlaceholders();
-        $template->removeAllPlaceholders(true);
     }
 
     public function tearDown()
@@ -94,11 +91,11 @@ class RecoveryFormTest extends DatabaseTestCase
                 [
                     'email' => '',
                     Rock::$app->csrf->csrfParam => function () {
-                        return Rock::$app->csrf->get(/*(new RecoveryForm())->formName()*/);
+                        return Rock::$app->csrf->get();
                     },
                     'captcha' => ''
                 ],
-                array(
+                [
                     'email' =>
                         [
                            'e-mail must not be empty',
@@ -107,7 +104,7 @@ class RecoveryFormTest extends DatabaseTestCase
                         [
                             'captcha must not be empty',
                         ],
-                )
+                ]
             ],
             [
                 [
@@ -117,12 +114,12 @@ class RecoveryFormTest extends DatabaseTestCase
                     },
                     'captcha' => '12345'
                 ],
-                array(
+                [
                     'e_recovery' =>
                         [
                             'CSRF-token must not be empty',
                         ],
-                )
+                ]
             ],
         ];
     }
@@ -140,20 +137,21 @@ class RecoveryFormTest extends DatabaseTestCase
             'captcha' => '12345'
         ];
         static::getSession()->setFlash('captcha', '12345');
+        $template = new Template();
         $model = new RecoveryFormMock();
+        $model->setTemplate($template);
         $_POST = [$model->formName() => $post];
         $model->load($_POST);
         $this->assertFalse($model->validate());
         $this->assertFalse($model->isRecovery);
-        $this->assertEquals(
-            array(
-                'e_recovery' =>
-                    array(
-                        0 => 'Email is invalid.',
-                    ),
-            ),
-            $model->getErrors()
-        );
+        $expected = [
+            'e_recovery' =>
+                [
+                    0 => 'Email is invalid.',
+                ],
+        ];
+        $this->assertSame($expected, $model->getErrors());
+        $this->assertSame($expected, $template->getAllPlaceholders('$root'));
     }
 
 

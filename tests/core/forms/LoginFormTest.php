@@ -35,8 +35,6 @@ class LoginFormTest extends DatabaseTestCase
         parent::setUp();
         ActiveRecord::$connection = $this->getConnection();
         static::sessionUp();
-        Rock::$app->template->removeAllPlaceholders();
-        Rock::$app->template->removeAllPlaceholders(true);
     }
 
     public function tearDown()
@@ -104,7 +102,7 @@ class LoginFormTest extends DatabaseTestCase
                     'email' => 'linda@gmail.com',
                     'password' => '123456f',
                     Rock::$app->csrf->csrfParam => function () {
-                        return Rock::$app->csrf->get(/*(new LoginForm())->formName()*/);
+                        return Rock::$app->csrf->get();
                     },
                 ],
                 [
@@ -119,7 +117,7 @@ class LoginFormTest extends DatabaseTestCase
                     'email' => 'jane@hotmail.com',
                     'password' => '123456',
                     Rock::$app->csrf->csrfParam => function () {
-                        return Rock::$app->csrf->get(/*(new LoginForm())->formName()*/);
+                        return Rock::$app->csrf->get();
                     },
                 ],
                 [

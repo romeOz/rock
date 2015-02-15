@@ -4,7 +4,6 @@ namespace rockunit\core\forms;
 
 use rock\csrf\CSRF;
 use rock\di\Container;
-use rock\i18n\i18n;
 use rock\Rock;
 use rockunit\common\CommonTestTrait;
 use rockunit\core\db\DatabaseTestCase;
@@ -38,9 +37,6 @@ class SignupFormTest extends DatabaseTestCase
         ActiveRecord::$connection = $this->getConnection();
         static::sessionUp();
         static::activeSession();
-        $template = Rock::$app->template;
-        $template->removeAllPlaceholders();
-        $template->removeAllPlaceholders(true);
     }
 
     public function tearDown()
