@@ -80,8 +80,11 @@ class CSRF implements EventsInterface, RequestInterface
         return $token;
     }
 
-    protected function generate()
+    public function generate()
     {
+        if ($this->enableCsrfValidation === false) {
+            return null;
+        }
         $token = $this->security->generateRandomString();
         $this->storage->add($this->csrfParam, $token);
         return $token;
