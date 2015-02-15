@@ -94,7 +94,7 @@ class ActiveQuery extends Query implements ActiveQueryInterface
             // lazy loading
             if ($this->via instanceof self) {
                 // via pivot collection
-                $viaModels = $this->via->findJunctionRows([$this->primaryModel]);
+                $viaModels = $this->via->findPivotRows([$this->primaryModel]);
                 $this->filterByModels($viaModels);
             } elseif (is_array($this->via)) {
                 // via relation
