@@ -4,7 +4,6 @@ namespace rock\snippets\html;
 
 
 use rock\base\Alias;
-use rock\di\Container;
 use rock\file\UploadedFile;
 use rock\helpers\Helper;
 use rock\helpers\Instance;
@@ -68,8 +67,9 @@ class ActiveForm extends Snippet
             if (is_string($this->model)) {
                 $this->model = ['class' => Alias::getAlias($this->model)];
             }
-            $this->model = Container::load($this->model);
+            $this->model = Instance::ensure($this->model);
         }
+        $this->model->setTemplate($this->template);
 
         $this->calculateLoad();
         if ($this->validate === true) {
