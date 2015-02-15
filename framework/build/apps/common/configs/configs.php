@@ -9,8 +9,6 @@
  * @scope - scope root directory of currently running web application.
  * @web - base URL of currently running web application.
  */
-use rock\events\Event;
-
 \rock\base\Alias::setAlias('root', dirname(dirname(dirname(__DIR__))));
 \rock\base\Alias::setAlias('rock', '@root/framework/core');
 \rock\base\Alias::setAlias('vendor', '@root/vendor');
@@ -35,15 +33,6 @@ use rock\events\Event;
 
 \rock\base\Alias::setAlias('img', '@assets/images');
 \rock\base\Alias::setAlias('images', '@img');
-
-// regenerate CSRF token
-Event::on(
-    \rock\csrf\CSRF::className(),
-    \rock\csrf\CSRF::EVENT_AFTER_VALID,
-    function(){
-        \rock\Rock::$app->csrf->get(true);
-    }
-);
 
 $config =\rock\helpers\ArrayHelper::merge(
     require(\rock\base\Alias::getAlias('@rock/classes.php')),
