@@ -3,6 +3,7 @@
 namespace rockunit\extensions\imagine;
 
 use rock\base\Alias;
+use rock\helpers\FileHelper;
 use rock\imagine\Image;
 
 abstract class AbstractImageTest extends \PHPUnit_Framework_TestCase
@@ -18,6 +19,7 @@ abstract class AbstractImageTest extends \PHPUnit_Framework_TestCase
         $this->watermarkFile = Alias::getAlias('@rockunit/data/imagine/xparent') . '.gif';
         $this->runtimeTextFile = Alias::getAlias('@rockunit/runtime/image-text-test') . '.png';
         $this->runtimeWatermarkFile = Alias::getAlias('@rockunit/runtime/image-watermark-test') . '.png';
+        FileHelper::createDirectory(Alias::getAlias('@rockunit/runtime/'));
         parent::setUp();
     }
 
