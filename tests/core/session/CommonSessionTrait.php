@@ -61,15 +61,6 @@ trait CommonSessionTrait
         ];
     }
 
-    public function testGetMulti()
-    {
-        $this->handlerSession->addMulti(['id' => 1, 'title' => 'text3', 'params' => ['param_1', 'param_2']]);
-        $this->assertSame(
-            ['title' => 'text3', 'params.1' => 'param_2'],
-            $this->handlerSession->getMulti(['title', ['params', 1]])
-        );
-    }
-
     public function testGetAll()
     {
         $this->handlerSession->addMulti(['id' => 1, 'title' => 'text3', 'params' => ['param_1', 'param_2']]);

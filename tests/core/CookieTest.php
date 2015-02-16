@@ -93,16 +93,6 @@ class CookieTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-
-    public function testGetMulti()
-    {
-        $_COOKIE = ['id' => 1, 'title' => 'text3', 'params' => ['param_1', 'param_2']];
-        $this->assertSame(
-            Rock::$app->cookie->getMulti(['title', ['params', 1]]),
-            ['title' => 'text3', 'params.1' => 'param_2']
-        );
-    }
-
     public function testToArray()
     {
         $_COOKIE = ['id' => 1, 'title' => 'text3', 'params' => ['  <b> param_1  </b> ', 'param_2']];

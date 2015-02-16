@@ -89,27 +89,6 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
     /**
      * @inheritdoc
      */
-    public function getMulti(array $names)
-    {
-        if (!$this->getIsActive()) {
-            return null;
-        }
-        $result = [];
-        foreach ($names as $keys) {
-            if ($value = $this->get($keys)) {
-                if (is_array($keys)) {
-                    $keys = implode('.',$keys);
-                }
-                $result[$keys] = $value;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getAll(array $only = [], array $exclude = [])
     {
         if (!$this->getIsActive()) {

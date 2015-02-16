@@ -88,24 +88,6 @@ class Cookie extends SessionFlash implements \ArrayAccess, SerializeInterface
     /**
      * @inheritdoc
      */
-    public function getMulti(array $names)
-    {
-        $result = [];
-        foreach ($names as $keys) {
-            if ($value = $this->get($keys)) {
-                if (is_array($keys)) {
-                    $keys = implode('.',$keys);
-                }
-                $result[$keys] = $value;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getAll(array $only = [], array $exclude = [], Sanitize $sanitize = null)
     {
         if (empty($_COOKIE)) {

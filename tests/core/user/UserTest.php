@@ -65,20 +65,6 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(0, $user->getCount());
     }
 
-    public function testGetMulti()
-    {
-        $user = $this->getUser();
-        $user->addMulti(['id' => 1,'name' => 'Smith', 'age' => 21, 'gender' => 'male', 'groups.0' => 'group_1', 'groups.1' => 'group_2']);
-        $this->assertSame(
-            [
-                'name' => 'Smith',
-                'gender' => 'male',
-                'groups' => ['group_1', 'group_2']
-            ],
-            $user->getMulti(['name', 'firstname', 'gender', 'groups'])
-        );
-    }
-
     public function testRemoveMulti()
     {
         $user = $this->getUser();

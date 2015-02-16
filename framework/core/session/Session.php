@@ -523,24 +523,6 @@ class Session extends SessionFlash implements \ArrayAccess
     }
 
     /**
-     * @inheritdoc
-     */
-    public function getMulti(array $names)
-    {
-        $result = [];
-        foreach ($names as $keys) {
-            if ($value = $this->get($keys)) {
-                if (is_array($keys)) {
-                    $keys = implode('.',$keys);
-                }
-                $result[$keys] = $value;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
      * Returns an iterator for traversing the session variables.
      * 
      * This method is required by the interface IteratorAggregate.
