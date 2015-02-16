@@ -44,7 +44,7 @@ before_script:
   - mysql -e 'CREATE DATABASE rocktest;';
   - psql -U postgres -c 'CREATE DATABASE rocktest;';
   - tests/data/travis/sphinx-setup.sh
-  #- mongo rocktest --eval 'db.addUser("travis", "test");'
+  - mongo rocktest --eval 'db.addUser("travis", "test");'
 
 script:
   - mkdir -p build/logs
