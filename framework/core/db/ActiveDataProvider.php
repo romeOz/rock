@@ -5,9 +5,9 @@ namespace rock\db;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\components\Model;
-use rock\di\Container;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
+use rock\helpers\Instance;
 use rock\helpers\Pagination;
 use rock\request\Request;
 use rock\response\Response;
@@ -97,10 +97,8 @@ class ActiveDataProvider implements ObjectInterface
      */
     protected $totalCount = 0;
     private $_keys;
-    /** @var  Url */
-    protected $url;
-    /** @var  Response */
-    protected $response;
+    /** @var  Response|string|array */
+    public $response = 'response';
 
     public function init()
     {
@@ -108,8 +106,7 @@ class ActiveDataProvider implements ObjectInterface
             $this->pagination['pageCurrent'] = Request::get(self::PAGE_VAR, null, Sanitize::positive()->int());
         }
         
-        $this->response = Container::load('response');
-        $this->url = Container::load('url');
+        $this->response = Instance::ensure($this->response, '\rock\response\Response', false);
     }
 
 
@@ -309,11 +306,13 @@ class ActiveDataProvider implements ObjectInterface
 
     protected function addHeaders($total, array $data)
     {
-        if ($this->response->format == Response::FORMAT_HTML || empty($data)) {
+        if (!$this->response instanceof Response || $this->response->format == Response::FORMAT_HTML || empty($data)) {
             return;
         }
 
-        $absoluteUrl = $this->url->removeAllArgs()->getAbsoluteUrl(true);
+        $absoluteUrl = class_exists('\rock\url\Url')
+            ? Url::set()->removeAllArgs()->getAbsoluteUrl(true)
+            : $_SERVER['REQUEST_URI'] . '?' . $_SERVER['QUERY_STRING'];
         $links = [];
         $links[] = "<{$absoluteUrl}?{$data['pageVar']}={$data['pageCurrent']}>; rel=self";
         $this->response->content['_links']['self'] = "{$absoluteUrl}?{$data['pageVar']}={$data['pageCurrent']}";

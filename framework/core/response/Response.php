@@ -1,12 +1,11 @@
 <?php
 namespace rock\response;
 
-use rock\base\BaseException;
 use rock\csrf\CSRF;
-use rock\di\Container;
 use rock\events\EventsInterface;
 use rock\events\EventsTrait;
 use rock\helpers\FileHelper;
+use rock\helpers\Instance;
 use rock\helpers\StringHelper;
 use rock\request\Request;
 use rock\url\Url;
@@ -255,21 +254,21 @@ class Response implements EventsInterface
      * @var HeaderCollection
      */
     private $_headers;
-    /** @var  CSRF */
-    private $_csrf;
-    /** @var  User */
-    private $_user;
-    /** @var  Request */
-    private $_request;
+    /** @var CSRF|string|array */
+    public $csrf = 'csrf';
+    /** @var User|string|array */
+    public $user = 'user';
+    /** @var Request|string|array */
+    public $request = 'request';
 
     /**
      * Initializes this component.
      */
     public function init()
     {
-        $this->_csrf = Container::load('csrf');
-        $this->_user = Container::load('user');
-        $this->_request = Container::load('request');
+        $this->csrf = Instance::ensure($this->csrf, '\rock\csrf\CSRF', false);
+        $this->user = Instance::ensure($this->user, '\rock\user\User', false);
+        $this->request = Instance::ensure($this->request, '\rock\request\Request');
         $this->locale = strtolower($this->locale);
 
         if ($this->version === null) {
@@ -333,7 +332,7 @@ class Response implements EventsInterface
      * Sends the response to the client.
      *
      * @param bool $die
-     * @throws BaseException
+     * @throws ResponseException
      */
     public function send($die = false)
     {
@@ -472,7 +471,7 @@ class Response implements EventsInterface
      *     meaning a download dialog will pop up.
      *
      * @return static the response object itself
-     * @throws \rock\base\BaseException if the requested range is not satisfiable
+     * @throws ResponseException if the requested range is not satisfiable
      */
     public function sendContentAsFile($content, $attachmentName, $options = [])
     {
@@ -519,7 +518,7 @@ class Response implements EventsInterface
      *     meaning a download dialog will pop up.
      *
      * @return static the response object itself
-     * @throws BaseException if the requested range cannot be satisfied.
+     * @throws ResponseException if the requested range cannot be satisfied.
      */
     public function sendStreamAsFile($handle, $attachmentName, $options = [])
     {
@@ -790,12 +789,12 @@ class Response implements EventsInterface
         $urlBuilder = Url::set($url);
         $url = $urlBuilder->getAbsoluteUrl();
         if (strpos($url, '/') === 0 && strpos($url, '//') !== 0) {
-            $url = $this->_request->getHostInfo() . $url;
+            $url = $this->request->getHostInfo() . $url;
         }
         if ($checkAjax) {
-            if ($this->_request->isPjax()) {
+            if ($this->request->isPjax()) {
                 $this->getHeaders()->set('X-Pjax-Url', $url);
-            } elseif ($this->_request->isAjax()) {
+            } elseif ($this->request->isAjax()) {
                 $this->getHeaders()->set('X-Redirect', $url);
             } else {
                 $this->getHeaders()->set('Location', $url);
@@ -850,7 +849,7 @@ class Response implements EventsInterface
      */
     public function goHome()
     {
-        return $this->redirect($this->_request->getHomeUrl());
+        return $this->redirect($this->request->getHomeUrl());
     }
 
     /**
@@ -869,7 +868,10 @@ class Response implements EventsInterface
      */
     public function goBack($defaultUrl = null)
     {
-        return $this->redirect($this->_user->getReturnUrl($defaultUrl));
+        if (!$this->user instanceof User) {
+            return $this->redirect($this->request->getHomeUrl());
+        }
+        return $this->redirect($this->user->getReturnUrl($defaultUrl));
     }
 
     /**
@@ -989,7 +991,7 @@ class Response implements EventsInterface
      * The default implementation will convert {@see \rock\response\Response::$data}
      * into {@see \rock\response\Response::$content} and set headers accordingly.
      *
-     * @throws BaseException if the formatter for the specified format is invalid or {@see \rock\response\Response::$format} is not supported
+     * @throws ResponseException if the formatter for the specified format is invalid or {@see \rock\response\Response::$format} is not supported
      */
     protected function prepare()
     {
@@ -1003,7 +1005,7 @@ class Response implements EventsInterface
         if (isset($this->formatters[$this->format])) {
             $formatter = $this->formatters[$this->format];
             if (!is_object($formatter)) {
-                $this->formatters[$this->format] = $formatter = Container::load($formatter);
+                $this->formatters[$this->format] = $formatter = Instance::ensure($formatter);
             }
             if ($formatter instanceof ResponseFormatterInterface) {
                 $formatter->format($this);
@@ -1028,13 +1030,13 @@ class Response implements EventsInterface
 
     protected function addCSRF()
     {
-        if (!$this->sendCSRF) {
+        if (!$this->sendCSRF || !$this->csrf instanceof CSRF) {
             return;
         }
-        $csrfToken = $this->_csrf->get();
+        $csrfToken = $this->csrf->get();
         if ($csrfToken) {
             if (is_array($this->data)) {
-                $this->data[$this->_csrf->csrfParam] = $csrfToken;
+                $this->data[$this->csrf->csrfParam] = $csrfToken;
             }
             $this->getHeaders()->add(CSRF::CSRF_HEADER, $csrfToken);
         }
