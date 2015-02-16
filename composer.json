@@ -1,7 +1,7 @@
 {
     "name": "romeoz/rock",
     "description": "The Rock PHP framework",
-    "keywords": ["rock", "framework"],
+    "keywords": ["framework", "rock"],
     "type": "library",
     "license": "MIT",
     "support": {
@@ -44,6 +44,7 @@
         "romeoz/rock-widgets" : "*@dev",
         "romeoz/rock-behaviors" : "*@dev",
         "romeoz/rock-session" : "*@dev",
+        "romeoz/rock-db" : "*@dev",
         "filp/whoops": "*",
         "phpmailer/phpmailer"   : "*",
         "imagine/imagine": "*",
