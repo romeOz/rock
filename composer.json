@@ -63,6 +63,7 @@
         "romeoz/rock-access" : "*@dev",
         "romeoz/rock-template" : "*@dev",
         "romeoz/rock-widgets" : "*@dev",
+        "romeoz/rock-behaviors" : "*@dev",
         "filp/whoops": "*",
         "phpmailer/phpmailer"   : "*",
         "imagine/imagine": "*",
