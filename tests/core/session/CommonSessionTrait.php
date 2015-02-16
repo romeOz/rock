@@ -3,11 +3,8 @@
 namespace rockunit\core\session;
 
 
-use rockunit\core\db\mocks\SessionMock;
-
 trait CommonSessionTrait
 {
-    /** @var  SessionMock */
     public $handlerSession;
     /**
      * @dataProvider providerGet

@@ -61,7 +61,6 @@ class ActiveQuery extends Query implements ActiveQueryInterface
      */
     const EVENT_INIT = 'init';
 
-
     /**
      * Constructor.
      * @param array $modelClass the model class associated with this query
