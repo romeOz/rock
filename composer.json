@@ -18,26 +18,7 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/romeOz/rock-base"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/romeOz/rock-components"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/romeOz/rock-file"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/romeOz/rock-execute"
-        },        {
-            "type": "vcs",
             "url": "https://github.com/romeOz/rock-access"
-        },
-        {
-          "type": "vcs",
-          "url": "https://github.com/romeOz/rock-widgets"
         },
         {
             "type": "vcs",
@@ -46,13 +27,11 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "romeoz/rock-base" : "*@dev",
         "romeoz/rock-helpers" : "*@dev",
         "romeoz/rock-di" : "*@dev",
         "romeoz/rock-components" : "*@dev",
         "romeoz/rock-sanitize" : "*@dev",
         "romeoz/rock-validate" : "*@dev",
-        "romeoz/rock-events" : "*@dev",
         "romeoz/rock-request" : "*@dev",
         "romeoz/rock-url" : "*@dev",
         "romeoz/rock-date" : "*@dev",
