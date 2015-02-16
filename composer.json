@@ -47,7 +47,6 @@
         "romeoz/rock-db" : "*@dev",
         "filp/whoops": "*",
         "phpmailer/phpmailer"   : "*",
-        "imagine/imagine": "*",
         "monolog/monolog": "*",
         "cebe/markdown": "*@dev"
     },
@@ -56,13 +55,15 @@
         "videlalvaro/php-amqplib": "2.2.*",
         "lusitanian/oauth": "*",
         "mibe/feedwriter": "*",
-        "tackk/cartographer" :"*@dev"
+        "tackk/cartographer" :"*@dev",
+        "imagine/imagine": "0.6.*"
     },
     "suggest": {
         "tackk/cartographer": "required by SitemapResponseFormatter",
         "mibe/feedwriter": "required by RssResponseFormatter",
         "lusitanian/oauth" : "required by rock-authclient extension",
-        "videlalvaro/php-amqplib": "required by rock-mq extension"
+        "videlalvaro/php-amqplib": "required by rock-mq extension",
+        "imagine/imagine": "required by rock-imagine"
     },
     "autoload": {
         "psr-4": {
