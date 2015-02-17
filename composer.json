@@ -38,9 +38,9 @@
         "romeoz/rock-i18n" : "*@dev",
         "romeoz/rock-file" : "*@dev",
         "romeoz/rock-cache" : "*@dev",
-        "romeoz/rock-execute" : "*@dev",
         "romeoz/rock-access" : "*@dev",
         "romeoz/rock-template" : "*@dev",
+        "romeoz/rock-execute" : "*@dev",
         "romeoz/rock-widgets" : "*@dev",
         "romeoz/rock-behaviors" : "*@dev",
         "romeoz/rock-session" : "*@dev",
@@ -53,6 +53,7 @@
     "require-dev": {
         "phpunit/phpunit": "4.4.*",
         "romeoz/rock-sphinx" : "*@dev",
+        "romeoz/rock-mongodb" : "*@dev",
         "videlalvaro/php-amqplib": "2.2.*",
         "lusitanian/oauth": "*",
         "mibe/feedwriter": "*",
