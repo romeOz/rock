@@ -121,7 +121,7 @@ class ErrorHandler implements LogInterface
         }
 
         // display Whoops
-        if (DEBUG === true) {
+        if (ROCK_DEBUG === true) {
             static::debuger()->handleException($exception);
             return;
         }

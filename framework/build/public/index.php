@@ -8,7 +8,7 @@ if (version_compare(PHP_VERSION, '5.4.0', '<')) {
 
 require(dirname(__DIR__) . '/vendor/autoload.php');
 
-defined('DEBUG') or define('DEBUG', true);
+defined('ROCK_DEBUG') or define('ROCK_DEBUG', true);
 defined('DS') or define('DS', DIRECTORY_SEPARATOR);
 require(dirname(__DIR__) . '/framework/polyfills.php');
 

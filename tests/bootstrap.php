@@ -10,8 +10,8 @@ if (is_file($composerAutoload)) {
 
 $loader->addPsr4('rockunit\\', __DIR__);
 
-defined('DEBUG')            or define('DEBUG', true);
-defined('DS')               or define('DS', DIRECTORY_SEPARATOR);
+defined('ROCK_DEBUG') or define('ROCK_DEBUG', true);
+defined('DS')         or define('DS', DIRECTORY_SEPARATOR);
 
 $_SERVER['SERVER_NAME'] = $_SERVER['HTTP_HOST'] = 'site.com';
 $_SERVER['HTTP_USER_AGENT'] = 'user';
