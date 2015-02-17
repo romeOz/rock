@@ -48,24 +48,6 @@ return [
             'fixture' => __DIR__ . '/postgres.sql',
         ],
     ],
-    'sphinx' => [
-        'sphinx' => [
-            'dsn' => 'mysql:host=127.0.0.1;port=9306;',
-            'username' => 'travis',
-            'password' => '',
-        ],
-        'db' => [
-            'dsn' => 'mysql:host=127.0.0.1;dbname=rocktest',
-            'username' => 'travis',
-            'password' => '',
-            'fixture' => __DIR__ . '/sphinx/source.sql',
-        ],
-    ],
-    'mongodb' => [
-        'dsn' => 'mongodb://travis:test@localhost:27017',
-        'defaultDatabaseName' => 'rocktest',
-        'options' => [],
-    ],
     'classes' => [
         'log' => [
             'class' => Log::className(),
