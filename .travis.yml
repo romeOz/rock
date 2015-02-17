@@ -26,7 +26,6 @@ install:
   - composer install --prefer-dist
   - composer require satooshi/php-coveralls:*@dev
   - chmod -R +x tests/data/travis/
-  - tests/data/travis/mongodb-setup.sh
   - tests/data/travis/zmq-setup.sh
   - tests/data/travis/gearman-setup.sh
   - tests/data/travis/rabbitmq-setup.sh
@@ -35,14 +34,13 @@ install:
   - framework/rock.sh
 
 before_script:
-  - mysql -e 'CREATE DATABASE rocktest;';
-  - mongo rocktest --eval 'db.addUser("travis", "test");'
+  - mysql -e 'CREATE DATABASE rocktest;'
 
 script:
   - mkdir -p build/logs
   - |
     if (php --version | grep -i HipHop > /dev/null); then
-      vendor/bin/phpunit --verbose --exclude-group php,mongodb,mq
+      vendor/bin/phpunit --verbose --exclude-group php,mq
     else
       vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml --exclude-group hhvm
     fi
