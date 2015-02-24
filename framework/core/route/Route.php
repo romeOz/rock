@@ -12,6 +12,7 @@ use rock\di\Container;
 use rock\events\Event;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
+use rock\helpers\Instance;
 use rock\helpers\StringHelper;
 use rock\request\Request;
 use rock\request\RequestInterface;
@@ -19,7 +20,7 @@ use rock\response\Response;
 use rock\Rock;
 use rock\sanitize\Sanitize;
 
-class Route implements RequestInterface, ErrorsInterface, ComponentsInterface
+class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \ArrayAccess
 {
     use ComponentsTrait;
     use ErrorsTrait;
@@ -37,26 +38,26 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface
     const FORMAT_QUERY  = 8;
     const FORMAT_ALL    = 15;
 
-    /** @var  array */
-    public $data = [];
     public $rules = [];
     /** @var  array|\Closure */
     public $success;
     /** @var  array|\Closure */
     public $fail;
     public $RESTHandlers = [];
-    public static $defaultFilters = ['removeTags', 'trim', ['call' => 'urldecode'],'toType'];
-
-    protected $errors = 0;
+    public $defaultFilters = ['removeTags', 'trim', ['call' => 'urldecode'],'toType'];
     /** @var  Request */
-    private $_request;
+    public $request = 'request';
+
     /** @var  Response */
-    private $_response;
+    public $response = 'response';
+    /** @var  array */
+    protected $data = [];
+    protected $errors = 0;
 
     public function init()
     {
-        $this->_request = Container::load('request');
-        $this->_response = Container::load('response');
+        $this->request = Instance::ensure($this->request, Request::className());
+        $this->response = Instance::ensure($this->response, Response::className());
 
         $this->calculateData();
         $handlers = $this->defaultRESTHandlers();
@@ -194,62 +195,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface
         return $this->addRoute(self::DELETE, $pattern, $handler, $filters);
     }
 
-    protected function defaultRESTHandlers()
-    {
-        return [
-            'index' => [
-                self::GET,
-                '/{url}/',
-                function(array $dataRoute) {
-                    return call_user_func([Container::load($dataRoute['controller']), 'actionIndex'], $dataRoute);
-                }
-            ],
-            'create' => [
-                self::GET,
-                '/{url}/create/',
-                function(array $dataRoute) {
-                    return call_user_func([Container::load($dataRoute['controller']), 'actionCreate'], $dataRoute);
-                }
-            ],
-            'store' => [
-                self::POST,
-                '/{url}/',
-                function(array $dataRoute) {
-                    return call_user_func([Container::load($dataRoute['controller']), 'actionStore'], $dataRoute);
-                }
-            ],
-            'show' => [
-                self::GET,
-                '~/^\/{url}\/(?P<id>[^\/]+)$/',
-                function(array $dataRoute) {
-                    return call_user_func([Container::load($dataRoute['controller']), 'actionShow'], $dataRoute);
-                }
-            ],
-            'edit' => [
-                self::GET,
-                '~/^\/{url}\/(?P<id>[^\/]+)\/edit\/$/',
-                function(array $dataRoute) {
-                    return call_user_func([Container::load($dataRoute['controller']), 'actionEdit'], $dataRoute);
-                }
-            ],
-            'update' => [
-                [self::PUT, self::PATCH],
-                '~/^\/{url}\/(?P<id>[^\/]+)$/',
-                function(array $dataRoute) {
-                    return call_user_func([Container::load($dataRoute['controller']), 'actionUpdate'], $dataRoute);
-                }
-            ],
-            'delete' => [
-                self::DELETE,
-                '~/^\/{url}\/(?P<id>[^\/]+)$/',
-                function(array $dataRoute) {
-                    return call_user_func([Container::load($dataRoute['controller']), 'actionDelete'], $dataRoute);
-                }
-            ]
-        ];
-    }
-
-    /**
+     /**
      * Add routers
      *
      * @param string   $url
@@ -285,6 +231,84 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface
     {
         $this->fail = $fail;
         return $this;
+    }
+
+    /**
+     * Returns route-param.
+     * @param string $name name of param
+     * @return mixed
+     */
+    public function __get($name)
+    {
+        return $this->data[$name];
+    }
+
+    /**
+     * Returns route-param.
+     * @param string $name name of param
+     * @return mixed
+     */
+    public function offsetGet($name)
+    {
+        return $this->$name;
+    }
+
+    /**
+     * Exists route-param.
+     * @param string $name name of param
+     * @return bool
+     */
+    public function __isset($name)
+    {
+        return isset($this->data[$name]);
+    }
+
+    /**
+     * Exists route-param.
+     * @param string $name name of param
+     * @return bool
+     */
+    public function offsetExists($name)
+    {
+        return isset($this->$name);
+    }
+
+    /**
+     * Set route-param.
+     * @param string $name name of param
+     * @param mixed $value
+     */
+    public function __set($name, $value)
+    {
+        $this->data[$name] = $value;
+    }
+
+    /**
+     * Set route-param.
+     * @param string $name name of param
+     * @param mixed $value
+     */
+    public function offsetSet($name, $value)
+    {
+        $this->$name = $value;
+    }
+
+    /**
+     * Deleting route-param.
+     * @param string $name name of param
+     */
+    public function __unset($name)
+    {
+        unset($this->data[$name]);
+    }
+
+    /**
+     * Deleting route-param.
+     * @param string $name name of param
+     */
+    public function offsetUnset($name)
+    {
+        unset($this->$name);
     }
 
     /**
@@ -324,7 +348,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface
     /**
      * Get format.
      *
-*@param $key
+     * @param $key
      * @return string
      * @throws RouteException
      */
@@ -370,7 +394,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface
                 if (is_int($key)) {
                     continue;
                 }
-                $result[$key] = Sanitize::rules(static::$defaultFilters)->sanitize($value);
+                $result[$key] = Sanitize::rules($this->defaultFilters)->sanitize($value);
             }
             $this->data = array_merge($this->data, $result);
 
@@ -392,7 +416,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface
             return true;
         }
 
-        return $this->_request->isMethods($verbs);
+        return $this->request->isMethods($verbs);
     }
 
     protected function initSuccess()
@@ -553,11 +577,11 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface
 
     protected function callAction(\Closure $handler)
     {
-        $result = call_user_func($handler, $this->data);
+        $result = call_user_func($handler, $this);
 
         // echo other format json, xml...
         if (isset($result)) {
-            $this->_response->data = $result;
+            $this->response->data = $result;
         }
     }
 
@@ -568,7 +592,62 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface
 
     protected function calculateData()
     {
-        $this->data = parse_url($this->_request->getAbsoluteUrl());
+        $this->data = parse_url($this->request->getAbsoluteUrl());
         $this->defaultScope();
+    }
+
+    protected function defaultRESTHandlers()
+    {
+        return [
+            'index' => [
+                self::GET,
+                '/{url}/',
+                function(Route $route) {
+                    return call_user_func([Container::load($route['controller']), 'actionIndex'], $route);
+                }
+            ],
+            'create' => [
+                self::GET,
+                '/{url}/create/',
+                function(Route $route) {
+                    return call_user_func([Container::load($route['controller']), 'actionCreate'], $route);
+                }
+            ],
+            'store' => [
+                self::POST,
+                '/{url}/',
+                function(Route $route) {
+                    return call_user_func([Container::load($route['controller']), 'actionStore'], $route);
+                }
+            ],
+            'show' => [
+                self::GET,
+                '~/^\/{url}\/(?P<id>[^\/]+)$/',
+                function(Route $route) {
+                    return call_user_func([Container::load($route['controller']), 'actionShow'], $route);
+                }
+            ],
+            'edit' => [
+                self::GET,
+                '~/^\/{url}\/(?P<id>[^\/]+)\/edit\/$/',
+                function(Route $route) {
+                    return call_user_func([Container::load($route['controller']), 'actionEdit'], $route);
+                }
+            ],
+            'update' => [
+                [self::PUT, self::PATCH],
+                '~/^\/{url}\/(?P<id>[^\/]+)$/',
+                function(Route $route) {
+                    return call_user_func([Container::load($route['controller']), 'actionUpdate'], $route);
+                }
+            ],
+            'delete' => [
+                self::DELETE,
+                '~/^\/{url}\/(?P<id>[^\/]+)$/',
+                function(Route $route) {
+                    return call_user_func([Container::load($route['controller']), 'actionDelete'], $route);
+                }
+            ]
+        ];
     }
 }

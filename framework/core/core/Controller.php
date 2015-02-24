@@ -10,6 +10,7 @@ use rock\helpers\FileHelper;
 use rock\helpers\StringHelper;
 use rock\i18n\i18n;
 use rock\Rock;
+use rock\route\Route;
 use rock\template\Template;
 
 abstract class Controller implements ComponentsInterface
@@ -163,11 +164,11 @@ abstract class Controller implements ComponentsInterface
      * Get method
      *
      * @param string $actionName name of method
-     * @param array  $args args action method
+     * @param Route  $route
      * @return mixed
      * @throws ControllerException
      */
-    public function method($actionName, array $args = null)
+    public function method($actionName, Route $route = null)
     {
         if (!method_exists($this, $actionName)) {
             $this->detachBehaviors();
@@ -178,7 +179,7 @@ abstract class Controller implements ComponentsInterface
         if ($this->beforeAction($actionName) === false) {
             return null;
         }
-        $result = call_user_func_array([$this, $actionName], [$args]);
+        $result = call_user_func_array([$this, $actionName], [$route]);
 
         if ($this->afterAction($actionName, $result) === false) {
             return null;
