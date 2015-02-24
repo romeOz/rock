@@ -44,7 +44,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
     /** @var  array|\Closure */
     public $fail;
     public $RESTHandlers = [];
-    public $defaultFilters = ['removeTags', 'trim', ['call' => 'urldecode'],'toType'];
+    public $sanitizeRules = ['removeTags', 'trim', ['call' => 'urldecode'],'toType'];
     /** @var  Request */
     public $request = 'request';
 
@@ -394,7 +394,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
                 if (is_int($key)) {
                     continue;
                 }
-                $result[$key] = Sanitize::rules($this->defaultFilters)->sanitize($value);
+                $result[$key] = Sanitize::rules($this->sanitizeRules)->sanitize($value);
             }
             $this->data = array_merge($this->data, $result);
 
