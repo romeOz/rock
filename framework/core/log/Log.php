@@ -35,7 +35,8 @@ class Log implements LogInterface, ObjectInterface
      * Path to log
      * @var string
      */
-    public $path = '@runtime/logs';
+    public $path = __DIR__;
+
     /** @var Logger  */
     protected $logger;
 
