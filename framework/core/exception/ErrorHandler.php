@@ -4,7 +4,6 @@ namespace rock\exception;
 
 use rock\base\Alias;
 use rock\base\BaseException;
-use rock\di\Container;
 use rock\log\Log;
 use rock\log\LogInterface;
 use rock\response\Response;
@@ -113,7 +112,7 @@ class ErrorHandler implements LogInterface
         register_shutdown_function([$self, 'handleShutdown']);
     }
 
-    public static function display(\Exception $exception, $level = Log::CRITICAL)
+    public static function display(\Exception $exception, $level = Log::CRITICAL, Response $response = null)
     {
         // append log
         if (static::$logged) {
@@ -122,29 +121,33 @@ class ErrorHandler implements LogInterface
 
         // display Whoops
         if (ROCK_DEBUG === true) {
-            static::debuger()->handleException($exception);
+            static::debuger($response)->handleException($exception);
             return;
         }
 
         // else display fatal
-        static::displayFatal();
+        static::displayFatal($response);
     }
 
     /**
      * Display fatal error
+     *
+     * @param Response $response
+     * @throws \Exception
      */
-    public static function displayFatal()
+    public static function displayFatal(Response $response = null)
     {
-        /** @var Response $response */
-        $response = Container::load('response');
-        if ($response->getStatusCode() === 200) {
-            $response->status500();
+        if (isset($response)) {
+            if ($response->getStatusCode() === 200) {
+                $response->status500();
+            }
+            $response->send();
+            if ($response->format !== Response::FORMAT_HTML) {
+                echo 0;
+                return;
+            }
         }
-        $response->send();
-        if ($response->format !== Response::FORMAT_HTML) {
-            echo 0;
-            return;
-        }
+
         if (!isset(static::$pathFatal) ||
             !file_exists(Alias::getAlias(static::$pathFatal))) {
             die('This site is temporarily unavailable. Please, visit the page later.');
@@ -156,26 +159,31 @@ class ErrorHandler implements LogInterface
     /**
      * Run mode debug.
      *
-     * @return \rock\exception\Run
+     * @param Response $response
+     * @return Run
      */
-    protected static function debuger()
+    protected static function debuger(Response $response = null)
     {
         $run = new Run();
-        /** @var Response $response */
-        $response = Container::load('response');
-        switch ($response->format) {
-            case Response::FORMAT_JSON:
-                $handler = new JsonResponseHandler();
-                break;
-            case Response::FORMAT_XML:
-                $handler = new XmlResponseHandler();
-                break;
-            default:
-                $handler = new PrettyPageHandler();
+
+        if (isset($response)) {
+            switch ($response->format) {
+                case Response::FORMAT_JSON:
+                    $handler = new JsonResponseHandler();
+                    break;
+                case Response::FORMAT_XML:
+                    $handler = new XmlResponseHandler();
+                    break;
+                default:
+                    $handler = new PrettyPageHandler();
+            }
+            if ($response->getStatusCode() !== 200) {
+                $run->setSendHttpCode($response->getStatusCode());
+            }
+        } else {
+            $handler = new PrettyPageHandler();
         }
-        if ($response->getStatusCode() !== 200) {
-            $run->setSendHttpCode($response->getStatusCode());
-        }
+
         $run->pushHandler($handler);
         //$run->register();
         return $run;

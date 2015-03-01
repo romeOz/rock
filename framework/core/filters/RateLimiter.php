@@ -2,7 +2,6 @@
 
 namespace rock\filters;
 
-use rock\di\Container;
 use rock\helpers\Instance;
 use rock\snippets\filters\RateLimiterTrait;
 
@@ -35,13 +34,8 @@ class RateLimiter extends ActionFilter
 
     public function init()
     {
-        if (!is_object($this->session)) {
-            $this->session = Instance::ensure($this->session, '\rock\session\Session');
-        }
-
-        if (!is_object($this->response)) {
-            $this->response = Container::load($this->response);
-        }
+        $this->session = Instance::ensure($this->session, '\rock\session\Session');
+        $this->response = Instance::ensure($this->response, '\rock\response\Response');
     }
 
     /**

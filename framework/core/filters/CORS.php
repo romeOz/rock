@@ -3,9 +3,9 @@
 namespace rock\filters;
 
 
+use rock\helpers\Instance;
 use rock\request\Request;
 use rock\response\Response;
-use rock\Rock;
 
 /**
  * Cors filter implements [Cross Origin Resource Sharing](http://en.wikipedia.org/wiki/Cross-origin_resource_sharing).
@@ -55,13 +55,13 @@ use rock\Rock;
 class CORS extends ActionFilter
 {
     /**
-     * @var Request the current request. If not set, the `request` application component will be used.
+     * @var Request|string|array the current request. If not set, the `request` application component will be used.
      */
-    public $request;
+    public $request = 'request';
     /**
-     * @var Response the response to be sent. If not set, the `response` application component will be used.
+     * @var Response|string|array the response to be sent. If not set, the `response` application component will be used.
      */
-    public $response;
+    public $response = 'response';
     /**
      * @var array define specific CORS rules for specific actions
      */
@@ -78,15 +78,17 @@ class CORS extends ActionFilter
         'Access-Control-Expose-Headers' => [],
     ];
 
+    public function init()
+    {
+        $this->request = Instance::ensure($this->request, '\rock\request\Request');
+        $this->response = Instance::ensure($this->response, '\rock\response\Response');
+    }
 
     /**
      * @inheritdoc
      */
     public function beforeAction($action)
     {
-        $this->request = $this->request ?: Rock::$app->request;
-        $this->response = $this->response ?: Rock::$app->response;
-
         $this->overrideDefaultSettings($action);
 
         $requestCorsHeaders = $this->extractHeaders();

@@ -32,8 +32,8 @@ class RouteTest extends RouteConfigTest
             ->addRoute(
                 $verb,
                 $pattern,
-                function (array $data) {
-                    echo Helper::getValue($data['controller']) . 'action';
+                function (Route $route) {
+                    echo $route['controller'] . 'action';
                 },
                 $filter
             );
@@ -62,8 +62,8 @@ class RouteTest extends RouteConfigTest
             ->addRoute(
                 $verb,
                 $pattern,
-                function (array $data) {
-                    echo Helper::getValue($data['controller']) . 'action';
+                function (Route $route) {
+                    echo $route['controller'] . 'action';
                 },
                 $filter
             );
@@ -75,7 +75,7 @@ class RouteTest extends RouteConfigTest
     /**
      * @dataProvider providerUrlSuccess
      */
-    public function testResourceSuccess($url, $verb, $output)
+    public function testRESTSuccess($url, $verb, $output)
     {
         $_SERVER['HTTP_HOST'] = $_SERVER['SERVER_NAME'] = 'site.com';
         $_SERVER['REQUEST_URI'] = $url;
@@ -104,7 +104,7 @@ class RouteTest extends RouteConfigTest
     /**
      * @dataProvider providerUrlFail
      */
-    public function testResourceFail($url, $verb, $errors, $output)
+    public function testRESTFail($url, $verb, $errors, $output)
     {
         $_SERVER['HTTP_HOST'] = $_SERVER['SERVER_NAME'] = 'site.com';
         $_SERVER['REQUEST_URI'] = $url;

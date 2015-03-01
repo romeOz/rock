@@ -11,22 +11,14 @@ return [
                 [
                     [Route::GET],
                     '/' ,
-                    function(array $data){
-                        return (new \apps\frontend\controllers\MainController())->method('actionIndex', $data);
-                    }
+                    [new \apps\frontend\controllers\MainController(), 'actionIndex']
                 ],
-
                 [
                     \rock\route\Route::GET,
                     '*',
-                    function(array $data) {
-                        return (new \apps\frontend\controllers\MainController())->notPage('index');
-                    }
+                    [new \apps\frontend\controllers\MainController(), 'notPage']
                 ],
             ],
-        'fail' => function(\rock\route\Route $route) {
-                return (new \apps\frontend\controllers\MainController())->notPage('index');
-        }
     ],
 
     'template' => [

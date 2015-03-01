@@ -2,7 +2,9 @@
 
 namespace rock\filters;
 
-use rock\Rock;
+use rock\helpers\Instance;
+use rock\request\Request;
+use rock\response\Response;
 
 /**
  * VerbFilter is an action filter that filters by HTTP request methods.
@@ -37,6 +39,14 @@ use rock\Rock;
 class VerbFilter extends ActionFilter
 {
     /**
+     * @var Request|string|array the current request. If not set, the `request` application component will be used.
+     */
+    public $request = 'request';
+    /**
+     * @var Response|string|array the response to be sent. If not set, the `response` application component will be used.
+     */
+    public $response = 'response';
+    /**
      * @var array this property defines the allowed request methods for each action.
      * For each action that should only support limited set of request methods
      * you add an entry with the action id as array key and an array of
@@ -60,6 +70,12 @@ class VerbFilter extends ActionFilter
     public $actions = [];
     public $throwException = false;
 
+    public function init()
+    {
+        $this->request = Instance::ensure($this->request, '\rock\request\Request');
+        $this->response = Instance::ensure($this->response, '\rock\response\Response');
+    }
+
     /**
      * @inheritdoc
      */
@@ -68,17 +84,16 @@ class VerbFilter extends ActionFilter
         if (empty($this->actions) || empty($action)) {
             return true;
         }
-        $request = Rock::$app->request;
 
         if (isset($this->actions['*'])) {
             $verbs = $this->actions['*'];
-            if ($request->isMethods($this->actions['*'])) {
+            if ($this->request->isMethods($this->actions['*'])) {
                 return true;
             }
         }
         if (isset($this->actions[$action])) {
             $verbs = $this->actions[$action];
-            if ($request->isMethods($this->actions[$action])) {
+            if ($this->request->isMethods($this->actions[$action])) {
                 return true;
             }
         }
@@ -86,9 +101,8 @@ class VerbFilter extends ActionFilter
         if (!empty($verbs)) {
             // http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.7
             $verbs = implode(', ', $verbs);
-            $response = Rock::$app->response;
-            $response->getHeaders()->set('Allow', $verbs);
-            $response->setStatusCode(405);
+            $this->response->getHeaders()->set('Allow', $verbs);
+            $this->response->setStatusCode(405);
             if ($this->throwException === true) {
                 throw new VerbsFilterException('Method Not Allowed. This url can only handle the following request methods: ' . $verbs . '.');
             }

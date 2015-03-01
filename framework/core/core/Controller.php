@@ -4,11 +4,12 @@ namespace rock\core;
 use rock\base\Alias;
 use rock\components\ComponentsInterface;
 use rock\components\ComponentsTrait;
-use rock\di\Container;
 use rock\helpers\ArrayHelper;
 use rock\helpers\FileHelper;
+use rock\helpers\Instance;
 use rock\helpers\StringHelper;
 use rock\i18n\i18n;
+use rock\response\Response;
 use rock\Rock;
 use rock\route\Route;
 use rock\template\Template;
@@ -31,19 +32,19 @@ abstract class Controller implements ComponentsInterface
      */
     const EVENT_AFTER_ACTION = 'afterAction';
 
+    /** @var  Response */
+    public $response;
     /** @var  Template|string|array */
     protected $template = 'template';
 
     public function init()
     {
         $this->parentInit();
-        if (!is_object($this->template)) {
-            $this->template = Container::load($this->template);
-            $this->template->context = $this;
-            if (!$this->template->existsConst(['res', 'context'])) {
-                Rock::$app->controller = $this;
-                $this->template->addConst('res', static::defaultData(), false, true);
-            }
+        $this->template = Instance::ensure($this->template);
+        $this->template->context = $this;
+        if (!$this->template->existsConst(['res', 'context'])) {
+            Rock::$app->controller = $this;
+            $this->template->addConst('res', static::defaultData(), false, true);
         }
     }
 
@@ -66,7 +67,8 @@ abstract class Controller implements ComponentsInterface
      * @param string $defaultPathLayout
      * @return string the rendering result. Null if the rendering result is not required.
      */
-    public function render($layout, array $placeholders = [],$defaultPathLayout = '@views'){
+    public function render($layout, array $placeholders = [],$defaultPathLayout = '@views')
+    {
 
         $layout = FileHelper::normalizePath(Alias::getAlias($layout));
         if (!strstr($layout, DS)) {
@@ -76,7 +78,7 @@ abstract class Controller implements ComponentsInterface
                       $layout;
         }
 
-        echo $this->template->render($layout, $placeholders, $this);
+        return $this->template->render($layout, $placeholders, $this);
     }
 
     public static function context(array $keys = [])
@@ -88,12 +90,15 @@ abstract class Controller implements ComponentsInterface
     /**
      * Display notPage layout
      *
+     * @param Route       $route
      * @param string|null $layout
      * @return string|void
      */
-    public function notPage($layout = null)
+    public function notPage($route = null, $layout = null)
     {
-        Rock::$app->response->status404();
+        if (isset($this->response)) {
+            $this->response->status404();
+        }
         $this->template->title = StringHelper::upperFirst(i18n::t('notPage'));
         if (!isset($layout)) {
             $layout = '@common.views/layouts/notPage';
@@ -179,13 +184,8 @@ abstract class Controller implements ComponentsInterface
         if ($this->beforeAction($actionName) === false) {
             return null;
         }
-        $result = call_user_func_array([$this, $actionName], [$route]);
-
-        if ($this->afterAction($actionName, $result) === false) {
-            return null;
-        }
-
-        return $result;
+        $result = $this->$actionName($route);
+        return $this->afterAction($actionName, $result);
     }
 
     public static function findUrlById($resource)

@@ -11,4 +11,9 @@ class MainController extends Controller
     {
         $this->render('index', ['content' => 'Hello world!']);
     }
+
+    public function notPage()
+    {
+        return parent::notPage(null, 'index');
+    }
 } 

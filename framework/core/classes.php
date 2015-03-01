@@ -229,7 +229,7 @@ return array_merge(
         ],
         'response' => [
             'class' => \rock\response\Response::className(),
-            'singleton' => true,
+            //'singleton' => true,
             'locale' => Rock::$app->language
         ],
         'htmlResponseFormatter' => [

@@ -39,8 +39,10 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
                         [
                             $verb,
                             $pattern,
-                            function (array $data) {
-                                echo Helper::getValue($data['controller']) . 'action';
+                            function (Route $route) {
+                                //var_dump($route['controller']);
+                                echo $route['controller'] . 'action';
+                                return '';
                             },
                             $filter
                         ],
@@ -194,8 +196,8 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
                         [
                             $verb,
                             $pattern,
-                            function (array $data) {
-                                echo Helper::getValue($data['controller']) . 'action';
+                            function (Route $route) {
+                                echo $route['controller'] . 'action';
                             },
                             $filter
                         ],
@@ -342,21 +344,21 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
                         [
                             Route::GET,
                             '/news/',
-                            function (array $data) {
+                            function () {
                                 echo 'action1';
                             }
                         ],
                         [
                             Route::POST,
                             '/',
-                            function (array $data) {
+                            function () {
                                 echo 'action2';
                             }
                         ],
                         [
                             Route::GET,
                             '/',
-                            function (array $data) {
+                            function () {
                                 echo 'action3';
                             }
                         ],
@@ -395,14 +397,14 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
                         [
                             Route::GET,
                             '/news/',
-                            function (array $data) {
+                            function () {
                                 echo 'action1';
                             }
                         ],
                         [
                             Route::POST,
                             '/',
-                            function (array $data) {
+                            function () {
                                 echo 'action2';
                             }
                         ],
@@ -429,7 +431,7 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider providerUrlSuccess
      */
-    public function testResourceSuccess($url, $verb, $output)
+    public function testRESTSuccess($url, $verb, $output)
     {
         $_SERVER['HTTP_HOST'] = $_SERVER['SERVER_NAME'] = 'site.com';
         $_SERVER['REQUEST_URI'] = $url;
@@ -479,7 +481,7 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider providerUrlFail
      */
-    public function testResourceFail($url, $verb, $errors, $output)
+    public function testRESTFail($url, $verb, $errors, $output)
     {
         $_SERVER['HTTP_HOST'] = $_SERVER['SERVER_NAME'] = 'site.com';
         $_SERVER['REQUEST_URI'] = $url;

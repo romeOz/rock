@@ -96,13 +96,6 @@ class ContentNegotiatorFilter extends ActionFilter
      */
     public $response = 'response';
 
-    public function init()
-    {
-        $this->request ? : Instance::ensure($this->request, '\rock\request\Request');
-        $this->response ? : Instance::ensure($this->response, '\rock\response\Response');
-    }
-
-
     //    /**
 //     * @inheritdoc
 //     */
@@ -125,6 +118,9 @@ class ContentNegotiatorFilter extends ActionFilter
      */
     public function negotiate()
     {
+        $this->request = Instance::ensure($this->request, '\rock\request\Request');
+        $this->response = Instance::ensure($this->response, '\rock\response\Response');
+
         if (!empty($this->formats)) {
             $this->negotiateContentType($this->request, $this->response);
         }

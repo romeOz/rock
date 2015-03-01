@@ -68,28 +68,25 @@ class Rock extends Alias
      */
     public static function bootstrap(array $config)
     {
-        Trace::beginProfile(Trace::APP, Trace::TOKEN_APP_RUNTIME);
-        try {
+            Trace::beginProfile(Trace::APP, Trace::TOKEN_APP_RUNTIME);
+
             static::$components = $config['components'];
             unset($config['components']);
             static::$config = $config;
             Container::addMulti(static::$components);
 
-            Event::on(
-                static::className(),
-                self::EVENT_END_APP,
-                function(){
-                    Rock::$app->response->send();
-                }
-            );
+            $response = static::$app->response;
+        try {
             // Triggered at the beginning
             Event::trigger(static::className(), self::EVENT_BEGIN_APP);
 
             // Routing
-            Rock::$app->route->run();
+            $route = static::$app->route;
+            $route->response = $response;
 
+            $route->run();
         } catch (\Exception $e) {
-            ErrorHandler::display($e);
+            ErrorHandler::display($e, Log::CRITICAL, $response);
         }
         //var_dump(Trace::getTime(Trace::APP_TIME));
         Trace::endProfile(Trace::APP, Trace::TOKEN_APP_RUNTIME);
@@ -97,6 +94,8 @@ class Rock extends Alias
 
         // Triggered at the end
         Event::trigger(static::className(), self::EVENT_END_APP);
+
+        $response->send();
     }
 
     /**

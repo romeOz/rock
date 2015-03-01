@@ -8,6 +8,7 @@ use rock\access\ErrorsTrait;
 use rock\base\Alias;
 use rock\components\ComponentsInterface;
 use rock\components\ComponentsTrait;
+use rock\core\Controller;
 use rock\di\Container;
 use rock\events\Event;
 use rock\helpers\ArrayHelper;
@@ -45,10 +46,9 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
     public $fail;
     public $RESTHandlers = [];
     public $sanitizeRules = ['removeTags', 'trim', ['call' => 'urldecode'],'toType'];
-    /** @var  Request */
+    /** @var  Request|string|array */
     public $request = 'request';
-
-    /** @var  Response */
+    /** @var  Response|string|array */
     public $response = 'response';
     /** @var  array */
     protected $data = [];
@@ -64,11 +64,17 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
         $this->RESTHandlers = empty($this->RESTHandlers) ? $handlers : array_merge($handlers, $this->RESTHandlers);
     }
 
-    public function run()
+    public function run($new = false)
     {
-        Event::trigger($this, self::EVENT_BEGIN_ROUTER);
-        $this->provide();
-        Event::trigger($this, self::EVENT_END_ROUTER);
+        $self = $this;
+        if ($new) {
+            /** @var static $self */
+            $self = Instance::ensure(static::className());
+            $self->response = $this->response;
+        }
+        Event::trigger($self, self::EVENT_BEGIN_ROUTER);
+        $self->provide();
+        Event::trigger($self, self::EVENT_END_ROUTER);
     }
 
     /**
@@ -102,11 +108,11 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
      *
      * @param array|string $verbs
      * @param string|array          $pattern
-     * @param callable              $handler
-     * @param callable|array|null     $filters
+     * @param callable|array        $handler
+     * @param callable|array|null   $filters
      * @return boolean
      */
-    public function addRoute($verbs, $pattern, \Closure $handler, $filters = null)
+    public function addRoute($verbs, $pattern, $handler, $filters = null)
     {
         if (!$this->isRoute($verbs, $pattern, $handler, $filters)) {
             $this->initFail();
@@ -116,7 +122,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
         return true;
     }
 
-    protected function isRoute($verbs, $pattern, \Closure $handler, $filters = null)
+    protected function isRoute($verbs, $pattern, $handler, $filters = null)
     {
         /**
          * default rule or equals rule
@@ -134,11 +140,11 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
      * Add route by any request methods
      *
      * @param string|array $pattern
-     * @param callable     $handler
+     * @param callable|array  $handler
      * @param callable|array|null     $filters
      * @return boolean
      */
-    public function any($pattern, \Closure $handler, $filters = null)
+    public function any($pattern, $handler, $filters = null)
     {
         return $this->addRoute(self::ANY, $pattern, $handler, $filters);
     }
@@ -147,11 +153,11 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
      * Add route by GET
      *
      * @param string|array $pattern
-     * @param callable     $handler
+     * @param callable|array     $handler
      * @param callable|array|null     $filters
      * @return boolean
      */
-    public function get($pattern, \Closure $handler, $filters = null)
+    public function get($pattern, $handler, $filters = null)
     {
         return $this->addRoute(self::GET, $pattern, $handler, $filters);
     }
@@ -160,11 +166,11 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
      * Add route by POST
      *
      * @param string|array $pattern
-     * @param callable     $handler
+     * @param callable|array     $handler
      * @param callable|array|null     $filters
      * @return boolean
      */
-    public function post($pattern, \Closure $handler, $filters = null)
+    public function post($pattern, $handler, $filters = null)
     {
         return $this->addRoute(self::POST, $pattern, $handler, $filters);
     }
@@ -173,11 +179,11 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
      * Add route by PUT
      *
      * @param string|array $pattern
-     * @param callable     $handler
+     * @param callable|array     $handler
      * @param callable|array|null     $filters
      * @return boolean
      */
-    public function put($pattern, \Closure $handler, $filters = null)
+    public function put($pattern, $handler, $filters = null)
     {
         return $this->addRoute(self::PUT, $pattern, $handler, $filters);
     }
@@ -186,11 +192,11 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
      * Add route by DELETE
      *
      * @param string|array $pattern
-     * @param callable     $handler
+     * @param callable|array     $handler
      * @param callable|array|null     $filters
      * @return boolean
      */
-    public function delete($pattern, \Closure $handler, $filters = null)
+    public function delete($pattern, $handler, $filters = null)
     {
         return $this->addRoute(self::DELETE, $pattern, $handler, $filters);
     }
@@ -233,6 +239,11 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
         return $this;
     }
 
+    public function getParam()
+    {
+        return $this->data;
+    }
+
     /**
      * Returns route-param.
      * @param string $name name of param
@@ -240,7 +251,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
      */
     public function __get($name)
     {
-        return $this->data[$name];
+        return isset($this->data[$name]) ? $this->data[$name] : null;
     }
 
     /**
@@ -428,10 +439,9 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
             $this->success = [$this->success];
         }
         $this->success[1] = isset($this->success[1]) ? $this->success[1] : [];
-        list($function, $args) = $this->success;
-        $route = clone $this;
-        $route->data = array_merge(['callbackParams' => $args], $this->data);
-        call_user_func($function, $route);
+        list($handler, $args) = $this->success;
+        $this->data = array_merge(['callbackParams' => $args], $this->data);
+        call_user_func($handler, $this);
     }
 
     protected function initFail()
@@ -444,10 +454,9 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
         }
 
         $this->fail[1] = isset($this->fail[1]) ? $this->fail[1] : [];
-        list($function, $args) = $this->fail;
-        $route = clone $this;
-        $route->data = array_merge(['callbackParams' => $args], $this->data);
-        call_user_func($function, $route);
+        list($handler, $args) = $this->fail;
+        $this->data = array_merge(['callbackParams' => $args], $this->data);
+        call_user_func($handler, $this);
     }
 
     protected function provideRules(array $rules)
@@ -471,12 +480,11 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
                 $rule[3] = null;
             }
             list($verbs, $pattern, $handler, $filters) = $rule;
-            $route = clone $this;
-            if ($route->isRoute($verbs, $pattern, $handler, $filters)) {
+            if ($this->isRoute($verbs, $pattern, $handler, $filters)) {
                 $this->errors = 0;
                 return true;
             } else {
-                $this->errors |= $route->errors;
+                $this->errors |= $this->errors;
             }
         }
         return false;
@@ -502,13 +510,12 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
                 $pattern = "~{$pattern}";
             }
             $pattern = str_replace('{url}', $url, $pattern);
-            $route = clone $this;
-            $route->data['controller'] = $controller;
-            if ($route->isRoute($verbs, $pattern, $handler, $filters)) {
+            $this->data['controller'] = $controller;
+            if ($this->isRoute($verbs, $pattern, $handler, $filters)) {
                 $this->errors = 0;
                 return true;
             } else {
-                $this->errors |= $route->errors;
+                $this->errors |= $this->errors;
             }
         }
         return false;
@@ -516,11 +523,11 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
 
     /**
      * @param array    $verbs
-     * @param callable $handler
+     * @param callable|array $handler
      * @param callable $filters
      * @return bool
      */
-    protected function isRequests(array $verbs, \Closure $handler, $filters = null)
+    protected function isRequests(array $verbs, $handler, $filters = null)
     {
         if (!static::hasVerbs($verbs)) {
             $this->errors |= self::E_VERBS;
@@ -575,10 +582,33 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
         return true;
     }
 
-    protected function callAction(\Closure $handler)
+    protected function callAction($handler)
     {
-        $result = call_user_func($handler, $this);
+        if ($handler instanceof \Closure) {
+            $handler = call_user_func($handler, $this);
+        }
 
+        if (!is_array($handler)) {
+            return;
+        }
+
+        list($class, $method) = $handler;
+        if (is_string($class)) {
+            if (!class_exists($class)) {
+                throw new RouteException(RouteException::UNKNOWN_CLASS, ['class' => $class]);
+            }
+            $class = new $class;
+        }
+
+        if (!method_exists($class, $method)) {
+            $class = get_class($class);
+            throw new RouteException(RouteException::UNKNOWN_METHOD, ['method' => "{$class}::{$method}"]);
+        }
+        if ($class instanceof Controller) {
+            $class->response = $this->response;
+        }
+
+        $result = $class->method($method, $this);
         // echo other format json, xml...
         if (isset($result)) {
             $this->response->data = $result;
