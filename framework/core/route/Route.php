@@ -52,6 +52,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
     public $response = 'response';
     /** @var  array */
     protected $data = [];
+    protected $params = [];
     protected $errors = 0;
 
     public function init()
@@ -239,9 +240,13 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
         return $this;
     }
 
+    /**
+     * Returns list route-params.
+     * @return array
+     */
     public function getParam()
     {
-        return $this->data;
+        return $this->params;
     }
 
     /**
@@ -251,7 +256,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
      */
     public function __get($name)
     {
-        return isset($this->data[$name]) ? $this->data[$name] : null;
+        return isset($this->params[$name]) ? $this->params[$name] : null;
     }
 
     /**
@@ -271,7 +276,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
      */
     public function __isset($name)
     {
-        return isset($this->data[$name]);
+        return isset($this->params[$name]);
     }
 
     /**
@@ -291,7 +296,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
      */
     public function __set($name, $value)
     {
-        $this->data[$name] = $value;
+        $this->params[$name] = $value;
     }
 
     /**
@@ -310,7 +315,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
      */
     public function __unset($name)
     {
-        unset($this->data[$name]);
+        unset($this->params[$name]);
     }
 
     /**
@@ -322,11 +327,6 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
         unset($this->$name);
     }
 
-    /**
-     * Manager URL by Application.
-     *
-     * @throws RouteException
-     */
     protected function provide()
     {
         if (!empty($this->rules)) {
@@ -407,7 +407,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
                 }
                 $result[$key] = Sanitize::rules($this->sanitizeRules)->sanitize($value);
             }
-            $this->data = array_merge($this->data, $result);
+            $this->params = array_merge($this->params, $result);
 
             return true;
         }
@@ -435,13 +435,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
         if (!isset($this->success)) {
             return;
         }
-        if ($this->success instanceof \Closure) {
-            $this->success = [$this->success];
-        }
-        $this->success[1] = isset($this->success[1]) ? $this->success[1] : [];
-        list($handler, $args) = $this->success;
-        $this->data = array_merge(['callbackParams' => $args], $this->data);
-        call_user_func($handler, $this);
+        call_user_func($this->success, $this);
     }
 
     protected function initFail()
@@ -449,21 +443,12 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
         if (!isset($this->fail)) {
             return;
         }
-        if ($this->fail instanceof \Closure) {
-            $this->fail = [$this->fail];
-        }
-
-        $this->fail[1] = isset($this->fail[1]) ? $this->fail[1] : [];
-        list($handler, $args) = $this->fail;
-        $this->data = array_merge(['callbackParams' => $args], $this->data);
-        call_user_func($handler, $this);
+        call_user_func($this->fail, $this);
     }
 
     protected function provideRules(array $rules)
     {
         foreach ($rules as $rule) {
-            //$this->calculateData();
-
             if ($rule[0] === self::REST) {
                 array_shift($rule);
                 if (empty($rule[2])) {
@@ -510,7 +495,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
                 $pattern = "~{$pattern}";
             }
             $pattern = str_replace('{url}', $url, $pattern);
-            $this->data['controller'] = $controller;
+            $this->params['controller'] = $controller;
             if ($this->isRoute($verbs, $pattern, $handler, $filters)) {
                 $this->errors = 0;
                 return true;
@@ -547,7 +532,6 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
 
         $this->errors = 0;
         $this->initSuccess();
-        $this->defaultScope();
         $this->callAction($handler);
 
         return true;
@@ -615,15 +599,9 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
         }
     }
 
-    protected function defaultScope()
-    {
-        $this->data['scope'] = str_replace('\\', '', strstr(Alias::getAlias('@ns'), '\\'));
-    }
-
     protected function calculateData()
     {
         $this->data = parse_url($this->request->getAbsoluteUrl());
-        $this->defaultScope();
     }
 
     protected function defaultRESTHandlers()

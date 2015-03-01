@@ -4,7 +4,6 @@ namespace rockunit\core\route;
 
 use rock\core\Controller;
 use rock\route\filters\AccessFilter;
-use rock\helpers\Helper;
 use rock\route\Route;
 
 /**
@@ -47,16 +46,16 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
                             $filter
                         ],
                     ],
-                'success' => [
+                'success' =>
                     function (Route $route) {
                         echo 'total_success' . $route->getErrors();
                     }
-                ],
-                'fail' => [
+                ,
+                'fail' =>
                     function (Route $route) {
                         echo 'total_fail' . $route->getErrors();
                     }
-                ]
+
             ]
 
         ))
@@ -202,16 +201,16 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
                             $filter
                         ],
                     ],
-                'success' => [
+                'success' =>
                     function (Route $route) {
                         echo 'total_success' . $route->getErrors();
                     }
-                ],
-                'fail' => [
+                ,
+                'fail' =>
                     function (Route $route) {
                         echo 'total_fail' . $route->getErrors();
                     }
-                ]
+
             ]
 
         ))
@@ -363,16 +362,16 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
                             }
                         ],
                     ],
-                'success' => [
+                'success' =>
                     function (Route $route) {
                         echo 'total_success' . $route->getErrors();
                     }
-                ],
-                'fail' => [
+                ,
+                'fail' =>
                     function (Route $route) {
                         echo 'total_fail' . $route->getErrors();
                     }
-                ]
+
             ]
 
         ))
@@ -409,16 +408,16 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
                             }
                         ],
                     ],
-                'success' => [
+                'success' =>
                     function (Route $route) {
                         echo 'total_success' . $route->getErrors();
                     }
-                ],
-                'fail' => [
+                ,
+                'fail' =>
                     function (Route $route) {
                         echo 'total_fail' . $route->getErrors();
                     }
-                ]
+
             ]
 
         ))
@@ -448,16 +447,16 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
                             ['only' => ['index', 'show', 'update', 'create','delete']]
                         ],
                     ],
-                'success' => [
+                'success' =>
                     function (Route $route) {
                         echo 'total_success' . $route->getErrors();
                     }
-                ],
-                'fail' => [
+                ,
+                'fail' =>
                     function (Route $route) {
                         echo 'total_fail' . $route->getErrors();
                     }
-                ]
+
             ]
         );
 
@@ -504,16 +503,16 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
 //                            }
 //                        ],
                     ],
-                'success' => [
+                'success' =>
                     function (Route $route) {
                         echo 'total_success' . $route->getErrors();
                     }
-                ],
-                'fail' => [
+                ,
+                'fail' =>
                     function (Route $route) {
                         echo 'total_fail' . $route->getErrors();
                     }
-                ]
+
             ]
         );
 
