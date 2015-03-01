@@ -1,6 +1,7 @@
 <?php
 namespace rock\filters;
 
+use rock\helpers\Instance;
 use rock\request\Request;
 use rock\response\Response;
 use rock\Rock;
@@ -87,16 +88,22 @@ class ContentNegotiatorFilter extends ActionFilter
      */
     public $sendCSRF = false;
     /**
-     * @var Request the current request. If not set, the `request` application component will be used.
+     * @var Request|string|array the current request. If not set, the `request` application component will be used.
      */
-    public $request;
+    public $request = 'request';
     /**
-     * @var Response the response to be sent. If not set, the `response` application component will be used.
+     * @var Response|string|array the response to be sent. If not set, the `response` application component will be used.
      */
-    public $response;
+    public $response = 'response';
+
+    public function init()
+    {
+        $this->request ? : Instance::ensure($this->request, '\rock\request\Request');
+        $this->response ? : Instance::ensure($this->response, '\rock\response\Response');
+    }
 
 
-//    /**
+    //    /**
 //     * @inheritdoc
 //     */
 //    public function bootstrap($app)
@@ -118,16 +125,14 @@ class ContentNegotiatorFilter extends ActionFilter
      */
     public function negotiate()
     {
-        $request = $this->request ? : Rock::$app->request;
-        $response = $this->response ? : Rock::$app->response;
         if (!empty($this->formats)) {
-            $this->negotiateContentType($request, $response);
+            $this->negotiateContentType($this->request, $this->response);
         }
         if (!empty($this->languages)) {
-            Rock::$app->language = $this->negotiateLanguage($request);
+            Rock::$app->language = $this->negotiateLanguage($this->request);
         }
         if (isset($this->sendCSRF)) {
-            $response->sendCSRF = $this->sendCSRF;
+            $this->response->sendCSRF = $this->sendCSRF;
         }
     }
 
