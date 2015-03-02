@@ -11,12 +11,12 @@ return [
                 [
                     [Route::GET],
                     '/' ,
-                    [new \apps\frontend\controllers\MainController(), 'actionIndex']
+                    [\apps\frontend\controllers\MainController::className(), 'actionIndex']
                 ],
                 [
                     \rock\route\Route::GET,
                     '*',
-                    [new \apps\frontend\controllers\MainController(), 'notPage']
+                    [\apps\frontend\controllers\MainController::className(), 'notPage']
                 ],
             ],
     ],
