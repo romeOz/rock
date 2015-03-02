@@ -15,7 +15,6 @@ matrix:
 
 services:
   - rabbitmq
-  - mongodb
 
 # try running against postgres 9.4
 addons:
