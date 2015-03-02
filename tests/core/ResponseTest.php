@@ -21,12 +21,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     /** @var  Response */
     protected $response;
 
-    public static function setUpBeforeClass()
-    {
-        Container::load('response')->format = Response::FORMAT_HTML;
-    }
-
-    protected function setUp()
+     protected function setUp()
     {
         parent::setUp();
         $this->response = Container::load('response');
@@ -42,11 +37,9 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
     public function testGetJson()
     {
-        (new Route())->get(
+        (new Route(['response' => $this->response]))->get(
             '/',
-            function (array $dataRoute) {
-                return (new JsonController())->actionIndex();
-            }
+            [JsonController::className(), 'actionIndex']
         );
         $this->response->send();
         $this->expectOutputString(
@@ -61,11 +54,10 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
     public function testGetXml()
     {
-        (new Route())->get(
+
+        (new Route(['response' => $this->response]))->get(
             '/',
-            function (array $dataRoute) {
-                return (new XmlController())->actionIndex();
-            }
+            [XmlController::className(), 'actionIndex']
         );
         $this->response->send();
         $this->expectOutputString(
@@ -137,7 +129,7 @@ class JsonController extends Controller
 {
     public function actionIndex()
     {
-        Container::load('response')->format = Response::FORMAT_JSON;
+        $this->response->format = Response::FORMAT_JSON;
 
         return [
             'foo' => 'text',
@@ -150,7 +142,7 @@ class XmlController extends Controller
 {
     public function actionIndex()
     {
-        Container::load('response')->format = Response::FORMAT_XML;
+        $this->response->format = Response::FORMAT_XML;
 
         return [
             'foo' => 'text',
