@@ -12,8 +12,8 @@ class MainController extends Controller
         $this->render('index', ['content' => 'Hello world!']);
     }
 
-    public function notPage()
+    public function notPage($layout = 'index')
     {
-        return parent::notPage('index');
+        return parent::notPage($layout);
     }
 } 
