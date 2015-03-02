@@ -4,6 +4,7 @@ namespace rockunit\core\route;
 
 
 use rock\helpers\Helper;
+use rock\request\Request;
 use rock\route\Route;
 
 /**
@@ -12,6 +13,14 @@ use rock\route\Route;
  */
 class RouteTest extends RouteConfigTest
 {
+    public function testInjectArgs()
+    {
+        $_POST['_method'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/';
+        (new Route)->get('/', [FooController::className(), 'actionIndex']);
+        $this->expectOutputString(Request::className());
+    }
+
     /**
      * @dataProvider providerSuccess
      */

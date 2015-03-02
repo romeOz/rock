@@ -11,7 +11,6 @@ use rock\helpers\StringHelper;
 use rock\i18n\i18n;
 use rock\response\Response;
 use rock\Rock;
-use rock\route\Route;
 use rock\template\Template;
 
 abstract class Controller implements ComponentsInterface
@@ -90,11 +89,10 @@ abstract class Controller implements ComponentsInterface
     /**
      * Display notPage layout
      *
-     * @param Route       $route
      * @param string|null $layout
      * @return string|void
      */
-    public function notPage($route = null, $layout = null)
+    public function notPage($layout = null)
     {
         if (isset($this->response)) {
             $this->response->status404();
@@ -169,12 +167,12 @@ abstract class Controller implements ComponentsInterface
      * Get method
      *
      * @param string $actionName name of method
-     * @param Route  $route
      * @return mixed
      * @throws ControllerException
      */
-    public function method($actionName, Route $route = null)
+    public function method($actionName)
     {
+        $args = array_slice(func_get_args(), 1) ? : [];
         if (!method_exists($this, $actionName)) {
             $this->detachBehaviors();
             throw new ControllerException(ControllerException::UNKNOWN_METHOD, [
@@ -184,7 +182,7 @@ abstract class Controller implements ComponentsInterface
         if ($this->beforeAction($actionName) === false) {
             return null;
         }
-        $result = $this->$actionName($route);
+        $result = call_user_func_array([$this, $actionName], $args);//$this->$actionName($route);
         return $this->afterAction($actionName, $result);
     }
 

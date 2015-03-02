@@ -14,6 +14,6 @@ class MainController extends Controller
 
     public function notPage()
     {
-        return parent::notPage(null, 'index');
+        return parent::notPage('index');
     }
 } 

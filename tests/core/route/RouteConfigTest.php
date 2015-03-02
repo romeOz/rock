@@ -3,6 +3,7 @@
 namespace rockunit\core\route;
 
 use rock\core\Controller;
+use rock\request\Request;
 use rock\route\filters\AccessFilter;
 use rock\route\Route;
 
@@ -22,6 +23,30 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
     {
         parent::tearDownAfterClass();
         $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+    }
+
+    public function testInjectArgs()
+    {
+        $_POST['_method'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/';
+        (new Route(
+
+            [
+                'rules' =>
+                    [
+                        [
+                            Route::GET,
+                            '/',
+                            [FooController::className(), 'actionIndex']
+                        ],
+                    ],
+
+            ]
+
+        ))
+            ->run();
+
+        $this->expectOutputString(Request::className());
     }
 
     /**
@@ -560,4 +585,12 @@ class OrdersController extends Controller
         echo 'delete';
     }
 
+}
+
+class FooController extends Controller
+{
+    public function actionIndex(Request $request)
+    {
+        echo $request::className();
+    }
 }

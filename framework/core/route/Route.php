@@ -202,7 +202,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
         return $this->addRoute(self::DELETE, $pattern, $handler, $filters);
     }
 
-     /**
+    /**
      * Add routers
      *
      * @param string   $url
@@ -221,20 +221,20 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
     }
 
     /**
-     * @param array|\Closure $success
+     * @param callable $success
      * @return $this
      */
-    public function success($success)
+    public function success(callable $success)
     {
         $this->success = $success;
         return $this;
     }
 
     /**
-     * @param array|\Closure $fail
+     * @param callable $fail
      * @return $this
      */
-    public function fail($fail)
+    public function fail(callable $fail)
     {
         $this->fail = $fail;
         return $this;
@@ -592,11 +592,40 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
             $class->response = $this->response;
         }
 
-        $result = $class->method($method, $this);
+        $args = $this->injectArgs($class, $method);
+        array_unshift($args, $method);
+        $result = call_user_func_array([$class, 'method'], $args);//$class->method($method, $this);
         // echo other format json, xml...
         if (isset($result)) {
             $this->response->data = $result;
         }
+    }
+
+    protected function injectArgs($class, $method)
+    {
+        $reflectionMethod = new \ReflectionMethod($class, $method);
+        $args = [];
+        $i = 1;
+        foreach ($reflectionMethod->getParameters() as $param) {
+            if (!$class = $param->getClass()) {
+                if ($param->isDefaultValueAvailable()) {
+                    $args[] = $param->getDefaultValue();
+                } else {
+                    throw new RouteException("Argument #{$i} must be instance");
+                }
+
+                continue;
+            }
+
+            if ($class->isInstance($this)) {
+                $args[] = $this;
+                continue;
+            }
+
+            $args[] = Container::load($class->getName());
+            ++$i;
+        }
+        return $args;
     }
 
     protected function calculateData()
