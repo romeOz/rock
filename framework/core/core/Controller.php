@@ -4,6 +4,7 @@ namespace rock\core;
 use rock\base\Alias;
 use rock\components\ComponentsInterface;
 use rock\components\ComponentsTrait;
+use rock\di\Container;
 use rock\helpers\ArrayHelper;
 use rock\helpers\FileHelper;
 use rock\helpers\Instance;
@@ -39,11 +40,13 @@ abstract class Controller implements ComponentsInterface
     public function init()
     {
         $this->parentInit();
-        $this->template = Instance::ensure($this->template);
-        $this->template->context = $this;
-        if (!$this->template->existsConst(['res', 'context'])) {
-            Rock::$app->controller = $this;
-            $this->template->addConst('res', static::defaultData(), false, true);
+        if (!is_object($this->template)) {
+            $this->template = Container::load($this->template);
+            $this->template->context = $this;
+            if (!$this->template->existsConst(['res', 'context'])) {
+                Rock::$app->controller = $this;
+                $this->template->addConst('res', static::defaultData(), false, true);
+            }
         }
     }
 
