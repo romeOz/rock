@@ -13,9 +13,6 @@ matrix:
     - php: hhvm
     - php: hhvm-nightly
 
-services:
-  - rabbitmq
-
 # try running against postgres 9.4
 addons:
   postgresql: "9.4"
@@ -25,11 +22,7 @@ install:
   - composer install --prefer-dist
   - composer require satooshi/php-coveralls:*@dev
   - chmod -R +x tests/data/travis/
-  - tests/data/travis/zmq-setup.sh
-  - tests/data/travis/gearman-setup.sh
-  - tests/data/travis/rabbitmq-setup.sh
   - tests/data/travis/image-setup.sh
-  #- tests/data/travis/cubrid-setup.sh
   - framework/rock.sh
 
 before_script:
@@ -39,7 +32,7 @@ script:
   - mkdir -p build/logs
   - |
     if (php --version | grep -i HipHop > /dev/null); then
-      vendor/bin/phpunit --verbose --exclude-group php,mq
+      vendor/bin/phpunit --verbose --exclude-group php
     else
       vendor/bin/phpunit --verbose --coverage-clover build/logs/clover.xml --exclude-group hhvm
     fi

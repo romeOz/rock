@@ -61,6 +61,7 @@
         "imagine/imagine": "0.6.*"
     },
     "suggest": {
+        "romeoz/rock-mq": "required by Rock MQ",
         "tackk/cartographer": "required by SitemapResponseFormatter",
         "mibe/feedwriter": "required by RssResponseFormatter",
         "lusitanian/oauth" : "required by rock-authclient extension",
