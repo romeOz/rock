@@ -13,15 +13,10 @@ matrix:
     - php: hhvm
     - php: hhvm-nightly
 
-# try running against postgres 9.4
-addons:
-  postgresql: "9.4"
-
 install:
   - composer self-update && composer --version
   - composer install --prefer-dist
   - composer require satooshi/php-coveralls:*@dev
-  - chmod -R +x tests/data/travis/
   - framework/rock.sh
 
 before_script:
