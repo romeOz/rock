@@ -52,15 +52,18 @@
     },
     "require-dev": {
         "phpunit/phpunit": "4.4.*",
+        "romeoz/rock-image" : "*@dev",
         "romeoz/rock-sphinx" : "*@dev",
         "romeoz/rock-mongodb" : "*@dev",
-        "videlalvaro/php-amqplib": "2.2.*",
         "lusitanian/oauth": "*",
         "mibe/feedwriter": "*",
         "tackk/cartographer" :"*@dev",
         "imagine/imagine": "0.6.*"
     },
     "suggest": {
+        "romeoz/rock-mongodb" : "required by Rock MongoDB",
+        "romeoz/rock-sphinx" : "required by Rock Sphinx",
+        "romeoz/rock-image": "required by Rock Image",
         "romeoz/rock-mq": "required by Rock MQ",
         "tackk/cartographer": "required by SitemapResponseFormatter",
         "mibe/feedwriter": "required by RssResponseFormatter",

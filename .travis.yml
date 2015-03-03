@@ -22,7 +22,6 @@ install:
   - composer install --prefer-dist
   - composer require satooshi/php-coveralls:*@dev
   - chmod -R +x tests/data/travis/
-  - tests/data/travis/image-setup.sh
   - framework/rock.sh
 
 before_script:
