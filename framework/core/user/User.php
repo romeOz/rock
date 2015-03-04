@@ -276,7 +276,8 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
     protected static $access = [];
 
     /**
-     * @param       $roleName
+     * Check of compliance of the user to the role or permission.
+     * @param string $roleName name of role/permission
      * @param array $params
      * @param bool  $allowCaching
      * @return bool
