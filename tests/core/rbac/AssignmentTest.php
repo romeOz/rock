@@ -26,8 +26,8 @@ class AssignmentTest extends DatabaseTestCase
         static::sessionUp();
         
         $this->rbac = new PhpManager([
-             'path' => '@tests/core/rbac/src/rbac.php',
-             'pathAssignments' => '@tests/core/rbac/src/assignments.php'
+             'path' => '@rockunit/data/rbac/rbac.php',
+             'pathAssignments' => '@rockunit/data/rbac/assignments.php'
         ]);
     }
 
@@ -39,12 +39,12 @@ class AssignmentTest extends DatabaseTestCase
 
     public function testGet()
     {
-        $this->assertSame($this->rbac->getAssignments(2), ['editor']);
+        $this->assertSame(['editor'], $this->rbac->getAssignments(2));
     }
 
     public function testGetNull()
     {
-        $this->assertSame($this->rbac->getAssignments(77), []);
+        $this->assertSame([], $this->rbac->getAssignments(77));
     }
 
     public function testAssign()
@@ -58,7 +58,7 @@ class AssignmentTest extends DatabaseTestCase
 
         $this->assertEquals($expected, $actual);
         $this->assertTrue($this->rbac->revoke(2, [$moderator]));
-        $this->assertEquals($this->rbac->getAssignments(2), ['editor']);
+        $this->assertEquals(['editor'], $this->rbac->getAssignments(2));
     }
 
     /**
@@ -87,10 +87,10 @@ class AssignmentTest extends DatabaseTestCase
         $this->assertFalse($this->rbac->check(3, 'wizard'));
         $moderator = $this->rbac->getRole('moderator');
         $this->assertTrue($this->rbac->assign(3, [$moderator]));
-        $this->assertEquals($this->rbac->getAssignments(3), ['moderator']);
+        $this->assertEquals(['moderator'], $this->rbac->getAssignments(3));
         $this->assertFalse($this->rbac->check(3, 'moderator'));
         $this->assertTrue($this->rbac->revoke(3, [$moderator]));
-        $this->assertEquals($this->rbac->getAssignments(3), []);
+        $this->assertEquals([], $this->rbac->getAssignments(3));
         $this->assertFalse($this->rbac->check(3, 'moderator'));
     }
 

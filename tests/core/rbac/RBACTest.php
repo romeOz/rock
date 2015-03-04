@@ -25,8 +25,8 @@ class RBACTest extends DatabaseTestCase
         parent::setUp();
         static::sessionUp();
         $this->rbac = new PhpManager([
-             'path' => '@tests/core/rbac/src/rbac.php',
-             'pathAssignments' => '@tests/core/rbac/src/assignments.php'
+             'path' => '@rockunit/data/rbac/rbac.php',
+             'pathAssignments' => '@rockunit/data/rbac/assignments.php'
          ]);
     }
 

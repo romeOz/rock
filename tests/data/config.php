@@ -68,7 +68,7 @@ return [
         ],
         'rbac' => [
             'class' => PhpManager::className(),
-            'path' => '@tests/core/rbac/src/rbac.php'
+            'path' => '@rockunit/data/rbac/rbac.php'
         ]
     ]
 ];
