@@ -61,9 +61,9 @@ class BaseUsers extends ActiveRecord
 
     /**
      * Finds user by `id`
-     * @param int  $id      - `id` of user
-     * @param int|null  $status - `status` of user
-     * @param bool $asArray - result as `Array`
+     * @param int  $id      `id` of user
+     * @param int|null  $status `status` of user
+     * @param bool $asArray result as `Array`
      * @return UsersQuery|Users|array|null
      */
     public static function findOneById($id, $status = self::STATUS_ACTIVE, $asArray = true)
@@ -78,9 +78,9 @@ class BaseUsers extends ActiveRecord
     /**
      * Finds user by `username`
      *
-     * @param  string $username - `username` of user
-     * @param int|null  $status - `status` of user
-     * @param bool    $asArray  - result as `Array`
+     * @param  string $username `username` of user
+     * @param int|null  $status `status` of user
+     * @param bool    $asArray  result as `Array`
      * @return UsersQuery|Users|array|null
      */
     public static function findOneByUsername($username, $status = self::STATUS_ACTIVE, $asArray = true)
@@ -95,9 +95,9 @@ class BaseUsers extends ActiveRecord
     /**
      * Finds user by `email`
      *
-     * @param  string $email   - `email` of user
-     * @param int|null  $status - `status` of user
-     * @param bool    $asArray - result as `Array`
+     * @param  string $email   `email` of user
+     * @param int|null  $status `status` of user
+     * @param bool    $asArray result as `Array`
      * @return UsersQuery|Users|array|null
      */
     public static function findOneByEmail($email, $status = self::STATUS_ACTIVE, $asArray = true)
@@ -112,9 +112,9 @@ class BaseUsers extends ActiveRecord
     /**
      * Finds user by `token`
      *
-     * @param  string      $token - `token` of user
-     * @param int|null  $status - `status` of user
-     * @param bool    $asArray - result as `Array`
+     * @param  string      $token `token` of user
+     * @param int|null  $status `status` of user
+     * @param bool    $asArray result as `Array`
      * @return UsersQuery|Users|array|null
      */
     public static function findByToken($token, $status = self::STATUS_ACTIVE, $asArray = true)
@@ -129,8 +129,8 @@ class BaseUsers extends ActiveRecord
     /**
      * Exists user by `id`
      *
-     * @param  int $id - `id` of user
-     * @param int|null  $status - `status` of user
+     * @param  int $id `id` of user
+     * @param int|null  $status `status` of user
      * @return bool
      */
     public static function existsById($id, $status = self::STATUS_ACTIVE)
@@ -161,8 +161,8 @@ class BaseUsers extends ActiveRecord
     /**
      * Exists user by `email`
      *
-     * @param  string $email - `email` of user
-     * @param int|null  $status - `status` of user
+     * @param  string $email `email` of user
+     * @param int|null  $status `status` of user
      * @return bool
      */
     public static function existsByEmail($email, $status = self::STATUS_ACTIVE)
@@ -177,9 +177,9 @@ class BaseUsers extends ActiveRecord
     /**
      * Exists user by `email` or `username`
      *
-     * @param     $email    - `email` of user
-     * @param     $username - `username` of user
-     * @param int|null  $status - `status` of user
+     * @param     $email    `email` of user
+     * @param     $username `username` of user
+     * @param int|null  $status `status` of user
      * @return bool
      */
     public static function existsByUsernameOrEmail($email, $username, $status = self::STATUS_ACTIVE)

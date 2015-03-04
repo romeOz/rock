@@ -42,7 +42,7 @@ class BaseUsers extends ActiveRecord
      * Creates a new user
      *
      * @param  array       $attributes the attributes given by field => value
-     * @return BaseUsers|null the newly created model, or null on failure
+     * @return static the newly created model, or null on failure
      */
     public static function create($attributes)
     {
@@ -56,10 +56,27 @@ class BaseUsers extends ActiveRecord
         $user->setStatus(self::STATUS_NOT_ACTIVE);
         if ($user->save()) {
             return $user;
+        }
 
-        } else {
+        return null;
+    }
+
+    /**
+     * Activate user.
+     * @param string $token
+     * @return static
+     */
+    public static function activate($token)
+    {
+        if (empty($token) || (!$user = static::findByToken($token, static::STATUS_NOT_ACTIVE, false, []))) {
             return null;
         }
+        $user->removeToken();
+        $user->setStatus(static::STATUS_ACTIVE);
+        if ($user->save()) {
+            return $user;
+        }
+        return null;
     }
 
     public static function existsByUsernameOrEmail($email, $username)
@@ -93,10 +110,10 @@ class BaseUsers extends ActiveRecord
     /**
      * Finds user by `id`
      *
-     * @param int  $id      - `id` of user
-     * @param int|null  $status - `status` of user
-     * @param bool $asArray - result as `Array`
-     * @return UsersQuery|Users|array|null
+     * @param int  $id      `id` of user
+     * @param int|null  $status `status` of user
+     * @param bool $asArray result as `Array`
+     * @return static|array
      */
     public static function findOneById($id, $status = self::STATUS_ACTIVE, $asArray = true)
     {
@@ -110,10 +127,10 @@ class BaseUsers extends ActiveRecord
     /**
      * Finds user by username
      *
-     * @param  string $username - `username` of user
-     * @param int|null  $status - `status` of user
-     * @param bool    $asArray  - result as `Array`
-     * @return UsersQuery|Users|array|null
+     * @param  string $username `username` of user
+     * @param int|null  $status `status` of user
+     * @param bool    $asArray  result as `Array`
+     * @return static|array
      */
     public static function findOneByUsername($username, $status = self::STATUS_ACTIVE, $asArray = true)
     {
@@ -127,10 +144,10 @@ class BaseUsers extends ActiveRecord
     /**
      * Finds user by `email`
      *
-     * @param  string $email   - `email` of user
-     * @param int|null  $status - `status` of user
-     * @param bool    $asArray - result as `Array`
-     * @return UsersQuery|Users|array|null
+     * @param  string $email   `email` of user
+     * @param int|null  $status `status` of user
+     * @param bool    $asArray result as `Array`
+     * @return static|array
      */
     public static function findOneByEmail($email, $status = self::STATUS_ACTIVE, $asArray = true)
     {
@@ -144,10 +161,10 @@ class BaseUsers extends ActiveRecord
     /**
      * Finds user by `token`
      *
-     * @param  string      $token - `token` of user
-     * @param int|null  $status - `status` of user
-     * @param bool    $asArray - result as `Array`
-     * @return UsersQuery|Users|array|null
+     * @param  string      $token `token` of user
+     * @param int|null  $status `status` of user
+     * @param bool    $asArray result as `Array`
+     * @return static|array
      */
     public static function findByToken($token, $status = self::STATUS_ACTIVE, $asArray = true)
     {
@@ -159,9 +176,9 @@ class BaseUsers extends ActiveRecord
     }
 
     /**
-     * Exists user by id
+     * Exists user by id.
      *
-     * @param  int      $id
+     * @param  int  $id
      * @return bool
      */
     public static function existsById($id)
@@ -171,7 +188,6 @@ class BaseUsers extends ActiveRecord
             ->byId($id)
             ->exists();
     }
-
 
     /**
      * Exists user by username

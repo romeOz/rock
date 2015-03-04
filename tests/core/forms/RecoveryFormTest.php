@@ -12,7 +12,6 @@ use rockunit\core\db\models\ActiveRecord;
 use rockunit\core\db\models\BaseUsers;
 use rockunit\core\forms\models\RecoveryFormMock;
 use rockunit\core\forms\models\SignupFormMock;
-use rockunit\mocks\UserMock;
 
 /**
  * @group forms
@@ -51,6 +50,9 @@ class RecoveryFormTest extends DatabaseTestCase
 
     /**
      * @dataProvider providerFail
+     * @param array $post
+     * @param array $errors
+     * @throws \rock\di\ContainerException
      */
     public function testFail(array $post, array $errors)
     {
@@ -225,7 +227,7 @@ class RecoveryFormTest extends DatabaseTestCase
         $model->load($_POST);
         $this->assertTrue($model->validate());
         $this->assertTrue($model->isSignup);
-        $this->assertTrue((new UserMock())->activate($model->getUsers()->token));
+        $this->assertNotEmpty(BaseUsers::activate($model->getUsers()->token));
         $this->assertTrue(BaseUsers::existsByUsername('Chuck'));
     }
 }

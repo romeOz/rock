@@ -1,7 +1,6 @@
 <?php
 namespace rock\user;
 
-use apps\common\models\users\Users;
 use rock\base\CollectionInterface;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
@@ -249,29 +248,15 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
         return (bool)$this->get('is_login');
     }
 
+    /**
+     * Login user.
+     */
     public function login()
     {
         if (!$this->getIsActive()) {
             return;
         }
         $this->add('is_login', 1);
-    }
-
-    public function activate($token, $autoLogin = false)
-    {
-        if (empty($token) || (!$users = Users::findByToken($token, Users::STATUS_NOT_ACTIVE, false, []))) {
-            return false;
-        }
-        $users->removeToken();
-        $users->setStatus(Users::STATUS_ACTIVE);
-        $users->save();
-
-        if ($autoLogin === true) {
-            $this->addMulti($users->toArray(['id', 'username', 'firstname', 'lastname', 'fullname', 'url']));
-            $this->login();
-        }
-
-        return true;
     }
 
     /**
