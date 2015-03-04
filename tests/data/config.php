@@ -6,7 +6,7 @@ use rockunit\core\session\mocks\SessionMock;
 use rockunit\mocks\CookieMock;
 use rockunit\migrations\AccessItemsMigration;
 use rockunit\migrations\AccessRolesItemsMigration;
-use rockunit\migrations\AccessUsersItemsMigration;
+use rockunit\migrations\AccessAssignmentsMigration;
 use rockunit\migrations\SessionsMigration;
 use rockunit\migrations\UsersMigration;
 
@@ -27,7 +27,7 @@ return [
                 UsersMigration::className(),
                 AccessItemsMigration::className(),
                 AccessRolesItemsMigration::className(),
-                AccessUsersItemsMigration::className(),
+                AccessAssignmentsMigration::className(),
                 SessionsMigration::className(),
             ]
         ],

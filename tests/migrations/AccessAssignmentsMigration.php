@@ -6,9 +6,9 @@ namespace rockunit\migrations;
 use rock\db\Migration;
 use rock\db\Schema;
 
-class AccessUsersItemsMigration extends Migration
+class AccessAssignmentsMigration extends Migration
 {
-    public static $table = 'access_users_items';
+    public static $table = 'access_assignments';
     public function up()
     {
         $table = static::$table;

@@ -2,11 +2,8 @@
 
 namespace rock\rbac;
 
-use apps\common\models\users\access\Items;
-use apps\common\models\users\access\Roles;
-use apps\common\models\users\access\RolesItems;
-use apps\common\models\users\access\UsersItems;
 use rock\db\Connection;
+use rock\db\Query;
 use rock\db\SelectBuilder;
 use rock\di\Container;
 use rock\helpers\ArrayHelper;
@@ -19,7 +16,31 @@ class DBManager extends RBAC
      * with a DB connection object.
      */
     public $connection = 'db';
+    /**
+     * @var string the name of the table storing authorization items. Defaults to "access_items".
+     */
+    public $itemsTable = '{{%access_items}}';
+    /**
+     * @var string the name of the table storing roles. Defaults to "access_roles".
+     */
+    public $rolesTable = '{{%access_items}} {{%roles}}';
+    /**
+     * @var string the name of the table storing authorization item hierarchy. Defaults to "access_roles_items".
+     */
+    public $rolesItemsTable = '{{%access_roles_items}}';
+    /**
+     * @var string the name of the table storing authorization item assignments. Defaults to "access_assignments".
+     */
+    public $assignmentTable = '{{%access_assignments}}';
+    /**
+     * List roles and permissions.
+     * @var array
+     */
     protected static $items = [];
+    /**
+     * List assignments.
+     * @var array
+     */
     protected static $assignments = [];
 
     public function init()
@@ -27,7 +48,6 @@ class DBManager extends RBAC
         if (!is_object($this->connection)) {
             $this->connection = Container::load($this->connection);
         }
-        Items::$connection = Roles::$connection = RolesItems::$connection = UsersItems::$connection = $this->connection;
         if (!empty(static::$items)) {
             return;
         }
@@ -42,15 +62,18 @@ class DBManager extends RBAC
         if ($this->has($item->name)) {
             throw new RBACException("Cannot add '{$item->name}'. A has been exists.");
         }
+
         /** @var Role|Permission  $item */
-        $items = new Items();
-        $items->name = $item->name;
-        $items->type = $item->type;
-        $items->description = isset($item->description) ? $item->description : '';
-        $items->data = $item->data === null ? '' : serialize($item->data);
-        if (!$items->save()) {
+        if (!$this->connection->createCommand()
+            ->insert($this->itemsTable, [
+                'name' => $item->name,
+                'type' => $item->type,
+                'description' => isset($item->description) ? $item->description : '',
+                'data' => $item->data === null ? '' : serialize($item->data),
+            ])->execute()) {
             return false;
         }
+
         static::$items[$item->name] = [
             'type' => $item->type,
             'description' => $item->description,
@@ -70,7 +93,7 @@ class DBManager extends RBAC
         }
 
         $result = $this->connection->createCommand()
-            ->insert(RolesItems::tableName(), ['role' => $role->name, 'item' => $item->name])
+            ->insert($this->rolesItemsTable, ['role' => $role->name, 'item' => $item->name])
             ->execute();
 
         static::$items[$role->name]['items'] = isset(static::$items[$role->name]['items']) ? static::$items[$role->name]['items'] : [];
@@ -96,7 +119,7 @@ class DBManager extends RBAC
         }
         $result = $this->connection
             ->createCommand()
-            ->batchInsert(RolesItems::tableName(), ['role', 'item'], $rows)
+            ->batchInsert($this->rolesItemsTable, ['role', 'item'], $rows)
             ->execute();
         $items = isset(static::$items[$role->name]['items']) ? static::$items[$role->name]['items'] : [];
         static::$items[$role->name]['items'] =
@@ -113,7 +136,10 @@ class DBManager extends RBAC
     {
         $result = true;
         if (!empty(static::$items[$role->name]['items'])) {
-            $result = RolesItems::deleteAll(RolesItems::find()->byRole($role->name)->byItem($item->name)->where);
+            $result = $this->connection
+                ->createCommand()
+                ->delete($this->rolesItemsTable, ['and', '[[role]]=:role', '[[item]]=:item'], [':role' => $role->name, ':item' => $item->name])
+                ->execute();
             static::$items[$role->name]['items'] = array_diff(static::$items[$role->name]['items'], [$item->name]);
             unset(static::$roles[$role->name], static::$permissions[$role->name]);
         }
@@ -124,7 +150,7 @@ class DBManager extends RBAC
      * Detach an items
      *
      * @param Role $role
-     * @param Item[]                         $items
+     * @param Item[] $items
      * @return bool
      */
     public function detachItems(Role $role, array $items)
@@ -133,7 +159,11 @@ class DBManager extends RBAC
         foreach ($items as $item) {
             $names[] = $item->name;
         }
-        $result = RolesItems::deleteAll(RolesItems::find()->byRole($role->name)->byItems($names)->where);
+        $result = $this->connection
+            ->createCommand()
+            ->delete($this->rolesItemsTable, ['role' => $role->name, 'item' => $names])
+            ->execute();
+
         static::$items[$role->name]['items'] = array_diff(static::$items[$role->name]['items'], $names);
         unset(static::$roles[$role->name], static::$permissions[$role->name]);
         return (bool)$result;
@@ -141,7 +171,11 @@ class DBManager extends RBAC
 
     public function remove($itemName)
     {
-        $result = Items::deleteAll(Items::find()->byItem($itemName)->where);
+        $result = $this->connection
+            ->createCommand()
+            ->delete($this->itemsTable, '[[name]]=:item', [':item' => $itemName])
+            ->execute();
+
         $this->detachLoop($itemName);
         unset(static::$items[$itemName], static::$roles[$itemName], static::$permissions[$itemName]);
         return (bool)$result;
@@ -153,7 +187,10 @@ class DBManager extends RBAC
      */
     public function removeMulti(array $itemNames)
     {
-        $result = Items::deleteAll(Items::find()->byItems($itemNames)->where);
+        $result = $this->connection
+            ->createCommand()
+            ->delete($this->itemsTable, ['name' => $itemNames])
+            ->execute();
         foreach ($itemNames as $name) {
             $this->detachLoop($name);
             unset(static::$items[$name], static::$roles[$name], static::$permissions[$name]);
@@ -163,7 +200,11 @@ class DBManager extends RBAC
 
     public function removeAll()
     {
-        $result = Items::deleteAll();
+        $result = $this->connection
+            ->createCommand()
+            ->delete($this->itemsTable)
+            ->execute();
+
         static::$items = static::$roles = static::$permissions = null;
         return (bool)$result;
     }
@@ -176,7 +217,13 @@ class DBManager extends RBAC
         if (isset(static::$assignments[$userId])) {
             return static::$assignments[$userId];
         }
-        return static::$assignments[$userId] = array_keys(UsersItems::find()->byUserId($userId)->indexBy('item')->beginCache()->asArray()->all());
+        //@TODO cache
+        $assignments = (new Query)
+            ->from($this->assignmentTable)
+            ->where(['user_id' => $userId])
+            ->indexBy('item')
+            ->all($this->connection);
+        return static::$assignments[$userId] = array_keys($assignments);
     }
 
     /**
@@ -196,7 +243,7 @@ class DBManager extends RBAC
             static::$assignments[$userId][] = $role->name;
         }
 
-        return (bool)$this->connection->createCommand()->batchInsert(UsersItems::tableName(), ['user_id', 'item'], $rows)->execute();
+        return (bool)$this->connection->createCommand()->batchInsert($this->assignmentTable, ['user_id', 'item'], $rows)->execute();
     }
 
     /**
@@ -216,7 +263,10 @@ class DBManager extends RBAC
             unset(static::$assignments[$userId]);
         }
 
-        return (bool)UsersItems::deleteAll(UsersItems::find()->byUserId($userId)->byItems($names)->where);
+        return (bool)$this->connection
+            ->createCommand()
+            ->delete($this->assignmentTable, ['user_id' => $userId, 'item' => $names])
+            ->execute();
     }
 
     /**
@@ -225,7 +275,10 @@ class DBManager extends RBAC
     public function revokeAll($userId)
     {
         unset(static::$assignments[$userId]);
-        return (bool)UsersItems::deleteAll(UsersItems::find()->byUserId($userId)->where);
+        return (bool)$this->connection
+            ->createCommand()
+            ->delete($this->assignmentTable, ['user_id' => $userId])
+            ->execute();
     }
 
     public function refresh()
@@ -256,27 +309,34 @@ class DBManager extends RBAC
 
     protected function load()
     {
-        if (!$dataItems = Items::find()
-            ->fields()
-            ->sortByMenuIndex()
+        //@TODO cache
+        if (!$dataItems = (new Query)
+            ->from($this->itemsTable)
+            ->orderBy(['order_index' => SORT_DESC])
             ->indexBy('name')
-            ->beginCache()
-            ->asArray()
             ->all($this->connection)) {
 
             throw new RBACException('Items is empty.');
         }
         static::$items = $dataItems;
-        if (!$dataRolesItems = RolesItems::find()
-            ->select(SelectBuilder::selects([Roles::find()->fields(), [Items::find()->fields(), 'items']]))
-            ->innerJoinWith(
-                ['items', 'roles'],
-                false
+
+        $alias = Query::alias($this->rolesTable, $this->rolesTable);
+        //@TODO cache
+        if (!$dataRolesItems = (new Query)
+            ->select(
+                SelectBuilder::selects(
+                    [
+                        ['roles' => ['name', 'type', 'description', 'data']],
+                        ['access_items' => ['name', 'type', 'description', 'data'], 'items']
+                    ])
             )
-            ->beginCache()
-            ->asArray()
-            ->all($this->connection, true)
-        ) {
+            ->from($this->rolesItemsTable)
+            ->innerJoin($this->itemsTable, "{$this->rolesItemsTable}.item = {$this->itemsTable}.name")
+            ->innerJoin($this->rolesTable, "{$this->rolesItemsTable}.role = {$alias}.name")
+            ->andWhere(["{$alias}.type" => RBACInterface::TYPE_ROLE])
+            ->orderBy(["{$alias}.order_index" => SORT_DESC])
+            ->all($this->connection, true)) {
+
             return;
         }
         $result = [];

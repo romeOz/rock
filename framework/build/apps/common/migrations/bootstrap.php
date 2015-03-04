@@ -2,7 +2,7 @@
 
 use apps\common\migrations\AccessItemsMigration;
 use apps\common\migrations\AccessRolesItemsMigration;
-use apps\common\migrations\AccessUsersItemsMigration;
+use apps\common\migrations\AccessAssignmentsMigration;
 use apps\common\migrations\UsersMigration;
 use rock\Rock;
 
@@ -19,4 +19,4 @@ Rock::$app->language = 'en';
 (new UsersMigration())->up();
 (new  AccessItemsMigration())->up();
 (new  AccessRolesItemsMigration())->up();
-(new  AccessUsersItemsMigration())->up();
+(new  AccessAssignmentsMigration())->up();

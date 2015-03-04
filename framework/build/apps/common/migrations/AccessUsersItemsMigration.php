@@ -8,7 +8,7 @@ use rock\db\Schema;
 
 class AccessUsersItemsMigration extends Migration
 {
-    public $table = 'access_users_items';
+    public $table = 'access_assignments';
     public function up()
     {
         if ((bool)$this->connection->createCommand("SHOW TABLES LIKE '{$this->table}'")->execute()) {
