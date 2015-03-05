@@ -8,15 +8,11 @@ use rock\base\Alias;
 use rock\file\FileManager;
 use rock\image\ImageProvider;
 use rock\markdown\Markdown;
-use rockunit\core\db\DatabaseTestCase;
-use rockunit\core\db\models\ActiveRecord;
-use rockunit\core\db\models\Users;
 
 /**
  * @group base
- * @group db
  */
-class MarkdownTest extends DatabaseTestCase
+class MarkdownTest extends \PHPUnit_Framework_TestCase
 {
     protected function getMarkdown(array $config = [])
     {
@@ -119,68 +115,41 @@ Test</p>',
         );
     }
 
-    public function testThumbSuccess()
-    {
-        if (!class_exists('\rock\file\FileManager') || !class_exists('\League\Flysystem\Filesystem')) {
-            $this->markTestSkipped('FileManager not installed.');
-        }
-
-        $mark = $this->getMarkdown(['imageProvider' => $this->getImageProvider()]);
-        $this->assertSame(
-            '<p><img src="/src/cache/50x50/play.png" alt="" class="class2 class" id="id2" /></p>',
-            $mark->parse('![:thumb 50x50](/src/play.png){.class2 #id2 .class}')
-        );
-
-        $this->assertSame(
-            $mark->parse('![:thumb](/src/play.png){.class2 #id2 .class}'),
-            '<p><img src="/src/play.png" alt="" class="class2 class" id="id2" /></p>'
-        );
-    }
-    public function testThumbFail()
-    {
-        if (!class_exists('\rock\file\FileManager') || !class_exists('\League\Flysystem\Filesystem')) {
-            $this->markTestSkipped('FileManager not installed.');
-        }
-
-        $mark = $this->getMarkdown(['imageProvider' => $this->getImageProvider()]);
-        $this->assertSame(
-            $mark->parse('![:thumb 50x50](/src/foo.png){.class2 #id2 .class}'),
-            '<p><img src="/src/foo.png" alt="" class="class2 class" id="id2" /></p>'
-        );
-
-        $mark->denyTags = ['thumb'];
-        $this->assertSame(
-            $mark->parse('![:thumb 50x50](/src/foo.png){.class2 #id2 .class}'),
-            '<p><img src="/src/foo.png" alt="" class="class2 class" id="id2" /></p>'
-        );
-    }
-
-    public function testUsernameLinkSuccess()
-    {
-        ActiveRecord::$connection = $this->getConnection();
-        $markdown = $this->getMarkdown(['handlerLinkByUsername' =>
-            function($username){
-                return Users::findUrlByUsername($username);
-            }
-        ]);
-        $result = $markdown->parse('@Linda');
-        $this->assertSame('<p><a href="/linda/" title="Linda">@Linda</a></p>', $result);
-
-        $result = $markdown->parse('Hi @Linda, foo');
-        $this->assertSame('<p>Hi <a href="/linda/" title="Linda">@Linda</a>, foo</p>', $result);
-    }
-
-    public function testUsernameLinkFail()
-    {
-        ActiveRecord::$connection = $this->getConnection();
-        $markdown = $this->getMarkdown(['handlerLinkByUsername' =>
-        function($username){
-            return Users::findUrlByUsername($username);
-        }
-                                                    ]);
-        $result = $markdown->parse('@Tom');
-        $this->assertSame('<p><a href="#" title="Tom">@Tom</a></p>', $result);
-    }
+//    public function testThumbSuccess()
+//    {
+//        if (!class_exists('\rock\file\FileManager') || !class_exists('\League\Flysystem\Filesystem')) {
+//            $this->markTestSkipped('FileManager not installed.');
+//        }
+//
+//        $mark = $this->getMarkdown(['imageProvider' => $this->getImageProvider()]);
+//        $this->assertSame(
+//            '<p><img src="/src/cache/50x50/play.png" alt="" class="class2 class" id="id2" /></p>',
+//            $mark->parse('![:thumb 50x50](/src/play.png){.class2 #id2 .class}')
+//        );
+//
+//        $this->assertSame(
+//            $mark->parse('![:thumb](/src/play.png){.class2 #id2 .class}'),
+//            '<p><img src="/src/play.png" alt="" class="class2 class" id="id2" /></p>'
+//        );
+//    }
+//    public function testThumbFail()
+//    {
+//        if (!class_exists('\rock\file\FileManager') || !class_exists('\League\Flysystem\Filesystem')) {
+//            $this->markTestSkipped('FileManager not installed.');
+//        }
+//
+//        $mark = $this->getMarkdown(['imageProvider' => $this->getImageProvider()]);
+//        $this->assertSame(
+//            $mark->parse('![:thumb 50x50](/src/foo.png){.class2 #id2 .class}'),
+//            '<p><img src="/src/foo.png" alt="" class="class2 class" id="id2" /></p>'
+//        );
+//
+//        $mark->denyTags = ['thumb'];
+//        $this->assertSame(
+//            $mark->parse('![:thumb 50x50](/src/foo.png){.class2 #id2 .class}'),
+//            '<p><img src="/src/foo.png" alt="" class="class2 class" id="id2" /></p>'
+//        );
+//    }
 
     public function testDenyTags()
     {
@@ -215,21 +184,21 @@ bar')
         );
     }
 
-    protected function getImageProvider()
-    {
-        return new ImageProvider(
-            [
-                'srcImage' => '/src',
-                'srcCache' => '/src/cache',
-                'adapter' =>   [
-                    'class' => FileManager::className(),
-                    'adapter' => new Local(Alias::getAlias('@tests/core/markdown/src'))
-                ],
-                'adapterCache' => [
-                    'class' => FileManager::className(),
-                    'adapter' => new Local(Alias::getAlias('@tests/core/markdown/src/cache')),
-                ]
-            ]
-        );
-    }
+//    protected function getImageProvider()
+//    {
+//        return new ImageProvider(
+//            [
+//                'srcImage' => '/src',
+//                'srcCache' => '/src/cache',
+//                'adapter' =>   [
+//                    'class' => FileManager::className(),
+//                    'adapter' => new Local(Alias::getAlias('@rockunit/core/markdown/src'))
+//                ],
+//                'adapterCache' => [
+//                    'class' => FileManager::className(),
+//                    'adapter' => new Local(Alias::getAlias('@rockunit/core/markdown/src/cache')),
+//                ]
+//            ]
+//        );
+//    }
 }

@@ -26,7 +26,7 @@ class AssignmentTest extends DatabaseTestCase
         static::sessionUp();
         
         $this->rbac = new PhpManager([
-             'path' => '@rockunit/data/rbac/rbac.php',
+             'path' => '@rockunit/data/rbac/roles.php',
              'pathAssignments' => '@rockunit/data/rbac/assignments.php'
         ]);
     }

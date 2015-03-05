@@ -24,26 +24,23 @@ date_default_timezone_set('UTC');
 Rock::$app = new Rock();
 Rock::$app->language = 'en';
 
-if (!$config = require(dirname(__DIR__) . '/apps/common/configs/configs.php')) {
+if (!$config = require(dirname(__DIR__) . '/src/classes.php')) {
     die('configs is empty/not found');
 }
 
-
-Alias::setAlias('tests', __DIR__);
 Alias::setAlias('rockunit', __DIR__);
-Alias::setAlias('runtime', '@tests/runtime');
 
-require(dirname(__DIR__) . '/framework/polyfills.php');
+require(dirname(__DIR__) . '/src/polyfills.php');
 
 $components = require(__DIR__ . '/data/config.php');
-$config['components'] = \rock\helpers\ArrayHelper::merge(
-    $config['components'] ? : [],
+$config = \rock\helpers\ArrayHelper::merge(
+    $config ? : [],
     $components['classes']
 );
 
-Rock::$components = $config['components'];
-unset($config['components']);
-Rock::$config = $config;
+Rock::$components = $config;
+//unset($config['components']);
+//Rock::$config = $config;
 \rock\di\Container::addMulti(Rock::$components);
 
 \rock\exception\ErrorHandler::$logged = false;

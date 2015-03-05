@@ -1,8 +1,8 @@
 <?php
-use apps\common\rbac\UserRole;
 use rock\rbac\Permission;
 use rock\rbac\Role;
 use rock\rbac\RBACInterface;
+use rock\rbac\UserRole;
 
 return [
 

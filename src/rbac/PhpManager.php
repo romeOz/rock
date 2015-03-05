@@ -13,7 +13,7 @@ class PhpManager extends RBAC
      * This can be either a file path or a path alias to the file.
      * Make sure this file is writable by the Web server process if the authorization needs to be changed online.
      */
-    public $path = '@common/configs/rbac/rbac.php';
+    public $path = '@common/configs/rbac/roles.php';
     public $pathAssignments = '@common/configs/rbac/assignments.php';
 
     public function init()

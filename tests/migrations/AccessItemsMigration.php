@@ -3,12 +3,12 @@
 namespace rockunit\migrations;
 
 
-use apps\common\rbac\UserRole;
 use rock\db\Migration;
 use rock\db\Schema;
 use rock\rbac\Permission;
 use rock\rbac\Role;
 use rock\rbac\RBACInterface;
+use rock\rbac\UserRole;
 
 class AccessItemsMigration extends Migration
 {

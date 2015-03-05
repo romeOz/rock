@@ -21,21 +21,13 @@ trait CommonTestTrait
     public static $post = [];
 
     /**
-     * @param array $config config of session
+     * @param array|string $config config of session
      * @return SessionMock
      * @throws \rock\di\ContainerException
      */
-    public static function getSession(array $config = [])
+    public static function getSession($config = 'session')
     {
-        if (empty($config)) {
-            $config = [
-                'class' => SessionMock::className(),
-                //'singleton' => true
-            ];
-        }
-        Container::add('session', $config);
-
-        return Container::load('session');
+        return Container::load($config);
     }
 
     public static function activeSession($active = true)
@@ -98,7 +90,7 @@ trait CommonTestTrait
             $config = [
                 'class' => CacheFile::className(),
                 'adapter' => new FileManager([
-                   'adapter' => new Local(Alias::getAlias('@tests/runtime/cache')),
+                   'adapter' => new Local(Alias::getAlias('@rockunit/runtime/cache')),
                 ])
             ];
         }

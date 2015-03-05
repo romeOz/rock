@@ -28,7 +28,8 @@ class AccessAssignmentsMigration extends Migration
             true
         );
         $this->addPrimaryKey('',$table,['user_id', 'item']);
-        $this->addForeignKey("fk_{$table}_user", $table,'user_id', 'users', 'id', 'CASCADE', 'CASCADE');
+        //$this->addForeignKey("fk_{$table}_user", $table,'user_id', 'users', 'id', 'CASCADE', 'CASCADE');
+        $this->createIndex("idx_{$table}_user", $table, 'user_id');
         $this->addForeignKey("fk_{$table}_item", $table,'item', 'access_items', 'name', 'CASCADE', 'CASCADE');
 
         $this->batchInsert(

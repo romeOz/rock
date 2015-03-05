@@ -33,7 +33,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
     protected function getRBAC()
     {
         $rbac = new PhpManager([
-                   'path' => '@rockunit/data/rbac/rbac.php',
+                   'path' => '@rockunit/data/rbac/roles.php',
                    'pathAssignments' => '@rockunit/data/rbac/assignments.php'
            ]);
         return $rbac;

@@ -15,8 +15,8 @@
     </php>
     <testsuites>
         <testsuite>
-            <directory>./framework/polyfills/</directory>
-            <file>./framework/polyfills.php</file>
+            <directory>./src/polyfills/</directory>
+            <file>./src/polyfills.php</file>
             <directory>./tests/</directory>
         </testsuite>
     </testsuites>

@@ -5,8 +5,8 @@ namespace rock\markdown;
 use cebe\markdown\MarkdownExtra;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
-use rock\di\Container;
 use rock\helpers\Helper;
+use rock\helpers\Instance;
 use rock\image\ImageProvider;
 
 class Markdown extends MarkdownExtra implements ObjectInterface
@@ -44,6 +44,7 @@ class Markdown extends MarkdownExtra implements ObjectInterface
     public $specialAttributesDummy = '.dummy-video';
     public $defaultWidthVideo = 560;
     public $defaultHeightVideo = 315;
+    public $throwException = true;
     /** @var string|array|ImageProvider  */
     public $imageProvider = 'imageProvider';
     private $_specialAttributesRegex = '\{((?:[#\.][\\w-]+\\s*)+)\}';
@@ -53,9 +54,7 @@ class Markdown extends MarkdownExtra implements ObjectInterface
 
     public function init()
     {
-        if (!is_object($this->imageProvider)) {
-            $this->imageProvider = Container::load($this->imageProvider);
-        }
+        $this->imageProvider = Instance::ensure($this->imageProvider, null, false);
     }
 
     public function parse($text)
@@ -211,6 +210,12 @@ class Markdown extends MarkdownExtra implements ObjectInterface
             list($text, $url, $title, $offset, $key, $data) = $parts;
             if (isset($data['macros'])) {
                 if ($this->isTag('thumb') && $data['macros'] === 'thumb' && isset($data['width'])) {
+                    if (!isset($this->imageProvider)) {
+                        if ($this->throwException) {
+                            throw new MarkdownException(MarkdownException::NOT_INSTALL_IMAGE);
+                        }
+                        return $this->skipImage($markdown);
+                    }
                     $url = $this->imageProvider->get( '/' . ltrim($url, '/'), $data['width'], $data['height']);
                 } elseif ($this->isTag('video') && $data['macros'] !== 'thumb') {
                     $video = $this->calculateVideo(
@@ -242,15 +247,20 @@ class Markdown extends MarkdownExtra implements ObjectInterface
                 $offset + 1
             ];
         } else {
-            // remove all starting [ markers to avoid next one to be parsed as link
-            $result = '!';
-            $i = 1;
-            while (isset($markdown[$i]) && $markdown[$i] == '[') {
-                $result .= '[';
-                $i++;
-            }
-            return [['text', $result], $i];
+            return $this->skipImage($markdown);
         }
+    }
+
+    protected function skipImage($markdown)
+    {
+        // remove all starting [ markers to avoid next one to be parsed as link
+        $result = '!';
+        $i = 1;
+        while (isset($markdown[$i]) && $markdown[$i] == '[') {
+            $result .= '[';
+            $i++;
+        }
+        return [['text', $result], $i];
     }
 
 

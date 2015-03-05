@@ -66,11 +66,9 @@
     },
     "autoload": {
         "psr-4": {
-            "rock\\": "framework/core/",
-            "rock\\authclient\\" : "framework/extensions/authclient/",
-            "apps\\": "apps/"
+            "rock\\": "src/"
         },
-        "files": ["framework/extensions/phpmorphy/src/common.php"]
+        "files": ["src/phpmorphy/src/common.php"]
     },
     "extra": {
         "branch-alias": {

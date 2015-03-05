@@ -5,8 +5,8 @@ namespace rock\rbac;
 use rock\db\Connection;
 use rock\db\Query;
 use rock\db\SelectBuilder;
-use rock\di\Container;
 use rock\helpers\ArrayHelper;
+use rock\helpers\Instance;
 
 class DBManager extends RBAC
 {
@@ -45,9 +45,8 @@ class DBManager extends RBAC
 
     public function init()
     {
-        if (!is_object($this->connection)) {
-            $this->connection = Container::load($this->connection);
-        }
+        $this->connection = Instance::ensure($this->connection);
+
         if (!empty(static::$items)) {
             return;
         }

@@ -51,7 +51,7 @@ class DatabaseTestCase extends \PHPUnit_Framework_TestCase
     public static function getParam($name, $default = null)
     {
         if (static::$params === null) {
-            static::$params = require(Alias::getAlias('@tests/data/config.php'));
+            static::$params = require(Alias::getAlias('@rockunit/data/config.php'));
         }
 
         return isset(static::$params[$name]) ? static::$params[$name] : $default;

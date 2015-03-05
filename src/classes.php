@@ -1,10 +1,6 @@
 <?php
-use apps\common\rbac\UserRole;
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Cached\Storage\Adapter;
 use rock\base\Alias;
 use rock\db\BatchQueryResult;
-use rock\file\FileManager;
 use rock\helpers\ArrayHelper;
 use rock\rbac\Permission;
 use rock\rbac\Role;
@@ -40,32 +36,7 @@ return array_merge(
         'activeData' => [
             'class' => \rock\db\ActiveDataProvider::className(),
         ],
-//        'sphinx' => [
-//            'class' => \rock\sphinx\Connection::className(),
-//            'dsn' => 'mysql:host=127.0.0.1;port=9306;charset=utf8;',
-//            'username' => '',
-//            'password' => '',
-//        ],
-//        'mongodb' => [
-//            'class' => \rock\mongodb\Connection::className(),
-//            'dsn' => 'mongodb://developer:password@localhost:27017/mydatabase',
-//        ],
-//        'cache' => [
-//            'class' => \rock\cache\CacheStub::className(),
-//        ],
-//        'cache' => [
-//            'class' => \rock\cache\CacheFile::className(),
-//            'adapter' => function () {
-//                    return \rock\di\Container::load(
-//                        [
-//                            'class' => FileManager::className(),
-//                            'adapter' => new Local(Alias::getAlias('@common/runtime/cache')),
-//                            'config' => ['visibility' => FileManager::VISIBILITY_PRIVATE],
-//                            'cache' => new Adapter(new Local(Alias::getAlias('@common/runtime/filesystem')), 'cache.tmp')
-//                        ]
-//                    );
-//                }
-//        ],
+
         'template' => [
             'class' => Template::className(),
             'locale' => Rock::$app->language,
@@ -194,19 +165,18 @@ return array_merge(
 
         'execute' => [
             'class' => \rock\execute\CacheExecute::className(),
-            'path' => '@common/runtime/execute'
         ],
 
         'i18n' => [
             'class' => \rock\i18n\i18n::className(),
             'pathsDicts' => [
                 'ru' => [
-                    '@common/lang/ru/lang.php',
-                    '@common/lang/ru/validate.php',
+                    '@rock/messages/ru/lang.php',
+                    '@rock/messages/ru/validate.php',
                 ],
                 'en' => [
-                    '@common/lang/en/lang.php',
-                    '@common/lang/en/validate.php',
+                    '@rock/messages/en/lang.php',
+                    '@rock/messages/en/validate.php',
                 ]
             ],
             'locale' => Rock::$app->language
@@ -233,40 +203,6 @@ return array_merge(
             ]
         ],
 
-        // File manager
-        'file' => [
-            'class' => \rock\file\FileManager::className(),
-        ],
-        'uploadedFile' =>[
-            'class' => \rock\file\UploadedFile::className(),
-            'adapter' => [
-                'class' => FileManager::className(),
-                'adapter' => new Local(Alias::getAlias('@assets/images')),
-                'cache' => new Adapter(new Local(Alias::getAlias('@common.runtime/filesystem')), 'images.tmp')
-            ],
-            'calculatePathname' => function(\rock\file\UploadedFile $upload, $path, FileManager $fileManager = null) {
-                $pathname = !empty($path) ? [$path] : [];
-
-                if (isset($fileManager)) {
-                    $num = floor(
-                        count(
-                            $fileManager
-                                ->listContents(
-                                    "~/^\\d+\//",
-                                    true,
-                                    FileManager::TYPE_FILE
-                                )
-                        ) / 500);
-
-                    if (isset($num)) {
-                        $pathname[] =$num;
-                    }
-                }
-
-                $pathname[] = str_shuffle(md5_file($upload->tempName));
-                return implode(DS, $pathname) . ".{$upload->extension}";
-            }
-        ],
         'mail' => [
             'class' => \rock\mail\Mail::className(),
             'From' => 'support@' . (new \rock\request\Request())->getHost(),
@@ -290,25 +226,20 @@ return array_merge(
         ],
         'htmlResponseFormatter' => [
             'class' => \rock\response\HtmlResponseFormatter::className(),
-            //'singleton' => true,
         ],
         'jsonResponseFormatter' => [
             'class' => \rock\response\JsonResponseFormatter::className(),
-            //'singleton' => true,
         ],
         'xmlResponseFormatter' => [
             'class' => \rock\response\XmlResponseFormatter::className(),
-            //'singleton' => true,
         ],
         'rssResponseFormatter' => [
             'class' => \rock\response\RssResponseFormatter::className(),
-            //'singleton' => true,
         ],
 
         // Session & Cookies
         'session' => [
             'class' => \rock\session\Session::className(),
-            //'singleton' => true,
             'cookieParams' => [
                 'httponly' => true,
                 'lifetime' => 60 * 60 * 24 * 60,
@@ -317,21 +248,6 @@ return array_merge(
         ],
         'cookie' => [
             'class' => \rock\cookie\Cookie::className(),
-            //'singleton' => true,
-        ],
-
-        'imageProvider' => [
-            'class' => '\rock\image\ImageProvider',
-            'adapter' => [
-                'class' => FileManager::className(),
-                'adapter' => new Local(Alias::getAlias('@assets/images')),
-                'cache' => new Adapter(new Local(Alias::getAlias('@common.runtime/filesystem')), 'images.tmp')
-            ],
-            'adapterCache' => [
-                'class' => FileManager::className(),
-                'adapter' => new Local(Alias::getAlias('@assets/cache')),
-                'cache' => new Adapter(new Local(Alias::getAlias('@common.runtime/filesystem')), 'image_cache.tmp')
-            ],
         ],
 
         // Security
@@ -383,10 +299,6 @@ return array_merge(
         Permission::className() =>[
             'class' => Permission::className(),
         ],
-        UserRole::className() =>[
-            'class' => UserRole::className(),
-        ],
     ],
     require(__DIR__ . '/widgets.php')
-    //require(__DIR__ . '/snippets.php')
 );
