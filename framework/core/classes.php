@@ -14,8 +14,14 @@ use rock\template\Template;
 
 return array_merge(
     [
+        'route' => [
+            'class' => \rock\route\Route::className(),
+        ],
         'access' => [
             'class' => \rock\access\Access::className(),
+        ],
+        'behavior' => [
+            'class' => \rock\components\Behavior::className(),
         ],
 
         // Database
@@ -31,13 +37,22 @@ return array_merge(
         'BatchQueryResult' => [
             'class' => BatchQueryResult::className(),
         ],
-        'mongodb' => [
-            'class' => '\rock\mongodb\Connection',
-            'dsn' => 'mongodb://developer:password@localhost:27017/mydatabase',
+        'activeData' => [
+            'class' => \rock\db\ActiveDataProvider::className(),
         ],
-        'cache' => [
-            'class' => '\rock\cache\CacheStub'
-        ],
+//        'sphinx' => [
+//            'class' => \rock\sphinx\Connection::className(),
+//            'dsn' => 'mysql:host=127.0.0.1;port=9306;charset=utf8;',
+//            'username' => '',
+//            'password' => '',
+//        ],
+//        'mongodb' => [
+//            'class' => \rock\mongodb\Connection::className(),
+//            'dsn' => 'mongodb://developer:password@localhost:27017/mydatabase',
+//        ],
+//        'cache' => [
+//            'class' => \rock\cache\CacheStub::className(),
+//        ],
 //        'cache' => [
 //            'class' => \rock\cache\CacheFile::className(),
 //            'adapter' => function () {
@@ -218,15 +233,56 @@ return array_merge(
             ]
         ],
 
+        // File manager
+        'file' => [
+            'class' => \rock\file\FileManager::className(),
+        ],
+        'uploadedFile' =>[
+            'class' => \rock\file\UploadedFile::className(),
+            'adapter' => [
+                'class' => FileManager::className(),
+                'adapter' => new Local(Alias::getAlias('@assets/images')),
+                'cache' => new Adapter(new Local(Alias::getAlias('@common.runtime/filesystem')), 'images.tmp')
+            ],
+            'calculatePathname' => function(\rock\file\UploadedFile $upload, $path, FileManager $fileManager = null) {
+                $pathname = !empty($path) ? [$path] : [];
+
+                if (isset($fileManager)) {
+                    $num = floor(
+                        count(
+                            $fileManager
+                                ->listContents(
+                                    "~/^\\d+\//",
+                                    true,
+                                    FileManager::TYPE_FILE
+                                )
+                        ) / 500);
+
+                    if (isset($num)) {
+                        $pathname[] =$num;
+                    }
+                }
+
+                $pathname[] = str_shuffle(md5_file($upload->tempName));
+                return implode(DS, $pathname) . ".{$upload->extension}";
+            }
+        ],
         'mail' => [
             'class' => \rock\mail\Mail::className(),
             'From' => 'support@' . (new \rock\request\Request())->getHost(),
             'FromName' => 'Rock Framework',
         ],
+
+        // Request
+        'url' => [
+            'class' => \rock\url\Url::className(),
+        ],
         'request' => [
             'class' => \rock\request\Request::className(),
             'locale' => Rock::$app->language
         ],
+
+        // Response
         'response' => [
             'class' => \rock\response\Response::className(),
             //'singleton' => true,
@@ -249,16 +305,7 @@ return array_merge(
             //'singleton' => true,
         ],
 
-        'route' => [
-            'class' => \rock\route\Route::className(),
-        ],
-
-        'sphinx' => [
-            'class' => '\rock\sphinx\Connection',
-            'dsn' => 'mysql:host=127.0.0.1;port=9306;charset=utf8;',
-            'username' => '',
-            'password' => '',
-        ],
+        // Session & Cookies
         'session' => [
             'class' => \rock\session\Session::className(),
             //'singleton' => true,
@@ -286,11 +333,13 @@ return array_merge(
                 'cache' => new Adapter(new Local(Alias::getAlias('@common.runtime/filesystem')), 'image_cache.tmp')
             ],
         ],
-        'csrf' => [
-            'class' => \rock\csrf\CSRF::className(),
+
+        // Security
+        'security' => [
+            'class' => Security::className(),
         ],
-        'url' => [
-            'class' => \rock\url\Url::className(),
+        'sanitize' => [
+            'class' => \rock\sanitize\Sanitize::className(),
         ],
         'validate' => [
             'class' => \rock\validate\Validate::className(),
@@ -299,6 +348,9 @@ return array_merge(
         'activeValidate' => [
             'class' => \rock\validate\ActiveValidate::className(),
             'locale' => Rock::$app->language,
+        ],
+        'csrf' => [
+            'class' => \rock\csrf\CSRF::className(),
         ],
         'captcha' => [
             'class' => \rock\captcha\Captcha::className(),
@@ -309,70 +361,22 @@ return array_merge(
             // Noise black
             'blackNoiseDensity' => 1 / 30,
         ],
-        'file' => [
-            'class' => \rock\file\FileManager::className(),
-        ],
+
+        // user & RBAC
         'user' => [
             'class' => \rock\user\User::className(),
             'container' => 'user',
         ],
-
-        'activeData' => [
-            'class' => \rock\db\ActiveDataProvider::className(),
+        'rbac' =>[
+            'class' => \rock\rbac\DBManager::className(),
         ],
+
+
         'log' => [
             'class' => \rock\log\Log::className(),
             'path' => '@runtime/logs'
         ],
 
-        'behavior' => [
-            'class' => \rock\components\Behavior::className(),
-        ],
-        'rbac' =>[
-            'class' => \rock\rbac\DBManager::className(),
-        ],
-        'markdown' =>[
-            'class' => \rock\markdown\Markdown::className(),
-            'handlerLinkByUsername' => function($username){
-                    return \apps\common\models\users\Users::findUrlByUsername($username);
-                }
-        ],
-        'uploadedFile' =>[
-            'class' => \rock\file\UploadedFile::className(),
-            'adapter' => [
-                'class' => FileManager::className(),
-                'adapter' => new Local(Alias::getAlias('@assets/images')),
-                'cache' => new Adapter(new Local(Alias::getAlias('@common.runtime/filesystem')), 'images.tmp')
-            ],
-            'calculatePathname' => function(\rock\file\UploadedFile $upload, $path, FileManager $fileManager = null) {
-                    $pathname = !empty($path) ? [$path] : [];
-
-                    if (isset($fileManager)) {
-                        $num = floor(
-                            count(
-                                $fileManager
-                                    ->listContents(
-                                        "~/^\\d+\//",
-                                        true,
-                                        FileManager::TYPE_FILE
-                                    )
-                            ) / 500);
-
-                        if (isset($num)) {
-                            $pathname[] =$num;
-                        }
-                    }
-
-                    $pathname[] = str_shuffle(md5_file($upload->tempName));
-                    return implode(DS, $pathname) . ".{$upload->extension}";
-                }
-        ],
-        'security' => [
-            'class' => Security::className(),
-        ],
-        'sanitize' => [
-            'class' => \rock\sanitize\Sanitize::className(),
-        ],
         Role::className() =>[
             'class' => Role::className(),
         ],
