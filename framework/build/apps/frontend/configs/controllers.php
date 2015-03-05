@@ -1,5 +1,0 @@
-<?php
-/**
- * Container "Controllers"
- */
-return [];

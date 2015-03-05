@@ -17,7 +17,6 @@ install:
   - composer self-update && composer --version
   - composer install --prefer-dist
   - composer require satooshi/php-coveralls:*@dev
-  - framework/rock.sh
 
 before_script:
   - mysql -e 'CREATE DATABASE rocktest;'
