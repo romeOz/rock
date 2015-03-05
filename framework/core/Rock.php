@@ -30,6 +30,11 @@ class Rock extends Alias
      */
     public static $app;
     /**
+     * Directory to framework.
+     * @var string
+     */
+    public static $dir = __DIR__;
+    /**
      * @var string the charset currently used for the application.
      */
     public $charset = 'UTF-8';
