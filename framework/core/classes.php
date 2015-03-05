@@ -32,11 +32,11 @@ return array_merge(
             'class' => BatchQueryResult::className(),
         ],
         'mongodb' => [
-            'class' => \rock\mongodb\Connection::className(),
+            'class' => '\rock\mongodb\Connection',
             'dsn' => 'mongodb://developer:password@localhost:27017/mydatabase',
         ],
         'cache' => [
-            'class' => \rock\cache\CacheStub::className(),
+            'class' => '\rock\cache\CacheStub'
         ],
 //        'cache' => [
 //            'class' => \rock\cache\CacheFile::className(),
@@ -254,7 +254,7 @@ return array_merge(
         ],
 
         'sphinx' => [
-            'class' => \rock\sphinx\Connection::className(),
+            'class' => '\rock\sphinx\Connection',
             'dsn' => 'mysql:host=127.0.0.1;port=9306;charset=utf8;',
             'username' => '',
             'password' => '',
@@ -274,7 +274,7 @@ return array_merge(
         ],
 
         'imageProvider' => [
-            'class' => \rock\image\ImageProvider::className(),
+            'class' => '\rock\image\ImageProvider',
             'adapter' => [
                 'class' => FileManager::className(),
                 'adapter' => new Local(Alias::getAlias('@assets/images')),
