@@ -30,6 +30,13 @@ class Rock extends Alias
      */
     public static $app;
     /**
+     * List path aliases.
+     * @var array registered path aliases
+     * @see getAlias()
+     * @see setAlias()
+     */
+    public static $aliases = ['@rock' => __DIR__];
+    /**
      * @var string the charset currently used for the application.
      */
     public $charset = 'UTF-8';
