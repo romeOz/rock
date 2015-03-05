@@ -27,9 +27,9 @@ return [
             'class' => Log::className(),
             'path' => __DIR__ . '/runtime/logs'
         ],
-        'cache' => [
-            'class' => \rock\cache\CacheStub::className()
-        ],
+//        'cache' => [
+//            'class' => \rock\cache\CacheStub::className()
+//        ],
         'session' => [
             'class' => SessionMock::className(),
         ],
