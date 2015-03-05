@@ -18,49 +18,43 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/romeOz/rock-access"
-        },
-        {
-            "type": "vcs",
             "url": "https://github.com/romeOz/cartographer"
         }
     ],
     "require": {
         "php": ">=5.4.0",
-        "romeoz/rock-helpers" : "*@dev",
-        "romeoz/rock-di" : "*@dev",
-        "romeoz/rock-components" : "*@dev",
-        "romeoz/rock-sanitize" : "*@dev",
-        "romeoz/rock-validate" : "*@dev",
-        "romeoz/rock-request" : "*@dev",
-        "romeoz/rock-url" : "*@dev",
-        "romeoz/rock-date" : "*@dev",
-        "romeoz/rock-i18n" : "*@dev",
-        "romeoz/rock-file" : "*@dev",
-        "romeoz/rock-cache" : "*@dev",
-        "romeoz/rock-access" : "*@dev",
-        "romeoz/rock-template" : "*@dev",
-        "romeoz/rock-execute" : "*@dev",
-        "romeoz/rock-widgets" : "*@dev",
-        "romeoz/rock-behaviors" : "*@dev",
-        "romeoz/rock-session" : "*@dev",
-        "romeoz/rock-db" : "*@dev",
-        "filp/whoops": "*",
-        "phpmailer/phpmailer"   : "*",
-        "monolog/monolog": "*",
-        "cebe/markdown": "*@dev"
+        "romeoz/rock-components" : "0.10.*",
+        "romeoz/rock-di" : "0.10.*",
+        "romeoz/rock-sanitize" : "0.10.*",
+        "romeoz/rock-validate" : "0.10.*",
+        "romeoz/rock-request" : "0.10.*",
+        "romeoz/rock-url" : "0.10.*",
+        "romeoz/rock-date" : "0.10.*",
+        "romeoz/rock-i18n" : "0.10.*",
+        "romeoz/rock-file" : "0.10.*",
+        "romeoz/rock-access" : "0.10.*",
+        "romeoz/rock-template" : "0.10.*",
+        "romeoz/rock-widgets" : "0.10.*",
+        "romeoz/rock-behaviors" : "0.10.*",
+        "romeoz/rock-session" : "0.10.*",
+        "romeoz/rock-db" : "0.10.*",
+        "filp/whoops": "1.1.*",
+        "phpmailer/phpmailer"   : "5.2.*",
+        "monolog/monolog": "1.*"
     },
     "require-dev": {
         "phpunit/phpunit": "4.4.*",
-        "romeoz/rock-image" : "*@dev",
-        "romeoz/rock-sphinx" : "*@dev",
-        "romeoz/rock-mongodb" : "*@dev",
-        "lusitanian/oauth": "*",
-        "mibe/feedwriter": "*",
+        "romeoz/rock-image" : "0.10.*",
+        "romeoz/rock-cache" : "0.10.*",
+        "romeoz/rock-sphinx" : "0.10.*",
+        "romeoz/rock-mongodb" : "0.10.*",
+        "lusitanian/oauth": "0.3.*",
+        "mibe/feedwriter": "1.0.*",
         "tackk/cartographer" :"*@dev",
-        "imagine/imagine": "0.6.*"
+        "cebe/markdown": "*@dev"
     },
     "suggest": {
+        "romeoz/rock-cache" : "required by Rock Cache",
         "romeoz/rock-mongodb" : "required by Rock MongoDB",
         "romeoz/rock-sphinx" : "required by Rock Sphinx",
         "romeoz/rock-image": "required by Rock Image",
@@ -68,17 +62,12 @@
         "tackk/cartographer": "required by SitemapResponseFormatter",
         "mibe/feedwriter": "required by RssResponseFormatter",
         "lusitanian/oauth" : "required by rock-authclient extension",
-        "videlalvaro/php-amqplib": "required by rock-mq extension",
-        "imagine/imagine": "required by rock-imagine"
+        "videlalvaro/php-amqplib": "required by rock-mq extension"
     },
     "autoload": {
         "psr-4": {
             "rock\\": "framework/core/",
-            "rock\\imagine\\": "framework/extensions/imagine/",
-            "rock\\sphinx\\": "framework/extensions/sphinx/",
-            "rock\\mongodb\\": "framework/extensions/mongodb/",
             "rock\\authclient\\" : "framework/extensions/authclient/",
-            "rock\\mq\\" : "framework/extensions/mq/",
             "apps\\": "apps/"
         },
         "files": ["framework/extensions/phpmorphy/src/common.php"]
