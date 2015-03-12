@@ -48,23 +48,22 @@
         "tackk/cartographer" :"*@dev"
     },
     "suggest": {
-        "romeoz/rock-file" : "required by Rock File",
-        "romeoz/rock-cache" : "required by Rock Cache",
-        "romeoz/rock-mongodb" : "required by Rock MongoDB",
-        "romeoz/rock-sphinx" : "required by Rock Sphinx",
-        "romeoz/rock-image": "required by Rock Image",
-        "romeoz/rock-markdown": "required by Rock Markdown",
-        "romeoz/rock-mq": "required by Rock MQ",
+        "romeoz/rock-file" : "Rock File",
+        "romeoz/rock-cache" : "Rock Cache",
+        "romeoz/rock-mongodb" : "Rock MongoDB",
+        "romeoz/rock-sphinx" : "Rock Sphinx",
+        "romeoz/rock-image": "Rock Image",
+        "romeoz/rock-markdown": "Rock Markdown",
+        "romeoz/rock-mq": "Rock MQ",
+        "romeoz/rock-morphy": "Rock Morphy",
         "tackk/cartographer": "required by SitemapResponseFormatter",
         "mibe/feedwriter": "required by RssResponseFormatter",
-        "lusitanian/oauth" : "required by rock-authclient extension",
-        "videlalvaro/php-amqplib": "required by rock-mq extension"
+        "lusitanian/oauth" : "required by rock-authclient extension"
     },
     "autoload": {
         "psr-4": {
             "rock\\": "src/"
-        },
-        "files": ["src/phpmorphy/src/common.php"]
+        }
     },
     "extra": {
         "branch-alias": {
