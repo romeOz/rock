@@ -45,8 +45,7 @@
         "phpunit/phpunit": "4.4.*",
         "lusitanian/oauth": "0.3.*",
         "mibe/feedwriter": "1.0.*",
-        "tackk/cartographer" :"*@dev",
-        "cebe/markdown": "*@dev"
+        "tackk/cartographer" :"*@dev"
     },
     "suggest": {
         "romeoz/rock-file" : "required by Rock File",
@@ -54,6 +53,7 @@
         "romeoz/rock-mongodb" : "required by Rock MongoDB",
         "romeoz/rock-sphinx" : "required by Rock Sphinx",
         "romeoz/rock-image": "required by Rock Image",
+        "romeoz/rock-markdown": "required by Rock Markdown",
         "romeoz/rock-mq": "required by Rock MQ",
         "tackk/cartographer": "required by SitemapResponseFormatter",
         "mibe/feedwriter": "required by RssResponseFormatter",
