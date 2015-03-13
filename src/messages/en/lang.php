@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'siteUnavailable'           => 'The website is temporarily unavailable. Please go to the page later.',
+    'notPage'                   => 'page not found',
+    'notContent'                => 'content is empty',
+    'notFound'                  => 'not found',
     'all' => 'all',
     'pageFirst'                 => 'page first',
     'first'                     => 'first',
@@ -55,7 +59,6 @@ return [
     'commentsNote' => 'In the message, use markup language <a href="http://ru.wikipedia.org/wiki/Markdown" target="_blank">Markdown</a>.',
     'notJs'                     => 'Your browser does not support JavaScript. Try to fix this in the browser settings.',
     'logout' => 'logout',
-    'notContent'                => 'content is empty',
     'characters' => 'characters',
     'failHTTPRequest'               => 'HTTP-request error.',
     'failServer' => 'Server error.',
