@@ -1,6 +1,0 @@
----
-- name: Install ZeroMQ library + php5-zmq
-  action: apt pkg={{ item }} state=latest
-  with_items:
-    - libzmq3
-    - php5-zmq

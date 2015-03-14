@@ -1,8 +1,0 @@
----
-- name: Install Memcahced + php5-memcached + php5-memcache
-  action: apt pkg={{ item }} state=latest
-  with_items:
-    - memcached
-    - php5-memcached
-    - php5-memcache
-  notify: restart memcached
