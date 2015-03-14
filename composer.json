@@ -43,10 +43,7 @@
         "monolog/monolog": "1.*"
     },
     "require-dev": {
-        "phpunit/phpunit": "4.4.*",
-        "lusitanian/oauth": "0.3.*",
-        "mibe/feedwriter": "1.0.*",
-        "tackk/cartographer" :"*@dev"
+        "phpunit/phpunit": "4.4.*"
     },
     "suggest": {
         "romeoz/rock-file" : "Rock File",
