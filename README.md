@@ -43,7 +43,12 @@ Features
  * [Url Builder](https://github.com/romeOz/rock-url)
  * [DateTime Builder](https://github.com/romeOz/rock-date)
  * [Request](https://github.com/romeOz/rock-request)
- * Response + Formatters (HtmlResponseFormatter, JsonResponseFormatter, XmlResponseFormatter, RssResponseFormatter, SitemapResponseFormatter)
+ * Response + Formatters 
+    * HtmlResponseFormatter
+    * JsonResponseFormatter 
+    * XmlResponseFormatter 
+    * RssResponseFormatter 
+    * SitemapResponseFormatter
  * [Session](https://github.com/romeOz/rock-session)
  * Cookie
  * [i18n](https://github.com/romeOz/rock-i18n)
