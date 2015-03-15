@@ -34,7 +34,7 @@ abstract class Controller implements ComponentsInterface
     /** @var  Response */
     public $response;
     /** @var  Template|string|array */
-    protected $template = 'template';
+    public $template = 'template';
 
     public function init()
     {
