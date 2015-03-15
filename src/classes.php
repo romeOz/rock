@@ -98,11 +98,7 @@ return array_merge(
                     },
             ],
             'title' => 'Demo',
-            'metaTags' => function(){
-                    return [
-                        '<meta charset="'.Rock::$app->charset.'" />',
-                    ];
-                },
+            'metaTags' => '<meta charset="'.Rock::$app->charset.'" />',
             'linkTags' => [
                 '<link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico?10">',
             ],
@@ -302,3 +298,7 @@ return array_merge(
     ],
     require(__DIR__ . '/widgets.php')
 );
+
+class TemplateProperties {
+
+}
