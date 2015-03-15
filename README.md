@@ -69,6 +69,7 @@ Features
  * [Markdown](https://github.com/romeOz/rock-markdown) **(option)**
  * [Sphinx API/ORM](https://github.com/romeOz/rock-sphinx) **(option)**
  * [Morphy API](https://github.com/romeOz/rock-morphy) **(option)**
+ * [MongoDB ODM](https://github.com/romeOz/rock-mongodb) **(option)**
  * OAuth/OAuth2 clients
  * [Message queue services](https://github.com/romeOz/rock-mq) **(option)**
     * ZeroMQ
