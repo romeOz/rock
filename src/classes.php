@@ -298,7 +298,3 @@ return array_merge(
     ],
     require(__DIR__ . '/widgets.php')
 );
-
-class TemplateProperties {
-
-}

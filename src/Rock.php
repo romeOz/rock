@@ -2,7 +2,6 @@
 namespace rock;
 
 
-use League\Flysystem\Util;
 use rock\base\Alias;
 use rock\base\ClassName;
 use rock\base\ObjectInterface;
