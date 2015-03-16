@@ -2,8 +2,6 @@
 namespace rockunit\core\behavior\Behavior;
 
 
-
-use rock\access\Access;
 use rock\components\Behavior;
 use rock\core\ActionEvent;
 use rock\core\Controller;
@@ -99,11 +97,12 @@ class BehaviorTest extends \PHPUnit_Framework_TestCase
                 echo 'fail';
             }
         ];
+        $this->assertNull($controller->actionView());
         $this->assertTrue($controller->existsBehavior('access'));
         $this->assertInstanceOf(Behavior::className(), $controller->detachBehavior('access'));
         $this->assertFalse($controller->existsBehavior('access'));
         $this->assertSame('view', $controller->actionView());
-        $this->expectOutputString('test view');
+        $this->expectOutputString('failtest view');
     }
 }
 
