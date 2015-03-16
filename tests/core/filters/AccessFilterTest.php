@@ -63,9 +63,9 @@ class FooController extends Controller
                         'ips' => ['127.0.0.5'],
                         'roles' => ['editor']
                     ],
-                'fail' =>  [function(AccessFilter $access){
+                'fail' =>  function(AccessFilter $access){
                     echo $access->access->isErrorRoles().$access->access->isErrorIps().$access->access->isErrorCustom().$access->access->isErrorVerbs();
-                }],
+                },
             ],
         ];
     }

@@ -5,7 +5,6 @@ namespace rock\filters;
 
 use rock\components\Behavior;
 use rock\core\Controller;
-use rock\helpers\Helper;
 
 class ActionFilter extends Behavior
 {
@@ -29,9 +28,9 @@ class ActionFilter extends Behavior
      * Success as callable, when using filter.
      *
      * ```php
-     * [[new Object, 'method'], $args]
-     * [['Object', 'staticMethod'], $args]
-     * [callback, $args]
+     * [new Object, 'method']
+     * ['Object', 'staticMethod']
+     * closure
      * ```
      *
      * @var array
@@ -41,9 +40,9 @@ class ActionFilter extends Behavior
      * Fail as callable, when using filter.
      *
      * ```php
-     * [[new Object, 'method'], $args]
-     * [['Object', 'staticMethod'], $args]
-     * [callback, $args]
+     * [new Object, 'method']
+     * ['Object', 'staticMethod']
+     * closure
      * ```
      *
      * @var array
@@ -99,7 +98,7 @@ class ActionFilter extends Behavior
         if ($event->isValid) {
             // call afterFilter only if beforeFilter succeeds
             // beforeFilter and afterFilter should be properly nested
-            $this->owner->on(Controller::EVENT_AFTER_ACTION, [$this, 'afterFilter'], null, false);
+            $this->owner->on(Controller::EVENT_AFTER_ACTION, [$this, 'afterFilter'], false);
             $this->callback($this->success);
         } else {
             $this->event->handled = true;
@@ -151,18 +150,11 @@ class ActionFilter extends Behavior
         return !in_array($action, $this->except, true) && (empty($this->only) || in_array($action, $this->only, true));
     }
 
-    protected function callback($handler)
+    protected function callback(callable $handler = null)
     {
         if (!isset($handler)) {
             return;
         }
-
-        if ($handler instanceof \Closure) {
-            $handler = [$handler];
-        }
-        $handler[1] = Helper::getValue($handler[1], [], true);
-        list($function, $data) = $handler;
-        $this->data = $data;
-        call_user_func($function, $this);
+        call_user_func($handler, $this);
     }
 } 

@@ -40,9 +40,9 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
     const FORMAT_ALL    = 15;
 
     public $rules = [];
-    /** @var  array|\Closure */
+    /** @var  callable */
     public $success;
-    /** @var  array|\Closure */
+    /** @var  callable */
     public $fail;
     public $RESTHandlers = [];
     public $sanitizeRules = ['removeTags', 'trim', ['call' => 'urldecode'],'toType'];
