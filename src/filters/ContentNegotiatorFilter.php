@@ -83,11 +83,6 @@ class ContentNegotiatorFilter extends ActionFilter
      */
     public $languages;
     /**
-     * Sending CSRF-token.
-     * @var bool
-     */
-    public $sendCSRF = false;
-    /**
      * @var Request|string|array the current request. If not set, the `request` application component will be used.
      */
     public $request = 'request';
@@ -97,12 +92,12 @@ class ContentNegotiatorFilter extends ActionFilter
     public $response = 'response';
 
     //    /**
-//     * @inheritdoc
-//     */
-//    public function bootstrap($app)
-//    {
-//        $this->negotiate();
-//    }
+    //     * @inheritdoc
+    //     */
+    //    public function bootstrap($app)
+    //    {
+    //        $this->negotiate();
+    //    }
 
     /**
      * {@inheritdoc}
@@ -126,9 +121,6 @@ class ContentNegotiatorFilter extends ActionFilter
         }
         if (!empty($this->languages)) {
             Rock::$app->language = $this->negotiateLanguage($this->request);
-        }
-        if (isset($this->sendCSRF)) {
-            $this->response->sendCSRF = $this->sendCSRF;
         }
     }
 
