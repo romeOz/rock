@@ -164,17 +164,6 @@ class Response implements EventsInterface
      */
     public $isSent = false;
     /**
-     * Sending CSRF-token.
-     * @var bool
-     */
-    public $sendCSRF = false;
-    /**
-     * Content Security Policy.
-     * @var string
-     * @link http://www.w3.org/TR/CSP/
-     */
-    public $CSP;
-    /**
      * @var array list of HTTP status codes and the corresponding texts
      */
     public $httpStatuses = [
@@ -316,7 +305,7 @@ class Response implements EventsInterface
 
     /**
      * Returns the header collection.
-     * 
+     *
      * The header collection contains the currently registered HTTP headers.
      * @return HeaderCollection the header collection
      */
@@ -340,8 +329,6 @@ class Response implements EventsInterface
             return;
         }
         $this->trigger(self::EVENT_BEFORE_SEND);
-        $this->addCSP();
-        $this->addCSRF();
         $this->prepare();
         $this->trigger(self::EVENT_AFTER_PREPARE);
         $this->sendHeaders();
@@ -810,7 +797,7 @@ class Response implements EventsInterface
 
     /**
      * Refreshes the current page.
-     * 
+     *
      * The effect of this method call is the same as the user pressing the refresh button of his browser
      * (without re-posting data).
      *
@@ -833,8 +820,6 @@ class Response implements EventsInterface
         }
         return $this->redirect($url->getAbsoluteUrl(true) . $anchor);
     }
-
-
 
     /**
      * Redirects the browser to the home page.
@@ -998,10 +983,10 @@ class Response implements EventsInterface
         if ($this->stream !== null || $this->data === null) {
             return;
         }
-//        if (!empty($this->content) && is_array($this->data)) {
-//            $this->data = array_merge($this->data, $this->content);
-//            $this->content = null;
-//        }
+        //        if (!empty($this->content) && is_array($this->data)) {
+        //            $this->data = array_merge($this->data, $this->content);
+        //            $this->content = null;
+        //        }
         if (isset($this->formatters[$this->format])) {
             $formatter = $this->formatters[$this->format];
             if (!is_object($formatter)) {
@@ -1026,33 +1011,5 @@ class Response implements EventsInterface
                 throw new ResponseException("Response content must be a string or an object implementing __toString().");
             }
         }
-    }
-
-    protected function addCSRF()
-    {
-        if (!$this->sendCSRF || !$this->csrf instanceof CSRF) {
-            return;
-        }
-        $csrfToken = $this->csrf->get();
-        if ($csrfToken) {
-            if (is_array($this->data)) {
-                $this->data[$this->csrf->csrfParam] = $csrfToken;
-            }
-            $this->getHeaders()->add(CSRF::CSRF_HEADER, $csrfToken);
-        }
-    }
-
-    protected function addCSP()
-    {
-        if (!isset($this->CSP)) {
-            return;
-        }
-        $this->CSP = str_replace(["\n", "\t"], ' ', $this->CSP);
-        // @link http://caniuse.com/#feat=contentsecuritypolicy
-        $headers = [
-            'Content-Security-Policy' => $this->CSP,
-            'X-Content-Security-Policy' => $this->CSP // for IE10 or great
-        ];
-        $this->getHeaders()->addMulti($headers);
     }
 }
