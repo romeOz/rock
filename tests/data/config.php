@@ -12,8 +12,8 @@ return [
     'databases' => [
         'mysql' => [
             'dsn' => 'mysql:host=127.0.0.1;dbname=rocktest',
-            'username' => 'travis',
-            'password' => '',
+            'username' => 'root',
+            'password' => 'demo',
             'fixture' => __DIR__ . '/mysql.sql',
             'migrations' => [
                 AccessItemsMigration::className(),
