@@ -17,7 +17,7 @@ use rock\snippets\filters\RateLimiterTrait;
  *         'rateLimiter' => [
  *             'class' => RateLimiter::className(),
  *             'actions' => [
- *                  'actionIndex' => [100,10]
+ *                  'actionIndex' => [8, 60] // 8 iteration and 60 sec delay
  *             ]
  *         ],
  *     ];
@@ -30,12 +30,27 @@ class RateLimiter extends ActionFilter
 {
     use RateLimiterTrait;
 
+    /**
+     * Limit iterations.
+     * @var int
+     */
+    public $defaultLimit = 8;
+    /**
+     * Delay (second).
+     * @var int
+     */
+    public $defaultPeriod = 60;
+    /**
+     * List actions.
+     * @var array
+     */
     public $actions = [];
 
     public function init()
     {
         $this->session = Instance::ensure($this->session, '\rock\session\Session');
         $this->response = Instance::ensure($this->response, '\rock\response\Response');
+        $this->actions = (array)$this->actions;
     }
 
     /**
@@ -43,18 +58,22 @@ class RateLimiter extends ActionFilter
      */
     public function beforeAction($action)
     {
-        if (empty($this->actions) || empty($action)) {
+        if (empty($this->actions)) {
             return true;
         }
 
         if (isset($this->actions['*'])) {
             list ($limit, $period) = $this->actions['*'];
-        } elseif (isset($this->actions[$action])) {
+        } elseif (!empty($action) && isset($this->actions[$action])) {
             list ($limit, $period) = $this->actions[$action];
         } else {
-            return true;
+            $limit = $this->defaultLimit;
+            $period = $this->defaultPeriod;
         }
 
-        return $this->check($limit, $period, get_class($this->owner) . '::' .$action);
+        if (!empty($action)) {
+            $action =  '::' . $action;
+        }
+        return $this->check($limit, $period, get_class($this->owner) . $action);
     }
 }
