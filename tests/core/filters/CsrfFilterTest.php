@@ -22,8 +22,6 @@ class CsrfFilterTest extends \PHPUnit_Framework_TestCase
         $controller = new FooController();
         $controller->compare = 'fail';
         $this->assertNull($controller->method('actionIndex'));
-
-
     }
 
     /**
