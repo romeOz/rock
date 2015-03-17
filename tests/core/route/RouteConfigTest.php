@@ -16,6 +16,7 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
+        $_SERVER['REQUEST_METHOD'] = $_POST['_method'] = 'GET';
         $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
     }
 
