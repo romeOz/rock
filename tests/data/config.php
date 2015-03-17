@@ -19,6 +19,7 @@ return [
                 AccessItemsMigration::className(),
                 AccessRolesItemsMigration::className(),
                 AccessAssignmentsMigration::className(),
+                \rockunit\migrations\UsersMigration::className()
             ]
         ],
     ],

@@ -2,16 +2,16 @@
 
 namespace rockunit\core\db\models;
 
-use apps\frontend\controllers\users\UsersController;
-use apps\frontend\models\geo\Cities;
-use apps\frontend\models\geo\Countries;
-use apps\frontend\models\geo\Regions;
-use apps\frontend\models\templates\Templates;
-use apps\frontend\models\users\ImagesUsers;
-use rock\db\SelectBuilder;
-use rock\helpers\StringHelper;
+use rock\components\Linkable;
+use rock\helpers\Link;
+use rock\url\Url;
 
-
-class Users extends BaseUsers
+class Users extends BaseUsers implements Linkable
 {
+    public function getLinks()
+    {
+        return [
+            Link::REL_SELF => Url::set("http://site.com/users/{$this->username}")->getAbsoluteUrl(true),
+        ];
+    }
 }
