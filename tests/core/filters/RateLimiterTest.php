@@ -4,6 +4,7 @@ namespace rockunit\core\filters\RateLimiter;
 
 use rock\core\Controller;
 use rock\filters\RateLimiter;
+use rock\response\Response;
 use rock\Rock;
 
 /**
@@ -30,12 +31,15 @@ class RateLimiterTest extends \PHPUnit_Framework_TestCase
 
     public function testSuccess()
     {
-        $controller = new FooController();
+        $response = new Response();
+        $controller = new RateLimiterController(['response' => $response]);
         $this->assertSame($controller->method('actionIndex'), 'test');
         $this->assertSame($_SESSION['_allowance'][$controller::className().'::actionIndex']["maxRequests"], 1);
         $this->assertSame($controller->method('actionIndex'), 'test');
         $this->assertSame($_SESSION['_allowance'][$controller::className().'::actionIndex']["maxRequests"], 0);
         $this->assertNull($controller->method('actionIndex'));
+        $this->assertSame(2, $response->getHeaders()->get('x-rate-limit-limit'));
+        $this->assertSame(429, $response->statusCode);
         sleep(4);
 
         $this->assertSame($controller->method('actionIndex'), 'test');
@@ -56,7 +60,7 @@ class RateLimiterTest extends \PHPUnit_Framework_TestCase
 
     public function testFail()
     {
-        $controller = new FooController();
+        $controller = new RateLimiterController();
         $this->assertSame($controller->method('actionView'), 'view');
         $this->assertSame($controller->method('actionView'), 'view');
         $this->assertSame($controller->method('actionView'), 'view');
@@ -64,7 +68,7 @@ class RateLimiterTest extends \PHPUnit_Framework_TestCase
 }
 
 
-class FooController extends Controller
+class RateLimiterController extends Controller
 {
     public function behaviors()
     {
@@ -73,7 +77,8 @@ class FooController extends Controller
                 'class' => RateLimiter::className(),
                 'actions' => [
                     'actionIndex' => [2, 2]
-                ]
+                ],
+                'response' => $this->response
             ],
 
         ];
