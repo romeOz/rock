@@ -4,6 +4,7 @@ namespace rock\core;
 use rock\base\Alias;
 use rock\components\ComponentsInterface;
 use rock\components\ComponentsTrait;
+use rock\filters\CsrfFilter;
 use rock\helpers\ArrayHelper;
 use rock\helpers\FileHelper;
 use rock\helpers\Instance;
@@ -35,6 +36,11 @@ abstract class Controller implements ComponentsInterface
     public $response;
     /** @var  Template|string|array */
     public $template = 'template';
+    /**
+     * @var boolean whether to enable CSRF validation for the actions in this controller.
+     * CSRF validation is enabled only when both this property and {@see \rock\csrf\CSRF::enableCsrfValidation} are true.
+     */
+    public $enableCsrfValidation = true;
 
     public function init()
     {
@@ -45,6 +51,20 @@ abstract class Controller implements ComponentsInterface
             Rock::$app->controller = $this;
             $this->template->addConst('res', static::defaultData(), false, true);
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'csrfFilter' => [
+                'class' => CsrfFilter::className(),
+                'validate' => $this->enableCsrfValidation,
+                'response' => $this->response
+            ]
+        ];
     }
 
     /**
@@ -125,7 +145,7 @@ abstract class Controller implements ComponentsInterface
      * ```
      *
      * @param string $action the action to be executed.
-     * @return boolean whether the action should continue to run.
+     * @return bool whether the action should continue to run.
      */
     public function beforeAction($action)
     {
