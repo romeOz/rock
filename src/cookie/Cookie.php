@@ -43,6 +43,11 @@ class Cookie extends SessionFlash implements \ArrayAccess, SerializeInterface
      * such as JavaScript, which can effectively help to reduce identity theft through XSS attacks.
      */
     public $httpOnly = false;
+    /**
+     * Default sanitize rules.
+     * @var Sanitize
+     */
+    public $sanitize;
 
     protected static $isActive = false;
 
@@ -53,7 +58,6 @@ class Cookie extends SessionFlash implements \ArrayAccess, SerializeInterface
         }
         static::$isActive = true;
     }
-
 
     /**
      * @param string|array $keys        chain keys
@@ -66,10 +70,7 @@ class Cookie extends SessionFlash implements \ArrayAccess, SerializeInterface
         if (!$result = ArrayHelper::getValue(Serialize::unserializeRecursive($_COOKIE), $keys)) {
             return $default;
         }
-        if (!isset($sanitize)) {
-            $sanitize = Sanitize::removeTags()->trim()->toType();
-        }
-        return $sanitize->sanitize($result);
+        return $this->sanitize($result, $sanitize);
     }
 
     public function __get($name)
@@ -94,10 +95,7 @@ class Cookie extends SessionFlash implements \ArrayAccess, SerializeInterface
             return [];
         }
         static::$data = Serialize::unserializeRecursive($_COOKIE);
-        if (!isset($sanitize)) {
-            $sanitize = Sanitize::removeTags()->trim()->toType();
-        }
-        static::$data = $sanitize->sanitize(static::$data);
+        static::$data = $this->sanitize(static::$data, $sanitize);
 
         return static::$data = ArrayHelper::only(static::$data, $only, $exclude);
     }
@@ -223,5 +221,21 @@ class Cookie extends SessionFlash implements \ArrayAccess, SerializeInterface
         foreach ($_COOKIE as $name => $value) {
             $this->remove($name);
         }
+    }
+
+    protected function sanitize($value, Sanitize $sanitize = null)
+    {
+        if (!isset($sanitize)) {
+            if (isset($this->sanitize)) {
+                $sanitize = $this->sanitize;
+            } else {
+                $sanitize = Sanitize::removeTags()->trim()->toType();
+            }
+            if (is_array($value)) {
+                return Sanitize::attributes($sanitize)->sanitize($value);
+            }
+        }
+
+        return $sanitize->sanitize($value);
     }
 }
