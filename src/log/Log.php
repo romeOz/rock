@@ -38,7 +38,9 @@ class Log implements LogInterface, ObjectInterface
     public $path = __DIR__;
 
     /** @var Logger  */
-    protected $logger;
+    public $logger;
+    /** @var  LineFormatter */
+    public $formatter;
 
     public function __construct($config = [])
     {
@@ -47,10 +49,14 @@ class Log implements LogInterface, ObjectInterface
         if (isset($this->logger)) {
             return;
         }
-        $this->logger = new Logger('Rock');
         $path = Alias::getAlias($this->path);
         FileHelper::createDirectory($path);
-        $formatter = new LineFormatter("[%datetime%]\t%level_name%\t%extra.hash%\t%message%\t%extra.user_id%\t%extra.user_ip%\t%extra.user_agent%\n");
+
+        $this->logger = new Logger('Rock');
+
+        if (!$this->formatter instanceof LineFormatter) {
+            $this->formatter = new LineFormatter("[%datetime%]\t%level_name%\t%extra.hash%\t%message%\t%extra.user_id%\t%extra.user_ip%\t%extra.user_agent%\n");
+        }
         $this->logger->pushProcessor(function ($record) {
                 $record['extra']['hash'] = substr(md5($record['message']), -6);
                 $record['extra']['user_agent'] = strip_tags($_SERVER['HTTP_USER_AGENT']);
@@ -58,14 +64,14 @@ class Log implements LogInterface, ObjectInterface
                 $record['extra']['user_id'] = isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 'NULL';
                 return $record;
             });
-        $this->logger->pushHandler((new StreamHandler("{$path}/debug.log", self::DEBUG, false))->setFormatter($formatter));
-        $this->logger->pushHandler((new StreamHandler("{$path}/info.log", self::INFO, false))->setFormatter($formatter));
-        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::NOTICE, false))->setFormatter($formatter));
-        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::WARNING, false))->setFormatter($formatter));
-        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::ERROR, false))->setFormatter($formatter));
-        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::CRITICAL, false))->setFormatter($formatter));
-        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::ALERT, false))->setFormatter($formatter));
-        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::EMERGENCY, false))->setFormatter($formatter));
+        $this->logger->pushHandler((new StreamHandler("{$path}/debug.log", self::DEBUG, false))->setFormatter($this->formatter));
+        $this->logger->pushHandler((new StreamHandler("{$path}/info.log", self::INFO, false))->setFormatter($this->formatter));
+        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::NOTICE, false))->setFormatter($this->formatter));
+        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::WARNING, false))->setFormatter($this->formatter));
+        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::ERROR, false))->setFormatter($this->formatter));
+        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::CRITICAL, false))->setFormatter($this->formatter));
+        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::ALERT, false))->setFormatter($this->formatter));
+        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::EMERGENCY, false))->setFormatter($this->formatter));
     }
 
     public function setLogger(Logger $logger)
