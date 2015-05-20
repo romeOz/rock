@@ -55,7 +55,7 @@ class Log implements LogInterface, ObjectInterface
                 $record['extra']['hash'] = substr(md5($record['message']), -6);
                 $record['extra']['user_agent'] = strip_tags($_SERVER['HTTP_USER_AGENT']);
                 $record['extra']['user_ip'] = filter_input(INPUT_SERVER, 'REMOTE_ADDR', FILTER_VALIDATE_IP);
-                $record['extra']['user_id'] = isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 0;
+                $record['extra']['user_id'] = isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 'NULL';
                 return $record;
             });
         $this->logger->pushHandler((new StreamHandler("{$path}/debug.log", self::DEBUG, false))->setFormatter($formatter));
