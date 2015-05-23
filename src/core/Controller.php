@@ -110,9 +110,10 @@ abstract class Controller implements ComponentsInterface
      * Display notPage layout
      *
      * @param string|null $layout
+     * @param array $placeholders list placeholders
      * @return string|void
      */
-    public function notPage($layout = null)
+    public function notPage($layout = null, array $placeholders = [])
     {
         if (isset($this->response)) {
             $this->response->status404();
@@ -121,7 +122,7 @@ abstract class Controller implements ComponentsInterface
         if (!isset($layout)) {
             $layout = '@common.views/layouts/notPage';
         }
-        return $this->render($layout);
+        return $this->render($layout, $placeholders);
     }
 
     /**
