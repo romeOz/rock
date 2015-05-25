@@ -46,14 +46,7 @@ return array_merge(
                     return '#';
                 }
 
-                $urlBuilder = \rock\url\Url::set($link);
-                if (!isset($params['scheme'])) {
-                    $params['scheme'] = \rock\url\Url::REL;
-                }
-                if (!isset($params['selfHost'])) {
-                    $params['selfHost'] = false;
-                }
-                return $template->autoEscape($urlBuilder->get($params['scheme'], $params['selfHost']));
+                return $template->autoEscape(\rock\template\filters\BaseFilter::modifyUrl($link, $params));
             },
 
             'extensions' => [
