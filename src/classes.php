@@ -1,7 +1,6 @@
 <?php
 use rock\base\Alias;
 use rock\db\BatchQueryResult;
-use rock\helpers\ArrayHelper;
 use rock\rbac\Permission;
 use rock\rbac\Role;
 use rock\Rock;
@@ -41,28 +40,21 @@ return array_merge(
             'class' => Template::className(),
             'locale' => Rock::$app->language,
             'autoEscape' => Template::ESCAPE | Template::TO_TYPE,
-            'handlerLink' => function($link, Template $template)
-                {
-                    $class = $link[0];
-                    if (!class_exists($class)) {
-                        /** @var \rock\core\Controller $class */
-                        if (!$class = ArrayHelper::getValue((array)\rock\di\Container::get($class), ['class'])) {
-                            throw new \rock\template\TemplateException(\rock\template\TemplateException::UNKNOWN_CLASS, ['class' => $link[0]]);
-                        }
-                    }
-
-                    //  Get url by context
-                    if (count($link) === 1) {
-                        $urlBuilder = \rock\url\Url::set($class::context(['url']));
-                        return $template->autoEscape($urlBuilder->get());
-                    }
-                    // Get url by resource
-                    if (count($link) > 1) {
-                        $urlBuilder = \rock\url\Url::set($class::findUrlById($link[1]));
-                        return $template->autoEscape($urlBuilder->get());
-                    }
+            'handlerLink' => function($link, Template $template, array $params = [])
+            {
+                if (!$link = Alias::getAlias("@{$link}", [], false)) {
                     return '#';
-                },
+                }
+
+                $urlBuilder = \rock\url\Url::set($link);
+                if (!isset($params['scheme'])) {
+                    $params['scheme'] = \rock\url\Url::REL;
+                }
+                if (!isset($params['selfHost'])) {
+                    $params['selfHost'] = false;
+                }
+                return $template->autoEscape($urlBuilder->get($params['scheme'], $params['selfHost']));
+            },
 
             'extensions' => [
                 'cfg' => function (array $keys) {
