@@ -33,11 +33,14 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
     const ANY = '*';
     const REST = 1;
 
-    const FORMAT_SCHEME = 1;
-    const FORMAT_HOST   = 2;
-    const FORMAT_PATH   = 4;
-    const FORMAT_QUERY  = 8;
-    const FORMAT_ALL    = 15;
+    const FILTER_SCHEME = 'scheme';
+    const FILTER_HOST   = 'host';
+    const FILTER_PATH   = 'path';
+    const FILTER_QUERY  = 'query';
+    const FILTER_GET    = 'get';
+    const FILTER_POST   = 'post';
+    const FILTER_PUT   = 'put';
+    const FILTER_DELETE = 'delete';
 
     public $rules = [];
     /** @var  callable */
@@ -341,13 +344,21 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
     protected function isPattern($pattern)
     {
         if (is_array($pattern)) {
-            foreach ($pattern as $key => $value) {
-                if (!$format = $this->getFormat($key)) {
+            foreach ($pattern as $request => $compared) {
+                if (!$inputs = $this->getDataRequest($request)) {
                     return false;
                 }
-                if ($this->validPattern($value, $format) === false) {
-                    return false;
+                foreach ((array)$compared as $key => $compare) {
+
+                    if ($this->validPattern($compare, $inputs[$key]) === false) {
+                        return false;
+                    }
                 }
+
+                //                foreach($inputs as $input) {
+                //
+                //
+                //                }
             }
 
             return true;
@@ -360,29 +371,37 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
      * Get format.
      *
      * @param $key
-     * @return string
+     * @return array
      * @throws RouteException
      */
-    protected function getFormat($key)
+    protected function getDataRequest($key)
     {
         switch ($key) {
-            case self::FORMAT_SCHEME:
-                return $this->data['scheme'];
-            case self::FORMAT_HOST:
-                return $this->data['host'];
-            case self::FORMAT_PATH:
-                return $this->data['path'];
-            case self::FORMAT_QUERY:
-                return isset($this->data['query']) ? $this->data['query'] : null;
+            case self::FILTER_SCHEME:
+                return [$this->data['scheme']];
+            case self::FILTER_HOST:
+                return [$this->data['host']];
+            case self::FILTER_PATH:
+                return [$this->data['path']];
+            case self::FILTER_QUERY:
+                return isset($this->data['query']) ? [$this->data['query']] : [];
+            case self::FILTER_GET:
+                return $GLOBALS['_GET'] ? : [];
+            case self::FILTER_POST:
+                return $GLOBALS['_POST'] ? : [];
+            case self::FILTER_PUT:
+                return $GLOBALS['_PUT'] ? : [];
+            case self::FILTER_DELETE:
+                return $GLOBALS['_DELETE'] ? : [];
             default:
                 throw new RouteException(RouteException::UNKNOWN_FORMAT, ['format' => $key]);
         }
     }
 
-    protected function validPattern($pattern, $url)
+    protected function validPattern($pattern, $input)
     {
-        if ($pattern === '*' || $pattern === $url ||
-            (StringHelper::isRegexp($pattern) && $this->match($pattern, $url))
+        if ($pattern === '*' || $pattern === $input ||
+            (StringHelper::isRegexp($pattern) && $this->match($pattern, $input))
         ) {
             return true;
         }
@@ -474,7 +493,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
         }
         return false;
     }
-    
+
     protected function isREST($url, $controller, $filters)
     {
         $handlers = ArrayHelper::only(

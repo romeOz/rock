@@ -150,8 +150,8 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
                     $_POST['_method'] = null;
                 },
                 [
-                    Route::FORMAT_HOST => 'admin.site.com',
-                    Route::FORMAT_PATH => '~/^
+                    Route::FILTER_HOST => 'admin.site.com',
+                    Route::FILTER_PATH => '~/^
                                  \/
                                  (?P<controller>(news|tags))
                                  \/
@@ -293,8 +293,8 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
                     $_POST['_method'] = null;
                 },
                 [
-                    Route::FORMAT_HOST => 'admin.site.com',
-                    Route::FORMAT_PATH => '~/^
+                    Route::FILTER_HOST => 'admin.site.com',
+                    Route::FILTER_PATH => '~/^
                                  \/
                                  (?P<controller>(news|tags))
                                  \/
