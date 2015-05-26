@@ -147,6 +147,7 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
                 function(){
                     $_SERVER['HTTP_HOST'] = $_SERVER['SERVER_NAME'] = 'admin.site.com';
                     $_SERVER['REQUEST_URI'] = '/news/';
+                    $_GET['test'] = 'foo';
                     $_POST['_method'] = null;
                 },
                 [
@@ -155,7 +156,8 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
                                  \/
                                  (?P<controller>(news|tags))
                                  \/
-                            $/ix'
+                            $/ix',
+                    Route::FILTER_GET => ['test' => 'foo']
                 ],
                 Route::GET,
                 null,
@@ -291,14 +293,16 @@ class RouteConfigTest extends \PHPUnit_Framework_TestCase
                     $_SERVER['HTTP_HOST'] = $_SERVER['SERVER_NAME'] = 'site.com';
                     $_SERVER['REQUEST_URI'] = '/news/';
                     $_POST['_method'] = null;
+                    $_GET['test'] = 'bar';
                 },
                 [
-                    Route::FILTER_HOST => 'admin.site.com',
+                    Route::FILTER_HOST => 'site.com',
                     Route::FILTER_PATH => '~/^
                                  \/
                                  (?P<controller>(news|tags))
                                  \/
-                            $/ix'
+                            $/ix',
+                    Route::FILTER_GET => ['test' => 'foo']
                 ],
                 Route::GET,
                 null,
