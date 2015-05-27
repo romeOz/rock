@@ -19,7 +19,7 @@ Features
  * [Dependency Injection](https://github.com/romeOz/rock-di)
  * Route
  * [Template engine](https://github.com/romeOz/rock-template)
-    * [Snippets (ListView, Pagination,...)](https://github.com/romeOz/rock-template)
+    * [Snippets (listView, pagination,...)](https://github.com/romeOz/rock-template)
     * [HTML Builder](https://github.com/romeOz/rock-template)
     * [Widgets](https://github.com/romeOz/rock-widgets)
  * [ORM/DBAL](https://github.com/romeOz/rock-db)
