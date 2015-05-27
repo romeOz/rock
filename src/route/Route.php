@@ -349,6 +349,12 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
                     return false;
                 }
                 foreach ((array)$compared as $key => $compare) {
+                    if (!isset($inputs[$key])) {
+                        return false;
+                    }
+                    if ($compare === true && isset($inputs[$key])) {
+                        continue;
+                    }
                     if ($this->validPattern($compare, $inputs[$key]) === false) {
                         return false;
                     }
