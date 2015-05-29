@@ -54,33 +54,33 @@ return array_merge(
                     return \rock\helpers\ArrayHelper::getValue(Rock::$config, $keys);
                 },
                 'user' => function (array $keys) {
-                        if (current($keys) === 'isGuest') {
-                            return Rock::$app->user->isGuest();
-                        } elseif (in_array(current($keys), ['isLogged', 'isAuthenticated'], true)) {
-                            return !Rock::$app->user->isGuest();
-                        }
-                        return \rock\helpers\ArrayHelper::getValue(Rock::$app->user->getAll(), $keys);
-                    },
+                    if (current($keys) === 'isGuest') {
+                        return Rock::$app->user->isGuest();
+                    } elseif (in_array(current($keys), ['isLogged', 'isAuthenticated'], true)) {
+                        return !Rock::$app->user->isGuest();
+                    }
+                    return \rock\helpers\ArrayHelper::getValue(Rock::$app->user->getAll(), $keys);
+                },
                 'call' => function (array $call, array $params = [], Template $template) {
-                        if (!isset($call[1])) {
-                            $call[1] = null;
+                    if (!isset($call[1])) {
+                        $call[1] = null;
+                    }
+                    list($class, $method) = $call;
+                    if ($class === 'context') {
+                        $object = $template->context;
+                        $function = [$object, $method];
+                    } elseif (function_exists($class) && !$class instanceof \Closure){
+                        return call_user_func_array($class, $params);
+                    } else {
+                        $object = \rock\di\Container::load(Alias::getAlias($class));
+                        if (!method_exists($object, $method)) {
+                            throw new \rock\base\BaseException(\rock\base\BaseException::UNKNOWN_METHOD, ['method' => "{$class}::{$method}"]);
                         }
-                        list($class, $method) = $call;
-                        if ($class === 'context') {
-                            $object = $template->context;
-                            $function = [$object, $method];
-                        } elseif (function_exists($class) && !$class instanceof \Closure){
-                            return call_user_func_array($class, $params);
-                        } else {
-                            $object = \rock\di\Container::load(Alias::getAlias($class));
-                            if (!method_exists($object, $method)) {
-                                throw new \rock\base\BaseException(\rock\base\BaseException::UNKNOWN_METHOD, ['method' => "{$class}::{$method}"]);
-                            }
-                            $function = [$object, $method];
-                        }
+                        $function = [$object, $method];
+                    }
 
-                        return call_user_func_array($function, $params);
-                    },
+                    return call_user_func_array($function, $params);
+                },
             ],
             'title' => 'Demo',
             'metaTags' => '<meta charset="'.Rock::$app->charset.'" />',
@@ -88,36 +88,39 @@ return array_merge(
                 '<link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico?10">',
             ],
             'snippets' => [
-                'ListView' => [
+                'listView' => [
                     'class'        => \rock\snippets\ListView::className(),
                 ],
 
-                'Date' => [
+                'list' => [
+                    'class'        => \rock\snippets\ListView::className(),
+                ],
+
+                'date' => [
                     'class'        => \rock\snippets\Date::className(),
                 ],
 
-                'For' => [
+                'for' => [
                     'class'        => \rock\snippets\ForSnippet::className(),
                 ],
 
-                'Formula' => [
+                'formula' => [
                     'class'        => \rock\snippets\Formula::className(),
                 ],
 
-                'If' => [
+                'if' => [
                     'class'        => \rock\snippets\IfSnippet::className(),
                 ],
 
-                'Pagination' => [
+                'pagination' => [
                     'class'        => \rock\snippets\Pagination::className(),
                 ],
 
-                'request\Get' => [
-
+                'request.get' => [
                     'class'        => \rock\snippets\request\Get::className(),
                 ],
 
-                'request\Post' => [
+                'request.post' => [
                     'class'        => \rock\snippets\request\Post::className(),
                 ],
 
@@ -125,7 +128,7 @@ return array_merge(
                     'class'        => \rock\snippets\CSRF::className(),
                 ],
 
-                'Url' => [
+                'url' => [
                     'class'        => \rock\snippets\Url::className(),
                 ],
 
@@ -133,7 +136,7 @@ return array_merge(
                     'class'        => \rock\snippets\CaptchaView::className(),
                 ],
 
-                'Thumb' => [
+                'thumb' => [
                     'class'        => \rock\snippets\Thumb::className(),
                 ],
 
@@ -167,20 +170,20 @@ return array_merge(
             'locale' => Rock::$app->language,
             'formats' => [
                 'dmy'   => function(\rock\date\DateTime $dateTime){
-                        $nowYear  = date('Y');
-                        $lastYear = $dateTime->format('Y');
+                    $nowYear  = date('Y');
+                    $lastYear = $dateTime->format('Y');
 
-                        return $nowYear > $lastYear
-                            ? $dateTime->format('j F Y')
-                            : $dateTime->format('d F');
-                    },
+                    return $nowYear > $lastYear
+                        ? $dateTime->format('j F Y')
+                        : $dateTime->format('d F');
+                },
                 'dmyhm' => function(\rock\date\DateTime $dateTime){
-                        $nowYear  = date('Y');
-                        $lastYear = $dateTime->format('Y');
-                        return $nowYear > $lastYear
-                            ? $dateTime->format('j F Y H:i')
-                            : $dateTime->format('j F H:i');
-                    },
+                    $nowYear  = date('Y');
+                    $lastYear = $dateTime->format('Y');
+                    return $nowYear > $lastYear
+                        ? $dateTime->format('j F Y H:i')
+                        : $dateTime->format('j F H:i');
+                },
             ]
         ],
 
