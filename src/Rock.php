@@ -12,6 +12,43 @@ use rock\helpers\Trace;
 use rock\i18n\i18n;
 use rock\log\Log;
 
+/**
+ * "Rock"
+ *
+ * @property-read string $language
+ * @property-read string[] $allowLanguages a list of the languages supported by the application.
+ * @property-read string $charset
+ * @property-read \rock\core\Controller $controller
+ * @property-read string $name
+ * @property-read \rock\cache\CacheInterface $cache
+ * @property-read \rock\db\Connection        $db
+ * @property-read \rock\events\Event         $event
+ * @property-read \rock\file\FileManager     $file
+ * @property-read \rock\template\Template    $template
+ * @property-read \rock\request\Request      $request
+ * @property-read \rock\user\User            $user
+ * @property-read \rock\url\Url              $url
+ * @property-read \rock\sanitize\Sanitize    $sanitize
+ * @property-read \rock\session\Session      $session
+ * @property-read \rock\cookie\Cookie        $cookie
+ * @property-read \rock\i18n\i18n            $i18n
+ * @property-read \rock\mail\Mail            $mail
+ * @property-read \rock\route\Route          $route
+ * @property-read \rock\csrf\CSRF            $csrf
+ * @property-read \rock\execute\Execute      $execute
+ * @property-read \rock\helpers\Trace        $trace
+ * @property-read \rock\captcha\Captcha      $captcha
+ * @property-read \rock\date\DateTime        $date
+ * @property-read \rock\image\ImageProvider  $imageProvider
+ * @property-read \rock\response\Response    $response
+ * @property-read \rock\log\Log              $log
+ * @property-read \rock\validate\Validate    $validate
+ * @property-read \rock\di\Container         $di
+ * @property-read \rock\rbac\RBAC            $rbac
+ * @property-read \rock\markdown\Markdown    $markdown
+ * @property-read \rock\security\Security    $security
+ * @property-read \rock\authclient\Collection   $authClientCollection
+ */
 class Rock extends Alias
 {
     use ClassName;
@@ -25,7 +62,7 @@ class Rock extends Alias
     const EVENT_END_APP = 'endApp';
 
     /**
-     * @var RockInterface
+     * @var static
      */
     public static $app;
     /**

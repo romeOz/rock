@@ -17,7 +17,7 @@ use rock\user\User;
  * It holds the {@see \rock\response\Response::getHeaders()} and {@see \rock\response\Response::$content} that is to be sent to the client.
  * It also controls the HTTP {@see \rock\response\Response::$statusCode} .
  *
- * Response is configured as an application component. You can access that instance via {@see \rock\RockInterface::$response}.
+ * Response is configured as an application component. You can access that instance via {@see \rock\Rock::$response}.
  *
  * You can modify its configuration by adding an array to your application config under `components`
  * as it is shown in the following example:
