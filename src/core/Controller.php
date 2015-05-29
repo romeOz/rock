@@ -5,7 +5,6 @@ use rock\base\Alias;
 use rock\components\ComponentsInterface;
 use rock\components\ComponentsTrait;
 use rock\filters\CsrfFilter;
-use rock\helpers\ArrayHelper;
 use rock\helpers\FileHelper;
 use rock\helpers\Instance;
 use rock\helpers\StringHelper;
@@ -47,10 +46,7 @@ abstract class Controller implements ComponentsInterface
         $this->parentInit();
         $this->template = Instance::ensure($this->template);
         $this->template->context = $this;
-        if (!$this->template->existsConst(['res', 'context'])) {
-            Rock::$app->controller = $this;
-            $this->template->addConst('res', static::defaultData(), false, true);
-        }
+        Rock::$app->controller = $this;
     }
 
     /**
@@ -68,16 +64,6 @@ abstract class Controller implements ComponentsInterface
     }
 
     /**
-     * Array data by context
-     *
-     * @return array
-     */
-    public static function defaultData()
-    {
-        return [];
-    }
-
-    /**
      * Renders a view with a layout.
      *
      *
@@ -86,7 +72,7 @@ abstract class Controller implements ComponentsInterface
      * @param string $defaultPathLayout
      * @return string the rendering result. Null if the rendering result is not required.
      */
-    public function render($layout, array $placeholders = [],$defaultPathLayout = '@views')
+    public function render($layout, array $placeholders = [], $defaultPathLayout = '@views')
     {
 
         $layout = FileHelper::normalizePath(Alias::getAlias($layout));
@@ -98,12 +84,6 @@ abstract class Controller implements ComponentsInterface
         }
 
         return $this->template->render($layout, $placeholders, $this);
-    }
-
-    public static function context(array $keys = [])
-    {
-        $keys = array_merge(['context'], $keys);
-        return ArrayHelper::getValue(static::defaultData(), $keys);
     }
 
     /**
@@ -205,10 +185,5 @@ abstract class Controller implements ComponentsInterface
         }
         $result = call_user_func_array([$this, $actionName], $args);//$this->$actionName($route);
         return $this->afterAction($actionName, $result);
-    }
-
-    public static function findUrlById($resource)
-    {
-        return null;
     }
 }
