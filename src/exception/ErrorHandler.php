@@ -15,6 +15,48 @@ class ErrorHandler implements LogInterface
 {
     public static $logged = true;
     public static $pathFatal = '@common.views/layouts/fatal.html';
+    /**
+     * @var integer the size of the reserved memory. A portion of memory is pre-allocated so that
+     * when an out-of-memory issue occurs, the error handler is able to handle the error with
+     * the help of this reserved memory. If you set this value to be 0, no memory will be reserved.
+     * Defaults to 256KB.
+     */
+    public static $memoryReserveSize = 262144;
+    /**
+     * @var string Used to reserve memory for fatal error handler.
+     */
+    private static $_memoryReserve;
+
+    /**
+     * Register this error handler
+     */
+    public static function register()
+    {
+        // Start buffer
+        ob_start();
+        $class = get_called_class();
+        // Catch errors
+        set_error_handler([$class, 'handleError']);
+        // Without try ... catch
+        set_exception_handler(
+            function () {
+            }
+        );
+        if (static::$memoryReserveSize > 0) {
+            self::$_memoryReserve = str_repeat('x', static::$memoryReserveSize);
+        }
+        // Catch fatal errors
+        register_shutdown_function([$class, 'handleShutdown']);
+    }
+
+    /**
+     * Unregisters this error handler by restoring the PHP error and exception handlers.
+     */
+    public static function unregister()
+    {
+        restore_error_handler();
+        restore_exception_handler();
+    }
 
     /**
      * Error handler
@@ -33,12 +75,12 @@ class ErrorHandler implements LogInterface
         switch ($code) {
             case E_USER_WARNING:
             case E_WARNING:
-            static::log(self::WARNING, "[E_WARNING] {$msg}", $file, $line);
+                static::log(self::WARNING, "[E_WARNING] {$msg}", $file, $line);
                 break;
             case E_USER_NOTICE:
             case E_NOTICE:
             case @E_STRICT:
-            static::log(self::NOTICE, "[E_NOTICE] {$msg}", $file, $line);
+                static::log(self::NOTICE, "[E_NOTICE] {$msg}", $file, $line);
                 break;
             case @E_RECOVERABLE_ERROR:
                 static::log(self::ERROR, "[E_CATCHABLE] {$msg}", $file, $line);
@@ -58,6 +100,8 @@ class ErrorHandler implements LogInterface
      */
     public static function handleShutdown()
     {
+        self::$_memoryReserve = null;
+
         $error = error_get_last();
         if (
             isset($error['type']) &&
@@ -67,8 +111,8 @@ class ErrorHandler implements LogInterface
              $error['type'] == E_CORE_ERROR)
         ) {
             // Clean buffer, complete work buffer
-            ob_end_clean();
-            //header($_SERVER['SERVER_PROTOCOL'].' 500 Internal Server Error');
+            static::clearOutput();
+
             $type = "";
             switch ($error['type']) {
                 case E_ERROR:
@@ -91,25 +135,6 @@ class ErrorHandler implements LogInterface
                 ob_end_flush();
             }
         }
-    }
-
-    /**
-     * Set handler
-     */
-    public static function run()
-    {
-        // Start buffer
-        ob_start();
-        $self = new static;
-        // Catch errors
-        set_error_handler([$self, 'handleError']);
-        // Without try ... catch
-        set_exception_handler(
-            function () {
-            }
-        );
-        // Catch fatal errors
-        register_shutdown_function([$self, 'handleShutdown']);
     }
 
     public static function display(\Exception $exception, $level = Log::CRITICAL, Response $response = null)
@@ -155,6 +180,20 @@ class ErrorHandler implements LogInterface
 
         die(file_get_contents(Alias::getAlias(static::$pathFatal)));
     }
+
+    /**
+     * Removes all output echoed before calling this method.
+     */
+    public static function clearOutput()
+    {
+        // the following manual level counting is to deal with zlib.output_compression set to On
+        for ($level = ob_get_level(); $level > 0; --$level) {
+            if (!@ob_end_clean()) {
+                ob_clean();
+            }
+        }
+    }
+
 
     /**
      * Run mode debug.
