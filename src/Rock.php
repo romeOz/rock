@@ -13,13 +13,8 @@ use rock\i18n\i18n;
 use rock\log\Log;
 
 /**
- * "Rock"
+ * Bootstrap
  *
- * @property-read string $language
- * @property-read string[] $allowLanguages a list of the languages supported by the application.
- * @property-read string $charset
- * @property-read \rock\core\Controller $controller
- * @property-read string $name
  * @property-read \rock\cache\CacheInterface $cache
  * @property-read \rock\db\Connection        $db
  * @property-read \rock\events\Event         $event
@@ -81,7 +76,7 @@ class Rock extends Alias
     public $language = 'en';
     /**
      * A list of the languages supported by the application.
-     * @var array
+     * @var string[]
      */
     public $allowLanguages = [];
     /**
