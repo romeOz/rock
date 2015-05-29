@@ -4,7 +4,7 @@ namespace rockunit\rest;
 
 
 use rock\components\Model;
-use rock\db\ActiveDataProvider;
+use rock\db\common\ActiveDataProvider;
 use rock\response\Response;
 use rock\rest\Serializer;
 use rockunit\core\db\DatabaseTestCase;

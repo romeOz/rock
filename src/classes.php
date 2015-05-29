@@ -32,9 +32,6 @@ return array_merge(
         'BatchQueryResult' => [
             'class' => BatchQueryResult::className(),
         ],
-        'activeData' => [
-            'class' => \rock\db\ActiveDataProvider::className(),
-        ],
 
         'template' => [
             'class' => Template::className(),
