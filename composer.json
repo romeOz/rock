@@ -15,12 +15,6 @@
             "email": "serggalka@gmail.com"
         }
     ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/romeOz/cartographer"
-        }
-    ],
     "require": {
         "php": ">=5.4.0",
         "romeoz/rock-components" : "0.10.*",
