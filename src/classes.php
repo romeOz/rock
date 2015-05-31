@@ -121,7 +121,7 @@ return array_merge(
                     'class'        => \rock\snippets\request\Post::className(),
                 ],
 
-                'CSRF' => [
+                'csrf' => [
                     'class'        => \rock\snippets\CSRF::className(),
                 ],
 
@@ -129,7 +129,7 @@ return array_merge(
                     'class'        => \rock\snippets\Url::className(),
                 ],
 
-                'CaptchaView' => [
+                'captchaView' => [
                     'class'        => \rock\snippets\CaptchaView::className(),
                 ],
 
@@ -137,8 +137,7 @@ return array_merge(
                     'class'        => \rock\snippets\Thumb::className(),
                 ],
 
-
-                'ActiveForm' => [
+                'activeForm' => [
                     'class' => \rock\snippets\html\ActiveForm::className(),
                 ]
             ]
