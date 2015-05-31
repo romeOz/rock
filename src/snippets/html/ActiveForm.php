@@ -3,13 +3,11 @@
 namespace rock\snippets\html;
 
 
-use rock\base\Alias;
+use rock\components\Model;
 use rock\file\UploadedFile;
+use rock\helpers\ArrayHelper;
 use rock\helpers\Helper;
 use rock\helpers\Instance;
-use rock\helpers\Serialize;
-use rock\request\Request;
-use rock\snippets\filters\RateLimiter;
 use rock\snippets\Snippet;
 use rock\template\Html;
 
@@ -23,9 +21,6 @@ class ActiveForm extends Snippet
     public $load;
     public $prepareAttributes = [];
     public $validate = false;
-    public $after;
-    public $submitted = false;
-    public $success;
     /**
      * Name/inline wrapper template
      *
@@ -42,56 +37,23 @@ class ActiveForm extends Snippet
      * @inheritdoc
      */
     public $autoEscape = false;
-    /** @var  RateLimiter|string|array */
-    public $rateLimiter;
 
-    /**
-     * @inheritdoc
-     */
-    public function init()
-    {
-        parent::init();
-        $this->rateLimiter = Instance::ensure($this->rateLimiter, '\rock\snippets\filters\RateLimiter');
-    }
 
     /**
      * @inheritdoc
      */
     public function get()
     {
-        if (empty($this->model)) {
-            return null;
-        }
-        $this->unserialize();
-        if (!is_object($this->model)) {
-            if (is_string($this->model)) {
-                $this->model = ['class' => Alias::getAlias($this->model)];
-            }
-            $this->model = Instance::ensure($this->model);
-        }
-        $this->model->setTemplate($this->template);
+        $this->model = Instance::ensure($this->model);
 
-        $this->calculateLoad();
+        if (!$this->model->isLoad()) {
+            $this->validate = false;
+        }
+
         if ($this->validate === true) {
             $this->prepareAttributes();
-            if ($this->model->validate()) {
-                // remove rate limiter of attributes
-//                foreach ($this->fields as $attributeName => $params) {
-//                    $this->rateLimiter->removeAllowance(get_class($this->model) . '::' . $attributeName);
-//                }
-                if (isset($this->after)) {
-                    foreach ($this->after as $method) {
-                        $methodName = $method;
-                        $args = null;
-                        if (is_array($method)) {
-                            list($methodName, $args) = $method;
-                        }
-                        call_user_func([$this->model, $methodName], $args);
-                    }
-                }
-                if ($this->success) {
-                    return $this->template->replaceByPrefix($this->success);
-                }
+            if (!$this->model->validate()) {
+                $this->errorsToPlaceholders($this->model);
             }
         }
 
@@ -120,7 +82,7 @@ class ActiveForm extends Snippet
         if (!empty($this->toPlaceholder)) {
             $this->template->addPlaceholder($this->toPlaceholder, $result, true);
             $this->template->cachePlaceholders[$this->toPlaceholder] = $result;
-            return null;
+            return '';
         }
 
         return $result;
@@ -128,7 +90,7 @@ class ActiveForm extends Snippet
 
     protected function prepareFields(\rock\widgets\ActiveForm $form, array $fields, array &$result)
     {
-        $form->submitted = $this->submitted;
+        $form->submitted = $this->model->isLoad();
         foreach ($fields as $attributeName => $params) {
             if (is_int($attributeName)) {
                 $result[] = $this->template->replaceByPrefix($params);
@@ -188,64 +150,22 @@ class ActiveForm extends Snippet
         return $value;
     }
 
-
-    protected function unserialize()
-    {
-        if (is_string($this->after)) {
-            $this->after = Serialize::unserialize($this->after);
-        }
-        if (is_string($this->prepareAttributes)) {
-            $this->prepareAttributes = Serialize::unserialize($this->prepareAttributes);
-        }
-        if (is_string($this->config)) {
-            $this->config = Serialize::unserialize($this->config);
-        }
-        if (is_string($this->model)) {
-            $this->model = Serialize::unserialize($this->model, false);
-        }
-
-        if (is_string($this->fields)) {
-            $this->fields = Serialize::unserialize($this->fields);
-        }
-
-        if (is_string($this->submitButton)) {
-            $this->submitButton = Serialize::unserialize($this->submitButton);
-        }
-    }
-
-    protected function calculateLoad()
-    {
-        if (!isset($this->load)) {
-            if (isset($this->config['method'])) {
-                $verb = strtoupper($this->config['method']);
-                if ($verb == Request::GET) {
-                    $this->load = Request::getAll();
-                } else {
-                    $this->load = Request::postAll();
-                }
-            } else {
-                $this->load = Request::postAll();
-            }
-        }
-        if (!empty($this->load)) {
-            $this->model->load($this->load);
-            $this->submitted = true;
-            return;
-        }
-
-        $this->validate = false;
-    }
-
     protected function prepareAttributes()
     {
-        foreach ($this->prepareAttributes as $attributeName => $value) {
+        foreach ($this->prepareAttributes as $attributeName => $type) {
             if (isset($this->model->$attributeName)) {
-                if ($value == 'file') {
+                if ($type == 'file') {
                     $this->model->$attributeName = UploadedFile::getInstance($this->model, $attributeName);
-                } elseif ($value == 'multiFiles') {
+                } elseif ($type == 'multiFiles') {
                     $this->model->$attributeName = UploadedFile::getInstances($this->model, $attributeName);
                 }
             }
         }
     }
-} 
+
+    protected function errorsToPlaceholders(Model $model)
+    {
+        $errors = ArrayHelper::only($model->getErrors(), [], $model->safeAttributes());
+        $this->template->addMultiPlaceholders($errors);
+    }
+}
