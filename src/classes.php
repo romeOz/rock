@@ -241,10 +241,6 @@ return array_merge(
             'class' => \rock\validate\Validate::className(),
             'locale' => Rock::$app->language,
         ],
-        'activeValidate' => [
-            'class' => \rock\validate\ActiveValidate::className(),
-            'locale' => Rock::$app->language,
-        ],
         'csrf' => [
             'class' => \rock\csrf\CSRF::className(),
         ],
