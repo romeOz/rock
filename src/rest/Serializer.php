@@ -6,8 +6,8 @@ use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\components\Arrayable;
 use rock\components\Model;
-use rock\db\common\ActiveDataPagination;
 use rock\db\common\ActiveDataProvider;
+use rock\db\common\PaginationProvider;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Instance;
 use rock\helpers\Link;
@@ -149,7 +149,7 @@ class Serializer implements ObjectInterface
      */
     protected function serializeDataProvider($dataProvider)
     {
-        $models = $this->serializeModels($dataProvider->get());
+        $models = $this->serializeModels($dataProvider->getModels());
 
         if (($pagination = $dataProvider->getPagination()) !== false) {
             $this->addPaginationHeaders($pagination);
@@ -173,11 +173,11 @@ class Serializer implements ObjectInterface
 
     /**
      * Serializes a pagination into an array.
-     * @param ActiveDataPagination $pagination
+     * @param PaginationProvider $pagination
      * @return array the array representation of the pagination
      * @see addPaginationHeaders()
      */
-    protected function serializePagination($pagination)
+    protected function serializePagination(PaginationProvider $pagination)
     {
         return [
             '_links' => Link::serialize($pagination->getLinks(true)),
@@ -192,9 +192,9 @@ class Serializer implements ObjectInterface
 
     /**
      * Adds HTTP headers about the pagination to the response.
-     * @param ActiveDataPagination $pagination
+     * @param PaginationProvider $pagination
      */
-    protected function addPaginationHeaders($pagination)
+    protected function addPaginationHeaders(PaginationProvider $pagination)
     {
         $links = [];
         foreach ($pagination->getLinks(true) as $rel => $url) {

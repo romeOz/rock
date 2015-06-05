@@ -26,7 +26,6 @@ class SerializerTest extends DatabaseTestCase
         $provider = new ActiveDataProvider(
             [
                 'query' => Users::find()->select(['id', 'username'])->asArray(),
-                'only' => ['id', 'name'],
                 'pagination' => ['limit' => 2, 'sort' => SORT_DESC]
             ]
         );
@@ -110,7 +109,8 @@ class SerializerTest extends DatabaseTestCase
             'username' => 'Tom',
             'email' => 'foo@email'
         ];
-        $this->assertFalse($model->validate($post));
+        $model->attributes = $post;
+        $this->assertFalse($model->validate());
         $this->assertNotEmpty($model->getErrors());
         $response = new Response();
         $serialize =  new Serializer(['collectionEnvelope' => 'data', 'response' => $response]);
@@ -137,19 +137,19 @@ class TestModel extends Model
     {
         return [
             [
-                self::RULE_SANITIZE, ['email', 'username'], 'trim'
+                ['email', 'username'], 'trim'
             ],
             [
-                self::RULE_VALIDATE, ['email', 'username'], 'required',
+                ['email', 'username'], 'required',
             ],
             [
-                self::RULE_VALIDATE, 'email', 'length' => [4, 80, true], 'email'
+                'email', 'length' => [4, 80, true], 'email'
             ],
             [
-                self::RULE_SANITIZE, 'email', 'lowercase'
+                'email', '!lowercase'
             ],
             [
-                self::RULE_SANITIZE, ['email', 'username'], 'removeTags'
+                ['email', 'username'], 'removeTags'
             ],
         ];
     }
