@@ -332,9 +332,10 @@ class DBManager extends RBAC
             ->from($this->rolesItemsTable)
             ->innerJoin($this->itemsTable, "{$this->rolesItemsTable}.item = {$this->itemsTable}.name")
             ->innerJoin($this->rolesTable, "{$this->rolesItemsTable}.role = {$alias}.name")
-            ->andWhere(["{$alias}.type" => RBACInterface::TYPE_ROLE])
-            ->orderBy(["{$alias}.order_index" => SORT_DESC])
-            ->all($this->connection, true)) {
+            ->andWhere(["{$alias}.[[type]]" => RBACInterface::TYPE_ROLE])
+            ->orderBy(["{$alias}.[[order_index]]" => SORT_DESC])
+            ->asSubattributes()
+            ->all($this->connection)) {
 
             return;
         }
