@@ -16,10 +16,10 @@ return [
             'password' => '',
             'fixture' => __DIR__ . '/mysql.sql',
             'migrations' => [
-                AccessItemsMigration::className(),
-                AccessRolesItemsMigration::className(),
-                AccessAssignmentsMigration::className(),
-                \rockunit\migrations\UsersMigration::className()
+                ['class' => AccessItemsMigration::className()],
+                ['class' => AccessRolesItemsMigration::className()],
+                ['class' => AccessAssignmentsMigration::className()],
+                ['class' => \rockunit\migrations\UsersMigration::className()]
             ]
         ],
     ],
