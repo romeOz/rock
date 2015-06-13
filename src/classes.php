@@ -80,10 +80,8 @@ return array_merge(
                 },
             ],
             'title' => 'Demo',
-            'metaTags' => '<meta charset="'.Rock::$app->charset.'" />',
-            'linkTags' => [
-                '<link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico?10">',
-            ],
+            'metaTags' => ['<meta charset="'.Rock::$app->charset.'" />'],
+            'linkTags' => ['<link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico?10">'],
             'snippets' => [
                 'listView' => [
                     'class'        => \rock\snippets\ListView::className(),
