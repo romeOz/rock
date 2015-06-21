@@ -1,7 +1,6 @@
 <?php
 namespace rock\response;
 
-use rock\csrf\CSRF;
 use rock\events\EventsInterface;
 use rock\events\EventsTrait;
 use rock\helpers\FileHelper;
@@ -243,8 +242,6 @@ class Response implements EventsInterface
      * @var HeaderCollection
      */
     private $_headers;
-    /** @var CSRF|string|array */
-    public $csrf = 'csrf';
     /** @var User|string|array */
     public $user = 'user';
     /** @var Request|string|array */
@@ -255,8 +252,6 @@ class Response implements EventsInterface
      */
     public function init()
     {
-        $this->csrf = Instance::ensure($this->csrf, '\rock\csrf\CSRF', false);
-        $this->user = Instance::ensure($this->user, '\rock\user\User', false);
         $this->request = Instance::ensure($this->request, '\rock\request\Request');
         $this->locale = strtolower($this->locale);
 
@@ -270,7 +265,6 @@ class Response implements EventsInterface
         $formatters = $this->defaultFormatters();
         $this->formatters = empty($this->formatters) ? $formatters : array_merge($formatters, $this->formatters);
     }
-
 
     /**
      * @return integer the HTTP status code to send with the response.
@@ -853,10 +847,11 @@ class Response implements EventsInterface
      */
     public function goBack($defaultUrl = null)
     {
-        if (!$this->user instanceof User) {
-            return $this->redirect($this->request->getHomeUrl());
+        $user = Instance::ensure($this->user, '\rock\user\User', false);
+        if (!$user instanceof User) {
+            return $this->goHome();
         }
-        return $this->redirect($this->user->getReturnUrl($defaultUrl));
+        return $this->redirect($user->getReturnUrl($defaultUrl));
     }
 
     /**
