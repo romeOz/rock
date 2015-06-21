@@ -73,11 +73,6 @@ class Cookie extends SessionFlash implements \ArrayAccess, SerializeInterface
         return $this->sanitize($result, $sanitize);
     }
 
-    public function __get($name)
-    {
-        return $this->get($name);
-    }
-
     /**
      * @inheritdoc
      */
@@ -130,11 +125,6 @@ class Cookie extends SessionFlash implements \ArrayAccess, SerializeInterface
      * @inheritdoc
      */
     public function offsetSet($name, $value)
-    {
-        $this->add($name, $value);
-    }
-
-    public function __set($name, $value)
     {
         $this->add($name, $value);
     }
