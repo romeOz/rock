@@ -238,4 +238,9 @@ class Cookie extends SessionFlash implements \ArrayAccess, SerializeInterface
 
         return $sanitize->sanitize($value);
     }
+
+    public function reset()
+    {
+        static::$isActive = false;
+    }
 }
