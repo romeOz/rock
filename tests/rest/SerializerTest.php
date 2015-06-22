@@ -115,10 +115,16 @@ class SerializerTest extends DatabaseTestCase
         $response = new Response();
         $serialize =  new Serializer(['collectionEnvelope' => 'data', 'response' => $response]);
         $expected = [
-                [
-                    'field' => 'email',
-                    'message' => 'email must be valid',
-                ],
+            'email'=>'email must be valid'
+        ];
+
+        $this->assertEquals($expected, $serialize->serialize($model));
+
+        // all errors
+
+        $serialize =  new Serializer(['collectionEnvelope' => 'data', 'response' => $response, 'firstErrors' => false]);
+        $expected = [
+            'email'=> ['email must be valid']
         ];
 
         $this->assertEquals($expected, $serialize->serialize($model));

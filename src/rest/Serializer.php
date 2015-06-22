@@ -85,9 +85,14 @@ class Serializer implements ObjectInterface
      */
     public $collectionEnvelope;
     /**
+     * Returns first errors by attribute.
+     * @var bool
+     */
+    public $firstErrors = true;
+    /**
      * @var Request the current request. If not set, the `request` application component will be used.
      */
-    public $request= 'request';
+    public $request = 'request';
     /**
      * @var Response the response to be sent. If not set, the `response` application component will be used.
      */
@@ -232,15 +237,7 @@ class Serializer implements ObjectInterface
     protected function serializeModelErrors($model)
     {
         $this->response->setStatusCode(422, 'Data Validation Failed.');
-        $result = [];
-        foreach ($model->getFirstErrors() as $name => $message) {
-            $result[] = [
-                'field' => $name,
-                'message' => $message,
-            ];
-        }
-
-        return $result;
+        return $this->firstErrors ? $model->getFirstErrors() : $model->getErrors();
     }
 
     /**
