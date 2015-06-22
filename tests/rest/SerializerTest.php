@@ -84,7 +84,8 @@ class SerializerTest extends DatabaseTestCase
     public function testAsModel()
     {
         $response = new Response();
-        $serialize =  new Serializer(['collectionEnvelope' => 'data', 'response' => $response]);
+        $config = ['collectionEnvelope' => 'data', 'response' => $response];
+        $serialize =  new Serializer($config);
         $_GET[$serialize->fieldsParam] = 'username,email';
         $model = Users::find()->select(['id', 'username', 'email'])->one();
 
@@ -100,6 +101,16 @@ class SerializerTest extends DatabaseTestCase
                 ],
         ];
         $this->assertEquals($expected, $serialize->serialize($model));
+
+        // extend
+
+        $config['extend'] = ['message' => 'text...'];
+        $serialize =  new Serializer($config);
+        $expected[$serialize->extendAttribute] = [
+            'message' => 'text...'
+        ];
+        $this->assertEquals($expected, $serialize->serialize($model));
+
     }
 
     public function testAsModelForm()
@@ -128,6 +139,43 @@ class SerializerTest extends DatabaseTestCase
         ];
 
         $this->assertEquals($expected, $serialize->serialize($model));
+    }
+
+    public function testExtend()
+    {
+        $data = [
+            'username' => 'Tom',
+            'email' => 'foo@email'
+        ];
+        $config = [
+            'extend' => [
+                'message' => 'text...'
+            ]
+        ];
+        $serialize =  new Serializer($config);
+
+        $expected = $data;
+        $expected[$serialize->extendAttribute] = [
+            'message' => 'text...'
+        ];
+        $this->assertEquals($expected, $serialize->serialize($data));
+
+        // merge
+
+        $config = [
+            'extend' => [
+                'message' => 'text foo',
+                'note' => 'note...'
+            ]
+        ];
+        $serialize =  new Serializer($config);
+
+        $expected2 = $data;
+        $expected2[$serialize->extendAttribute] = [
+            'message' => 'text foo',
+            'note' => 'note...'
+        ];
+        $this->assertEquals($expected2, $serialize->serialize($expected));
     }
 }
 

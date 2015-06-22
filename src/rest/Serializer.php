@@ -85,6 +85,15 @@ class Serializer implements ObjectInterface
      */
     public $collectionEnvelope;
     /**
+     * @var string the name of attribute.
+     */
+    public $extendAttribute = '_extend';
+    /**
+     * List extend attributes.
+     * @var array
+     */
+    public $extend = [];
+    /**
      * Returns first errors by attribute.
      * @var bool
      */
@@ -119,13 +128,13 @@ class Serializer implements ObjectInterface
     public function serialize($data)
     {
         if ($data instanceof Model && $data->hasErrors()) {
-            return $this->serializeModelErrors($data);
+            return $this->addExtend($this->serializeModelErrors($data));
         } elseif ($data instanceof Arrayable) {
-            return $this->serializeModel($data);
+            return $this->addExtend($this->serializeModel($data));
         } elseif ($data instanceof ActiveDataProvider) {
-            return $this->serializeDataProvider($data);
+            return $this->addExtend($this->serializeDataProvider($data));
         } else {
-            return $data;
+            return $this->addExtend($data);
         }
     }
 
@@ -256,6 +265,24 @@ class Serializer implements ObjectInterface
             }
         }
 
+        return $models;
+    }
+
+    /**
+     * Adds extend attributes.
+     * @param mixed $models
+     * @return array
+     */
+    protected function addExtend($models)
+    {
+        if (empty($models) || !is_array($models) || empty($this->extend)) {
+            return $models;
+        }
+        if (isset($models[$this->extendAttribute]) && is_array($models[$this->extendAttribute]) && is_array($this->extend)) {
+            $models[$this->extendAttribute] = array_merge($models[$this->extendAttribute], $this->extend);
+            return $models;
+        }
+        $models[$this->extendAttribute] = $this->extend;
         return $models;
     }
 }
