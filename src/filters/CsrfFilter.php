@@ -56,7 +56,7 @@ class CsrfFilter extends ActionFilter
         if (!$this->csrf->valid($this->compare)) {
             $this->response->setStatusCode(403);
             if ($this->throwException === true) {
-                throw new CsrfFilterException('Invalid CSRF-token');
+                throw new CsrfFilterException('Invalid CSRF-token.');
             }
             return false;
         }
@@ -69,7 +69,13 @@ class CsrfFilter extends ActionFilter
             return;
         }
         if (in_array($this->response->format, [Response::FORMAT_JSON, Response::FORMAT_XML]) && is_array($this->response->data)) {
-            $this->response->data[$this->csrf->csrfParam] = $csrfToken;
+            if (!isset($this->response->data['_extend'])) {
+                $this->response->data['_extend'] = [];
+            }
+            $this->response->data['_extend']['csrf'] = [
+                'token' => $csrfToken,
+                'param' => $this->csrf->csrfParam
+            ];
         }
         $this->response->getHeaders()->set(CSRF::CSRF_HEADER, $csrfToken);
     }
