@@ -8,6 +8,7 @@ use rock\helpers\ArrayHelper;
 use rock\helpers\Instance;
 use rock\request\Request;
 use rock\response\Response;
+use rock\rest\Serializer;
 
 class CsrfFilter extends ActionFilter
 {
@@ -72,10 +73,16 @@ class CsrfFilter extends ActionFilter
             if (!isset($this->response->data['_extend'])) {
                 $this->response->data['_extend'] = [];
             }
-            $this->response->data['_extend']['csrf'] = [
-                'token' => $csrfToken,
-                'param' => $this->csrf->csrfParam
+            $config = [
+                'response' => $this->response,
+                'extend' => [
+                    'csrf' => [
+                        'token' => $csrfToken,
+                        'param' => $this->csrf->csrfParam
+                    ]
+                ]
             ];
+            $this->response->data = (new Serializer($config))->serialize($this->response->data);
         }
         $this->response->getHeaders()->set(CSRF::CSRF_HEADER, $csrfToken);
     }

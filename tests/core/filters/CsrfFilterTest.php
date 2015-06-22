@@ -7,6 +7,7 @@ use rock\core\Controller;
 use rock\csrf\CSRF;
 use rock\filters\CsrfFilter;
 use rock\response\Response;
+use rock\rest\Serializer;
 
 class CsrfFilterTest extends \PHPUnit_Framework_TestCase
 {
@@ -46,6 +47,12 @@ class CsrfFilterTest extends \PHPUnit_Framework_TestCase
 
         $_POST[$csrf->csrfParam] = $csrf->get();
         $this->assertSame('test', (new CsrfController())->method('actionIndex'));
+
+        $config = ['response' => new Response(['format' => Response::FORMAT_JSON, 'data' => ['name' => 'Tom']])];
+        $filter = new CsrfFilter($config);
+        $filter->send();
+        $expected = $filter->response->data[(new Serializer())->extendAttribute]['csrf']['token'];
+        $this->assertSame($expected, $csrf->get());
     }
 }
 
