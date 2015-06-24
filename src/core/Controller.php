@@ -4,7 +4,7 @@ namespace rock\core;
 use rock\base\Alias;
 use rock\components\ComponentsInterface;
 use rock\components\ComponentsTrait;
-use rock\filters\CsrfFilter;
+use rock\filters\CSRFFilter;
 use rock\helpers\FileHelper;
 use rock\helpers\Instance;
 use rock\helpers\StringHelper;
@@ -56,7 +56,7 @@ abstract class Controller implements ComponentsInterface
     {
         return [
             'csrfFilter' => [
-                'class' => CsrfFilter::className(),
+                'class' => CSRFFilter::className(),
                 'validate' => $this->enableCsrfValidation,
                 'response' => $this->response
             ]

@@ -5,11 +5,11 @@ namespace rockunit\core\filters;
 
 use rock\core\Controller;
 use rock\csrf\CSRF;
-use rock\filters\CsrfFilter;
+use rock\filters\CSRFFilter;
 use rock\response\Response;
 use rock\rest\Serializer;
 
-class CsrfFilterTest extends \PHPUnit_Framework_TestCase
+class CSRFFilterTest extends \PHPUnit_Framework_TestCase
 {
     public function testFail()
     {
@@ -49,7 +49,7 @@ class CsrfFilterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('test', (new CsrfController())->method('actionIndex'));
 
         $config = ['response' => new Response(['format' => Response::FORMAT_JSON, 'data' => ['name' => 'Tom']])];
-        $filter = new CsrfFilter($config);
+        $filter = new CSRFFilter($config);
         $filter->send();
         $expected = $filter->response->data[(new Serializer())->extendAttribute]['csrf']['token'];
         $this->assertSame($expected, $csrf->get());
@@ -64,7 +64,7 @@ class CsrfController extends Controller
     {
         return [
             'csrfFilter' => [
-                'class' => CsrfFilter::className(),
+                'class' => CSRFFilter::className(),
                 'response' => $this->response,
                 'compare' => $this->compare
             ],

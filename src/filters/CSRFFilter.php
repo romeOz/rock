@@ -10,7 +10,7 @@ use rock\request\Request;
 use rock\response\Response;
 use rock\rest\Serializer;
 
-class CsrfFilter extends ActionFilter
+class CSRFFilter extends ActionFilter
 {
     /**
      * @var CSRF|string|array the CSRF instance.
