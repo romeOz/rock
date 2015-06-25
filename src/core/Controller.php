@@ -4,7 +4,6 @@ namespace rock\core;
 use rock\base\Alias;
 use rock\components\ComponentsInterface;
 use rock\components\ComponentsTrait;
-use rock\filters\CSRFFilter;
 use rock\helpers\FileHelper;
 use rock\helpers\Instance;
 use rock\helpers\StringHelper;
@@ -35,11 +34,6 @@ abstract class Controller implements ComponentsInterface
     public $response;
     /** @var  Template|string|array */
     public $template = 'template';
-    /**
-     * @var boolean whether to enable CSRF validation for the actions in this controller.
-     * CSRF validation is enabled only when both this property and {@see \rock\csrf\CSRF::enableCsrfValidation} are true.
-     */
-    public $enableCsrfValidation = true;
 
     public function init()
     {
@@ -47,20 +41,6 @@ abstract class Controller implements ComponentsInterface
         $this->template = Instance::ensure($this->template);
         $this->template->context = $this;
         Rock::$app->controller = $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function behaviors()
-    {
-        return [
-            'csrfFilter' => [
-                'class' => CSRFFilter::className(),
-                'validate' => $this->enableCsrfValidation,
-                'response' => $this->response
-            ]
-        ];
     }
 
     /**
@@ -74,7 +54,6 @@ abstract class Controller implements ComponentsInterface
      */
     public function render($layout, array $placeholders = [], $defaultPathLayout = '@views')
     {
-
         $layout = FileHelper::normalizePath(Alias::getAlias($layout));
         if (!strstr($layout, DS)) {
             $class = explode('\\', get_class($this));
@@ -82,7 +61,6 @@ abstract class Controller implements ComponentsInterface
                       strtolower(str_replace('Controller', '', array_pop($class))) . DS .
                       $layout;
         }
-
         return $this->template->render($layout, $placeholders, $this);
     }
 
