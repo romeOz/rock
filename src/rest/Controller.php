@@ -1,11 +1,11 @@
 <?php
 namespace rock\rest;
 
+use rock\helpers\Instance;
 use rock\response\Response;
 use rock\filters\ContentNegotiatorFilter;
 use rock\filters\VerbFilter;
 use rock\filters\RateLimiter;
-use rock\di\Container;
 
 /**
  * Controller is the base class for RESTful API controller classes.
@@ -17,19 +17,24 @@ use rock\di\Container;
  * 4. Rate limiting ({@see \rock\filters\RateLimiter});
  * 5. Formatting response data ({@see \rock\rest\Controller::serializeData()}).
  */
-class Controller extends \rock\core\Controller
+abstract class Controller extends \rock\core\Controller
 {
     /**
      * @var string|array the configuration for creating the serializer that formats the response data.
      */
     public $serializer = 'rock\rest\Serializer';
+    /**
+     * List extend attributes.
+     * @var array
+     */
+    public $extend = [];
 
     /**
      * @inheritdoc
      */
     public function behaviors()
     {
-        return parent::behaviors() + [
+        return array_merge(parent::behaviors(), [
             'contentNegotiator' => [
                 'class' => ContentNegotiatorFilter::className(),
                 'formats' => [
@@ -47,7 +52,7 @@ class Controller extends \rock\core\Controller
                 'class' => RateLimiter::className(),
                 'response' => $this->response
             ],
-        ];
+        ]);
     }
 
     /**
@@ -78,6 +83,17 @@ class Controller extends \rock\core\Controller
      */
     protected function serializeData($data)
     {
-        return Container::load(['class' => $this->serializer, 'response' => $this->response])->serialize($data);
+        if (is_string($this->serializer)) {
+            $this->serializer = [
+                'class' => $this->serializer,
+                'response' => $this->response,
+            ];
+        }
+        if (is_array($this->serializer)) {
+            $this->serializer['extend'] = $this->extend;
+        }
+        /** @var Serializer $serializer */
+        $serializer = Instance::ensure($this->serializer);
+        return $serializer->serialize($data);
     }
 }
