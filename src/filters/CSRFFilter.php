@@ -8,7 +8,6 @@ use rock\helpers\ArrayHelper;
 use rock\helpers\Instance;
 use rock\request\Request;
 use rock\response\Response;
-use rock\rest\Serializer;
 
 class CSRFFilter extends ActionFilter
 {
@@ -52,39 +51,15 @@ class CSRFFilter extends ActionFilter
         if (!$this->validate || !$this->request->isMethods($this->verbs)) {
             return true;
         }
-        $this->send();
         $this->compare = $this->getCompare();
         if (!$this->csrf->valid($this->compare)) {
-            $this->response->setStatusCode(403);
+            $this->response->setStatusCode(403, 'Invalid CSRF-token.');
             if ($this->throwException === true) {
                 throw new CsrfFilterException('Invalid CSRF-token.');
             }
             return false;
         }
         return true;
-    }
-
-    public function send()
-    {
-        if (!$csrfToken = $this->csrf->get()) {
-            return;
-        }
-        if (in_array($this->response->format, [Response::FORMAT_JSON, Response::FORMAT_XML]) && is_array($this->response->data)) {
-            if (!isset($this->response->data['_extend'])) {
-                $this->response->data['_extend'] = [];
-            }
-            $config = [
-                'response' => $this->response,
-                'extend' => [
-                    'csrf' => [
-                        'token' => $csrfToken,
-                        'param' => $this->csrf->csrfParam
-                    ]
-                ]
-            ];
-            $this->response->data = (new Serializer($config))->serialize($this->response->data);
-        }
-        $this->response->getHeaders()->set(CSRF::CSRF_HEADER, $csrfToken);
     }
 
     protected function getCompare()
