@@ -7,10 +7,16 @@ use rock\core\Controller;
 use rock\csrf\CSRF;
 use rock\filters\CSRFFilter;
 use rock\response\Response;
-use rock\rest\Serializer;
 
 class CSRFFilterTest extends \PHPUnit_Framework_TestCase
 {
+    public static function tearDownAfterClass()
+    {
+        parent::tearDownAfterClass();
+        $_POST = [];
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+    }
+
     public function testFail()
     {
         $_SERVER['REQUEST_METHOD'] = 'POST';
@@ -25,7 +31,6 @@ class CSRFFilterTest extends \PHPUnit_Framework_TestCase
         $controller = new CsrfController(['response' => $response]);
         $controller->compare = 'fail';
         $this->assertNull($controller->method('actionIndex'));
-        $this->assertSame($csrf->get(), $response->getHeaders()->get(CSRF::CSRF_HEADER));
         $this->assertSame(403, $response->statusCode);
     }
 
@@ -45,14 +50,18 @@ class CSRFFilterTest extends \PHPUnit_Framework_TestCase
         $controller->compare = $csrf->get();
         $this->assertSame('test', $controller->method('actionIndex'));
 
+        // via POST
         $_POST[$csrf->csrfParam] = $csrf->get();
         $this->assertSame('test', (new CsrfController())->method('actionIndex'));
 
-        $config = ['response' => new Response(['format' => Response::FORMAT_JSON, 'data' => ['name' => 'Tom']])];
-        $filter = new CSRFFilter($config);
-        $filter->send();
-        $expected = $filter->response->data[(new Serializer())->extendAttribute]['csrf']['token'];
-        $this->assertSame($expected, $csrf->get());
+        // via HEADER
+        $_POST = [];
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $csrf = new CSRF();
+        $response = new Response();
+        $key = 'HTTP_' . str_replace('-', '_', strtoupper(CSRF::CSRF_HEADER));
+        $_SERVER[$key] = $csrf->get();
+        $this->assertSame('test', (new CsrfController(['response' => $response]))->method('actionIndex'));
     }
 }
 
