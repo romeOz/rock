@@ -72,9 +72,12 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
     {
         $self = $this;
         if ($new) {
+            $config = [
+                'class' => static::className(),
+                'response' => $this->response
+            ];
             /** @var static $self */
-            $self = Instance::ensure(static::className());
-            $self->response = $this->response;
+            $self = Instance::ensure($config);
         }
         Event::trigger($self, self::EVENT_BEGIN_ROUTER);
         $self->provide();
@@ -600,15 +603,16 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
             if (!class_exists($class)) {
                 throw new RouteException(RouteException::UNKNOWN_CLASS, ['class' => $class]);
             }
-            $class = new $class;
+            $config = ['class' => $class];
+            if (is_subclass_of($class, '\rock\core\Controller')) {
+                $config['response'] = $this->response;
+            }
+            $class = Instance::ensure($config);
         }
 
         if (!method_exists($class, $method)) {
             $class = get_class($class);
             throw new RouteException(RouteException::UNKNOWN_METHOD, ['method' => "{$class}::{$method}"]);
-        }
-        if ($class instanceof Controller) {
-            $class->response = $this->response;
         }
 
         $args = $this->injectArgs($class, $method);
