@@ -28,6 +28,8 @@ return [
     'call' => '{{name}} must be valid',
 
     'unique' => '{{value}} has already been taken',
-    'notUnique' => '{{value}} not already been taken.'
+    'notUnique' => '{{value}} not already been taken',
+
+    'csrf' => 'CSRF-token must be valid',
+    'notCsrf' => 'CSRF-token must not be valid',
 ];
- 
