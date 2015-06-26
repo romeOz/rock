@@ -45,14 +45,14 @@ abstract class Controller implements ComponentsInterface
 
     /**
      * Renders a view with a layout.
-     *
-     *
-     * @param string $layout       name of the view to be rendered.
-     * @param array  $placeholders
+     * @param string $layout name of the view to be rendered.
+     * @param array $placeholders list placeholders.
      * @param string $defaultPathLayout
+     * @param bool $isAjax
      * @return string the rendering result. Null if the rendering result is not required.
+     * @throws \Exception
      */
-    public function render($layout, array $placeholders = [], $defaultPathLayout = '@views')
+    public function render($layout, array $placeholders = [], $defaultPathLayout = '@views', $isAjax = false)
     {
         $layout = FileHelper::normalizePath(Alias::getAlias($layout));
         if (!strstr($layout, DS)) {
@@ -61,7 +61,19 @@ abstract class Controller implements ComponentsInterface
                       strtolower(str_replace('Controller', '', array_pop($class))) . DS .
                       $layout;
         }
-        return $this->template->render($layout, $placeholders, $this);
+        return $this->template->render($layout, $placeholders, $this, $isAjax);
+    }
+
+    /**
+     * Renders a ajax-view with a layout.
+     * @param string $layout name of the view to be rendered.
+     * @param array $placeholders list placeholders.
+     * @param string $defaultPathLayout
+     * @return string
+     */
+    public function renderAjax($layout, array $placeholders = [], $defaultPathLayout = '@views')
+    {
+        return $this->render($layout, $placeholders, $defaultPathLayout, true);
     }
 
     /**
