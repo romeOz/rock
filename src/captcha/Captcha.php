@@ -11,7 +11,7 @@ use rock\response\Response;
 use rock\session\Session;
 
 /**
- * @author   Kruglov Sergei (fork by Romeo)
+ * @author   Kruglov Sergei (fork by RomeOz)
  * @link     http://captcha.ru, http://kruglov.ru
  */
 class Captcha implements ObjectInterface, CaptchaInterface
@@ -279,7 +279,7 @@ class Captcha implements ObjectInterface, CaptchaInterface
         } while ($x >= $this->width - 10); // while not fit in canvas
 
 
-         // noise
+        // noise
         $white = imagecolorallocate($font, 255, 255, 255);
         $black = imagecolorallocate($font, 0, 0, 0);
         for (
@@ -529,7 +529,7 @@ class Captcha implements ObjectInterface, CaptchaInterface
     }
 
     /**
-     * Get code of captcha.
+     * Returns code of captcha.
      *
      * @param string|null $name
      * @return string|null
@@ -537,6 +537,19 @@ class Captcha implements ObjectInterface, CaptchaInterface
     public function getSession($name = null)
     {
         return $this->session->getFlash(Helper::getValue($name, $this->sessionName));
+    }
+    /**
+     * Returns code of captcha and remove session.
+     *
+     * @param string|null $name
+     * @return string|null
+     */
+    public function getAndRemoveSession($name = null)
+    {
+        $name = Helper::getValue($name, $this->sessionName);
+        $result = $this->session->getFlash($name);
+        $this->removeSession($name);
+        return $result;
     }
 
     /**
