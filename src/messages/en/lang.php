@@ -66,4 +66,5 @@ return [
     'failAccess' => 'Denied access.',
     'logged'             => 'you have logged',
     'unlogged'             => 'you have not logged',
+    'error' => 'error'
 ];
