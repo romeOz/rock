@@ -80,36 +80,9 @@ return array_merge(
                 },
             ],
             'title' => 'Demo',
-            'metaTags' => ['<meta charset="'.Rock::$app->charset.'" />'],
-            'linkTags' => ['<link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico?10">'],
+            'metaTags' => ['charset' => '<meta charset="'.Rock::$app->charset.'" />'],
+            'linkTags' => ['favicon' => '<link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico?10">'],
             'snippets' => [
-                'listView' => [
-                    'class'        => \rock\snippets\ListView::className(),
-                ],
-
-                'list' => [
-                    'class'        => \rock\snippets\ListView::className(),
-                ],
-
-                'date' => [
-                    'class'        => \rock\snippets\Date::className(),
-                ],
-
-                'for' => [
-                    'class'        => \rock\snippets\ForSnippet::className(),
-                ],
-
-                'formula' => [
-                    'class'        => \rock\snippets\Formula::className(),
-                ],
-
-                'if' => [
-                    'class'        => \rock\snippets\IfSnippet::className(),
-                ],
-
-                'pagination' => [
-                    'class'        => \rock\snippets\Pagination::className(),
-                ],
 
                 'request.get' => [
                     'class'        => \rock\snippets\request\Get::className(),
@@ -123,16 +96,9 @@ return array_merge(
                     'class'        => \rock\snippets\CSRF::className(),
                 ],
 
-                'url' => [
-                    'class'        => \rock\snippets\Url::className(),
-                ],
 
                 'captchaView' => [
                     'class'        => \rock\snippets\CaptchaView::className(),
-                ],
-
-                'thumb' => [
-                    'class'        => \rock\snippets\Thumb::className(),
                 ],
 
                 'activeForm' => [
