@@ -102,7 +102,7 @@ return array_merge(
                 ],
 
                 'activeForm' => [
-                    'class' => \rock\snippets\html\ActiveForm::className(),
+                    'class' => \rock\snippets\ActiveForm::className(),
                 ]
             ]
         ],
