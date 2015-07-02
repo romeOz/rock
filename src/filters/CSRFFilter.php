@@ -55,7 +55,7 @@ class CSRFFilter extends ActionFilter
         if (!$this->csrf->valid($this->compare)) {
             $this->response->setStatusCode(403, 'Invalid CSRF-token.');
             if ($this->throwException === true) {
-                throw new CsrfFilterException('Invalid CSRF-token.');
+                throw new CSRFFilterException('Invalid CSRF-token.');
             }
             return false;
         }
