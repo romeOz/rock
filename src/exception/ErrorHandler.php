@@ -28,7 +28,7 @@ class ErrorHandler implements LogInterface
     private static $_memoryReserve;
 
     /**
-     * Register this error handler
+     * Register this error handler.
      */
     public static function register()
     {
@@ -59,7 +59,7 @@ class ErrorHandler implements LogInterface
     }
 
     /**
-     * Error handler
+     * Error handler.
      *
      * @param int    $code
      * @param string $msg
@@ -94,7 +94,7 @@ class ErrorHandler implements LogInterface
     }
 
     /**
-     * Fatal handler
+     * Fatal handler.
      *
      * @return void
      */
@@ -137,6 +137,11 @@ class ErrorHandler implements LogInterface
         }
     }
 
+    /**
+     * @param \Exception $exception
+     * @param int $level
+     * @param Response $response
+     */
     public static function display(\Exception $exception, $level = Log::CRITICAL, Response $response = null)
     {
         // append log
@@ -155,7 +160,7 @@ class ErrorHandler implements LogInterface
     }
 
     /**
-     * Display fatal error
+     * Display fatal error.
      *
      * @param Response $response
      * @throws \Exception
@@ -163,9 +168,7 @@ class ErrorHandler implements LogInterface
     public static function displayFatal(Response $response = null)
     {
         if (isset($response)) {
-            if ($response->getStatusCode() === 200) {
-                $response->status500();
-            }
+            $response->status500();
             $response->send();
             if ($response->format !== Response::FORMAT_HTML) {
                 echo 0;
@@ -216,9 +219,7 @@ class ErrorHandler implements LogInterface
                 default:
                     $handler = new PrettyPageHandler();
             }
-            if ($response->getStatusCode() !== 200) {
-                $run->setSendHttpCode($response->getStatusCode());
-            }
+            $run->setSendHttpCode(500);
         } else {
             $handler = new PrettyPageHandler();
         }
