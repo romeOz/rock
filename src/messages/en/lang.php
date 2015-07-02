@@ -22,7 +22,6 @@ return [
     'token'                  => 'token',
     'captcha'                  => 'captcha',
     'example' => 'example',
-    //    'validToken' => 'must be valid token',
     'invalidEmail'            => 'Email is invalid.',
     'invalidTokenActivated' => 'Wrong token or user is already activated.',
     'invalidPasswordOrEmail'            => 'Password or email is invalid.',
@@ -66,5 +65,6 @@ return [
     'failAccess' => 'Denied access.',
     'logged'             => 'you have logged',
     'unlogged'             => 'you have not logged',
-    'error' => 'error'
+    'error' => 'error',
+    'value' => 'value'
 ];

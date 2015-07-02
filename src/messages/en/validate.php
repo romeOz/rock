@@ -32,4 +32,9 @@ return [
 
     'csrf' => 'CSRF-token must be valid',
     'notCsrf' => 'CSRF-token must not be valid',
+
+    'date' => '{{name}} must be date',
+    'dateFormat' => '{{name}} must be a valid date. Sample format: {{format}}',
+    'notDate' => '{{name}} must not be date',
+    'notDateFormat' => '{{name}} must not be a valid date in the format {{format}}',
 ];
