@@ -162,7 +162,7 @@ class CORS extends ActionFilter
             $responseHeaders['Access-Control-Max-Age'] = $this->cors['Access-Control-Max-Age'];
         }
         if (isset($this->cors['Access-Control-Expose-Headers'])) {
-             $responseHeaders['Access-Control-Expose-Headers'] = implode(', ', $this->cors['Access-Control-Expose-Headers']);
+            $responseHeaders['Access-Control-Expose-Headers'] = implode(', ', $this->cors['Access-Control-Expose-Headers']);
         }
 
         return $responseHeaders;
