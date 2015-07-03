@@ -14,6 +14,8 @@ return [
     'search' => 'search',
     'username' => 'username',
     'email' => 'e-mail',
+    'enter'                     => 'enter',
+    'input'                     => 'input',
     'password'                  => 'password',
     'passwords'                  => 'passwords',
     'confirmPassword' => 'confirm password',
