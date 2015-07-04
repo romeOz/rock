@@ -24,7 +24,7 @@ return [
     'mainPage'                  => 'главная страница',
     'registration'              => 'регистрация',
     'authorization'             => 'авторизация',
-    'recover'               => 'восстановить',
+    'resetPassword'               => 'сбросить пароль',
     'recovery'                    => 'восстановление пароля',
     'signup'                   => 'зарегистрироваться',
     'signin'                   => 'войти',

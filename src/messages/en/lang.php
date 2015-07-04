@@ -53,7 +53,7 @@ return [
     'activate'                => 'activate',
     'registration'              => 'registration',
     'authorization'             => 'login',
-    'recover'               => 'recover',
+    'resetPassword'               => 'reset password',
     'recovery'               => 'recovery',
     'loginLogout' => 'You\'re sign in. Authorization is required to <a href="{{url}}" rel="nofollow">logout</a> of your profile',
     'signupLogout' => 'You\'re sign in. The registration must be <a href="{{url}}" rel="nofollow">logout</a> of your profile',
