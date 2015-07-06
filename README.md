@@ -14,7 +14,7 @@ Rock PHP Framework
 Features
 -------------------
 
- * Modular design
+ * Modular/Component design
  * MVC
  * [Dependency Injection](https://github.com/romeOz/rock-di)
  * Route
@@ -99,7 +99,7 @@ Demo & Tests (one of two ways)
 ####1. Docker + Ansible
 
  * [Install Docker](https://docs.docker.com/installation/) or [askubuntu](http://askubuntu.com/a/473720)
- * `docker run -d -p 8080:80 romeoz/rock-app-basic:dev`
+ * `docker run -d -p 8080:80 romeoz/rock-app-basic`
  * Open demo [http://localhost:8080/](http://localhost:8080/)
  
 ####2. VirtualBox + Vagrant + Ansible
@@ -108,7 +108,7 @@ Demo & Tests (one of two ways)
  * [Install VirtualBox](https://www.virtualbox.org/wiki/Downloads)
  * [Install Vagrant](https://www.vagrantup.com/downloads), and additional Vagrant plugins `vagrant plugin install vagrant-hostsupdater vagrant-vbguest vagrant-cachier`
  * `vagrant up`
- * Open demo [http://rock-basic/](http:/rock-basic/) or [http://192.168.33.40/](http://192.168.33.40/)
+ * Open demo [http://rock-basic/](http:/rock-basic/) or [http://192.168.55.55/](http://192.168.55.55/)
 
 > Work/editing the project can be done via ssh:
 
