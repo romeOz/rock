@@ -109,7 +109,7 @@ class Rock extends Alias
             static::$components = $config['components'];
             unset($config['components']);
             static::$config = $config;
-            Container::addMulti(static::$components);
+            Container::registerMulti(static::$components);
 
             $response = static::$app->response;
         try {

@@ -94,7 +94,7 @@ trait CommonTestTrait
                 ])
             ];
         }
-        Container::add('cache', $config);
+        Container::register('cache', $config);
         return Container::load('cache');
     }
 

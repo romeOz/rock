@@ -87,7 +87,7 @@ class DatabaseTestCase extends \PHPUnit_Framework_TestCase
             $config['class'] = Connection::className();
         }
         if (is_string($this->connection)) {
-            Container::add($this->connection, $config);
+            Container::register($this->connection, $config);
         }
 
         /** @var Connection $connection */

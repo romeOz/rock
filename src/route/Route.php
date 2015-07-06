@@ -107,7 +107,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
             Rock::$components = $components;
             Rock::$config = $config;
         }
-        Container::addMulti($components);
+        Container::registerMulti($components);
     }
 
     /**
