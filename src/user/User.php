@@ -11,6 +11,11 @@ use rock\request\Request;
 use rock\Rock;
 use rock\session\Session;
 
+/**
+ * User is the class for the "user" application component that manages the user authentication status.
+ * @property string $returnUrl
+ * @package rock\user
+ */
 class User implements \ArrayAccess, CollectionInterface, ObjectInterface
 {
     use ObjectTrait;
@@ -73,14 +78,6 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
     /**
      * @inheritdoc
      */
-    public function __get($keys)
-    {
-        return $this->get($keys);
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getAll(array $only = [], array $exclude = [])
     {
         if (!$this->getIsActive()) {
@@ -110,14 +107,6 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
             return;
         }
         $this->storage->add($this->prepareKeys($keys), $value);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __set($keys, $value)
-    {
-        $this->add($keys, $value);
     }
 
     /**
@@ -154,11 +143,6 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
         return $this->exists($keys);
     }
 
-    public function __isset($name)
-    {
-        return $this->exists($name);
-    }
-
     /**
      * @inheritdoc
      */
@@ -191,11 +175,6 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
      * @inheritdoc
      */
     public function offsetUnset($keys)
-    {
-        $this->remove($keys);
-    }
-
-    public function __unset($keys)
     {
         $this->remove($keys);
     }

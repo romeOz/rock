@@ -33,9 +33,9 @@ class UserTest extends \PHPUnit_Framework_TestCase
     protected function getRBAC()
     {
         $rbac = new PhpManager([
-                   'path' => '@rockunit/data/rbac/roles.php',
-                   'pathAssignments' => '@rockunit/data/rbac/assignments.php'
-           ]);
+            'path' => '@rockunit/data/rbac/roles.php',
+            'pathAssignments' => '@rockunit/data/rbac/assignments.php'
+        ]);
         return $rbac;
     }
 
@@ -57,7 +57,6 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('Smith', $user->get('name'));
     }
 
-
     public function testGetNull()
     {
         $user = $this->getUser();
@@ -74,7 +73,6 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(['id' => 1,'age' => 21, 'groups' => ['group_1']], $user->getAll());
     }
 
-
     public function testHasTrue()
     {
         $user = $this->getUser();
@@ -83,7 +81,6 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($user->exists(['groups', 1]));
         $this->assertTrue($user->exists('groups.1'));
     }
-
 
     public function testHasFalse()
     {
@@ -95,7 +92,6 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($user->exists('groups.77'));
     }
 
-
     public function testIsAuthenticatedTrue()
     {
         $user = $this->getUser();
@@ -104,7 +100,6 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($user->isLogged());
     }
 
-
     public function testIsAuthenticatedFalse()
     {
         $user = $this->getUser();
@@ -112,7 +107,6 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $user->add('is_login', 0);
         $this->assertFalse($user->isLogged());
     }
-
 
     public function testIsAuthenticatedWithoutSessionFalse()
     {
@@ -156,7 +150,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('http://site.com/', $user->getReturnUrl());
 
         // add
-        $user->setReturnUrl('http://test.com/');
+        $user->returnUrl = 'http://test.com/';
         $this->assertSame('http://test.com/', $user->getReturnUrl());
     }
 }
