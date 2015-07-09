@@ -11,6 +11,7 @@ use rock\i18n\i18n;
 use rock\response\Response;
 use rock\Rock;
 use rock\template\Template;
+use rock\url\Url;
 
 abstract class Controller implements ComponentsInterface
 {
@@ -175,5 +176,75 @@ abstract class Controller implements ComponentsInterface
         }
         $result = call_user_func_array([$this, $actionName], $args);//$this->$actionName($route);
         return $this->afterAction($actionName, $result);
+    }
+
+    /**
+     * Redirects the browser to the specified URL.
+     * This method is a shortcut to {@see \rock\response\Response::redirect()}.
+     *
+     * You can use it in an action by returning the {@see \rock\response\Response} directly:
+     *
+     * ```php
+     * // stop executing this action and redirect to login page
+     * return $this->redirect(['login']);
+     * ```
+     *
+     * @param string|array $url the URL to be redirected to. This can be in one of the following formats:
+     *
+     * - a string representing a URL (e.g. "http://example.com")
+     * - a string representing a URL alias (e.g. "@example.com")
+     *
+     * Any relative URL will be converted into an absolute one by prepending it with the host info
+     * of the current request.
+     *
+     * @param integer $statusCode the HTTP status code. Defaults to 302.
+     * See <http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html>
+     * for details about HTTP status code
+     * @return Response the current response object
+     */
+    public function redirect($url, $statusCode = 302)
+    {
+        return $this->response->redirect(Url::modify($url, Url::ABS), $statusCode);
+    }
+
+    /**
+     * Redirects the browser to the home page.
+     *
+     * You can use this method in an action by returning the {@see \rock\response\Response} directly:
+     *
+     * ```php
+     * // stop executing this action and redirect to home page
+     * return $this->goHome();
+     * ```
+     *
+     * @return Response the current response object
+     * @throws \Exception
+     */
+    public function goHome()
+    {
+        return $this->response->redirect(Rock::$app->request->getHomeUrl());
+    }
+
+    /**
+     * Redirects the browser to the last visited page.
+     *
+     * You can use this method in an action by returning the {@see \rock\response\Response} directly:
+     *
+     * ```php
+     * // stop executing this action and redirect to last visited page
+     * return $this->goBack();
+     * ```
+     *
+     * For this function to work you have to  {@see \rock\user\User::setReturnUrl()} in appropriate places before.
+     *
+     * @param string|array $defaultUrl the default return URL in case it was not set previously.
+     * If this is null and the return URL was not set previously, {@see \rock\request\Request::$homeUrl} will be redirected to.
+     * Please refer to {@see \rock\user\User::setReturnUrl()} on accepted format of the URL.
+     * @return Response the current response object
+     * @see User::getReturnUrl()
+     */
+    public function goBack($defaultUrl = null)
+    {
+        return $this->response->redirect(Rock::$app->user->getReturnUrl($defaultUrl));
     }
 }
