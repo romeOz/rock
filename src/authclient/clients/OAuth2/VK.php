@@ -44,13 +44,12 @@ class VK implements ComponentsInterface, ClientInterface
         //$serviceFactory = new ServiceFactory();
         // Session storage
         $storage = new Session();
-        $urlBuilder = Url::set($this->redirectUrl);
 
         // Setup the credentials for the requests
         $credentials = new Credentials(
             $this->clientId,
             $this->clientSecret,
-            $urlBuilder->getAbsoluteUrl()
+            Url::modify([$this->redirectUrl], Url::ABS)
         );
 
         $this->service = new Vkontakte($credentials, new StreamClient(), $storage, $this->scopes);

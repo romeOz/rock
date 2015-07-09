@@ -10,6 +10,7 @@ use rock\helpers\Instance;
 use rock\request\Request;
 use rock\Rock;
 use rock\session\Session;
+use rock\url\Url;
 
 /**
  * User is the class for the "user" application component that manages the user authentication status.
@@ -279,7 +280,7 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
     {
         $url = $this->storage->get($this->returnUrlParam, $defaultUrl);
 
-        return $url === null ?  $this->request->getHomeUrl() : $url;
+        return $url === null ?  $this->request->getHomeUrl() : Url::modify($url);
     }
 
     /**

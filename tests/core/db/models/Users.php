@@ -11,7 +11,7 @@ class Users extends BaseUsers implements Linkable
     public function getLinks()
     {
         return [
-            Link::REL_SELF => Url::set("http://site.com/users/{$this->username}")->getAbsoluteUrl(true),
+            Link::REL_SELF => Url::modify(["http://site.com/users/{$this->username}"], Url::ABS),
         ];
     }
 }

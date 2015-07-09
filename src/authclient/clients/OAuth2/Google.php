@@ -39,13 +39,12 @@ class Google implements ComponentsInterface, ClientInterface
         $serviceFactory = new ServiceFactory();
         // Session storage
         $storage = new Session(false);
-        $urlBuilder = Url::set($this->redirectUrl);
 
         // Setup the credentials for the requests
         $credentials = new Credentials(
             $this->clientId,
             $this->clientSecret,
-            $urlBuilder->getAbsoluteUrl()
+            Url::modify($this->redirectUrl, Url::ABS)
         );
 
         // Instantiate the Google service using the credentials, http client and storage mechanism for the token

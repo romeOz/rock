@@ -750,8 +750,6 @@ class Response implements EventsInterface
      *
      * - a string representing a URL (e.g. "http://example.com")
      * - a string representing a URL alias (e.g. "@example.com")
-     *   Note that the route is with respect to the whole application, instead of relative to a controller or module.
-     *   {@see \rock\url\Url} will be used to convert the array into a URL.
      *
      * Any relative URL will be converted into an absolute one by prepending it with the host info
      * of the current request.
@@ -767,8 +765,6 @@ class Response implements EventsInterface
      */
     public function redirect($url, $statusCode = 302, $checkAjax = true)
     {
-        $urlBuilder = Url::set($url);
-        $url = $urlBuilder->getAbsoluteUrl();
         if (strpos($url, '/') === 0 && strpos($url, '//') !== 0) {
             $url = $this->request->getHostInfo() . $url;
         }
@@ -801,57 +797,12 @@ class Response implements EventsInterface
      * return Rock::$app->response->refresh();
      * ```
      *
-     * @param string $anchor the anchor that should be appended to the redirection URL.
-     *                       Defaults to empty. Make sure the anchor starts with '#' if you want to specify it.
-     * @param bool   $removeArgs
+     * @param array $modify
      * @return Response the response object itself
      */
-    public function refresh($anchor = '', $removeArgs = false)
+    public function refresh(array $modify = null)
     {
-        $url = Url::set();
-        if ($removeArgs) {
-            $url->removeAllArgs();
-        }
-        return $this->redirect($url->getAbsoluteUrl(true) . $anchor);
-    }
-
-    /**
-     * Redirects the browser to the home page.
-     *
-     *
-     * ```php
-     * // stop executing this action and redirect to home page
-     * return $this->goHome();
-     * ```
-     *
-     * @return $this the current response object
-     */
-    public function goHome()
-    {
-        return $this->redirect($this->request->getHomeUrl());
-    }
-
-    /**
-     * Redirects the browser to the last visited page.
-     *
-     * You can use this method in an action by returning the {@see \rock\response\Response} directly:
-     *
-     * ```php
-     * // stop executing this action and redirect to last visited page
-     * return $this->goBack();
-     * ```
-     *
-     * @param string|array $defaultUrl the default return URL in case it was not set previously.
-     * @return $this the current response object
-     * @see \rock\user\User::getReturnUrl()
-     */
-    public function goBack($defaultUrl = null)
-    {
-        $user = Instance::ensure($this->user, '\rock\user\User', false);
-        if (!$user instanceof User) {
-            return $this->goHome();
-        }
-        return $this->redirect($user->getReturnUrl($defaultUrl));
+        return $this->redirect(Url::modify($modify, Url::ABS));
     }
 
     /**
