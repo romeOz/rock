@@ -2,7 +2,7 @@
 use rock\execute\CacheExecute;
 use rock\log\Log;
 use rock\rbac\PhpManager;
-use rockunit\core\session\mocks\SessionMock;
+use rockunit\mocks\SessionMock;
 use rockunit\mocks\CookieMock;
 use rockunit\migrations\AccessItemsMigration;
 use rockunit\migrations\AccessRolesItemsMigration;

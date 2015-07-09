@@ -12,7 +12,7 @@ use rock\di\Container;
 use rock\file\FileManager;
 use rock\helpers\FileHelper;
 
-use rockunit\core\session\mocks\SessionMock;
+use rockunit\mocks\SessionMock;
 
 trait CommonTestTrait
 {

@@ -7,9 +7,9 @@ use rock\components\Model;
 use rock\db\common\ActiveDataProvider;
 use rock\response\Response;
 use rock\rest\Serializer;
-use rockunit\core\db\DatabaseTestCase;
-use rockunit\core\db\models\ActiveRecord;
-use rockunit\core\db\models\Users;
+use rockunit\db\DatabaseTestCase;
+use rockunit\db\models\ActiveRecord;
+use rockunit\db\models\Users;
 
 class SerializerTest extends DatabaseTestCase
 {
