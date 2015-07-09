@@ -5,12 +5,11 @@ use rock\base\CollectionInterface;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\cookie\Cookie;
-use rock\di\Container;
 use rock\helpers\ArrayHelper;
+use rock\helpers\Instance;
 use rock\request\Request;
 use rock\Rock;
 use rock\session\Session;
-use rock\session\SessionInterface;
 
 class User implements \ArrayAccess, CollectionInterface, ObjectInterface
 {
@@ -18,7 +17,7 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
 
     /**
      * The adapter where to store the token: cookies or session (by default).
-     * @var string|array|SessionInterface
+     * @var string|array|Session
      */
     public $storage = 'session';
     /**
@@ -32,18 +31,12 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
      */
     public $returnUrlParam = '__returnUrl';
     /** @var  Request */
-    private $_request;
-    /** @var  Session */
-    private $_session;
+    public $request = 'request';
 
     public function init()
     {
-        $this->_request = Container::load('request');
-        $this->_session = Container::load('session');
-
-        if (!is_object($this->storage)) {
-            $this->storage = Container::load($this->storage);
-        }
+        $this->request = Instance::ensure($this->request);
+        $this->storage = Instance::ensure($this->storage);
         if ($this->storage instanceof Cookie) {
             $this->storage->httpOnly = true;
         }
@@ -265,8 +258,8 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
      */
     public function logout($destroy = true)
     {
-        if ($destroy === true) {
-            $this->_session->destroy();
+        if ($destroy === true && $this->storage instanceof Session) {
+            $this->storage->destroy();
             return;
         }
 
@@ -300,15 +293,23 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
      * may call this method to redirect the browser to where it goes after successful authentication.
      *
      * @param string|array $defaultUrl the default return URL in case it was not set previously.
-     * If this is null and the return URL was not set previously, @see Request::getHomeUrl() will be redirected to.
+     * If this is null and the return URL was not set previously, {@see \rock\request\Request::getHomeUrl()} will be redirected to.
      * @return string the URL that the user should be redirected to after login.
-     * @see loginRequired()
      */
     public function getReturnUrl($defaultUrl = null)
     {
-        $url = $this->_session->get($this->returnUrlParam, $defaultUrl);
+        $url = $this->storage->get($this->returnUrlParam, $defaultUrl);
 
-        return $url === null ?  $this->_request->getHomeUrl() : $url;
+        return $url === null ?  $this->request->getHomeUrl() : $url;
+    }
+
+    /**
+     * Remembers the URL in the session so that it can be retrieved back later by {@see \rock\user\User::getReturnUrl()}.
+     * @param string|array $url the URL that the user should be redirected to after login.
+     */
+    public function setReturnUrl($url)
+    {
+        $this->storage->add($this->returnUrlParam, $url);
     }
 
     protected function prepareKeys($keys)
