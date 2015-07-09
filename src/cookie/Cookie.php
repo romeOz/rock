@@ -213,6 +213,14 @@ class Cookie extends SessionFlash implements \ArrayAccess, SerializeInterface
         }
     }
 
+    /**
+     * Remove all values to $_COOKIES.
+     */
+    public function destroy()
+    {
+        $this->removeAll();
+    }
+
     protected function sanitize($value, Sanitize $sanitize = null)
     {
         if (!isset($sanitize)) {
