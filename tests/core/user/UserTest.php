@@ -46,7 +46,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
     {
         return Container::load(User::className());
     }
-    
+
     // tests
 
     public function testGet()
@@ -148,6 +148,16 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($user->check('update_post', null, false));
         $this->assertFalse($user->check('delete_post', null, false));
         $this->assertTrue($this->getRBAC()->revoke(3, [$moderator, $editor]));
+    }
+
+    public function testReturnUrl()
+    {
+        $user = $this->getUser();
+        $this->assertSame('http://site.com/', $user->getReturnUrl());
+
+        // add
+        $user->setReturnUrl('http://test.com/');
+        $this->assertSame('http://test.com/', $user->getReturnUrl());
     }
 }
  

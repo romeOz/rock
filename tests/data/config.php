@@ -28,6 +28,9 @@ return [
             'class' => Log::className(),
             'path' => __DIR__ . '/runtime/logs'
         ],
+        'request' => [
+            'homeUrl' => 'http://site.com/'
+        ],
 //        'cache' => [
 //            'class' => \rock\cache\CacheStub::className()
 //        ],
