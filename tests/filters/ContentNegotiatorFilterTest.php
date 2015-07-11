@@ -22,7 +22,7 @@ class ContentNegotiatorFilterTest extends \PHPUnit_Framework_TestCase
         $controller = new ContentNegotiatorFilterController($config);
 
         $controller->response->data = $controller->method('actionIndex');
-        $this->assertSame(Rock::$app->language, 'en');
+        $this->assertSame('en', Rock::$app->language);
         $this->assertSame($controller->response->format, Response::FORMAT_JSON);
         $controller->response->send();
         $this->expectOutputString(json_encode(['foo', 'bar']));
