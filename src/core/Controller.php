@@ -13,6 +13,11 @@ use rock\Rock;
 use rock\template\Template;
 use rock\url\Url;
 
+/**
+ * Controller.
+ *
+ * @property \rock\template\Template $template
+ */
 abstract class Controller implements ComponentsInterface
 {
     use ComponentsTrait {
@@ -34,14 +39,27 @@ abstract class Controller implements ComponentsInterface
     /** @var  Response */
     public $response;
     /** @var  Template|string|array */
-    public $template = 'template';
+    private $_template = 'template';
 
     public function init()
     {
         $this->parentInit();
-        $this->template = Instance::ensure($this->template);
-        $this->template->context = $this;
         Rock::$app->controller = $this;
+    }
+
+    /**
+     * Returns instance {@see \rock\template\Template}.
+     * @return Template
+     * @throws \rock\helpers\InstanceException
+     */
+    public function getTemplate()
+    {
+        if ($this->_template instanceof Template) {
+            return $this->_template;
+        }
+        $this->_template = Instance::ensure($this->_template);
+        $this->_template->context = $this;
+        return $this->_template;
     }
 
     /**
@@ -59,10 +77,10 @@ abstract class Controller implements ComponentsInterface
         if (!strstr($layout, DS)) {
             $class = explode('\\', get_class($this));
             $layout = Alias::getAlias($defaultPathLayout). DS . 'layouts' . DS .
-                      strtolower(str_replace('Controller', '', array_pop($class))) . DS .
-                      $layout;
+                strtolower(str_replace('Controller', '', array_pop($class))) . DS .
+                $layout;
         }
-        return $this->template->render($layout, $placeholders, $this, $isAjax);
+        return $this->getTemplate()->render($layout, $placeholders, $this, $isAjax);
     }
 
     /**
@@ -89,7 +107,7 @@ abstract class Controller implements ComponentsInterface
         if (isset($this->response)) {
             $this->response->status404();
         }
-        $this->template->title = StringHelper::upperFirst(i18n::t('notPage'));
+        $this->getTemplate()->title = StringHelper::upperFirst(i18n::t('notPage'));
         if (!isset($layout)) {
             $layout = '@common.views/layouts/notPage';
         }
