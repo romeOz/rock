@@ -6,6 +6,7 @@ use rock\base\Alias;
 use rock\base\BaseException;
 use rock\log\Log;
 use rock\log\LogInterface;
+use rock\request\Request;
 use rock\response\Response;
 use Whoops\Handler\JsonResponseHandler;
 use Whoops\Handler\PrettyPageHandler;
@@ -61,10 +62,10 @@ class ErrorHandler implements LogInterface
     /**
      * Error handler.
      *
-     * @param int    $code
+     * @param int $code
      * @param string $msg
      * @param string $file
-     * @param int    $line
+     * @param int $line
      * @return bool
      */
     public static function handleError($code, $msg, $file, $line)
@@ -106,9 +107,9 @@ class ErrorHandler implements LogInterface
         if (
             isset($error['type']) &&
             ($error['type'] == E_ERROR ||
-             $error['type'] == E_PARSE ||
-             $error['type'] == E_COMPILE_ERROR ||
-             $error['type'] == E_CORE_ERROR)
+                $error['type'] == E_PARSE ||
+                $error['type'] == E_COMPILE_ERROR ||
+                $error['type'] == E_CORE_ERROR)
         ) {
             // Clean buffer, complete work buffer
             static::clearOutput();
@@ -168,16 +169,18 @@ class ErrorHandler implements LogInterface
     public static function displayFatal(Response $response = null)
     {
         if (isset($response)) {
-            $response->status500();
+            $response->setStatusCode(500);
             $response->send();
-            if ($response->format !== Response::FORMAT_HTML) {
+            $request = new Request();
+            if ($response->format !== Response::FORMAT_HTML || $request->isAjax() || $request->isCORS()) {
                 echo 0;
                 return;
             }
         }
 
         if (!isset(static::$pathFatal) ||
-            !file_exists(Alias::getAlias(static::$pathFatal))) {
+            !file_exists(Alias::getAlias(static::$pathFatal))
+        ) {
             die('This site is temporarily unavailable. Please, visit the page later.');
         }
 
@@ -217,9 +220,17 @@ class ErrorHandler implements LogInterface
                     $handler = new XmlResponseHandler();
                     break;
                 default:
-                    $handler = new PrettyPageHandler();
+                    $request = new Request();
+                    if ($request->isAjax() || $request->isCORS()) {
+                        $handler = new JsonResponseHandler();
+                    } else {
+                        $handler = new PrettyPageHandler();
+                    }
+
             }
             $run->setSendHttpCode(500);
+            $response->setStatusCode(500);
+            $response->send();
         } else {
             $handler = new PrettyPageHandler();
         }
