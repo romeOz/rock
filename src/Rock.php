@@ -154,10 +154,10 @@ class Rock extends Alias
      *     'username' => $username,
      *     'password' => $password,
      * ]);
-     * $object = Rock::factory($arg1, $arg2, [
+     * $object = Rock::factory([
      *     'class' => 'apps\frontend\FooController',
      *     'test' => 'test',
-     * ]);
+     * ], [$arg1, $arg2]);
      * ```
      *
      *
@@ -172,15 +172,16 @@ class Rock extends Alias
      * The method will pass the given configuration as the last parameter of the constructor,
      * and any additional parameters to this method will be passed as the rest of the constructor parameters.
      *
-     * @param mixed ...$args arguments for constructor.
      * @param string|array $config the configuration. It can be either a string representing the class name
      *                             or an array representing the object configuration.
+     * @param array $args arguments of constructor.
      * @param mixed $throwException throws exception
-     * @return ObjectInterface|null the created object
+     * @return null|ObjectInterface the created object
+     * @throws di\ContainerException
      */
-    public static function factory(/*$args...*/$config, $throwException = true)
+    public static function factory($config, array $args = [], $throwException = true)
     {
-        return call_user_func_array([Container::className(), 'load'], func_get_args());
+        return Container::load($config, $args, $throwException);
     }
 
     /**
@@ -191,7 +192,7 @@ class Rock extends Alias
      */
     public function __get($class)
     {
-        return self::factory($class);
+        return static::factory($class);
     }
 
     /**
