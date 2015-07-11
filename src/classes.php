@@ -35,7 +35,7 @@ return array_merge(
 
         'template' => [
             'class' => Template::className(),
-            'locale' => Rock::$app->language,
+            'locale' =>  [\rock\LocaleProperties::className(), 'locale'],
             'autoEscape' => Template::ESCAPE | Template::TO_TYPE,
             'handlerLink' => function($link, Template $template, array $params = [])
             {
@@ -123,11 +123,11 @@ return array_merge(
                     '@rock/messages/en/validate.php',
                 ]
             ],
-            'locale' => Rock::$app->language
+            'locale' =>  [\rock\LocaleProperties::className(), 'locale']
         ],
         'date' => [
             'class' => \rock\date\DateTime::className(),
-            'locale' => Rock::$app->language,
+            'locale' =>  [\rock\LocaleProperties::className(), 'locale'],
             'formats' => [
                 'dmy'   => function(\rock\date\DateTime $dateTime){
                     $nowYear  = date('Y');
@@ -159,14 +159,14 @@ return array_merge(
         ],
         'request' => [
             'class' => \rock\request\Request::className(),
-            'locale' => Rock::$app->language
+            'locale' => [\rock\LocaleProperties::className(), 'locale']
         ],
 
         // Response
         'response' => [
             'class' => \rock\response\Response::className(),
             //'singleton' => true,
-            'locale' => Rock::$app->language
+            'locale' =>  [\rock\LocaleProperties::className(), 'locale']
         ],
         'htmlResponseFormatter' => [
             'class' => \rock\response\HtmlResponseFormatter::className(),
@@ -203,7 +203,7 @@ return array_merge(
         ],
         'validate' => [
             'class' => \rock\validate\Validate::className(),
-            'locale' => Rock::$app->language,
+            'locale' =>  [\rock\LocaleProperties::className(), 'locale']
         ],
         'csrf' => [
             'class' => \rock\csrf\CSRF::className(),
