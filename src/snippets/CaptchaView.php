@@ -14,17 +14,17 @@ use rock\helpers\FileHelper;
 class CaptchaView extends Snippet
 {
     /** @var  Captcha */
-    protected $_captcha;
+    protected $captcha = 'captcha';
 
     public function init()
     {
         parent::init();
-        $this->_captcha = Container::load('captcha');
+        $this->captcha = Container::load($this->captcha);
     }
 
     public function get()
     {
-        if (!$dataImage = $this->_captcha->get()) {
+        if (!$dataImage = $this->captcha->get()) {
             return '#';
         }
 

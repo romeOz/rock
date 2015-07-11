@@ -123,15 +123,12 @@ class Captcha implements ObjectInterface, CaptchaInterface
      */
     protected $code;
     /** @var  Session */
-    protected $session;
-    /** @var  Response */
-    protected $response;
+    public $session = 'session';
 
     public function init()
     {
         $this->parentInit();
-        $this->session = Container::load('session');
-        $this->response = Container::load('response');
+        $this->session = Container::load($this->session);
 
         $this->length = Helper::getValue(
             $this->length,
@@ -148,9 +145,9 @@ class Captcha implements ObjectInterface, CaptchaInterface
     }
 
     /**
-     * Get data captcha.
+     * Returns data captcha.
      *
-     * @param bool $session create session
+     * @param bool $session create session.
      * @return array
      */
     public function get($session = true)
@@ -463,32 +460,24 @@ class Captcha implements ObjectInterface, CaptchaInterface
     }
 
     /**
-     * Display captcha.
+     * Returns image captcha.
      *
      * @param bool $session
+     * @param Response $response
+     * @return null
      */
-    public function display($session = true)
+    public function getImage($session = true, Response $response)
     {
         if (!$data = $this->generate($session)) {
-            return;
+            return null;
         }
-        $this->setHttpHeaders($data['mimeType']);
-        echo $data['image'];
-    }
-
-    /**
-     * Sets the HTTP headers needed by image response.
-     *
-     * @param string $mimeType
-     */
-    protected function setHttpHeaders($mimeType)
-    {
-        $this->response->getHeaders()
+        $response->getHeaders()
             ->set('Pragma', 'public')
             ->set('Expires', '0')
             ->set('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
             ->set('Content-Transfer-Encoding', 'binary')
-            ->set('Content-type', $mimeType);
+            ->set('Content-type', $data['mimeType']);
+        return $data['image'];
     }
 
     /**

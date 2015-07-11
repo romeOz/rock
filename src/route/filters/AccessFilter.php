@@ -4,7 +4,7 @@ namespace rock\route\filters;
 
 
 use rock\access\Access;
-use rock\di\Container;
+use rock\helpers\Instance;
 use rock\route\RouteEvent;
 
 /**
@@ -56,12 +56,7 @@ class AccessFilter extends RouteFilter
             'owner' => $this->owner,
             'rules' => $this->rules,
         ];
-        if (class_exists('\rock\di\Container')) {
-            $this->access = Container::load($config);
-        } else {
-            unset($config['class']);
-            $this->access = new Access($config);
-        }
+        $this->access = Instance::ensure($config);
         if (!$this->access->checkAccess()) {
             if ($this->event instanceof RouteEvent) {
                 $this->event->errors |= $this->access->errors;

@@ -69,7 +69,7 @@ return array_merge(
                     } elseif (function_exists($class) && !$class instanceof \Closure){
                         return call_user_func_array($class, $params);
                     } else {
-                        $object = \rock\di\Container::load(Alias::getAlias($class));
+                        $object = \rock\di\Container::load($class);
                         if (!method_exists($object, $method)) {
                             throw new \rock\base\BaseException(\rock\base\BaseException::UNKNOWN_METHOD, ['method' => "{$class}::{$method}"]);
                         }
