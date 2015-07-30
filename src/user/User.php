@@ -1,12 +1,14 @@
 <?php
 namespace rock\user;
 
+use rock\base\BaseException;
 use rock\base\CollectionInterface;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\cookie\Cookie;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Instance;
+use rock\log\Log;
 use rock\request\Request;
 use rock\Rock;
 use rock\session\Session;
@@ -239,6 +241,15 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
             return;
         }
         $this->add('is_login', 1);
+
+        $ip = $this->request->getUserIP();
+        $id = $this->get('id');
+        if ($this->enableSession) {
+            $msg = "User '$id' logged in from {$ip}.";
+        } else {
+            $msg = "User '$id' logged in from $ip. Session not enabled.";
+        }
+        Log::info(BaseException::convertExceptionToString(new BaseException($msg)));
     }
 
     /**
@@ -250,6 +261,9 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
         if (!$this->enableSession) {
             return;
         }
+        $ip = $this->request->getUserIP();
+        $id = $this->get('id');
+        Log::info(BaseException::convertExceptionToString(new BaseException("User '$id' logged out from $ip.")));
         if ($destroy === true && $this->storage instanceof Session) {
             $this->storage->destroy();
             return;
@@ -264,7 +278,7 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
      * Check of compliance of the user to the role or permission.
      * @param string $roleName name of role/permission
      * @param array $params
-     * @param bool $allowCaching
+     * @param bool  $allowCaching
      * @return bool
      */
     public function check($roleName, array $params = null, $allowCaching = true)
@@ -275,7 +289,7 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
         if ($allowCaching && empty($params) && isset(static::$access[$roleName])) {
             return static::$access[$roleName];
         }
-        return static::$access[$roleName] = Rock::$app->rbac->check($this->get('id'), $roleName, $params);
+        return static::$access[$roleName] =  Rock::$app->rbac->check($this->get('id'), $roleName, $params);
     }
 
     /**
@@ -292,7 +306,7 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
     {
         $url = $this->storage->get($this->returnUrlParam, $defaultUrl);
 
-        return $url === null ? $this->request->getHomeUrl() : Url::modify($url);
+        return $url === null ?  $this->request->getHomeUrl() : Url::modify($url);
     }
 
     /**
