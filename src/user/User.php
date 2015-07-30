@@ -4,8 +4,8 @@ namespace rock\user;
 use rock\base\BaseException;
 use rock\base\CollectionInterface;
 use rock\base\ObjectInterface;
-use rock\base\ObjectTrait;
 use rock\cookie\Cookie;
+use rock\events\EventsTrait;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Instance;
 use rock\log\Log;
@@ -21,7 +21,12 @@ use rock\url\Url;
  */
 class User implements \ArrayAccess, CollectionInterface, ObjectInterface
 {
-    use ObjectTrait;
+    use EventsTrait;
+
+    const EVENT_BEFORE_LOGIN = 'beforeLogin';
+    const EVENT_AFTER_LOGIN = 'afterLogin';
+    const EVENT_BEFORE_LOGOUT = 'beforeLogout';
+    const EVENT_AFTER_LOGOUT = 'afterLogout';
 
     /**
      * The adapter where to store the token: cookies or session (by default).
@@ -278,7 +283,7 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
      * Check of compliance of the user to the role or permission.
      * @param string $roleName name of role/permission
      * @param array $params
-     * @param bool  $allowCaching
+     * @param bool $allowCaching
      * @return bool
      */
     public function check($roleName, array $params = null, $allowCaching = true)
@@ -289,7 +294,7 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
         if ($allowCaching && empty($params) && isset(static::$access[$roleName])) {
             return static::$access[$roleName];
         }
-        return static::$access[$roleName] =  Rock::$app->rbac->check($this->get('id'), $roleName, $params);
+        return static::$access[$roleName] = Rock::$app->rbac->check($this->get('id'), $roleName, $params);
     }
 
     /**
@@ -306,7 +311,7 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
     {
         $url = $this->storage->get($this->returnUrlParam, $defaultUrl);
 
-        return $url === null ?  $this->request->getHomeUrl() : Url::modify($url);
+        return $url === null ? $this->request->getHomeUrl() : Url::modify($url);
     }
 
     /**
@@ -316,6 +321,58 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
     public function setReturnUrl($url)
     {
         $this->storage->add($this->returnUrlParam, $url);
+    }
+
+    /**
+     * This method is called before logging in a user.
+     * The default implementation will trigger the {@see \rock\user\User::EVENT_BEFORE_LOGIN} event.
+     * If you override this method, make sure you call the parent implementation
+     * so that the event is triggered.
+     * If 0, it means login till the user closes the browser or the session is manually destroyed.
+     * @return boolean whether the user should continue to be logged in
+     */
+    protected function beforeLogin()
+    {
+        $event = new UserEvent();
+        $this->trigger(self::EVENT_BEFORE_LOGIN, $event);
+        return $event->isValid;
+    }
+
+    /**
+     * This method is called after the user is successfully logged in.
+     * The default implementation will trigger the {@see \rock\user\User::EVENT_AFTER_LOGIN} event.
+     * If you override this method, make sure you call the parent implementation
+     * so that the event is triggered.
+     * If 0, it means login till the user closes the browser or the session is manually destroyed.
+     */
+    protected function afterLogin()
+    {
+        $this->trigger(self::EVENT_AFTER_LOGIN, new UserEvent());
+    }
+
+    /**
+     * This method is invoked when calling {@see \rock\user\User::logout()} to log out a user.
+     * The default implementation will trigger the {@see \rock\user\User::EVENT_BEFORE_LOGOUT} event.
+     * If you override this method, make sure you call the parent implementation
+     * so that the event is triggered.
+     * @return boolean whether the user should continue to be logged out
+     */
+    protected function beforeLogout()
+    {
+        $event = new UserEvent();
+        $this->trigger(self::EVENT_BEFORE_LOGOUT, $event);
+        return $event->isValid;
+    }
+
+    /**
+     * This method is invoked right after a user is logged out via {@see \rock\user\User::logout()}.
+     * The default implementation will trigger the {@see \rock\user\User::EVENT_AFTER_LOGOUT} event.
+     * If you override this method, make sure you call the parent implementation
+     * so that the event is triggered.
+     */
+    protected function afterLogout()
+    {
+        $this->trigger(self::EVENT_AFTER_LOGOUT, new UserEvent());
     }
 
     protected function prepareKeys($keys)
