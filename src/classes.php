@@ -229,8 +229,7 @@ return array_merge(
 
 
         'log' => [
-            'class' => \rock\log\Log::className(),
-            'path' => '@runtime/logs'
+            'class' => \rock\log\Log::className()
         ],
 
         Role::className() =>[

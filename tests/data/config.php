@@ -1,4 +1,5 @@
 <?php
+use Monolog\Handler\NullHandler;
 use rock\execute\CacheExecute;
 use rock\log\Log;
 use rock\rbac\PhpManager;
@@ -26,7 +27,7 @@ return [
     'classes' => [
         'log' => [
             'class' => Log::className(),
-            'path' => __DIR__ . '/runtime/logs'
+            'handlers' => [new NullHandler()]
         ],
         'request' => [
             'homeUrl' => 'http://site.com/'

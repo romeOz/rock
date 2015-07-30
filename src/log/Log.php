@@ -4,8 +4,10 @@ namespace rock\log;
 
 
 use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use rock\base\Alias;
 use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
@@ -32,15 +34,12 @@ class Log implements LogInterface, ObjectInterface
     }
 
     /**
-     * Path to log
-     * @var string
+     * List handlers.
+     * @var AbstractProcessingHandler[]
      */
-    public $path = __DIR__;
-
-    /** @var Logger  */
+    public $handlers = [];
+    /** @var LoggerInterface */
     public $logger;
-    /** @var  LineFormatter */
-    public $formatter;
 
     public function __construct($config = [])
     {
@@ -49,34 +48,16 @@ class Log implements LogInterface, ObjectInterface
         if (isset($this->logger)) {
             return;
         }
-        $path = Alias::getAlias($this->path);
-        FileHelper::createDirectory($path);
 
         $this->logger = new Logger('Rock');
 
-        if (!$this->formatter instanceof LineFormatter) {
-            $this->formatter = new LineFormatter("[%datetime%]\t%level_name%\t%extra.hash%\t%message%\t%extra.user_id%\t%extra.user_ip%\t%extra.user_agent%\n");
+        if (!$this->handlers) {
+            $this->handlers = $this->defaultHandlers();
         }
-        $this->logger->pushProcessor(function ($record) {
-                $record['extra']['hash'] = substr(md5($record['message']), -6);
-                $record['extra']['user_agent'] = strip_tags($_SERVER['HTTP_USER_AGENT']);
-                $record['extra']['user_ip'] = filter_input(INPUT_SERVER, 'REMOTE_ADDR', FILTER_VALIDATE_IP);
-                $record['extra']['user_id'] = isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 'NULL';
-                return $record;
-            });
-        $this->logger->pushHandler((new StreamHandler("{$path}/debug.log", self::DEBUG, false))->setFormatter($this->formatter));
-        $this->logger->pushHandler((new StreamHandler("{$path}/info.log", self::INFO, false))->setFormatter($this->formatter));
-        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::NOTICE, false))->setFormatter($this->formatter));
-        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::WARNING, false))->setFormatter($this->formatter));
-        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::ERROR, false))->setFormatter($this->formatter));
-        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::CRITICAL, false))->setFormatter($this->formatter));
-        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::ALERT, false))->setFormatter($this->formatter));
-        $this->logger->pushHandler((new StreamHandler("{$path}/error.log", self::EMERGENCY, false))->setFormatter($this->formatter));
-    }
 
-    public function setLogger(Logger $logger)
-    {
-        $this->logger = $logger;
+        foreach ($this->handlers as $level => $ahndler) {
+            $this->logger->pushHandler($ahndler);
+        }
     }
 
     public function __call($name, $arguments)
@@ -100,9 +81,9 @@ class Log implements LogInterface, ObjectInterface
      *
      * This method allows for compatibility with common interfaces.
      *
-     * @param  int   $level  log level
-     * @param  string  $message log message
-     * @param  array   $placeholders placeholders for replacement
+     * @param  int $level log level
+     * @param  string $message log message
+     * @param  array $placeholders placeholders for replacement
      * @return bool Whether the record has been processed
      */
     protected function logInternal($level, $message, array $placeholders = [])
@@ -115,8 +96,8 @@ class Log implements LogInterface, ObjectInterface
      *
      * This method allows for compatibility with common interfaces.
      *
-     * @param  string  $message log message
-     * @param  array   $placeholders placeholders for replacement
+     * @param  string $message log message
+     * @param  array $placeholders placeholders for replacement
      * @return bool Whether the record has been processed
      */
     protected function debugInternal($message, array $placeholders = [])
@@ -129,8 +110,8 @@ class Log implements LogInterface, ObjectInterface
      *
      * This method allows for compatibility with common interfaces.
      *
-     * @param  string  $message log message
-     * @param  array   $placeholders placeholders for replacement
+     * @param  string $message log message
+     * @param  array $placeholders placeholders for replacement
      * @return bool Whether the record has been processed
      */
     protected function infoInternal($message, array $placeholders = [])
@@ -143,8 +124,8 @@ class Log implements LogInterface, ObjectInterface
      *
      * This method allows for compatibility with common interfaces.
      *
-     * @param  string  $message log message
-     * @param  array   $placeholders placeholders for replacement
+     * @param  string $message log message
+     * @param  array $placeholders placeholders for replacement
      * @return bool Whether the record has been processed
      */
     protected function noticeInternal($message, array $placeholders = [])
@@ -157,8 +138,8 @@ class Log implements LogInterface, ObjectInterface
      *
      * This method allows for compatibility with common interfaces.
      *
-     * @param  string  $message log message
-     * @param  array   $placeholders placeholders for replacement
+     * @param  string $message log message
+     * @param  array $placeholders placeholders for replacement
      * @return bool Whether the record has been processed
      */
     protected function warnInternal($message, array $placeholders = [])
@@ -171,8 +152,8 @@ class Log implements LogInterface, ObjectInterface
      *
      * This method allows for compatibility with common interfaces.
      *
-     * @param  string  $message log message
-     * @param  array   $placeholders placeholders for replacement
+     * @param  string $message log message
+     * @param  array $placeholders placeholders for replacement
      * @return bool Whether the record has been processed
      */
     protected function errInternal($message, array $placeholders = [])
@@ -185,8 +166,8 @@ class Log implements LogInterface, ObjectInterface
      *
      * This method allows for compatibility with common interfaces.
      *
-     * @param  string  $message log message
-     * @param  array   $placeholders placeholders for replacement
+     * @param  string $message log message
+     * @param  array $placeholders placeholders for replacement
      * @return bool Whether the record has been processed
      */
     protected function critInternal($message, array $placeholders = [])
@@ -199,8 +180,8 @@ class Log implements LogInterface, ObjectInterface
      *
      * This method allows for compatibility with common interfaces.
      *
-     * @param  string  $message log message
-     * @param  array   $placeholders placeholders for replacement
+     * @param  string $message log message
+     * @param  array $placeholders placeholders for replacement
      * @return bool Whether the record has been processed
      */
     protected function alertInternal($message, array $placeholders = [])
@@ -213,12 +194,42 @@ class Log implements LogInterface, ObjectInterface
      *
      * This method allows for compatibility with common interfaces.
      *
-     * @param  string  $message log message
-     * @param  array   $placeholders placeholders for replacement
+     * @param  string $message log message
+     * @param  array $placeholders placeholders for replacement
      * @return bool Whether the record has been processed
      */
     protected function emergInternal($message, array $placeholders = [])
     {
         return $this->logger->emerg(StringHelper::replace($message, $placeholders, false), $placeholders);
+    }
+
+    protected function defaultHandlers()
+    {
+        $path = $path = Alias::getAlias('@runtime/logs');
+        FileHelper::createDirectory($path);
+        $paths = [
+            self::DEBUG => "{$path}/debug.log",
+            self::INFO => "{$path}/info.log",
+            self::NOTICE => "{$path}/error.log",
+            self::WARNING => "{$path}/error.log",
+            self::ERROR => "{$path}/error.log",
+            self::CRITICAL => "{$path}/error.log",
+            self::ALERT => "{$path}/error.log",
+            self::EMERGENCY => "{$path}/error.log",
+        ];
+        $formatter = new LineFormatter("[%datetime%]\t%level_name%\t%extra.hash%\t%message%\t%extra.user_id%\t%extra.user_ip%\t%extra.user_agent%\n");
+        $this->logger->pushProcessor(function ($record) {
+            $record['extra']['hash'] = substr(md5($record['message']), -6);
+            $record['extra']['user_agent'] = strip_tags($_SERVER['HTTP_USER_AGENT']);
+            $record['extra']['user_ip'] = filter_input(INPUT_SERVER, 'REMOTE_ADDR', FILTER_VALIDATE_IP);
+            $record['extra']['user_id'] = isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 'NULL';
+            return $record;
+        });
+
+        $handlers = [];
+        foreach ($paths as $level => $path) {
+            $handlers[$level] = (new StreamHandler($path, $level, false))->setFormatter($formatter);
+        }
+        return $handlers;
     }
 }
