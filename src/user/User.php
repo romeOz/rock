@@ -38,6 +38,12 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
     public $returnUrlParam = '__returnUrl';
     /** @var  Request */
     public $request = 'request';
+    /**
+     * @var boolean whether to use session to persist authentication status across multiple requests.
+     * You set this property to be false if your application is stateless, which is often the case
+     * for RESTful APIs.
+     */
+    public $enableSession = true;
 
     public function init()
     {
@@ -53,6 +59,9 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
      */
     public function getIsActive()
     {
+        if (!$this->enableSession) {
+            return false;
+        }
         return $this->storage->exists("{$this->container}.id");
     }
 
@@ -104,7 +113,7 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
      */
     public function add($keys, $value)
     {
-        if (!isset($value)) {
+        if (!$this->enableSession || !isset($value)) {
             return;
         }
         $this->storage->add($this->prepareKeys($keys), $value);
@@ -238,6 +247,9 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
      */
     public function logout($destroy = true)
     {
+        if (!$this->enableSession) {
+            return;
+        }
         if ($destroy === true && $this->storage instanceof Session) {
             $this->storage->destroy();
             return;
@@ -252,7 +264,7 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
      * Check of compliance of the user to the role or permission.
      * @param string $roleName name of role/permission
      * @param array $params
-     * @param bool  $allowCaching
+     * @param bool $allowCaching
      * @return bool
      */
     public function check($roleName, array $params = null, $allowCaching = true)
@@ -263,7 +275,7 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
         if ($allowCaching && empty($params) && isset(static::$access[$roleName])) {
             return static::$access[$roleName];
         }
-        return static::$access[$roleName] =  Rock::$app->rbac->check($this->get('id'), $roleName, $params);
+        return static::$access[$roleName] = Rock::$app->rbac->check($this->get('id'), $roleName, $params);
     }
 
     /**
@@ -280,7 +292,7 @@ class User implements \ArrayAccess, CollectionInterface, ObjectInterface
     {
         $url = $this->storage->get($this->returnUrlParam, $defaultUrl);
 
-        return $url === null ?  $this->request->getHomeUrl() : Url::modify($url);
+        return $url === null ? $this->request->getHomeUrl() : Url::modify($url);
     }
 
     /**
