@@ -34,12 +34,12 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
     const REST = 1;
 
     const FILTER_SCHEME = 'scheme';
-    const FILTER_HOST   = 'host';
-    const FILTER_PATH   = 'path';
-    const FILTER_QUERY  = 'query';
-    const FILTER_GET    = 'get';
-    const FILTER_POST   = 'post';
-    const FILTER_PUT   = 'put';
+    const FILTER_HOST = 'host';
+    const FILTER_PATH = 'path';
+    const FILTER_QUERY = 'query';
+    const FILTER_GET = 'get';
+    const FILTER_POST = 'post';
+    const FILTER_PUT = 'put';
     const FILTER_DELETE = 'delete';
 
     public $rules = [];
@@ -48,7 +48,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
     /** @var  callable */
     public $fail;
     public $RESTHandlers = [];
-    public $sanitizeRules = ['removeTags', 'trim', ['call' => 'urldecode'],'toType'];
+    public $sanitizeRules = ['removeTags', 'trim', ['call' => 'urldecode'], 'toType'];
     /** @var  Request|string|array */
     public $request = 'request';
     /** @var  Response|string|array */
@@ -88,7 +88,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
      * Set config scope
      *
      * @param string $path path to config
-     * @param bool   $clear clear DIC.
+     * @param bool $clear clear DIC.
      * @throws RouteException
      * @throws \Exception
      */
@@ -101,7 +101,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
         if ($clear) {
             Container::removeAll();
         }
-        $components = $config['components'] ? : [];
+        $components = $config['components'] ?: [];
         if (class_exists('\rock\Rock')) {
             unset($config['components']);
             Rock::$components = $components;
@@ -114,9 +114,9 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
      * Add route
      *
      * @param array|string $verbs
-     * @param string|array          $pattern
-     * @param callable|array        $handler
-     * @param callable|array|null   $filters
+     * @param string|array $pattern
+     * @param callable|array $handler
+     * @param callable|array|null $filters
      * @return boolean
      */
     public function addRoute($verbs, $pattern, $handler, $filters = null)
@@ -147,8 +147,8 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
      * Add route by any request methods
      *
      * @param string|array $pattern
-     * @param callable|array  $handler
-     * @param callable|array|null     $filters
+     * @param callable|array $handler
+     * @param callable|array|null $filters
      * @return boolean
      */
     public function any($pattern, $handler, $filters = null)
@@ -160,8 +160,8 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
      * Add route by GET
      *
      * @param string|array $pattern
-     * @param callable|array     $handler
-     * @param callable|array|null     $filters
+     * @param callable|array $handler
+     * @param callable|array|null $filters
      * @return boolean
      */
     public function get($pattern, $handler, $filters = null)
@@ -173,8 +173,8 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
      * Add route by POST
      *
      * @param string|array $pattern
-     * @param callable|array     $handler
-     * @param callable|array|null     $filters
+     * @param callable|array $handler
+     * @param callable|array|null $filters
      * @return boolean
      */
     public function post($pattern, $handler, $filters = null)
@@ -186,8 +186,8 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
      * Add route by PUT
      *
      * @param string|array $pattern
-     * @param callable|array     $handler
-     * @param callable|array|null     $filters
+     * @param callable|array $handler
+     * @param callable|array|null $filters
      * @return boolean
      */
     public function put($pattern, $handler, $filters = null)
@@ -199,8 +199,8 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
      * Add route by DELETE
      *
      * @param string|array $pattern
-     * @param callable|array     $handler
-     * @param callable|array|null     $filters
+     * @param callable|array $handler
+     * @param callable|array|null $filters
      * @return boolean
      */
     public function delete($pattern, $handler, $filters = null)
@@ -211,8 +211,8 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
     /**
      * Add routers
      *
-     * @param string   $url
-     * @param string   $controller
+     * @param string $url
+     * @param string $controller
      * @param array $filters
      * @return boolean
      */
@@ -389,13 +389,13 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
             case self::FILTER_QUERY:
                 return isset($this->data['query']) ? [$this->data['query']] : [];
             case self::FILTER_GET:
-                return $GLOBALS['_GET'] ? : [];
+                return Request::rawGet() ?: [];
             case self::FILTER_POST:
-                return $GLOBALS['_POST'] ? : [];
+                return Request::rawPost() ?: [];
             case self::FILTER_PUT:
-                return $GLOBALS['_PUT'] ? : [];
+                return Request::rawPost() ?: [];
             case self::FILTER_DELETE:
-                return $GLOBALS['_DELETE'] ? : [];
+                return Request::rawPost() ?: [];
             default:
                 throw new RouteException(RouteException::UNKNOWN_FORMAT, ['format' => $key]);
         }
@@ -510,7 +510,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
                 $value[3] = null;
             }
             list ($verbs, $pattern, $handler, $_filters) = $value;
-            $filters = !empty($filters['filters']) ? $filters['filters'] : $_filters ;
+            $filters = !empty($filters['filters']) ? $filters['filters'] : $_filters;
 
             if (StringHelper::isRegexp($pattern)) {
                 $url = preg_quote($url, '/');
@@ -529,7 +529,7 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
     }
 
     /**
-     * @param array    $verbs
+     * @param array $verbs
      * @param callable|array $handler
      * @param callable $filters
      * @return bool
@@ -662,49 +662,49 @@ class Route implements RequestInterface, ErrorsInterface, ComponentsInterface, \
             'index' => [
                 self::GET,
                 '/{url}/',
-                function(Route $route) {
+                function (Route $route) {
                     return call_user_func([Container::load($route['controller']), 'actionIndex'], $route);
                 }
             ],
             'create' => [
                 self::GET,
                 '/{url}/create/',
-                function(Route $route) {
+                function (Route $route) {
                     return call_user_func([Container::load($route['controller']), 'actionCreate'], $route);
                 }
             ],
             'store' => [
                 self::POST,
                 '/{url}/',
-                function(Route $route) {
+                function (Route $route) {
                     return call_user_func([Container::load($route['controller']), 'actionStore'], $route);
                 }
             ],
             'show' => [
                 self::GET,
                 '~/^\/{url}\/(?P<id>[^\/]+)$/',
-                function(Route $route) {
+                function (Route $route) {
                     return call_user_func([Container::load($route['controller']), 'actionShow'], $route);
                 }
             ],
             'edit' => [
                 self::GET,
                 '~/^\/{url}\/(?P<id>[^\/]+)\/edit\/$/',
-                function(Route $route) {
+                function (Route $route) {
                     return call_user_func([Container::load($route['controller']), 'actionEdit'], $route);
                 }
             ],
             'update' => [
                 [self::PUT, self::PATCH],
                 '~/^\/{url}\/(?P<id>[^\/]+)$/',
-                function(Route $route) {
+                function (Route $route) {
                     return call_user_func([Container::load($route['controller']), 'actionUpdate'], $route);
                 }
             ],
             'delete' => [
                 self::DELETE,
                 '~/^\/{url}\/(?P<id>[^\/]+)$/',
-                function(Route $route) {
+                function (Route $route) {
                     return call_user_func([Container::load($route['controller']), 'actionDelete'], $route);
                 }
             ]

@@ -1,5 +1,6 @@
 <?php
 namespace rock\snippets\request;
+
 use rock\request\Request;
 use rock\sanitize\Sanitize;
 use rock\snippets\Snippet;
@@ -20,19 +21,13 @@ class Get extends Snippet
     public $default;
 
     public $autoEscape = false;
+
     public function get()
     {
         if (is_array($this->filters)) {
             $this->filters = Sanitize::rules($this->filters);
         }
-        if (empty($this->name)){
-            return Request::getAll($this->filters);
-        }
 
-        if (!isset($_POST[$this->name])) {
-            return Request::get($this->name, $this->default, $this->filters);
-        }
-
-        return null;
+        return Request::get($this->name, $this->default, $this->filters);
     }
 }

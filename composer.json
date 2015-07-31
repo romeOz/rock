@@ -19,7 +19,7 @@
         "php": ">=5.4.0",
         "romeoz/rock-components" : "0.11.*",
         "romeoz/rock-di" : "0.12.*",
-        "romeoz/rock-request" : "0.10.*",
+        "romeoz/rock-request" : "0.11.*",
         "romeoz/rock-url" : "0.11.*",
         "romeoz/rock-csrf" : "0.11.*",
         "romeoz/rock-sanitize" : "0.10.*",

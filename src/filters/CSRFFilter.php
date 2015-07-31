@@ -28,6 +28,7 @@ class CSRFFilter extends ActionFilter
     public $verbs = ['POST', 'PUT', 'DELETE', 'PATH'];
     public $validate = true;
     public $throwException = false;
+
     /**
      * @throws \rock\helpers\InstanceException
      */
@@ -80,19 +81,19 @@ class CSRFFilter extends ActionFilter
     protected function getGlobalsVars()
     {
         if ($this->request->isPost() && in_array('POST', $this->verbs, true)) {
-            return Request::postAll();
+            return Request::post();
         }
 
         if ($this->request->isGet() && in_array('GET', $this->verbs, true)) {
-            return Request::getAll();
+            return Request::get();
         }
 
         if ($this->request->isPut() && in_array('PUT', $this->verbs, true)) {
-            return Request::putAll();
+            return Request::post();
         }
 
         if ($this->request->isDelete() && in_array('DELETE', $this->verbs, true)) {
-            return Request::deleteAll();
+            return Request::post();
         }
 
         return [];
