@@ -4,7 +4,7 @@ namespace rockunit\rest;
 
 
 use rock\components\Model;
-use rock\db\common\ActiveDataProvider;
+use rock\data\ActiveDataProvider;
 use rock\response\Response;
 use rock\rest\Serializer;
 use rockunit\db\DatabaseTestCase;
@@ -48,23 +48,23 @@ class SerializerTest extends DatabaseTestCase
                 [
                     'self' =>
                         [
-                            'href' => 'http://site.com/',
+                            'href' => 'http://site.com/?limit=2',
                         ],
                     'first' =>
                         [
-                            'href' => 'http://site.com/',
+                            'href' => 'http://site.com/?limit=2',
                         ],
                     'prev' =>
                         [
-                            'href' => 'http://site.com/',
+                            'href' => 'http://site.com/?limit=2',
                         ],
                     'next' =>
                         [
-                            'href' => 'http://site.com/?page=1',
+                            'href' => 'http://site.com/?page=1&limit=2',
                         ],
                     'last' =>
                         [
-                            'href' => 'http://site.com/?page=1',
+                            'href' => 'http://site.com/?page=1&limit=2',
                         ],
                 ],
             '_meta' =>
@@ -75,7 +75,7 @@ class SerializerTest extends DatabaseTestCase
                     'perPage' => 2,
                 ],
         ];
-        $serialize =  new Serializer(['collectionEnvelope' => 'data', 'response' => $response]);
+        $serialize = new Serializer(['collectionEnvelope' => 'data', 'response' => $response]);
         $this->assertEquals($expected, $serialize->serialize($provider));
         $this->assertNotEmpty($response->getHeaders()->get(strtolower($serialize->totalCountHeader)));
         $this->assertNotEmpty($response->getHeaders()->get('link'));
@@ -85,7 +85,7 @@ class SerializerTest extends DatabaseTestCase
     {
         $response = new Response();
         $config = ['collectionEnvelope' => 'data', 'response' => $response];
-        $serialize =  new Serializer($config);
+        $serialize = new Serializer($config);
         $_GET[$serialize->fieldsParam] = 'username,email';
         $model = Users::find()->select(['id', 'username', 'email'])->one();
 
@@ -105,7 +105,7 @@ class SerializerTest extends DatabaseTestCase
         // extend
 
         $config['extend'] = ['message' => 'text...'];
-        $serialize =  new Serializer($config);
+        $serialize = new Serializer($config);
         $expected[$serialize->extendAttribute] = [
             'message' => 'text...'
         ];
@@ -124,18 +124,18 @@ class SerializerTest extends DatabaseTestCase
         $this->assertFalse($model->validate());
         $this->assertNotEmpty($model->getErrors());
         $response = new Response();
-        $serialize =  new Serializer(['collectionEnvelope' => 'data', 'response' => $response]);
+        $serialize = new Serializer(['collectionEnvelope' => 'data', 'response' => $response]);
         $expected = [
-            'email'=>'email must be valid'
+            'email' => 'email must be valid'
         ];
 
         $this->assertEquals($expected, $serialize->serialize($model));
 
         // all errors
 
-        $serialize =  new Serializer(['collectionEnvelope' => 'data', 'response' => $response, 'firstErrors' => false]);
+        $serialize = new Serializer(['collectionEnvelope' => 'data', 'response' => $response, 'firstErrors' => false]);
         $expected = [
-            'email'=> ['email must be valid']
+            'email' => ['email must be valid']
         ];
 
         $this->assertEquals($expected, $serialize->serialize($model));
@@ -152,7 +152,7 @@ class SerializerTest extends DatabaseTestCase
                 'message' => 'text...'
             ]
         ];
-        $serialize =  new Serializer($config);
+        $serialize = new Serializer($config);
 
         $expected = $data;
         $expected[$serialize->extendAttribute] = [
@@ -168,7 +168,7 @@ class SerializerTest extends DatabaseTestCase
                 'note' => 'note...'
             ]
         ];
-        $serialize =  new Serializer($config);
+        $serialize = new Serializer($config);
 
         $expected2 = $data;
         $expected2[$serialize->extendAttribute] = [

@@ -1,65 +1,69 @@
 {
-    "name": "romeoz/rock",
-    "description": "The Rock PHP framework",
-    "keywords": ["framework", "rock"],
-    "type": "library",
-    "license": "MIT",
-    "support": {
-        "email": "serggalka@gmail.com",
-        "issues": "https://github.com/romeOz/rock/issues",
-        "source": "https://github.com/romeOz/rock"
-    },
-    "authors": [
-        {
-            "name": "Ruslan",
-            "email": "serggalka@gmail.com"
-        }
-    ],
-    "require": {
-        "php": ">=5.4.0",
-        "romeoz/rock-components" : "0.11.*",
-        "romeoz/rock-di" : "0.12.*",
-        "romeoz/rock-request" : "0.11.*",
-        "romeoz/rock-url" : "0.11.*",
-        "romeoz/rock-csrf" : "0.11.*",
-        "romeoz/rock-sanitize" : "0.10.*",
-        "romeoz/rock-validate" : "0.10.*",
-        "romeoz/rock-date" : "0.10.*",
-        "romeoz/rock-i18n" : "0.10.*",
-        "romeoz/rock-access" : "0.10.*",
-        "romeoz/rock-template" : "0.12.*",
-        "romeoz/rock-widgets" : "0.11.*",
-        "romeoz/rock-behaviors" : "0.11.*",
-        "romeoz/rock-session" : "0.10.*",
-        "romeoz/rock-db" : "0.11.*",
-        "filp/whoops": "1.1.*",
-        "phpmailer/phpmailer"   : "5.2.*",
-        "monolog/monolog": "1.15.*"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "~4.7.0"
-    },
-    "suggest": {
-        "romeoz/rock-file" : "Rock File",
-        "romeoz/rock-cache" : "Rock Cache",
-        "romeoz/rock-mongodb" : "Rock MongoDB",
-        "romeoz/rock-sphinx" : "Rock Sphinx",
-        "romeoz/rock-image": "Rock Image",
-        "romeoz/rock-markdown": "Rock Markdown",
-        "romeoz/rock-mq": "Rock MQ",
-        "romeoz/rock-morphy": "Rock Morphy",
-        "tackk/cartographer": "required by SitemapResponseFormatter",
-        "mibe/feedwriter": "required by RssResponseFormatter",
-        "lusitanian/oauth" : "required by rock-authclient extension"
-    },
-    "autoload": {
-        "psr-4": {
-            "rock\\": "src/"
-        }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.0.x-dev"
-        }
+  "name": "romeoz/rock",
+  "description": "The Rock PHP framework",
+  "keywords": [
+    "framework",
+    "rock"
+  ],
+  "type": "library",
+  "license": "MIT",
+  "support": {
+    "email": "serggalka@gmail.com",
+    "issues": "https://github.com/romeOz/rock/issues",
+    "source": "https://github.com/romeOz/rock"
+  },
+  "authors": [
+    {
+      "name": "Ruslan",
+      "email": "serggalka@gmail.com"
     }
+  ],
+  "require": {
+    "php": ">=5.4.0",
+    "romeoz/rock-components": "*@dev",
+    "romeoz/rock-di": "*@dev",
+    "romeoz/rock-request": "*@dev",
+    "romeoz/rock-url": "*@dev",
+    "romeoz/rock-csrf": "*@dev",
+    "romeoz/rock-sanitize": "*@dev",
+    "romeoz/rock-validate": "*@dev",
+    "romeoz/rock-date": "*@dev",
+    "romeoz/rock-i18n": "*@dev",
+    "romeoz/rock-access": "*@dev",
+    "romeoz/rock-template": "*@dev",
+    "romeoz/rock-widgets": "*@dev",
+    "romeoz/rock-behaviors": "*@dev",
+    "romeoz/rock-session": "*@dev",
+    "romeoz/rock-db": "*@dev",
+    "romeoz/rock-dataprovider": "*@dev",
+    "filp/whoops": "1.1.*",
+    "phpmailer/phpmailer": "5.2.*",
+    "monolog/monolog": "1.15.*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~4.7.0"
+  },
+  "suggest": {
+    "romeoz/rock-file": "Rock File",
+    "romeoz/rock-cache": "Rock Cache",
+    "romeoz/rock-mongodb": "Rock MongoDB",
+    "romeoz/rock-sphinx": "Rock Sphinx",
+    "romeoz/rock-image": "Rock Image",
+    "romeoz/rock-markdown": "Rock Markdown",
+    "romeoz/rock-mq": "Rock MQ",
+    "romeoz/rock-morphy": "Rock Morphy",
+    "tackk/cartographer": "required by SitemapResponseFormatter",
+    "mibe/feedwriter": "required by RssResponseFormatter",
+    "lusitanian/oauth": "required by rock-authclient extension"
+  },
+  "autoload": {
+    "psr-4": {
+      "rock\\": "src/"
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0.x-dev"
+    }
+  }
 }

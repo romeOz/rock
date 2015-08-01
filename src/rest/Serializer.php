@@ -6,8 +6,8 @@ use rock\base\ObjectInterface;
 use rock\base\ObjectTrait;
 use rock\components\Arrayable;
 use rock\components\Model;
-use rock\db\common\ActiveDataProvider;
-use rock\db\common\PaginationProvider;
+use rock\data\ActiveDataProvider;
+use rock\data\PaginationProvider;
 use rock\helpers\ArrayHelper;
 use rock\helpers\Instance;
 use rock\helpers\Link;
@@ -21,7 +21,7 @@ use rock\response\Response;
  * so that they can be further turned into different formats, such as JSON, XML, by response formatters.
  *
  * The default implementation handles resources as {@see \rock\components\Model} objects and collections as objects
- * implementing {@see \rock\db\common\ActiveDataProvider}. You may override {@see \rock\rest\Serializer::serialize()} to handle more types.
+ * implementing {@see \rock\data\ActiveDataProvider}. You may override {@see \rock\rest\Serializer::serialize()} to handle more types.
  */
 class Serializer implements ObjectInterface
 {
@@ -120,7 +120,7 @@ class Serializer implements ObjectInterface
      * Serializes the given data into a format that can be easily turned into other formats.
      * This method mainly converts the objects of recognized types into array representation.
      * It will not do conversion for unknown object types or non-object data.
-     * The default implementation will handle {@see \rock\components\Model} and {@see \rock\db\common\ActiveDataProvider}.
+     * The default implementation will handle {@see \rock\components\Model} and {@see \rock\data\ActiveDataProvider}.
      * You may override this method to support more object types.
      * @param mixed $data the data to be serialized.
      * @return mixed the converted data.
@@ -158,7 +158,7 @@ class Serializer implements ObjectInterface
 
     /**
      * Serializes a data provider.
-     * @param ActiveDataProvider $dataProvider
+     * @param \rock\data\ActiveDataProvider $dataProvider
      * @return array the array representation of the data provider.
      */
     protected function serializeDataProvider($dataProvider)
